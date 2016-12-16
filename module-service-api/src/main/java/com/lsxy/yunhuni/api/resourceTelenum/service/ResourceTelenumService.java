@@ -41,7 +41,7 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * @param uri
      * @return
      */
-    String findNumByCallUri(String uri);
+    ResourceTelenum findNumByCallUri(String uri);
 
     /**
      * 获取分页信息
