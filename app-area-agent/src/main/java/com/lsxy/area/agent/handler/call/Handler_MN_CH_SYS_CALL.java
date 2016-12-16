@@ -6,7 +6,6 @@ import com.lsxy.app.area.cti.RpcError;
 import com.lsxy.app.area.cti.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.core.utils.MapBuilder;
-import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -15,14 +14,11 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.handler.RpcRequestHandler;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
-import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
-import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -49,25 +45,7 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-
-        for(int i=0;i<4;i++){
-            RPCRequest r = RPCRequest.unserialize("RQ:"+ UUIDGenerator.uuid()+" "+System.currentTimeMillis()+" CH_MN_CTI_EVENT begin_time=1481860550&answer_time=1481860586&from_uri=sip:system@183.63.144.42&to_uri=1000492&cause=0&call_dir=inbound&ipsc_info={process_id%3D11000015349512461}&user_data=");
-            try {
-                rpcCaller.invoke(session,r);
-            } catch (RightSessionNotFoundExcepiton rightSessionNotFoundExcepiton) {
-                rightSessionNotFoundExcepiton.printStackTrace();
-            } catch (SessionWriteException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-        if(true) return null;
-
         Commander cticlient = cticlientContext.getAvalibleClient();
-        if(cticlient == null) {
-            return null;
-        }
         try {
             Map<String, Object> params = request.getParamMap();
             String call_id = (String)params.get("user_data");
@@ -89,7 +67,7 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
                     try {
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
-                        logger.error("CTI发送事件"+Constants.EVENT_SYS_CALL_ON_START+"失败",e);
+                        logger.error("CTI发送事件%s,失败", Constants.EVENT_SYS_CALL_ON_START,e);
                     }
                 }
 
@@ -98,13 +76,13 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
                     logger.error("调用sys.call失败call_id={},result={}",call_id,rpcError);
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
-                                    .put("method", Constants.EVENT_SYS_CALL_ON_FAIL)
+                                    .put("method",Constants.EVENT_SYS_CALL_ON_FAIL)
                                     .put("user_data",call_id)
                                     .build());
                     try {
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
-                        logger.error("CTI发送事件"+Constants.EVENT_SYS_CALL_ON_FAIL+"失败",e);
+                        logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_ON_FAIL,e);
                     }
                 }
 
@@ -113,18 +91,18 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
                     logger.error("调用sys.call超时call_id={}",call_id);
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
-                                    .put("method",Constants.EVENT_SYS_CALL_ON_TIMEOUT)
+                                    .put("method", Constants.EVENT_SYS_CALL_ON_TIMEOUT)
                                     .put("user_data",call_id)
                                     .build());
                     try {
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
-                        logger.error("CTI发送事件["+Constants.EVENT_SYS_CALL_ON_TIMEOUT+"]失败",e);
+                        logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_ON_TIMEOUT,e);
                     }
                 }
             });
-        } catch (IOException e) {
-            logger.error("创建资源失败:"+request,e);
+        } catch (Throwable e) {
+            logger.error("创建资源失败",e);
         }
         return null;
     }
