@@ -3,6 +3,7 @@ package com.lsxy.area.server.service;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.lsxy.area.api.CallService;
 import com.lsxy.framework.api.test.TestService;
+import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.session.SessionContext;
@@ -86,7 +87,7 @@ public class TestServiceImpl implements TestService {
         @Override
         public void run() {
             for(int i=0;i<count;i++){
-                RPCRequest request = RPCRequest.unserialize("RQ:4bbe6d916ca4ea057808dc970b15d2a6 "+System.currentTimeMillis()+" MN_CH_SYS_CALL max_answer_seconds=21600&from_uri=system@area001.area.oneyun.com&to_uri=1000492@123.57.157.32&areaId=area001&max_ring_seconds=45&user_data=eba182f997aa287dc45ea13b709ba48b&");
+                RPCRequest request = RPCRequest.unserialize("RQ:"+ UUIDGenerator.uuid()+" "+System.currentTimeMillis()+" MN_CH_SYS_CALL max_answer_seconds=21600&from_uri=system@area001.area.oneyun.com&to_uri=1000492@123.57.157.32&areaId=area001&max_ring_seconds=45&user_data=eba182f997aa287dc45ea13b709ba48b&");
                 try {
                     rpcCaller.invoke(sessionContext, request);
                     Thread.currentThread().sleep(10);
