@@ -473,9 +473,12 @@
                 var h1="配置存储周期是否更改为："+ cycleName;
                 bootbox.confirm(h1, function(result) {
                     if(result){
-                        ajaxsync(ctx + "/console/app/edit/recording/"+appId,{csrfParameterName:csrfToken,'cycle':cycle},function(response1){
-                            console.info(response1);
-                            showtoast("");
+                        ajaxsync(ctx + "/console/app/edit/recording/"+appId,{csrfParameterName:csrfToken,'cycle':cycle},function(response){
+                            if(response.success){
+                                showtoast(response.data);
+                            }else{
+                                showtoast(response.errorMsg);
+                            }
                         },"post");
                     }
                 });
