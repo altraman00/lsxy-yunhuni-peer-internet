@@ -38,8 +38,8 @@
     </appender>
 
     <appender name="gelf" class="biz.paluch.logging.gelf.logback.GelfLogbackAppender">
-        <host>tcp:graylog.yunhuni.cn</host>
-        <port>12205</port>
+        <host>tcp:10.163.3.165</host>
+        <port>9999</port>
         <version>1.1</version>
         <facility>java-test</facility>
         <extractStackTrace>true</extractStackTrace>
@@ -61,13 +61,6 @@
             <!--<level>INFO</level>-->
         <!--</filter>-->
     </appender>
-
-
-    <root level="INFO">
-        <appender-ref ref="STDOUT" />
-        <!--<appender-ref ref="gelf" />-->
-        <!--<appender-ref ref="ROLLINGFILE"/>-->
-    </root>
 
 
     <logger name="com.lsxy" level="DEBUG" additivity="true" />

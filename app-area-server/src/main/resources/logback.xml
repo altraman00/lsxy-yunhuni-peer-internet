@@ -9,5 +9,10 @@
     <logger name="com.lsxy" level="DEBUG" additivity="true" />
     <logger name="com.lsxy.area" level="DEBUG" additivity="true" />
 
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="gelf" />
+        <appender-ref ref="ROLLINGFILE"/>
+    </root>
 
 </configuration>
