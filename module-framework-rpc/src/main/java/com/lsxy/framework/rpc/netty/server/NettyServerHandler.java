@@ -33,7 +33,7 @@ import java.util.concurrent.*;
 public class NettyServerHandler extends AbstractServerRPCHandler {
 
     // 业务逻辑线程池(业务逻辑最好跟netty io线程分开处理，线程切换虽会带来一定的性能损耗，但可以防止业务逻辑阻塞io线程)
-    private final static ExecutorService workerThreadService = newBlockingExecutorsUseCallerRun(Runtime.getRuntime().availableProcessors() * 2);
+    private final static ExecutorService workerThreadService = newBlockingExecutorsUseCallerRun(500);
 
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
