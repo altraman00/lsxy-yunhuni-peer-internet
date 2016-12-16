@@ -5,4 +5,11 @@
     <property name="systemId" value="app.opensips.proxy" />
     <include resource="logback-yunhuni.xml"/>
 
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="gelf" />
+        <!--<appender-ref ref="ROLLINGFILE"/>-->
+    </root>
+
 </configuration>
