@@ -82,7 +82,7 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
 //            }
             final RPCMessage rpcMessage = RPCMessage.unserialize(msg);
             if(logger.isDebugEnabled()){
-                logger.debug("收到消息耗时:{} ms  [{}]",(System.currentTimeMillis() - rpcMessage.getTimestamp()),msg);
+                logger.debug("收到消息耗时:{} ms  [{}]",(System.currentTimeMillis() - rpcMessage.getTimestamp()),rpcMessage.getSessionid());
             }
             workerThreadService.execute(new Runnable() {
                 @Override
