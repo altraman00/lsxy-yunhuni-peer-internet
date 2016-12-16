@@ -25,6 +25,7 @@ public class Handler_CH_MN_CTI_EVENT extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
+        if(true) return null;
         return eventManager.fire(request,session);
     }
 
