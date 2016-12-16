@@ -13,5 +13,5 @@ public interface TestService {
      * 压力测试使用
      * @param threads
      */
-    public void testPresure(int threads);
+    public void testPresure(int threads,int count);
 }

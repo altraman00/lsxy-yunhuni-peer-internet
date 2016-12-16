@@ -46,7 +46,7 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        if(false) return null;
+        if(true) return null;
 
         Commander cticlient = cticlientContext.getAvalibleClient();
         if(cticlient == null) {
