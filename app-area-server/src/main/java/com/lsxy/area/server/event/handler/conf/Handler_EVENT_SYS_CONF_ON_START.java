@@ -118,7 +118,7 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         String initiator = conversationService.getInitiator(conversationId);
         if(initiator != null){
             try {
-                conversationService.join(appId,conversationId,initiator,null,null,null);
+                conversationService.join(conversationId,initiator,null,null,null);
             } catch (YunhuniApiException e) {
                 e.printStackTrace();
             }

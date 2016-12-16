@@ -5,7 +5,11 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
+import com.lsxy.yunhuni.api.config.service.LineGatewayService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
@@ -17,6 +21,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by zhangxb on 2016/10/29.
@@ -32,6 +40,8 @@ public class ResourcesRentController extends AbstractRestController {
     ResourceTelenumService resourceTelenumService;
     @Autowired
     TenantService tenantService;
+    @Autowired
+    LineGatewayService lineGatewayService;
     /**
      * 获取租户的呼入号码分页数据
      * @param pageNo
@@ -50,6 +60,26 @@ public class ResourcesRentController extends AbstractRestController {
         }
         //获取该租户下的所有号码信息
         Page<ResourcesRent> page = resourcesRentService.pageListByTenantId(tenant.getId(),pageNo,pageSize);
+        List<ResourcesRent> result = page.getResult();
+        Set<String> lineIds = new HashSet<>();
+        for(ResourcesRent rent:result){
+            String lineId = rent.getResourceTelenum().getLineId();
+            if(StringUtil.isNotBlank(lineId)){
+                lineIds.add(lineId);
+            }
+        }
+        List<LineGateway> lines = lineGatewayService.findByIds(lineIds);
+        for(ResourcesRent rent:result){
+            ResourceTelenum resourceTelenum = rent.getResourceTelenum();
+            if(resourceTelenum != null){
+                for(LineGateway lg:lines){
+                    if(lg.getId().equals(resourceTelenum.getLineId())){
+                        resourceTelenum.setLine(lg);
+                        break;
+                    }
+                }
+            }
+        }
         return RestResponse.success(page);
     }
 //    @ApiOperation(value = "号码列表")

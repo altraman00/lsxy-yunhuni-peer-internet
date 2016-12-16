@@ -17,6 +17,8 @@ import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
+import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.agentserver.EnterConversationEvent;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
@@ -32,9 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by liuws on 2016/11/18.
@@ -96,6 +96,9 @@ public class ConversationService {
 
     @Autowired
     private CallCenterUtil callCenterUtil;
+
+    @Autowired
+    private MQService mqService;
 
     @Value(value = "${app.cc.opensips.ip}")
     private String sip_address;
@@ -195,13 +198,13 @@ public class ConversationService {
      * @throws YunhuniApiException
      */
     public String create(String id,String initiator,String tenantId,String appId, String areaId,String callBackUrl, Integer maxDuration) throws YunhuniApiException {
-        if(maxDuration!=null && maxDuration > MAX_DURATION){
+        if(maxDuration == null || maxDuration > MAX_DURATION){
             maxDuration = MAX_DURATION;
         }
         Map<String, Object> map = new MapBuilder<String,Object>()
                 .putIfNotEmpty("user_data",id)
                 //.putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(tenantId, appId))
-                .put("max_seconds",maxDuration,MAX_DURATION)
+                .put("max_seconds",maxDuration)
                 .putIfNotEmpty("areaId",areaId)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF, map);
@@ -221,7 +224,7 @@ public class ConversationService {
                 .setBusinessData(new MapBuilder<String,String>()
                         .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,initiator)//交谈发起者的callid
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(initiator))
-                        .put("max_seconds",maxDuration!=null?maxDuration.toString():null,""+MAX_DURATION)//交谈最大持续时长
+                        .putIfNotEmpty("max_seconds",maxDuration.toString())//交谈最大持续时长
                         .build())
                 .build();
         businessStateService.save(state);
@@ -318,7 +321,7 @@ public class ConversationService {
                 .put("max_answer_seconds",maxDuration, IVRActionService.MAX_DURATION_SEC)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
-                .put("areaId ",areaId)
+                .put("areaId",areaId)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
         try {
@@ -392,7 +395,7 @@ public class ConversationService {
                 .put("max_answer_seconds",maxDuration, IVRActionService.MAX_DURATION_SEC)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
-                .put("areaId ",areaId)
+                .put("areaId",areaId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
@@ -428,12 +431,11 @@ public class ConversationService {
     /**
      * 加入交谈
      */
-    public boolean join(String appId, String conversationId, String callId, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException{
+    public boolean join(String conversationId, String callId, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException{
 
         if(this.outOfParts(conversationId)){
             throw new OutOfConversationMaxPartsException();
         }
-
         return this.enter(callId,conversationId,maxDuration,playFile,voiceMode);
     }
 
@@ -452,6 +454,15 @@ public class ConversationService {
 
         if(call_state.getClosed()!= null && call_state.getClosed()){
             throw new SystemBusyException();
+        }
+
+        if(conversation_state != null &&
+                conversation_state.getResId() == null &&
+                (conversation_state.getClosed() == null ||
+                        !conversation_state.getClosed())){
+            logger.info("交谈={}尚未初始化完成，callid={}",conversation_id,call_id);
+            mqService.publish(new EnterConversationEvent(call_id,conversation_id,maxDuration,playFile,voiceMode));
+            return false;
         }
 
         if(conversation_state == null || conversation_state.getResId() == null){
@@ -504,10 +515,14 @@ public class ConversationService {
         } catch (Exception e) {
             throw new InvokeCallException(e);
         }
+        List<String> innerFields = new ArrayList<>();
         if(call_business.get(CallCenterUtil.CONVERSATION_FIELD) == null){
-            businessStateService.updateInnerField(call_id,CallCenterUtil.CONVERSATION_FIELD,conversation_id);
+            innerFields.add(CallCenterUtil.CONVERSATION_FIELD);
+            innerFields.add(conversation_id);
         }
-        businessStateService.updateInnerField(call_id,CallCenterUtil.PARTNER_VOICE_MODE_FIELD,voice_mode.toString());
+        innerFields.add(CallCenterUtil.PARTNER_VOICE_MODE_FIELD);
+        innerFields.add(voice_mode.toString());
+        businessStateService.updateInnerField(call_id,innerFields);
         if(logger.isDebugEnabled()){
             logger.debug("完成呼叫加入交谈call_id={},conversation_id={},maxDuration={},playFile={},voiceMode={}",
                     call_id,conversation_id,maxDuration,playFile,voice_mode);

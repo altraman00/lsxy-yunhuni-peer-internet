@@ -320,4 +320,9 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
         }
         return list;
     }
+
+    @Override
+    public List<Tenant> findByIds(Collection<String> ids) {
+        return tenantDao.findByIdIn(ids);
+    }
 }

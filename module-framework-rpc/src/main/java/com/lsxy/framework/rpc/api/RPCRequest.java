@@ -19,14 +19,17 @@ public class RPCRequest extends  RPCMessage{
 
 	private static final String EQ = "=";
 	private static final String AND = "&";
+	private static final String SPACE = " ";
 	private static final String EQ_ENCODE = "%3D";
 	private static final String AND_ENCODE = "%26";
+	private static final String SPACE_ENCODE = "%20";
 
 	private final static Pattern eq_pattern = Pattern.compile(EQ);
 	private final static Pattern and_pattern = Pattern.compile(AND);
+	private final static Pattern space_pattern = Pattern.compile(SPACE);
 	private final static Pattern eqencode_pattern = Pattern.compile(EQ_ENCODE);
 	private final static Pattern andencode_pattern = Pattern.compile(AND_ENCODE);
-
+	private final static Pattern spaceencode_pattern = Pattern.compile(SPACE_ENCODE);
 	private String name;		//RQ
 	private String param;		//PM
 
@@ -162,6 +165,9 @@ public class RPCRequest extends  RPCMessage{
 		if(value.indexOf(AND) > -1){
 			value = and_pattern.matcher(value).replaceAll(AND_ENCODE);
 		}
+		if(value.indexOf(SPACE) > -1){
+			value = space_pattern.matcher(value).replaceAll(SPACE_ENCODE);
+		}
 		return value;
 	}
 
@@ -174,6 +180,9 @@ public class RPCRequest extends  RPCMessage{
 		}
 		if(value.indexOf(AND_ENCODE) > -1){
 			value = andencode_pattern.matcher(value).replaceAll(AND);
+		}
+		if(value.indexOf(SPACE_ENCODE) > -1){
+			value = spaceencode_pattern.matcher(value).replaceAll(SPACE);
 		}
 		return value;
 	}
