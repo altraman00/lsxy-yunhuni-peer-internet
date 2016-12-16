@@ -65,7 +65,7 @@ public abstract class AbstractClient implements Client{
             } catch (ClientBindException e) {
                 logger.error("客户端连接失败:{}   {}",serverUrl,e.getMessage());
             }
-//            executorService.submit(task);
+            executorService.submit(task);
         }
     }
 
