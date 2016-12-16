@@ -169,13 +169,8 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     }
 
     @Override
-    public String findNumByCallUri(String uri) {
-        ResourceTelenum telenum = resourceTelenumDao.findByCallUri(uri);
-        if(telenum != null && ResourceTelenum.USABLE_TRUE.equals(telenum.getUsable())){
-            return telenum.getTelNumber();
-        }else{
-            return null;
-        }
+    public ResourceTelenum findNumByCallUri(String uri) {
+        return resourceTelenumDao.findByCallUri(uri);
     }
 
 

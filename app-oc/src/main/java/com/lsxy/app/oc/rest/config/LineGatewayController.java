@@ -478,8 +478,8 @@ public class LineGatewayController extends AbstractRestController {
         if(StringUtils.isEmpty(telnumVo.getCallUri())){
             return RestResponse.failed("0000","呼出URI不能为空");
         }
-        String temp2 = resourceTelenumService.findNumByCallUri(telnumVo.getCallUri());
-        if(StringUtils.isNotEmpty(temp2)){
+        ResourceTelenum temp2 = resourceTelenumService.findNumByCallUri(telnumVo.getCallUri());
+        if(temp2 != null){
             return RestResponse.failed("0000","该呼出URI已存在号码池中");
         }
         //先获取线路对象
@@ -593,8 +593,8 @@ public class LineGatewayController extends AbstractRestController {
                             reason = "该号码已存在号码池中";
                             break;
                         }
-                        String temp2 = resourceTelenumService.findNumByCallUri(callUri);
-                        if(StringUtils.isNotEmpty(temp2)){
+                        ResourceTelenum temp2 = resourceTelenumService.findNumByCallUri(callUri);
+                        if(temp2 != null){
                             reason = "该呼出URI已存在号码池中";
                             break;
                         }

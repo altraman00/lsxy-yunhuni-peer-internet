@@ -131,8 +131,8 @@ public class ResourceTelenumController extends AbstractRestController {
             isEditNum = true;
         }
         if(StringUtils.isNotEmpty(telnumTVo.getCallUri())&&!resourceTelenum.getCallUri().equals(telnumTVo.getCallUri())) {
-            String temp2 = resourceTelenumService.findNumByCallUri(telnumTVo.getCallUri());
-            if (StringUtils.isNotEmpty(temp2)) {
+            ResourceTelenum temp2 = resourceTelenumService.findNumByCallUri(telnumTVo.getCallUri());
+            if (temp2 != null) {
                 return RestResponse.failed("0000", "该呼出URI已存在号码池中");
             }
         }
@@ -203,8 +203,8 @@ public class ResourceTelenumController extends AbstractRestController {
         if(temp!=null){
             return RestResponse.failed("0000", "该号码已存在号码池中");
         }
-        String temp2 = resourceTelenumService.findNumByCallUri(telnumTVo.getCallUri());
-        if(StringUtils.isNotEmpty(temp2)){
+        ResourceTelenum temp2 = resourceTelenumService.findNumByCallUri(telnumTVo.getCallUri());
+        if(temp2 != null){
             return RestResponse.failed("0000", "该呼出URI已存在号码池中");
         }
         //如果有选择线路，则检验线路是否存在
