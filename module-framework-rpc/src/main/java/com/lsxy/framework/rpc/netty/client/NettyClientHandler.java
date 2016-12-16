@@ -3,7 +3,6 @@ package com.lsxy.framework.rpc.netty.client;
 import com.lsxy.framework.rpc.api.RPCMessage;
 import com.lsxy.framework.rpc.api.client.AbstractClientRPCHandler;
 import com.lsxy.framework.rpc.api.session.Session;
-import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -28,7 +27,7 @@ public class NettyClientHandler extends AbstractClientRPCHandler {
 
 
     // 业务逻辑线程池(业务逻辑最好跟netty io线程分开处理，线程切换虽会带来一定的性能损耗，但可以防止业务逻辑阻塞io线程)
-    private final static ExecutorService workerThreadService = newBlockingExecutorsUseCallerRun(500);
+//    private final static ExecutorService workerThreadService = newBlockingExecutorsUseCallerRun(500);
 
     private IOHandler ioHandler = new IOHandler();
 
@@ -56,16 +55,16 @@ public class NettyClientHandler extends AbstractClientRPCHandler {
                 logger.info("收到消息[" + msg + "]耗时:" + (System.currentTimeMillis() - rpcMessage.getTimestamp()) + "ms");
             }
 
-            workerThreadService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
+//            workerThreadService.execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    try {
                         process(ctx, rpcMessage);
-                    } catch (SessionWriteException e) {
-                        logger.error("处理RPC消息异常:"+rpcMessage,e);
-                    }
-                }
-            });
+//                    } catch (SessionWriteException e) {
+//                        logger.error("处理RPC消息异常:"+rpcMessage,e);
+//                    }
+//                }
+//            });
         }
 
         @Override
