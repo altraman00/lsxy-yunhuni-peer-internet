@@ -6,6 +6,7 @@ import com.lsxy.app.area.cti.RpcError;
 import com.lsxy.app.area.cti.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -14,6 +15,8 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.handler.RpcRequestHandler;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
+import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
+import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +49,19 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
+
+        for(int i=0;i<4;i++){
+            RPCRequest r = RPCRequest.unserialize("RQ:"+ UUIDGenerator.uuid()+" "+System.currentTimeMillis()+" CH_MN_CTI_EVENT begin_time=1481860550&answer_time=1481860586&from_uri=sip:system@183.63.144.42&to_uri=1000492&cause=0&call_dir=inbound&ipsc_info={process_id%3D11000015349512461}&user_data=");
+            try {
+                rpcCaller.invoke(session,r);
+            } catch (RightSessionNotFoundExcepiton rightSessionNotFoundExcepiton) {
+                rightSessionNotFoundExcepiton.printStackTrace();
+            } catch (SessionWriteException e) {
+                e.printStackTrace();
+            }
+        }
+
+
         if(true) return null;
 
         Commander cticlient = cticlientContext.getAvalibleClient();
