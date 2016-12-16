@@ -85,7 +85,7 @@ public class TestController {
     @RequestMapping("/test/call/presure/{threads}/{count}")
     public RestResponse<String> doCallPressureTest(@PathVariable int threads,@PathVariable  int count){
         ExecutorService es = Executors.newFixedThreadPool(threads);
-        testService.testPresure(10);
+        testService.testPresure(threads);
 //        long starttime = System.currentTimeMillis();
 //        long result = 0L;
 //        for(int i=0;i<threads;i++){
