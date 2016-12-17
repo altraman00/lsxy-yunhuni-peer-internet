@@ -44,4 +44,6 @@ public interface CallCenterService  extends BaseService<CallCenter> {
      * @return
      */
     Map sum(String tenantId, String appId, String startTime, String endTime, String type,String callnum, String agent);
+
+    void incrCost(String callCenterId, double cost);
 }

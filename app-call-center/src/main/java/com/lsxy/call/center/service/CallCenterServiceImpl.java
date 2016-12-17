@@ -113,4 +113,11 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
         Map result = this.jdbcTemplate.queryForMap(sql);
         return result;
     }
+
+    @Override
+    public void incrCost(String callCenterId, double cost) {
+        if(callCenterId != null && cost > 0){
+            callCenterDao.incrCost(callCenterId,cost);
+        }
+    }
 }

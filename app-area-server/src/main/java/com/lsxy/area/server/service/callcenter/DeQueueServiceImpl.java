@@ -126,7 +126,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         setAgentState(agentCallId,enQueue,result);
 
         //更新排队结果
-        updateQueue(queueId,callId,conversation,result.getAgent().getId(),agentCallId,CallCenterQueue.RESULT_SELETEED);
+        updateQueue(queueId,callId,conversation,result.getAgent().getName(),agentCallId,CallCenterQueue.RESULT_SELETEED);
 
         try{
             //更新呼叫中心统计数据
@@ -231,12 +231,12 @@ public class DeQueueServiceImpl implements DeQueueService {
      * @param id
      * @param callId
      * @param conversationId
-     * @param agentId
+     * @param agentName
      * @param agentCallId
      * @param result
      */
     private void updateQueue(String id,String callId,String conversationId,
-                             String agentId,String agentCallId,String result){
+                             String agentName,String agentCallId,String result){
         //更新排队记录
         try{
             if(id == null){
@@ -251,8 +251,8 @@ public class DeQueueServiceImpl implements DeQueueService {
             if(conversationId != null){
                 callCenterQueue.setConversation(conversationId);
             }
-            if(agentId != null){
-                callCenterQueue.setAgent(agentId);
+            if(agentName != null){
+                callCenterQueue.setAgent(agentName);
             }
             if(agentCallId != null){
                 callCenterQueue.setAgentCallId(agentCallId);

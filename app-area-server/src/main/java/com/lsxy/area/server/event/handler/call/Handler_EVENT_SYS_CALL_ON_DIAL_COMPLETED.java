@@ -322,7 +322,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                     callCenter.setToManualTime(toManualTime.toString());
                                 }
                                 callCenter.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_SUCESS);
-                                callCenter.setAgent(agentId);
+                                callCenter.setAgent(businessData.get(CallCenterUtil.AGENT_NAME_FIELD));
                                 callCenterService.save(callCenter);
                             }
                         }catch (Throwable t){
