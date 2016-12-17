@@ -115,11 +115,24 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             voiceCdr.setIvrType(2);
         }
 
+        if(logger.isDebugEnabled()){
+            logger.info("[{}][{}][{}]设置cdr的呼入呼出类型,isCallCenter={}",
+                    businessState.getTenantId(),businessState.getAppId(),call_id,productCode == ProductCode.call_center);
+        }
+
         if(productCode == ProductCode.call_center){
             String callCenterId = conversationService.getCallCenter(businessState);
+            if(logger.isDebugEnabled()){
+                logger.info("[{}][{}][{}]设置cdr的呼入呼出类型,callCenterId={}",
+                        businessState.getTenantId(),businessState.getAppId(),call_id,callCenterId);
+            }
             if(callCenterId != null){
                 try{
                     CallCenter callCenter = callCenterService.findById(callCenterId);
+                    if(logger.isDebugEnabled()){
+                        logger.info("[{}][{}][{}]设置cdr的呼入呼出类型,callCenter={}",
+                                businessState.getTenantId(),businessState.getAppId(),call_id,callCenter);
+                    }
                     if(callCenter != null && callCenter.getType()!= null){
                         voiceCdr.setIvrType(Integer.parseInt(callCenter.getType()));
                     }
