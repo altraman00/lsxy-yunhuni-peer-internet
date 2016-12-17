@@ -319,7 +319,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                 if(callCenter.getStartTime() != null){
                                     Long toManualTime = (callCenter.getAnswerTime().getTime()
                                             - callCenter.getStartTime().getTime()) / 1000;
-                                    callCenter.setToManualTime(toManualTime.toString());
+                                    callCenter.setToManualTime(toManualTime);
                                 }
                                 callCenter.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_SUCESS);
                                 callCenter.setAgent(businessData.get(CallCenterUtil.AGENT_NAME_FIELD));

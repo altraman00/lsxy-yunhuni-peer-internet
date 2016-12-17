@@ -45,7 +45,7 @@ public class CallCenter extends IdEntity {
     @Column( name = "cost")
     private BigDecimal cost;//费用
     @Column( name = "to_manual_time")
-    private String toManualTime;//转人工时间
+    private Long toManualTime;//转人工时间
     @Column( name = "to_manual_result")
     private String toManualResult;//转接结果
     @Column( name = "agent")
@@ -133,11 +133,11 @@ public class CallCenter extends IdEntity {
         this.cost = cost;
     }
 
-    public String getToManualTime() {
+    public Long getToManualTime() {
         return toManualTime;
     }
 
-    public void setToManualTime(String toManualTime) {
+    public void setToManualTime(Long toManualTime) {
         this.toManualTime = toManualTime;
     }
 
