@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -115,8 +116,8 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
     }
 
     @Override
-    public void incrCost(String callCenterId, double cost) {
-        if(callCenterId != null && cost > 0){
+    public void incrCost(String callCenterId, BigDecimal cost) {
+        if(callCenterId != null && cost.compareTo(BigDecimal.ZERO) == 1){
             callCenterDao.incrCost(callCenterId,cost);
         }
     }

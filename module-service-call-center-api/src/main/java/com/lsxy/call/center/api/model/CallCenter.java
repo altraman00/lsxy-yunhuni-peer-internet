@@ -6,6 +6,7 @@ import org.hibernate.annotations.Where;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -42,7 +43,7 @@ public class CallCenter extends IdEntity {
     @Column( name = "type")
     private String type;//1:呼入2:呼出
     @Column( name = "cost")
-    private String cost;//费用
+    private BigDecimal cost;//费用
     @Column( name = "to_manual_time")
     private String toManualTime;//转人工时间
     @Column( name = "to_manual_result")
@@ -124,11 +125,11 @@ public class CallCenter extends IdEntity {
         this.type = type;
     }
 
-    public String getCost() {
+    public BigDecimal getCost() {
         return cost;
     }
 
-    public void setCost(String cost) {
+    public void setCost(BigDecimal cost) {
         this.cost = cost;
     }
 
