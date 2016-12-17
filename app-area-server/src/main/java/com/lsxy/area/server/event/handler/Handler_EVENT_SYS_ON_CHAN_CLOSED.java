@@ -142,6 +142,14 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         //扣费
         if(voiceCdr.getCallAckDt() != null){
             calCostService.callConsume(voiceCdr);
+            if(productCode == ProductCode.call_center){
+                if(voiceCdr.getCost() != null && voiceCdr.getCost().doubleValue() > 0){
+                    String callCenterId = conversationService.getCallCenter(businessState);
+                    if(callCenterId != null){
+                        callCenterService.incrCost(callCenterId,voiceCdr.getCost().doubleValue());
+                    }
+                }
+            }
         }else{
             voiceCdr.setCostTimeLong(0L);
             voiceCdr.setCost(BigDecimal.ZERO);
