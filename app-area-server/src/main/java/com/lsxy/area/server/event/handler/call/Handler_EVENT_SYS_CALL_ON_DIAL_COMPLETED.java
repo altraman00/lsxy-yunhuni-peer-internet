@@ -318,8 +318,8 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                 callCenter = callCenterService.findById(conversationService.getCallCenter(state));
                             }
                             if(logger.isDebugEnabled()){
-                                logger.info("[{}][{}][{}]更新CallCenter,callCenter={}",
-                                        state.getTenantId(),state.getAppId(),call_id,callCenter);
+                                logger.info("[{}][{}][{}]更新CallCenter,callCenter={},state={}",
+                                        state.getTenantId(),state.getAppId(),call_id,callCenter,state);
                             }
                             if(callCenter != null){
                                 callCenter.setAnswerTime(new Date());
