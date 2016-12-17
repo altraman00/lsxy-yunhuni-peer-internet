@@ -23,7 +23,7 @@ fi
 #是否需要在最后TAIL LOG
 TAIL_LOG=false
 DEPLOY_PACKAGE="jar"
-JAVA_OPTS="-Xms1024m -Xmx1024m"
+JAVA_OPTS="-Xms512m -Xmx512m"
 
 while getopts "A:P:H:M:O:B:STLD" opt; do
   case $opt in
