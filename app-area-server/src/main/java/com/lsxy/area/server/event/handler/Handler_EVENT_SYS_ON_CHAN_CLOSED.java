@@ -143,10 +143,10 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         if(voiceCdr.getCallAckDt() != null){
             calCostService.callConsume(voiceCdr);
             if(productCode == ProductCode.call_center){
-                if(voiceCdr.getCost() != null && voiceCdr.getCost().doubleValue() > 0){
+                if(voiceCdr.getCost() != null && voiceCdr.getCost().compareTo(BigDecimal.ZERO) == 1){
                     String callCenterId = conversationService.getCallCenter(businessState);
                     if(callCenterId != null){
-                        callCenterService.incrCost(callCenterId,voiceCdr.getCost().doubleValue());
+                        callCenterService.incrCost(callCenterId,voiceCdr.getCost());
                     }
                 }
             }

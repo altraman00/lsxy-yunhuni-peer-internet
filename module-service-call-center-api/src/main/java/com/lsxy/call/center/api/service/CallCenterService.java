@@ -4,6 +4,7 @@ import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.core.utils.Page;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -45,5 +46,5 @@ public interface CallCenterService  extends BaseService<CallCenter> {
      */
     Map sum(String tenantId, String appId, String startTime, String endTime, String type,String callnum, String agent);
 
-    void incrCost(String callCenterId, double cost);
+    void incrCost(String callCenterId, BigDecimal cost);
 }
