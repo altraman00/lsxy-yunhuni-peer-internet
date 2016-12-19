@@ -2,9 +2,12 @@ package com.lsxy.app.oc.rest.config;
 
 import com.lsxy.app.oc.base.AbstractRestController;
 import com.lsxy.app.oc.rest.config.vo.*;
+import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.config.model.Area;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
@@ -30,9 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,6 +59,9 @@ public class LineGatewayController extends AbstractRestController {
     AreaService areaService;
     @Autowired
     LineGatewayToTenantService lineGatewayToTenantService;
+    @Autowired
+    TenantService tenantService;
+
     @RequestMapping(value = "/list",method = RequestMethod.GET)
     @ApiOperation(value = "获取全部数据")
     public RestResponse pList(){
@@ -258,21 +262,38 @@ public class LineGatewayController extends AbstractRestController {
                 return RestResponse.failed("0000", "号码属性类型错误");
             }
         }
-        Page page = telnumToLineGatewayService.getPage(pageNo,pageSize,id,number,isDialing,isCalled,isThrough);
-        List<TelnumToLineGatewayVo> list = new ArrayList();
-        for(int i=0;i<page.getResult().size();i++){
-            TelnumToLineGatewayVo temp = new TelnumToLineGatewayVo();
-            try {
-                BeanUtils.copyProperties(temp,page.getResult().get(i));
-            } catch (Exception e) {
-
+        Page<TelnumToLineGateway> page = telnumToLineGatewayService.getPage(pageNo,pageSize,id,number,isDialing,isCalled,isThrough);
+        Set<String> telNumbers = new HashSet<>();
+        for(TelnumToLineGateway ttg:page.getResult()){
+            if(StringUtil.isNotBlank(ttg.getTelNumber())){
+                telNumbers.add(ttg.getTelNumber());
             }
-            ResourceTelenum r1 = resourceTelenumService.findByTelNumber(temp.getTelNumber());
-            temp.setResourceTelenum(r1);
-            list.add(temp);
         }
-        Page p1 = new Page(page.getStartIndex(),page.getTotalCount(),page.getPageSize(),list);
-        return RestResponse.success(p1);
+        List<ResourceTelenum> resourceTelenums = resourceTelenumService.findByTelNumbers(telNumbers);
+        Set<String> tenantIds = new HashSet<>();
+        for(ResourceTelenum resourceTelenum:resourceTelenums){
+            if(StringUtil.isNotBlank(resourceTelenum.getTenantId())){
+                tenantIds.add(resourceTelenum.getTenantId());
+            }
+        }
+        //获取绑定租户
+        List<Tenant> tenants = tenantService.findByIds(tenantIds);
+        for(ResourceTelenum telenum:resourceTelenums){
+            for(Tenant tenant:tenants){
+                if(tenant.getId().equals(telenum.getTenantId())){
+                    telenum.setTenant(tenant);
+                    break;
+                }
+            }
+        }
+        for(TelnumToLineGateway ttg:page.getResult()){
+            for(ResourceTelenum num:resourceTelenums){
+                if(num.getTelNumber().equals(ttg.getTelNumber())){
+                    ttg.setResourceTelenum(num);
+                }
+            }
+        }
+        return RestResponse.success(page);
     }
 
 
@@ -457,8 +478,8 @@ public class LineGatewayController extends AbstractRestController {
         if(StringUtils.isEmpty(telnumVo.getCallUri())){
             return RestResponse.failed("0000","呼出URI不能为空");
         }
-        String temp2 = resourceTelenumService.findNumByCallUri(telnumVo.getCallUri());
-        if(StringUtils.isNotEmpty(temp2)){
+        ResourceTelenum temp2 = resourceTelenumService.findNumByCallUri(telnumVo.getCallUri());
+        if(temp2 != null){
             return RestResponse.failed("0000","该呼出URI已存在号码池中");
         }
         //先获取线路对象
@@ -572,8 +593,8 @@ public class LineGatewayController extends AbstractRestController {
                             reason = "该号码已存在号码池中";
                             break;
                         }
-                        String temp2 = resourceTelenumService.findNumByCallUri(callUri);
-                        if(StringUtils.isNotEmpty(temp2)){
+                        ResourceTelenum temp2 = resourceTelenumService.findNumByCallUri(callUri);
+                        if(temp2 != null){
                             reason = "该呼出URI已存在号码池中";
                             break;
                         }

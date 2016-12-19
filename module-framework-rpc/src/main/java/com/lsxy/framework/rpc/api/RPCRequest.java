@@ -221,7 +221,7 @@ public class RPCRequest extends  RPCMessage{
 	}
 
 	public static void main(String[] args) {
-		String value = "RQ:12341234123412341234123412341234 1481705348021 SDFSDFSDF_SDFSDF value1=哈哈哈";
+		String value = "RQ:810724b022c4800013339b20a0fc37b8 1481804145625 MN_CH_SYS_CALL max_answer_seconds=30&from_uri=02066304057&to_uri=02066304058@192.168.22.10&areaId =area001&max_ring_seconds=45&user_data=8a2d9fed590267f001590268e3900000&";
 //		Pattern pt = Pattern.compile("RQ:\\w[32]\\s\\w+\\s.*");
 		System.out.println(value.matches("RQ:\\w{32}\\s\\d{13}+\\s\\w+\\s.*"));
 		String[] parts = value.split(" ");
@@ -236,6 +236,9 @@ public class RPCRequest extends  RPCMessage{
 		System.out.println(sessionid);
 		System.out.println(name);
 		System.out.println(System.currentTimeMillis());
+
+		RPCRequest request = RPCRequest.unserialize(value);
+		System.out.println(request.getParam());
 
 	}
 }

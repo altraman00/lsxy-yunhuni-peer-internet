@@ -3,15 +3,12 @@ package com.lsxy.app.portal.rest.number;
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.api.billing.model.Billing;
 import com.lsxy.framework.api.billing.service.CalBillingService;
+import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.model.Tenant;
-import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
-import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
-import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
-import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
@@ -120,7 +117,8 @@ public class ResourcesRentController extends AbstractRestController{
      */
     @RequestMapping("/telnum/plist" )
     public RestResponse telnumPlist(Integer pageNo,Integer pageSize,String telnum,String type,String areaCode,String order) {
-        Page page = resourceTelenumService.getPageByFreeNumber(pageNo,pageSize,telnum,type,areaCode,order);
+        Account currentAccount = this.getCurrentAccount();
+        Page page = resourceTelenumService.getFreeNumberPage( currentAccount.getTenant().getId(),pageNo,pageSize,telnum,type,areaCode,order);
         return RestResponse.success(page);
     }
 

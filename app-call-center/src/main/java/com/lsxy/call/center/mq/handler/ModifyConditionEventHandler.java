@@ -103,7 +103,7 @@ public class ModifyConditionEventHandler implements MQMessageHandler<ModifyCondi
     */
     public void init(String agentId,Condition condition){
         try{
-            List<AgentSkill> skills = agentSkillService.findByAgent(condition.getTenantId(),condition.getAppId(),agentId);
+            List<AgentSkill> skills = agentSkillService.findEnabledByAgent(agentId);
             Map<String,Integer> vars = new HashMap<>();
             for (AgentSkill skill:skills) {
                 vars.put(skill.getName(),skill.getScore());

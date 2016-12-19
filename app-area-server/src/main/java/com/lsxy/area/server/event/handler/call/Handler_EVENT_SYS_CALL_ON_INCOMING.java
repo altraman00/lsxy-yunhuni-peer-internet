@@ -16,7 +16,7 @@ import com.lsxy.yunhuni.api.app.service.ServiceType;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
-import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
@@ -91,12 +91,12 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         String from_uri = (String)params.get("from_uri");//主叫sip地址
         String to_uri = (String)params.get("to_uri");//被叫号码sip地址
         String begin_time = (String)params.get("begin_time");
-        String to = resourceTelenumService.findNumByCallUri(to_uri);//被叫号码
+        ResourceTelenum to = resourceTelenumService.findNumByCallUri(to_uri);//被叫号码
         if(to ==null){
             logger.info("被叫号码不存在{}",request);
             return null;
         }
-        LineGateway calledLine = telnumToLineGatewayService.getCalledLineByNumber(to);
+        LineGateway calledLine = telnumToLineGatewayService.getCalledLineByNumber(to.getTelNumber());
         if(calledLine == null){
             logger.info("线路不存在{}",request);
             return null;
@@ -106,11 +106,11 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         Tenant tenant = null;
         App app = null;
 
-        if(testNum.equals(to)){
+        if(testNum.equals(to.getTelNumber())){
             //被叫是公共测试号,根据主叫号查出应用
             TestNumBind testNumBind = testNumBindService.findByNumber(from);
             if(testNumBind == null){
-                logger.error("公共测试号={}找不到对应的app，from={}",to,from);
+                logger.error("公共测试号={}找不到对应的app，from={}",testNum,from);
                 return res;
             }
             tenant = testNumBind.getTenant();
@@ -122,13 +122,12 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             }
         }else{
             //不是公共测试号，从号码资源池中查出被叫号码的应用
-            ResourcesRent rent = resourcesRentService.findByResDataAndRentStatus(to, ResourcesRent.RENT_STATUS_USING);
-            if(rent == null){
+            app = appService.findById(to.getAppId());
+            if(app == null){
                 logger.error("号码资源池中找不到被叫号码对应的应用：{}",params);
                 return res;
             }
-            tenant = rent.getTenant();
-            app = rent.getApp();
+            tenant = app.getTenant();
             if(app!= null && app.getStatus() == null || app.getStatus() == App.STATUS_OFFLINE){
                 logger.error("应用未上线");
                 return res;
@@ -159,7 +158,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             logger.debug("[{}][{}]开始处理ivr",tenant.getId(),app.getId());
         }
         logger.info("incoming找号码耗时:{}",(System.currentTimeMillis() - start));
-        ivrActionService.doActionIfAccept(app,tenant,res_id,from,to,calledLine.getId(),isCallCenter);
+        ivrActionService.doActionIfAccept(app,tenant,res_id,from,to.getTelNumber(),calledLine.getId(),isCallCenter);
         return res;
     }
 

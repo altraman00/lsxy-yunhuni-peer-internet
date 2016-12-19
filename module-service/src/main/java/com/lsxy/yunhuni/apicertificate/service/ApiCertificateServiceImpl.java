@@ -12,6 +12,10 @@ import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.exceptions.SkChangeCountLimitException;
 import com.lsxy.yunhuni.apicertificate.dao.ApiCertificateDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -60,9 +64,13 @@ public class ApiCertificateServiceImpl extends AbstractService<ApiCertificate> i
         }
     }
 
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "entity", key = "'entity_cert_' + #cert.certId", beforeInvocation = true)
+            }
+    )
     @Override
-    public String changeSecretKeyByUserName(String userName) throws MatchMutiEntitiesException {
-        ApiCertificate cert = findApiCertificateByUserName(userName);
+    public String changeSecretKey(ApiCertificate cert) throws MatchMutiEntitiesException {
         Long count = apiCertificateChangeLogService.countTodayCertChangeLogByCert(cert);
         if(count < SK_CHANGE_COUNT_OF_DAY){
             String secretKey = UUIDGenerator.uuid();
@@ -75,6 +83,7 @@ public class ApiCertificateServiceImpl extends AbstractService<ApiCertificate> i
         }
     }
 
+    @Cacheable(value="entity",key="'entity_cert_'+#certId",unless = "#result == null")
     @Override
     public ApiCertificate findApiCertificateSecretKeyByCertId(String certId) {
         ApiCertificate ac = this.apiCertificateDao.findByCertId(certId);
