@@ -55,13 +55,16 @@ public class DubboConsumerAutoConfiguration extends DubboBasedAutoConfiguration 
                     Reference dubboConsumer = field.getAnnotation(Reference.class);
                     if (dubboConsumer != null) {
                         Class type = field.getType();
-                        ReferenceBean consumerBean = getConsumerBean(type, dubboConsumer.version(), dubboConsumer.timeout());
+                        ReferenceBean consumerBean = getConsumerBean(type, dubboConsumer.version(), dubboConsumer.timeout(),dubboConsumer.check(),dubboConsumer.lazy(),dubboConsumer.retries());
                         String id = type.getCanonicalName() + ":" + dubboConsumer.version();
                         if (!dubboReferences.containsKey(id)) {
                             consumerBean.setApplicationContext(applicationContext);
                             consumerBean.setApplication(applicationConfig);
                             consumerBean.setRegistry(registryConfig);
                             consumerBean.setApplication(applicationConfig);
+                            consumerBean.setCheck(dubboConsumer.check());
+                            consumerBean.setLazy(dubboConsumer.lazy());
+
                             try {
                                 consumerBean.afterPropertiesSet();
                                 dubboReferences.put(id, consumerBean.getObject());

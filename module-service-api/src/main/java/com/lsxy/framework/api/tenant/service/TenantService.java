@@ -6,9 +6,7 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.model.TenantVO;
 import com.lsxy.framework.core.utils.Page;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 租户Mananger
@@ -125,4 +123,8 @@ public interface TenantService extends BaseService<Tenant> {
      * @return
      */
     Map getAwaitNum();
+
+    List<Tenant> getListByPage();
+
+    List<Tenant> findByIds(Collection<String> ids);
 }

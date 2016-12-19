@@ -2,6 +2,7 @@ package com.lsxy.framework.api.base;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.lsxy.framework.core.utils.JSONUtil;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
@@ -90,6 +91,7 @@ public abstract class IdEntity implements Serializable{
 		this.lastTime = lastTime;
 	}
 
+	@JsonIgnore
 	@Column(name="delete_time")
 	public Date getDeleteTime() {
 		return deleteTime;
@@ -99,6 +101,7 @@ public abstract class IdEntity implements Serializable{
 		this.deleteTime = deleteTime;
 	}
 
+	@JsonIgnore
 	@Column(name="sortno")
 	public Long getSortNo() {
 		return sortNo;
@@ -108,6 +111,7 @@ public abstract class IdEntity implements Serializable{
 		this.sortNo = sortNo;
 	}
 
+	@JsonIgnore
 	@Column(name="version")
 	public int getVersion() {
 		return version;
@@ -115,5 +119,10 @@ public abstract class IdEntity implements Serializable{
 
 	public void setVersion(int version) {
 		this.version = version;
+	}
+
+	@Override
+	public String toString(){
+		return JSONUtil.objectToJson(this);
 	}
 }

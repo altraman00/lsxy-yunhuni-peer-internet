@@ -1,6 +1,6 @@
 package com.lsxy.app.api.gateway.response;
 
-import com.lsxy.area.api.ApiReturnCodeEnum;
+import com.lsxy.framework.core.exceptions.api.ApiReturnCodeEnum;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.slf4j.Logger;

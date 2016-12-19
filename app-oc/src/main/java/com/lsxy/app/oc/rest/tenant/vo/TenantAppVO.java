@@ -30,13 +30,13 @@ public class TenantAppVO implements Serializable {
     private Integer isRecording;//是否录音服务0否，1是
     private Integer isVoiceValidate;//是否语音验证码0否，1是
     private Integer isIvrService;//是否IVR定制服务0否，1是
-
+    private String serviceType;//服务类型
     private BigDecimal consume;
     private Long sessionCount;
     private Long amongDuration;
-
+    private String recordingTime;
     private List<String> testPhone;
-
+    private String sipRegistrar;//分机信息
     public TenantAppVO(){}
     public TenantAppVO(App app){
         try {
@@ -46,6 +46,30 @@ public class TenantAppVO implements Serializable {
         } catch (InvocationTargetException e) {
             logger.error("复制类属性异常",e);
         }
+    }
+
+    public String getRecordingTime() {
+        return recordingTime;
+    }
+
+    public void setRecordingTime(String recordingTime) {
+        this.recordingTime = recordingTime;
+    }
+
+    public String getSipRegistrar() {
+        return sipRegistrar;
+    }
+
+    public void setSipRegistrar(String sipRegistrar) {
+        this.sipRegistrar = sipRegistrar;
+    }
+
+    public String getServiceType() {
+        return serviceType;
+    }
+
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
     }
 
     public String getId() {

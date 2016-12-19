@@ -4,11 +4,12 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
-import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.util.PlayFileUtil;
-import com.lsxy.framework.api.tenant.model.TenantServiceSwitch;
+import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
+import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -17,7 +18,7 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.config.model.LineGateway;
+import com.lsxy.yunhuni.api.app.service.ServiceType;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
@@ -30,13 +31,11 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by tandy on 16/8/18.
@@ -50,8 +49,11 @@ public class ConfServiceImpl implements ConfService {
     /**最大与会数**/
     public static final int MAX_PARTS = 8;
 
+    /**交谈最大时长**/
+    public static final int MAX_DURATION = 60 * 60 * 6;
+
     /**key的过期时间 秒**/
-    public static final int EXPIRE = 60 * 60 * 12;
+    public static final int EXPIRE = MAX_DURATION + 60 * 10;
 
     private static final String CONF_PARTS_COUNTER_KEY_PREFIX = "conf_parts_";
 
@@ -80,7 +82,7 @@ public class ConfServiceImpl implements ConfService {
     private PlayFileUtil playFileUtil;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisCacheService redisCacheService;
 
     @Autowired
     private TenantServiceSwitchService tenantServiceSwitchService;
@@ -93,23 +95,6 @@ public class ConfServiceImpl implements ConfService {
 
     @Autowired
     private AreaAndTelNumSelector areaAndTelNumSelector;
-
-    private boolean isEnableConfService(String tenantId,String appId){
-        try {
-            TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
-            if(serviceSwitch != null && (serviceSwitch.getIsSessionService() == null || serviceSwitch.getIsSessionService() != 1)){
-                return false;
-            }
-            App app = appService.findById(appId);
-            if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-                return false;
-            }
-        } catch (Throwable e) {
-            logger.error("判断是否开启service失败",e);
-            return false;
-        }
-        return true;
-    }
 
     @Override
     public String create(String ip, String appId, Integer maxDuration, Integer maxParts,
@@ -128,7 +113,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(!isEnableConfService(tenantId,appId)){
+        if(!appService.enabledService(tenantId,appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
         }
 
@@ -140,10 +125,7 @@ public class ConfServiceImpl implements ConfService {
             maxParts = MAX_PARTS;
         }
         //TODO
-        Map<String, String> result = areaAndTelNumSelector.getTelnumberAndAreaId(app);
-        String areaId = result.get("areaId");
-        String oneTelnumber = result.get("oneTelnumber");
-        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+        String areaId = areaAndTelNumSelector.getAreaId(app);
 
         Meeting meeting = new Meeting();
         meeting.setResId(null);
@@ -154,7 +136,7 @@ public class ConfServiceImpl implements ConfService {
         bgmFile = playFileUtil.convert(tenantId,appId,bgmFile);
         Map<String, Object> map = new MapBuilder<String,Object>()
                                 .putIfNotEmpty("user_data",confId)
-                                .putIfNotEmpty("max_seconds",maxDuration)
+                                .put("max_seconds",maxDuration,MAX_DURATION)
                                 .putIfNotEmpty("bg_file",bgmFile)
                                 .putIfNotEmpty("areaId",areaId)
                                 .build();
@@ -169,15 +151,16 @@ public class ConfServiceImpl implements ConfService {
                                 .setTenantId(tenantId)
                                 .setAppId(app.getId())
                                 .setId(confId)
-                                .setType("sys_conf")
+                                .setType(BusinessState.TYPE_SYS_CONF)
                                 .setUserdata(userData)
                                 .setAreaId(areaId)
-                                .setLineGatewayId(lineGateway.getId())
-                                .setBusinessData(new MapBuilder<String,Object>()
-                                        .putIfNotEmpty("max_seconds",maxDuration)//会议最大持续时长
-                                        .put("max_parts",maxParts,MAX_PARTS)//最大与会数
-                                        .putIfNotEmpty("auto_hangup",autoHangup)//会议结束是否自动挂断
-                                        .putIfNotEmpty("recording",recording)//是否自动启动录音
+                                .setCallBackUrl(app.getUrl())
+                                .setLineGatewayId(null)
+                                .setBusinessData(new MapBuilder<String,String>()
+                                        .putIfNotEmpty("max_seconds",maxDuration == null?null:maxDuration.toString())//会议最大持续时长
+                                        .put("max_parts",maxParts == null?null:maxParts.toString(),""+MAX_PARTS)//最大与会数
+                                        .putIfNotEmpty("auto_hangup",autoHangup==null?null:autoHangup.toString())//会议结束是否自动挂断
+                                        .putIfNotEmpty("recording",recording==null?null:recording.toString())//是否自动启动录音
                                         .build())
                                 .build();
         businessStateService.save(state);
@@ -197,13 +180,8 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(!isEnableConfService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
-        }
-
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
-        if(!isAmountEnough){
-            throw new BalanceNotEnoughException();
         }
 
         BusinessState state = businessStateService.get(confId);
@@ -212,10 +190,19 @@ public class ConfServiceImpl implements ConfService {
             throw new ConfNotExistsException();
         }
 
+        if(state.getResId() == null){
+            throw new SystemBusyException();
+        }
+
+        if(state.getClosed()!= null && state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         if(!appId.equals(state.getAppId())){
             //不能跨app操作
             throw new ConfNotExistsException();
         }
+
         String areaId = areaAndTelNumSelector.getAreaId(app);
 
         Map<String, Object> params = new MapBuilder<String,Object>()
@@ -253,7 +240,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(!isEnableConfService(tenantId,appId)){
+        if(!appService.enabledService(tenantId,appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
         }
 
@@ -266,6 +253,15 @@ public class ConfServiceImpl implements ConfService {
         if(state == null){
             throw new ConfNotExistsException();
         }
+
+        if(state.getResId() == null){
+            throw new SystemBusyException();
+        }
+
+        if(state.getClosed()!= null && state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         if(!appId.equals(state.getAppId())){
             //不能跨app操作
             throw new ConfNotExistsException();
@@ -278,16 +274,16 @@ public class ConfServiceImpl implements ConfService {
         String callId = UUIDGenerator.uuid();
 
         //TODO
-        Map<String, String> result = areaAndTelNumSelector.getTelnumberAndAreaId(app,to);
-        String areaId = result.get("areaId");
-        String oneTelnumber = result.get("oneTelnumber");
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
+        String areaId = selector.getAreaId();
+        String oneTelnumber = selector.getOneTelnumber();
 
-        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+        String lineId = selector.getLineId();
 
         CallSession callSession = new CallSession();
         callSession.setStatus(CallSession.STATUS_PREPARING);
         callSession.setFromNum(oneTelnumber);
-        callSession.setToNum(to+"@"+lineGateway.getIp()+":"+lineGateway.getPort());
+        callSession.setToNum(selector.getToUri());
         callSession.setApp(app);
         callSession.setTenant(app.getTenant());
         callSession.setRelevanceId(callId);
@@ -296,7 +292,7 @@ public class ConfServiceImpl implements ConfService {
         callSession = callSessionService.save(callSession);
 
         Map<String, Object> params = new MapBuilder<String,Object>()
-                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
+                .putIfNotEmpty("to_uri",selector.getToUri())
                 .putIfNotEmpty("from_uri",oneTelnumber)
                 .putIfNotEmpty("max_answer_seconds",maxDuration)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
@@ -315,19 +311,20 @@ public class ConfServiceImpl implements ConfService {
                                     .setTenantId(tenantId)
                                     .setAppId(app.getId())
                                     .setId(callId)
-                                    .setType("sys_conf")
+                                    .setType(BusinessState.TYPE_SYS_CONF)
+                                    .setCallBackUrl(app.getUrl())
                                     .setAreaId(areaId)
-                                    .setLineGatewayId(lineGateway.getId())
-                                    .setBusinessData(new MapBuilder<String,Object>()
+                                    .setLineGatewayId(lineId)
+                                    .setBusinessData(new MapBuilder<String,String>()
                                         .putIfNotEmpty("from",oneTelnumber)
                                         .putIfNotEmpty("to",to)
-                                        .putIfNotEmpty("max_seconds",maxDuration)//最大时间
+                                        .putIfNotEmpty("max_seconds",maxDuration==null?null:maxDuration.toString())//最大时间
                                         .putIfNotEmpty("conf_id",confId)//所属会议
                                         .putIfNotEmpty("play_file",playFile)//加入后在会议播放这个文件
-                                        .putIfNotEmpty("voice_mode",voiceMode)//加入后的声音模式
+                                        .putIfNotEmpty("voice_mode",voiceMode==null?null:voiceMode.toString())//加入后的声音模式
                                         //TODO 这个是什么鬼dial_voice_stop_cond
-                                        .putIfNotEmpty("dial_voice_stop_cond",dialVoiceStopCond)//自定义拨号音停止播放条件。0：振铃停止；1：接听或者挂断停止。
-                                        .putIfNotEmpty("sessionid",callSession.getId())
+                                        .putIfNotEmpty("dial_voice_stop_cond",dialVoiceStopCond==null?null:dialVoiceStopCond.toString())//自定义拨号音停止播放条件。0：振铃停止；1：接听或者挂断停止。
+                                        .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                                         .build())
                                     .build();
         businessStateService.save(callstate);
@@ -347,7 +344,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(!isEnableConfService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
         }
 
@@ -376,20 +373,32 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(!isEnableConfService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
         }
         BusinessState call_state = businessStateService.get(callId);
         BusinessState conf_state = businessStateService.get(confId);
-        if(call_state == null || call_state.getResId() == null){
-            throw new IllegalArgumentException();
+
+        if(call_state ==null || call_state.getResId() == null){
+            throw new SystemBusyException();
         }
+
+        if(call_state.getClosed()!= null && call_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         if(conf_state == null || conf_state.getResId() == null){
-            throw new IllegalArgumentException();
+            throw new SystemBusyException();
         }
+
+        if(conf_state.getClosed()!= null && conf_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         if(!call_state.getAppId().equals(conf_state.getAppId())){
             throw new IllegalArgumentException();
         }
+
         String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",call_state.getResId())
@@ -420,7 +429,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(!isEnableConfService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
         }
 
@@ -432,8 +441,13 @@ public class ConfServiceImpl implements ConfService {
         BusinessState conf_state = businessStateService.get(confId);
 
         if(conf_state == null || conf_state.getResId() == null){
-            throw new IllegalArgumentException();
+            throw new SystemBusyException();
         }
+
+        if(conf_state.getClosed()!= null && conf_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         playFiles = playFileUtil.convertArray(app.getTenant().getId(),appId,playFiles);
         String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String,Object> params = new MapBuilder<String,Object>()
@@ -465,15 +479,20 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(!isEnableConfService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
         }
 
         BusinessState conf_state = businessStateService.get(confId);
 
         if(conf_state == null || conf_state.getResId() == null){
-            throw new IllegalArgumentException();
+            throw new SystemBusyException();
         }
+
+        if(conf_state.getClosed()!= null && conf_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
@@ -503,7 +522,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(!isEnableConfService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
         }
 
@@ -515,21 +534,25 @@ public class ConfServiceImpl implements ConfService {
         BusinessState conf_state = businessStateService.get(confId);
 
         if(conf_state == null || conf_state.getResId() == null){
-            throw new IllegalArgumentException();
+            throw new SystemBusyException();
         }
-        Map<String,Object> businessData = conf_state.getBusinessData();
+
+        if(conf_state.getClosed()!= null && conf_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
+        Map<String,String> businessData = conf_state.getBusinessData();
         if(maxDuration == null && businessData!=null){
-            Object duration = businessData.get("max_seconds");
+            String duration = businessData.get("max_seconds");
             if(duration!=null){
-                maxDuration = (int)duration;
+                maxDuration = Integer.parseInt(duration);
             }
         }
         String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
                 .putIfNotEmpty("max_seconds",maxDuration)
-                //TODO 文件名如何定
-                .putIfNotEmpty("record_file",UUIDGenerator.uuid())
+                .putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(conf_state.getTenantId(),appId))
                 .putIfNotEmpty("user_data",confId)
                 .putIfNotEmpty("areaId",areaId)
                 .build();
@@ -556,14 +579,19 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(!isEnableConfService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
         }
         BusinessState conf_state = businessStateService.get(confId);
 
         if(conf_state == null || conf_state.getResId() == null){
-            throw new IllegalArgumentException();
+            throw new SystemBusyException();
         }
+
+        if(conf_state.getClosed()!= null && conf_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
@@ -593,7 +621,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(!isEnableConfService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
         }
 
@@ -604,12 +632,22 @@ public class ConfServiceImpl implements ConfService {
 
         BusinessState call_state = businessStateService.get(callId);
         BusinessState conf_state = businessStateService.get(confId);
-        if(call_state == null || call_state.getResId() == null){
-            throw new IllegalArgumentException();
+        if(call_state ==null || call_state.getResId() == null){
+            throw new SystemBusyException();
         }
+
+        if(call_state.getClosed()!= null && call_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         if(conf_state == null || conf_state.getResId() == null){
-            throw new IllegalArgumentException();
+            throw new SystemBusyException();
         }
+
+        if(conf_state.getClosed()!= null && conf_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         if(!call_state.getAppId().equals(conf_state.getAppId())){
             throw new IllegalArgumentException();
         }
@@ -636,43 +674,53 @@ public class ConfServiceImpl implements ConfService {
     public boolean confEnter(String call_id, String conf_id, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException {
         BusinessState call_state = businessStateService.get(call_id);
         BusinessState conf_state = businessStateService.get(conf_id);
-        if(call_state == null || call_state.getResId() == null){
-            throw new IllegalArgumentException();
+        if(call_state ==null || call_state.getResId() == null){
+            throw new SystemBusyException();
         }
+
+        if(call_state.getClosed()!= null && call_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         if(conf_state == null || conf_state.getResId() == null){
-            throw new IllegalArgumentException();
+            throw new SystemBusyException();
         }
+
+        if(conf_state.getClosed()!= null && conf_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         if(!call_state.getAppId().equals(conf_state.getAppId())){
             //不合法的参数
             throw new IllegalArgumentException();
         }
 
-        Map<String,Object> call_business=call_state.getBusinessData();
-        Map<String,Object> conf_business=call_state.getBusinessData();
+        Map<String,String> call_business=call_state.getBusinessData();
+        Map<String,String> conf_business=conf_state.getBusinessData();
 
         Integer max_seconds = maxDuration == null ? 0 : maxDuration;
         Integer voice_mode = voiceMode == null ? 1 : voiceMode;
         String play_file = playFile == null ? "" : playFile;
 
         if(call_business != null && call_business.get("max_seconds")!=null){
-            max_seconds = (Integer)call_business.get("max_seconds");
+            max_seconds = Integer.parseInt(call_business.get("max_seconds"));
         }else if(conf_business != null && conf_business.get("max_seconds")!=null){
-            max_seconds = (Integer)conf_business.get("max_seconds");
+            max_seconds = Integer.parseInt(conf_business.get("max_seconds"));
         }
 
         if(call_business != null && call_business.get("voice_mode")!=null){
-            voice_mode = (Integer) call_business.get("voice_mode");
+            voice_mode = Integer.parseInt(call_business.get("voice_mode"));
         }
 
         if(call_business != null && call_business.get("play_file")!=null){
-            play_file = (String) call_business.get("play_file");
+            play_file = call_business.get("play_file");
         }
 
         play_file = playFileUtil.convert(conf_state.getTenantId(),conf_state.getAppId(),play_file);
         Map<String, Object> params = new MapBuilder<String,Object>()
                                     .putIfNotEmpty("res_id",call_state.getResId())
                                     .putIfNotEmpty("conf_res_id",conf_state.getResId())
-                                    .putIfNotEmpty("max_seconds",max_seconds)
+                                    .put("max_seconds",max_seconds,MAX_DURATION)
                                     .putIfNotEmpty("voice_mode",voice_mode)
                                     .putIfNotEmpty("play_file",play_file)
                                     .putIfNotEmpty("user_data",call_id)
@@ -684,12 +732,8 @@ public class ConfServiceImpl implements ConfService {
         } catch (Exception e) {
             throw new InvokeCallException(e);
         }
-        if(call_business!=null){
-            if(call_business.get("conf_id") == null){
-                call_business.put("conf_id",conf_id);
-                call_state.setBusinessData(call_business);
-                businessStateService.save(call_state);
-            }
+        if(call_business.get("conf_id") == null){
+            businessStateService.updateInnerField(call_id,"conf_id",conf_id);
         }
         return true;
     }
@@ -709,7 +753,7 @@ public class ConfServiceImpl implements ConfService {
     @Override
     public boolean outOfParts(String confId){
         String key = key(confId);
-        return redisTemplate.opsForSet().size(key) >= MAX_PARTS;
+        return redisCacheService.ssize(key) >= MAX_PARTS;
     }
 
     /**
@@ -719,8 +763,8 @@ public class ConfServiceImpl implements ConfService {
     @Override
     public void incrPart(String confId,String callId){
         String key = key(confId);
-        redisTemplate.opsForSet().add(key,callId);
-        redisTemplate.expire(key,EXPIRE, TimeUnit.SECONDS);
+        redisCacheService.sadd(key,callId);
+        redisCacheService.expire(key,EXPIRE);
     }
 
     /**
@@ -730,8 +774,8 @@ public class ConfServiceImpl implements ConfService {
     @Override
     public void decrPart(String confId,String callId){
         String key = key(confId);
-        redisTemplate.opsForSet().remove(key,callId);
-        redisTemplate.expire(key,EXPIRE, TimeUnit.SECONDS);
+        redisCacheService.sremove(key,callId);
+        redisCacheService.expire(key,EXPIRE);
     }
 
     /**
@@ -744,7 +788,7 @@ public class ConfServiceImpl implements ConfService {
         String key = key(confId);
         Set<String> results = null;
         try{
-            results = redisTemplate.opsForSet().members(key);
+            results = redisCacheService.smembers(key);
         }catch (Throwable t){
             logger.error("获取会议成员失败",t);
         }
@@ -759,12 +803,12 @@ public class ConfServiceImpl implements ConfService {
         String key = key(confId);
         Set<String> results = null;
         try{
-            results = redisTemplate.opsForSet().members(key);
+            results = redisCacheService.smembers(key);
         }catch (Throwable t){
             logger.error("获取会议成员失败",t);
         }
         try{
-            redisTemplate.delete(key);
+            redisCacheService.del(key);
         }catch (Throwable t){
             logger.info("删除会议成员缓存失败",t);
         }

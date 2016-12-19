@@ -1,6 +1,5 @@
 package com.lsxy.framework.rpc.api;
 
-import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import org.slf4j.Logger;
@@ -41,7 +40,11 @@ public abstract class AbstractSession implements Session {
     @Override
     public void write(RPCMessage object) throws SessionWriteException {
         if (this.isValid()) {
-            concreteWrite(object);
+            String msg = object.getSerializeString();
+            if(logger.isDebugEnabled()){
+                logger.debug("write rpc message length is :{}",msg.length());
+            }
+            concreteWrite(msg);
         } else {
             logger.error("通道无效,无法写入对象,该对象将会进入FIX队列:{}", object);
             throw new SessionWriteException("通道无效,无法写入对象");

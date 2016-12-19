@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -15,12 +16,7 @@ import java.util.List;
  * Created by zhangxb on 2016/7/1.
  */
 public interface ResourceTelenumDao  extends BaseDaoInterface<ResourceTelenum, Serializable> {
-    /**
-     * 获取50个空闲的号码
-     * @param status
-     * @return
-     */
-    List<ResourceTelenum> findFirst50ByStatus(Integer status);
+
     /**
      * 根据号码获取资源
      * @param telNumber
@@ -33,14 +29,54 @@ public interface ResourceTelenumDao  extends BaseDaoInterface<ResourceTelenum, S
      * @param expireTime 过期时间
      */
     @Modifying
-    @Query(value = "UPDATE db_lsxy_bi_yunhuni.tb_oc_resource_telenum num SET num.status=0 , num.tenant_id=NULL WHERE num.id IN " +
-            "(SELECT rent.res_id FROM db_lsxy_bi_yunhuni.tb_bi_resources_rent rent WHERE rent.rent_expire<:expireTime AND rent.res_type=1 AND rent.rent_status IN (1,2))",nativeQuery = true)
+    @Query(value = "UPDATE db_lsxy_bi_yunhuni.tb_oc_resource_telenum num SET num.status=0 , num.tenant_id=NULL,num.app_id=NULL WHERE num.id IN " +
+            "(SELECT rent.res_id FROM db_lsxy_bi_yunhuni.tb_bi_resources_rent rent WHERE rent.deleted=0 AND rent.rent_expire<:expireTime AND rent.res_type=1 AND rent.rent_status IN (1,2))",nativeQuery = true)
     void cleanExpireResourceTelnum(@Param("expireTime") Date expireTime);
+
+
+    /**
+     * 根据状态获取总数
+     * @return
+     */
+    @Query(value = " SELECT COUNT(1) FROM " +
+            " (SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum num WHERE num.deleted=0 AND num.status = 0 AND num.usable=1 AND tel_number <> :testNum) a" +
+            " INNER JOIN " +
+            " (SELECT DISTINCT ttl.tel_number FROM db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway ttl WHERE ttl.line_id  IN (:lineIds) AND (ttl.is_dialing=1 OR ttl.is_through=1 ) AND ttl.deleted = 0) b" +
+            " ON a.tel_number = b.tel_number" , nativeQuery = true)
+    Long countFreeNumber(@Param("testNum") String testNum, @Param("lineIds") List<String> lineIds);
 
     /**
      * 获取1个空闲的号码
-     * @param status
      * @return
      */
-    ResourceTelenum findFirstByStatus(int status);
+    @Query(value = " SELECT * FROM " +
+            " (SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum num WHERE num.deleted=0 AND num.status = 0 AND num.usable=1 AND tel_number <> :testNum) a" +
+            " INNER JOIN " +
+            " (SELECT DISTINCT ttl.tel_number FROM db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway ttl WHERE ttl.line_id  IN (:lineIds) AND (ttl.is_dialing=1 OR ttl.is_through=1 ) AND ttl.deleted = 0) b" +
+            " ON a.tel_number = b.tel_number limit :random,1" , nativeQuery = true)
+    ResourceTelenum findOneFreeNumber(@Param("testNum") String testNum,@Param("lineIds") List<String> lineIds, @Param("random") long random);
+
+    /**
+     * 根据呼叫URI查找号码资源
+     * @param callUri
+     * @return
+     */
+    ResourceTelenum findByCallUri(String callUri);
+
+    /**
+     *
+     * @param ids
+     * @return
+     */
+    List<ResourceTelenum> findByIdIn(Collection<String> ids);
+
+    @Query(value = "SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum num WHERE num.tenant_id=:tenantId AND num.tel_number IN (:froms) AND (num.app_id = :appId OR num.app_id IS NULL)  " +
+            " AND num.usable='1' AND (num.is_dialing = '1' OR  num.is_through = '1') AND num.area_id = :areaId AND num.deleted = 0",nativeQuery = true)
+    List<ResourceTelenum> findCallingTelnumByTenantIdAndAppIdAndTelnum(@Param("tenantId") String tenantId, @Param("froms") List<String> froms, @Param("appId") String appId, @Param("areaId") String areaId);
+
+    @Query(value = " SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum num WHERE num.tenant_id=:tenantId AND (num.app_id = :appId OR num.app_id IS NULL) " +
+            " AND num.usable='1' AND (num.is_dialing = '1' OR  num.is_through = '1') AND num.area_id = :areaId AND num.deleted = 0 LIMIT 1",nativeQuery = true)
+    ResourceTelenum findCallingTelnumByTenantIdAndAppId(@Param("tenantId") String tenantId, @Param("appId") String appId, @Param("areaId") String areaId);
+
+    List<ResourceTelenum> findByTelNumberIn(Collection<String> telNumbers);
 }

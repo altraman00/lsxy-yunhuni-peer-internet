@@ -67,11 +67,11 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
         //释放资源
         businessStateService.delete(callId);
 
-        if(state.getType().equalsIgnoreCase("notify_call")){
+        if(BusinessState.TYPE_NOTIFY_CALL.equals(state.getType())){
             return notifyCall(callId,paramMap,state);
         }
 
-        if(state.getType().equalsIgnoreCase("verify_call")){
+        if(BusinessState.TYPE_VERIFY_CALL.equals(state.getType())){
             return verifyCall(callId,paramMap,state);
         }
         return res;
@@ -170,7 +170,7 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
             notifyCallService.save(notifyCall);
         }
         //处理会话表数据
-        CallSession callSession = callSessionService.findById((String)state.getBusinessData().get("sessionid"));
+        CallSession callSession = callSessionService.findById(state.getBusinessData().get(BusinessState.SESSIONID));
         if(callSession != null){
             callSession.setStatus(CallSession.STATUS_OVER);
             callSessionService.save(callSession);

@@ -12,7 +12,7 @@
 <section class='aside-section'>
     <section class="hbox stretch">
         <!-- .aside -->
-        <aside class="bg-Green lter aside hidden-print" id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
+         <%@include file="/inc/leftMenu.jsp"%>
         <!-- /.aside -->
         <section id="content">
             <section class="hbox stretch">
@@ -79,9 +79,10 @@
                 <aside>
                     <section class="vbox xbox">
                         <!-- 如果没有三级导航 这段代码注释-->
-                        <div class="head-box"><a href="#subNav" data-toggle="class:hide"> <i
-                                class="fa fa-angle-left text"></i> <i class="fa fa-angle-right text-active"></i> </a>
-                        </div>
+                        <div class="head-box"><a href="#subNav" data-toggle="class:hide">
+                            <i class=" iconfont icon-menu-left text"></i>
+                            <i class=" iconfont icon-menu-right text-active"></i>
+                        </a></div>
                         <div class="wrapper header">
                             <span class="border-left">&nbsp;充值</span></div>
 
@@ -93,8 +94,8 @@
                                             <p><strong>温馨提示：</strong></p>
                                             <p>1、如您有欠费账单，充值后会优先补扣欠费账单。</p>
                                             <p>2、充值后请及时对支付订单进行结算，以免影响正常服务。</p>
-                                            <p>3、若使用银行对公汇款方式充值，会员在汇款时，请在备注中注明您在云呼你平台使用的认证名称，方便对账。</p>
-                                            <p>4、到账时间主要由汇款行和收款行之间的结算方式决定，正常为1个工作日，款项到账后，云呼你平台会第一时间为您充值，如有疑问请联系客服人员。</p>
+                                            <p>3、若使用银行对公汇款方式充值，会员在汇款时，请在备注中注明您在壹耘平台使用的认证名称，方便对账。</p>
+                                            <p>4、到账时间主要由汇款行和收款行之间的结算方式决定，正常为1个工作日，款项到账后，壹耘平台会第一时间为您充值，如有疑问请联系客服人员。</p>
                                         </div>
                                     </div>
                                     <div class="col-md-12 padder-v fix-padding">

@@ -71,7 +71,31 @@ public abstract class AbstractPortalController {
         }
         return token;
     }
-
+    /**
+     * 根据省份获取城市
+     * @return
+     */
+    public List getTelnumLocationList(HttpServletRequest request,String province){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/telnum/location/city/list?province={1}";
+        return RestRequest.buildSecurityRequest(token).getList(uri, Map.class,province).getData();
+    }
+    public List getTelnumCity(HttpServletRequest request){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/telnum/city";
+        return RestRequest.buildSecurityRequest(token).getList(uri, Map.class).getData();
+    }
+    /**
+     * 获取省份列表
+     * @param request
+     * @return
+     */
+    public List getTelnumLocationProvinceList(HttpServletRequest request){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/telnum/location/province/list";
+        RestResponse<List<String> > restResponse =  RestRequest.buildSecurityRequest(token).getList(uri, String.class);
+        return restResponse.getData();
+    }
     /**
      * 获取用户的当前对象
      * @param request
@@ -94,7 +118,11 @@ public abstract class AbstractPortalController {
         String uri = PortalConstants.REST_PREFIX_URL + "/rest/app/list";
         return RestRequest.buildSecurityRequest(token).getList(uri, App.class);
     }
-
+    public RestResponse getBillAppList(HttpServletRequest request,String serviceType){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL + "/rest/app/list?serviceType={1}";
+        return RestRequest.buildSecurityRequest(token).getList(uri, App.class,serviceType);
+    }
     /**
      * 获取单个应用
      * @param request

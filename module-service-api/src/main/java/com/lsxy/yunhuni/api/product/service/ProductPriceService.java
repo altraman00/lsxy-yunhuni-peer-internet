@@ -1,6 +1,7 @@
 package com.lsxy.yunhuni.api.product.service;
 
 import com.lsxy.framework.api.base.BaseService;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.product.model.ProductPrice;
 
 /**
@@ -14,4 +15,5 @@ public interface ProductPriceService extends BaseService<ProductPrice> {
      * @return
      */
     ProductPrice getAvailableProductPrice(String productId);
+    Page<ProductPrice> getPageOrderCreate(Integer pageNo,Integer pageSize);
 }

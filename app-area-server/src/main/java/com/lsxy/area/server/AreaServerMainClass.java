@@ -9,6 +9,7 @@ import com.lsxy.framework.dubbo.EnableDubboConfiguration;
 import com.lsxy.framework.jmx.FrameworkJMXConfig;
 import com.lsxy.framework.monitor.FrameworkMonitorConfig;
 import com.lsxy.framework.mq.FrameworkMQConfig;
+import com.lsxy.framework.oss.FrameworkOSSConfig;
 import com.lsxy.framework.rpc.FrameworkRPCConfig;
 import com.lsxy.framework.rpc.exceptions.RemoteServerStartException;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
@@ -26,7 +27,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @SpringBootApplication(exclude = {EmbeddedServletContainerAutoConfiguration.class})
 @ComponentScan
 @Import(value={FrameworkRPCConfig.class, FrameworkMQConfig.class, FrameworkCacheConfig.class,FrameworkApiConfig.class,
-        FrameworkServiceConfig.class, YunhuniApiConfig.class, YunhuniServiceConfig.class,
+        FrameworkServiceConfig.class, YunhuniApiConfig.class, YunhuniServiceConfig.class, FrameworkOSSConfig.class,
         FrameworkJMXConfig.class, FrameworkMonitorConfig.class})
 @EnableDubboConfiguration
 @EnableAsync

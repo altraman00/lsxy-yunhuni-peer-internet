@@ -2,6 +2,7 @@ package com.lsxy.app.portal.console.account;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
+import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.framework.api.tenant.model.RealnameCorp;
 import com.lsxy.framework.api.tenant.model.RealnamePrivate;
 import com.lsxy.framework.api.tenant.model.Tenant;
@@ -36,7 +37,6 @@ public class AuthController extends AbstractPortalController {
 
     @Autowired
     private OSSService ossService;
-    private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
     /**
      * 实名认证首页
      * @param request
@@ -92,7 +92,7 @@ public class AuthController extends AbstractPortalController {
      */
     private RestResponse findAuthInfo(HttpServletRequest request){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl + "/rest/account/auth/find_auth_info";
+        String uri = PortalConstants.REST_PREFIX_URL  + "/rest/account/auth/find_auth_info";
         return  RestRequest.buildSecurityRequest(token).get(uri,HashMap.class);
     }
     /**
@@ -101,7 +101,7 @@ public class AuthController extends AbstractPortalController {
      */
     private RestResponse findAuthStatus(HttpServletRequest request){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl + "/rest/account/auth/find_auth_status";
+        String uri = PortalConstants.REST_PREFIX_URL  + "/rest/account/auth/find_auth_status";
         return  RestRequest.buildSecurityRequest(token).get(uri,HashMap.class);
     }
     /**
@@ -164,7 +164,7 @@ public class AuthController extends AbstractPortalController {
      */
     private RestResponse savePrivateAuth(HttpServletRequest request,AuthVo authVo){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +  "/rest/account/auth/save_private_auth";
+        String uri = PortalConstants.REST_PREFIX_URL  +  "/rest/account/auth/save_private_auth";
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.convertValue(authVo, Map.class);
         map.put("status",Tenant.AUTH_ONESELF_WAIT);//状态
@@ -179,7 +179,7 @@ public class AuthController extends AbstractPortalController {
      */
     private RestResponse saveCorpAuth(HttpServletRequest request, AuthVo authVo,String upgrade){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl + "/rest/account/auth/save_corp_auth";
+        String uri = PortalConstants.REST_PREFIX_URL  + "/rest/account/auth/save_corp_auth";
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.convertValue(authVo, Map.class);
         if(StringUtil.isNotEmpty(upgrade)){

@@ -5,10 +5,12 @@ import com.lsxy.app.area.cti.Commander;
 import com.lsxy.app.area.cti.RpcError;
 import com.lsxy.app.area.cti.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
+import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
+import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.handler.RpcRequestHandler;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
@@ -44,13 +46,7 @@ public class Handler_MN_CH_SYS_CALL_SEND_DTMF_START extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        RPCResponse response = RPCResponse.buildResponse(request);
-
         Commander cticlient = cticlientContext.getAvalibleClient();
-        if(cticlient == null) {
-            response.setMessage(RPCResponse.STATE_EXCEPTION);
-            return response;
-        }
         try {
             Map<String, Object> params = request.getParamMap();
             String call_id = (String)params.get("user_data");
@@ -66,19 +62,37 @@ public class Handler_MN_CH_SYS_CALL_SEND_DTMF_START extends RpcRequestHandler{
 
                 @Override
                 protected void onError(RpcError rpcError) {
-                    logger.error("调用sys.call.send_dtmf_start失败call_id={},result={}",call_id,rpcError);
+                    logger.error("调用sys.call.send_dtmf_start失败call_id={},result={}", call_id, rpcError);
+                    RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
+                            new MapBuilder<String,Object>()
+                                    .put("method", Constants.EVENT_SYS_CALL_SEND_DTMF_ON_FAIL)
+                                    .put("user_data",call_id)
+                                    .build());
+                    try {
+                        rpcCaller.invoke(sessionContext,req);
+                    } catch (Exception e) {
+                        logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_SEND_DTMF_ON_FAIL,e);
+                    }
                 }
 
                 @Override
                 protected void onTimeout() {
-                    logger.error("调用sys.call.send_dtmf_start超时call_id={}",call_id);
+                    logger.error("调用sys.call.send_dtmf_start超时call_id={}", call_id);
+                    RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
+                            new MapBuilder<String,Object>()
+                                    .put("method", Constants.EVENT_SYS_CALL_SEND_DTMF_ON_FAIL)
+                                    .put("user_data",call_id)
+                                    .build());
+                    try {
+                        rpcCaller.invoke(sessionContext,req);
+                    } catch (Exception e) {
+                        logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_SEND_DTMF_ON_FAIL,e);
+                    }
                 }
             });
-            response.setMessage(RPCResponse.STATE_OK);
-        } catch (IOException e) {
+        } catch (Throwable e) {
             logger.error("调用资源操作失败",e);
-            response.setMessage(RPCResponse.STATE_EXCEPTION);
         }
-        return response;
+        return null;
     }
 }

@@ -3,6 +3,7 @@ package com.lsxy.app.portal.console.telenum;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.MobileCodeUtils;
+import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -27,7 +28,6 @@ import java.util.Map;
 @RequestMapping("/console/telenum/bind")
 public class TestNumBindController extends AbstractPortalController{
     private static final Logger logger = LoggerFactory.getLogger(TestNumBindController.class);
-    private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
     private static final String testCallNumber = SystemConfig.getProperty("portal.test.call.number");
     private static final String RESULT_SUCESS = "2";//处理结果-成功
     private static final String RESULT_FIAL = "-2";//处理结果-失败
@@ -56,7 +56,7 @@ public class TestNumBindController extends AbstractPortalController{
      */
     private RestResponse list(HttpServletRequest request){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/test_num_bind/list";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/test_num_bind/list";
         return  RestRequest.buildSecurityRequest(token).getList(uri, TestNumBind.class);
     }
     /**
@@ -68,7 +68,7 @@ public class TestNumBindController extends AbstractPortalController{
     @ResponseBody
     private RestResponse isExist(HttpServletRequest request,String number){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/test_num_bind/isExist?number={1}";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/test_num_bind/isExist?number={1}";
         return  RestRequest.buildSecurityRequest(token).get(uri, String.class,number);
     }
     /**
@@ -130,7 +130,7 @@ public class TestNumBindController extends AbstractPortalController{
      */
     private RestResponse updateAppNumberRest(HttpServletRequest request,String numbers ,String appId){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl + "/rest/test_num_bind/update_app_number?numbers={1}&appId={2}";
+        String uri = PortalConstants.REST_PREFIX_URL  + "/rest/test_num_bind/update_app_number?numbers={1}&appId={2}";
         return  RestRequest.buildSecurityRequest(token).get(uri, TestNumBind.class,numbers,appId);
     }
     /**
@@ -141,7 +141,7 @@ public class TestNumBindController extends AbstractPortalController{
      */
     private RestResponse saveNumber(HttpServletRequest request,TestNumBind testNumBind){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/test_num_bind/save";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/test_num_bind/save";
         ObjectMapper mapper = new ObjectMapper();
         Map map = mapper.convertValue(testNumBind,Map.class);
         return  RestRequest.buildSecurityRequest(token).post(uri,map, TestNumBind.class);
@@ -172,7 +172,7 @@ public class TestNumBindController extends AbstractPortalController{
      */
     private RestResponse disbindNumber(HttpServletRequest request,String number){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/test_num_bind/disbind";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/test_num_bind/disbind";
         Map map = new HashMap();
         map.put("number",number);
         return  RestRequest.buildSecurityRequest(token).post(uri,map, String.class);

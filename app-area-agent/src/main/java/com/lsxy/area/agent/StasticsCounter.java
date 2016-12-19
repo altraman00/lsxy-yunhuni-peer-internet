@@ -2,19 +2,16 @@ package com.lsxy.area.agent;
 
 import com.lsxy.framework.core.statistics.AsbstractStatisticCounter;
 import com.lsxy.framework.core.statistics.MarkField;
-import org.springframework.context.annotation.Profile;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by tandy on 16/8/9.
  */
-@Component
-@EnableScheduling
-@Profile(value = {"test"})
+//@Component
+//@EnableScheduling
+//@Profile(value = {"test"})
 public class StasticsCounter extends AsbstractStatisticCounter {
 
     @MarkField(" 收到区域管理器请求次数")

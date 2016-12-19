@@ -1,6 +1,8 @@
 package com.lsxy.yunhuni.statistics.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.statistics.model.VoiceCdrDay;
 import com.lsxy.yunhuni.api.statistics.service.VoiceCdrDayService;
 import com.lsxy.framework.api.tenant.model.Tenant;
@@ -48,7 +50,14 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
 
     @Override
     public List<VoiceCdrDay> list(String tenantId, String appId,String type,Date startTime, Date endTime) {
-        String hql = "from VoiceCdrDay obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.day";
+        String[] types = null;
+        if(type!=null){
+            types = new String[]{type};
+        }
+        if(App.PRODUCT_CALL_CENTER.equals(type)){
+            types = CallSession.PRODUCT_CODE;
+        }
+        String hql = "from VoiceCdrDay obj where "+StatisticsUtils.getSqlIsNull2(tenantId,appId, types)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.day";
         List<VoiceCdrDay>  list = this.list(hql,startTime,endTime);
         return list;
     }

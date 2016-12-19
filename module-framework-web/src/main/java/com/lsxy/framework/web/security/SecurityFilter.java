@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,7 +25,6 @@ import java.util.Date;
 public abstract class SecurityFilter implements Filter {
 	private static final Logger logger = LoggerFactory.getLogger(SecurityFilter.class);
 	public String[] excludePath = null;
-
     /**
      * Default constructor.
      */

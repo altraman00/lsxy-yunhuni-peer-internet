@@ -15,4 +15,5 @@ public interface ProductTenantDiscountService extends BaseService<ProductTenantD
      * @return
      */
     Double getDiscountByProductIdAndTenantId(String productId,String tenantId);
+    ProductTenantDiscount findByProductIdAndTenantId(String productId,String tenantId);
 }

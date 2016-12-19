@@ -20,13 +20,16 @@ public class DubboBasedAutoConfiguration {
      * @return reference bean
      * @throws BeansException
      */
-    protected <T> ReferenceBean<T> getConsumerBean(Class<T> interfaceClazz, String version, Integer timeout) throws BeansException {
+    protected <T> ReferenceBean<T> getConsumerBean(Class<T> interfaceClazz, String version, Integer timeout,boolean check,boolean lazy,int retries) throws BeansException {
         ReferenceBean<T> consumerBean = new ReferenceBean<T>();
         String canonicalName = interfaceClazz.getCanonicalName();
         consumerBean.setInterface(canonicalName);
         consumerBean.setId(canonicalName);
         consumerBean.setVersion(version);
         consumerBean.setTimeout(timeout);
+        consumerBean.setCheck(check);
+        consumerBean.setLazy(lazy);
+        consumerBean.setRetries(retries);
         return consumerBean;
     }
 }

@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -46,13 +45,7 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        RPCResponse response = RPCResponse.buildResponse(request);
-
         Commander cticlient = cticlientContext.getAvalibleClient();
-        if(cticlient == null) {
-            response.setMessage(RPCResponse.STATE_EXCEPTION);
-            return response;
-        }
         try {
             Map<String, Object> params = request.getParamMap();
             String call_id = (String)params.get("user_data");
@@ -98,7 +91,7 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
                     logger.error("调用sys.call超时call_id={}",call_id);
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
-                                    .put("method",Constants.EVENT_SYS_CALL_ON_TIMEOUT)
+                                    .put("method", Constants.EVENT_SYS_CALL_ON_TIMEOUT)
                                     .put("user_data",call_id)
                                     .build());
                     try {
@@ -108,11 +101,9 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
                     }
                 }
             });
-            response.setMessage(RPCResponse.STATE_OK);
-        } catch (IOException e) {
+        } catch (Throwable e) {
             logger.error("创建资源失败",e);
-            response.setMessage(RPCResponse.STATE_EXCEPTION);
         }
-        return response;
+        return null;
     }
 }

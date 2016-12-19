@@ -5,7 +5,7 @@
     <parent>
         <artifactId>yunhuni</artifactId>
         <groupId>com.lsxy</groupId>
-        <version>1.2.0-RC5</version>
+        <version>1.2.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -31,17 +31,21 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-config</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-remote-shell</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-starter-remote-shell</artifactId>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-jmx</artifactId>
-            <version>1.2.0-RC5</version>
+            <version>1.2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.lsxy</groupId>
@@ -87,7 +91,11 @@
         </dependency>
         <dependency>
             <groupId>com.lsxy</groupId>
-            <artifactId>module-service</artifactId>
+            <artifactId>module-service-call-center-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-oss</artifactId>
         </dependency>
 
     </dependencies>

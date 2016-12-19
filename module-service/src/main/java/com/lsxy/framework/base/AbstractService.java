@@ -3,6 +3,7 @@ package com.lsxy.framework.base;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.base.IdEntity;
+import com.lsxy.framework.api.exceptions.PageSizeTooLargeException;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.HqlUtil;
@@ -78,8 +79,7 @@ public abstract class AbstractService<T extends IdEntity> implements BaseService
     @CacheEvict(value = "entity", key = "'entity_' + #entity.id", beforeInvocation = true)
     @Override
     public void delete(T entity) throws IllegalAccessException, InvocationTargetException {
-        //设置删除时间
-        entity.setDeleteTime(new Date());
+
         this.logicDelete(entity);
     }
 
@@ -116,7 +116,9 @@ public abstract class AbstractService<T extends IdEntity> implements BaseService
     @CacheEvict(value = "entity", key = "'entity_' + #obj.id", beforeInvocation = true)
     public void logicDelete(T obj) throws IllegalAccessException, InvocationTargetException{
         if(obj != null){
-            BeanUtils.setProperty(obj, "deleted", true);
+            //设置删除时间
+            obj.setDeleteTime(new Date());
+            obj.setDeleted(true);
             this.save(obj);
             this.getEm().flush();
 //			this.getEm().detach(obj);
@@ -161,6 +163,9 @@ public abstract class AbstractService<T extends IdEntity> implements BaseService
 
     @Override
     public Page pageList(String hql, int pageNo, int pageSize, Object... params) {
+        if(pageSize > 1000){
+            throw new PageSizeTooLargeException("分页数据太大");
+        }
         return this.findByCustom(hql,true, pageNo, pageSize,params);
     }
 
@@ -304,4 +309,7 @@ public abstract class AbstractService<T extends IdEntity> implements BaseService
         return totalCount;
     }
 
+    public Iterable<T> save(Iterable<T> list){
+        return getDao().save(list);
+    }
 }

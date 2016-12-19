@@ -13,8 +13,20 @@ import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.config.model.Area;
+import com.lsxy.yunhuni.api.config.model.AreaSip;
+import com.lsxy.yunhuni.api.config.model.GlobalConfig;
+import com.lsxy.yunhuni.api.config.model.TenantConfig;
+import com.lsxy.yunhuni.api.config.service.AreaSipService;
+import com.lsxy.yunhuni.api.config.service.GlobalConfigService;
+import com.lsxy.yunhuni.api.config.service.TenantConfigService;
+import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
+import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
+import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +35,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 应用RestApp
@@ -46,6 +62,58 @@ public class AppController extends AbstractRestController {
     private OSSService ossService;
     @Autowired
     private MQService mqService;
+    @Autowired
+    private AreaSipService areaSipService;
+    @Autowired
+    private TenantConfigService tenantConfigService;
+    @Autowired
+    private GlobalConfigService globalConfigService;
+    @Autowired
+    private ResourcesRentService resourcesRentService;
+    @RequestMapping("/get/{id}/recording/time")
+    public RestResponse getRecordingTimeByTenantIdAndAppId(@PathVariable String id){
+        int re = tenantConfigService.getRecordingTimeByTenantIdAndAppId(getCurrentAccount().getTenant().getId(),id);
+        return RestResponse.success(re);
+    }
+    @RequestMapping("/edit/{id}/recording/{time}")
+    public RestResponse getRecordingTimeByTenantIdAndAppId(@PathVariable String id,@PathVariable int time){
+        Pattern pattern = Pattern.compile("^[0-9]*[1-9][0-9]*$");
+        int globalRecording = 7;//
+        GlobalConfig globalConfig = globalConfigService.findByTypeAndName(GlobalConfig.TYPE_RECORDING,GlobalConfig.KEY_RECORDING);
+        if(globalConfig!=null&& StringUtils.isNotEmpty(globalConfig.getValue())) {
+            //全局录音文件存储时长时间
+            Matcher matcher = pattern.matcher(globalConfig.getValue());
+            if (matcher.matches()) {
+                globalRecording = Integer.valueOf(globalConfig.getValue());
+            }
+        }
+        int tenantRecording = 0;
+        TenantConfig tenantConfig = tenantConfigService.findByTypeAndKeyNameAndTenantIdAndAppId(GlobalConfig.TYPE_RECORDING, GlobalConfig.KEY_RECORDING, getCurrentAccount().getTenant().getId(), id);
+        if(tenantConfig!=null) {
+            Matcher matcher1 = pattern.matcher(tenantConfig.getValue());
+            if (matcher1.matches()) {
+                tenantRecording = Integer.valueOf(tenantConfig.getValue());
+            }
+            if(tenantRecording<=globalRecording&&time>globalRecording){//收费
+                boolean flag = resourcesRentService.recordCost(getCurrentAccount().getTenant().getId(),id);
+                if(!flag){
+                    return RestResponse.failed("-1","余额不足");
+                }
+            }
+            tenantConfig.setValue(time+"");
+            tenantConfigService.save(tenantConfig);
+        }else{
+            if(time>globalRecording){//收费
+                boolean flag = resourcesRentService.recordCost(getCurrentAccount().getTenant().getId(),id);
+                if(!flag){
+                    return RestResponse.failed("-1","余额不足");
+                }
+            }
+            tenantConfig = new TenantConfig( getCurrentAccount().getTenant().getId(),  id, GlobalConfig.TYPE_RECORDING, GlobalConfig.KEY_RECORDING, "录音文件存储时长", time+"", "on");
+            tenantConfigService.save(tenantConfig);
+        }
+        return RestResponse.success("修改成功");
+    }
     /**
      * 根据应用名字查找应用数
      * @param name 应用名字
@@ -56,13 +124,19 @@ public class AppController extends AbstractRestController {
         long re = appService.countByTenantIdAndName(getCurrentAccount().getTenant().getId(),name);
         return RestResponse.success(re);
     }
+
     /**
      * 查找当前用户的应用
      * @throws Exception
      */
     @RequestMapping("/list")
-    public RestResponse listApp() throws Exception{
-        List<App> apps = appService.findAppByUserName(getCurrentAccount().getTenant().getId());
+    public RestResponse listApp(String serviceType) throws Exception{
+        List<App> apps = null;
+        if(StringUtils.isNotEmpty(serviceType)) {
+            apps = appService.findAppByTenantIdAndServiceType(getCurrentAccount().getTenant().getId(),serviceType);
+        }else{
+            apps = appService.findAppByUserName(getCurrentAccount().getTenant().getId());
+        }
         return RestResponse.success(apps);
     }
 
@@ -152,7 +226,7 @@ public class AppController extends AbstractRestController {
         String userName = getCurrentAccountUserName();
         Tenant tenant = tenantService.findTenantByUserName(userName);
         app.setTenant(tenant);
-        app = appService.save(app);
+        appService.create(app);
         return RestResponse.success(app);
     }
     /**

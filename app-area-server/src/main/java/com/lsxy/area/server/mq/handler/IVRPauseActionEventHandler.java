@@ -27,6 +27,6 @@ public class IVRPauseActionEventHandler implements MQMessageHandler<IVRPauseActi
         if(logger.isDebugEnabled()){
             logger.debug("处理IVR暂停动作{}",message.toJson());
         }
-        ivrActionService.doAction(message.getCallId());
+        ivrActionService.doAction(message.getCallId(),null);
     }
 }

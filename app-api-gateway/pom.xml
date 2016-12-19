@@ -5,7 +5,7 @@
     <parent>
         <artifactId>yunhuni</artifactId>
         <groupId>com.lsxy</groupId>
-        <version>1.2.0-RC5</version>
+        <version>1.2.1-SNAPSHOT</version>
     </parent>
 
     <packaging>jar</packaging>
@@ -61,7 +61,6 @@
             <artifactId>module-service-area-api</artifactId>
         </dependency>
 
-
         <!--<dependency>-->
             <!--<groupId>com.lsxy</groupId>-->
             <!--<artifactId>module-framework-api</artifactId>-->
@@ -77,6 +76,10 @@
         <dependency>
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-monitor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-service-call-center-api</artifactId>
         </dependency>
     </dependencies>
 

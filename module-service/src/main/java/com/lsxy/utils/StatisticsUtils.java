@@ -1,6 +1,7 @@
 package com.lsxy.utils;
 
 import com.lsxy.framework.core.utils.StringUtil;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -45,14 +46,13 @@ public class StatisticsUtils {
      * 将租户和应用和类型对为空和非为空时进行处理成sql
      * @param tenantId 租户id
      * @param appId 应用id
-     * @param type 类型
+     * @param types 类型
      * @return
      */
-    public static String getSqlIsNull2(String tenantId,String appId,String type){
+    public static String getSqlIsNull2(String tenantId,String appId,String[] types){
         Map<String, String> map = new HashMap<String,String>();
         map.put("tenant_id",tenantId);
         map.put("app_id",appId);
-        map.put("type",type);
         String sql = "";
         for(Map.Entry<String, String> entry:map.entrySet()){
             String name = entry.getKey();
@@ -62,6 +62,20 @@ public class StatisticsUtils {
             }else{
                 sql += " "+name+"='"+value + "' and ";
             }
+        }
+        String type = "";
+        if(types!=null) {
+            for (int i = 0; i < types.length; i++) {
+                type += " '" + types[i] + "' ";
+                if (i != types.length - 1) {
+                    type += " , ";
+                }
+            }
+        }
+        if(StringUtils.isEmpty(type)){
+            sql += " type is null and ";
+        }else{
+            sql += " type in ("+type+") and ";
         }
         return sql;
     }

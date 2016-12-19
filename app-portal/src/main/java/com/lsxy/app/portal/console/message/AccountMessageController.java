@@ -27,7 +27,6 @@ import java.util.Map;
 @RequestMapping("/console/message/account_message")
 public class AccountMessageController extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(AccountMessageController.class);
-    private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
     /**
      * 获取未读消息
      * @return
@@ -58,7 +57,7 @@ public class AccountMessageController extends AbstractPortalController {
     @RequestMapping("/detail")
     public ModelAndView detail(HttpServletRequest request,String id){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/message/account_message/detail?id={1}";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/message/account_message/detail?id={1}";
         RestResponse restResponse = RestRequest.buildSecurityRequest(token).get(uri, AccountMessage.class,id);
         ModelAndView mav = new ModelAndView();
         mav.addObject("message",restResponse.getData());
@@ -74,7 +73,7 @@ public class AccountMessageController extends AbstractPortalController {
     @ResponseBody
     public RestResponse list(HttpServletRequest request){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/message/account_message/list";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/message/account_message/list";
         return  RestRequest.buildSecurityRequest(token).getList(uri, AccountMessage.class);
     }
     /**
@@ -84,7 +83,7 @@ public class AccountMessageController extends AbstractPortalController {
      */
     private RestResponse edit(HttpServletRequest request){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/message/account_message/edit";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/message/account_message/edit";
         return  RestRequest.buildSecurityRequest(token).get(uri, Object.class);
     }
     /**
@@ -96,7 +95,7 @@ public class AccountMessageController extends AbstractPortalController {
      */
     private RestResponse plist(HttpServletRequest request, Integer  pageNo, Integer pageSize){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/message/account_message/plist?pageNo={1}&pageSize={2}";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/message/account_message/plist?pageNo={1}&pageSize={2}";
         return  RestRequest.buildSecurityRequest(token).getPage(uri, AccountMessage.class,pageNo,pageSize);
     }
     /**
@@ -121,7 +120,7 @@ public class AccountMessageController extends AbstractPortalController {
      */
     private RestResponse deleteAccountMessage(HttpServletRequest request,String id){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/message/account_message/delete";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/message/account_message/delete";
         Map map = new HashMap();
         map.put("id",id);
         return  RestRequest.buildSecurityRequest(token).post(uri,map, AccountMessage.class);

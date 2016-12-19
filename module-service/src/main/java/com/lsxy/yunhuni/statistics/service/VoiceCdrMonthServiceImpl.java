@@ -1,6 +1,8 @@
 package com.lsxy.yunhuni.statistics.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.statistics.model.VoiceCdrMonth;
 import com.lsxy.yunhuni.api.statistics.service.VoiceCdrMonthService;
 import com.lsxy.framework.base.AbstractService;
@@ -37,7 +39,14 @@ public class VoiceCdrMonthServiceImpl extends AbstractService<VoiceCdrMonth> imp
     }
     @Override
     public List<VoiceCdrMonth> list(String tenantId, String appId,String type,Date startTime, Date endTime) {
-        String hql = "from VoiceCdrMonth obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+"  obj.dt between ?1 and ?2 ORDER BY obj.month";
+        String[] types = null;
+        if(type!=null){
+            types = new String[]{type};
+        }
+        if(App.PRODUCT_CALL_CENTER.equals(type)){
+            types = CallSession.PRODUCT_CODE;
+        }
+        String hql = "from VoiceCdrMonth obj where "+StatisticsUtils.getSqlIsNull2(tenantId,appId, types)+"  obj.dt between ?1 and ?2 ORDER BY obj.month";
         List<VoiceCdrMonth>list = this.list(hql,startTime,endTime);
         return list;
     }

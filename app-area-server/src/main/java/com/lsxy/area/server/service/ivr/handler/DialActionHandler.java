@@ -1,13 +1,18 @@
 package com.lsxy.area.server.service.ivr.handler;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
-import com.lsxy.area.api.exceptions.AppNotFoundException;
-import com.lsxy.area.api.exceptions.AppOffLineException;
 import com.lsxy.area.server.AreaAndTelNumSelector;
+import com.lsxy.area.server.service.callcenter.CallCenterUtil;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
+import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
+import com.lsxy.call.center.api.model.CallCenter;
+import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.api.tenant.service.TenantService;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -15,7 +20,6 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceIvr;
@@ -27,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -70,6 +73,15 @@ public class DialActionHandler extends ActionHandler{
     @Autowired
     private AreaAndTelNumSelector areaAndTelNumSelector;
 
+    @Autowired
+    private NotifyCallbackUtil notifyCallbackUtil;
+
+    @Autowired
+    private ConversationService conversationService;
+
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterService callCenterService;
+
     @Override
     public String getAction() {
         return "dial";
@@ -86,37 +98,10 @@ public class DialActionHandler extends ActionHandler{
      * @return
      */
     @Override
-    public boolean handle(String callId, Element root,String next) {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr动作，callId={},ivr={}",callId,getAction());
-        }
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr[{}]动作",getAction());
-        }
-        BusinessState state = businessStateService.get(callId);
-        if(state == null){
-            logger.info("没有找到call_id={}的state",callId);
-            return false;
-        }
-        boolean dialSucc = false;
-        try{
-            dialSucc = dial(callId,state.getResId(),state.getAppId(),state.getTenantId(),root);
-        }catch (Throwable t){
-            logger.error("ivr拨号失败:",t);
-        }
-
+    public boolean handle(String callId,BusinessState state, Element root,String next) {
         //更新下一步
-        Map<String,Object> businessData = state.getBusinessData();
-        if(businessData == null){
-            businessData = new HashMap<>();
-        }
-        businessData.put("next",next);
-        state.setBusinessData(businessData);
-        businessStateService.save(state);
-
-        if(!dialSucc){//拨号失败直接进行ivr下一步
-            ivrActionService.doAction(callId);
-        }
+        businessStateService.updateInnerField(callId,IVRActionService.IVR_NEXT_FIELD,next);
+        dial(callId,state.getResId(),state.getAppId(),state.getTenantId(),root);
         return true;
     }
 
@@ -134,19 +119,8 @@ public class DialActionHandler extends ActionHandler{
         return Long.parseLong(s);
     }
 
-    public boolean dial(String ivr_call_id,String parent_call_res_id,String appId,String tenantId, Element root){
+    public boolean dial(String ivr_call_id, String parent_call_res_id, String appId, String tenantId, Element root){
         App app = appService.findById(appId);
-        Map<String, String> result;
-        try {
-            result = areaAndTelNumSelector.getTelnumberAndAreaId(app);
-        } catch (AppOffLineException e) {
-            return false;
-        }
-        String areaId = result.get("areaId");
-        String oneTelnumber = result.get("oneTelnumber");
-
-        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
-
         //解析xml
         String ring_play_file = root.elementTextTrim("play");
         String to = root.elementTextTrim("number");
@@ -154,26 +128,26 @@ public class DialActionHandler extends ActionHandler{
         Integer maxDialDuration=parseInt(root.attributeValue("max_dial_duration"));
         Integer dialVoiceStopCond = parseInt(root.attributeValue("dial_voice_stop_cond"));
         String from = root.attributeValue("from");
-        Integer max_seconds=null;
-        Integer connect_mode = null;
-        boolean recording = false;
-        Integer volume1 = null;
-        Integer volume2 = null;
-        Long play_time = null;
+        String max_seconds=null;
+        String connect_mode = null;
+        String recording = null;
+        String volume1 = null;
+        String volume2 = null;
+        String play_time = null;
         String play_file=null;
-        Integer play_repeat= null;
+        String play_repeat= null;
         Element connectEle = root.element("connect");
         if(connectEle!=null){
-            max_seconds = parseInt(connectEle.attributeValue("max_duration"));
-            connect_mode = parseInt(connectEle.attributeValue("mode"));
-            recording = Boolean.parseBoolean(connectEle.attributeValue("recording"));
-            volume1 = parseInt(connectEle.attributeValue("volume1"));
-            volume2 = parseInt(connectEle.attributeValue("volume2"));
-            play_time = parseLong(connectEle.attributeValue("play_time"));
+            max_seconds = connectEle.attributeValue("max_duration");
+            connect_mode = connectEle.attributeValue("mode");
+            recording = connectEle.attributeValue("recording");
+            volume1 = connectEle.attributeValue("volume1");
+            volume2 = connectEle.attributeValue("volume2");
+            play_time = connectEle.attributeValue("play_time");
             Element playEle = connectEle.element("play");
             if(playEle != null){
                 play_file = playEle.getTextTrim();
-                play_repeat = parseInt(playEle.attributeValue("repeat"));
+                play_repeat = playEle.attributeValue("repeat");
             }
         }
 
@@ -183,34 +157,71 @@ public class DialActionHandler extends ActionHandler{
             logger.error("",t);
         }
 
-        VoiceIvr voiceIvr = new VoiceIvr();
-        voiceIvr.setFromNum(oneTelnumber);
-        voiceIvr.setToNum(to);
-        voiceIvr.setStartTime(new Date());
-        voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_CALL);
-        voiceIvr = voiceIvrService.save(voiceIvr);
-        String callId = voiceIvr.getId();
+        AreaAndTelNumSelector.Selector selector;
+        try {
+            selector = areaAndTelNumSelector.getTelnumberAndAreaId(app,from,to);
+        } catch (YunhuniApiException e) {
+            return false;
+        }
+        String areaId = selector.getAreaId();
+        String oneTelnumber = selector.getOneTelnumber();
+        String lineId = selector.getLineId();
 
-        CallSession callSession = new CallSession();
-        callSession.setStatus(CallSession.STATUS_PREPARING);
-        callSession.setFromNum(oneTelnumber);
-        callSession.setToNum(to+"@"+lineGateway.getIp()+":"+lineGateway.getPort());
-        callSession.setApp(app);
-        callSession.setTenant(app.getTenant());
-        callSession.setRelevanceId(callId);
-        callSession.setType(CallSession.TYPE_VOICE_IVR);
-        callSession.setResId(null);
-        callSession = callSessionService.save(callSession);
+        String callId = null;
+
+        CallSession callSession = null;
+
+        boolean isCC = conversationService.isCC(ivr_call_id);
+        if(isCC){
+            CallCenter callCenter = new CallCenter();
+            callCenter.setTenantId(tenantId);
+            callCenter.setAppId(appId);
+            callCenter.setFromNum(from);
+            callCenter.setToNum(to);
+            callCenter.setStartTime(new Date());
+            callCenter.setType(""+CallCenter.CALL_DIAL);
+            callId = callCenterService.save(callCenter).getId();
+
+            callSession = new CallSession();
+            callSession.setStatus(CallSession.STATUS_CALLING);
+            callSession.setFromNum(to);
+            callSession.setToNum(from);
+            callSession.setApp(app);
+            callSession.setTenant(app.getTenant());
+            callSession.setRelevanceId(callId);
+            callSession.setResId(null);
+            callSession.setType(CallSession.TYPE_CALL_CENTER);
+            callSession = callSessionService.save(callSession);
+        }else{
+            VoiceIvr voiceIvr = new VoiceIvr();
+            voiceIvr.setFromNum(oneTelnumber);
+            voiceIvr.setToNum(to);
+            voiceIvr.setStartTime(new Date());
+            voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_CALL);
+            voiceIvr = voiceIvrService.save(voiceIvr);
+            callId = voiceIvr.getId();
+
+            callSession = new CallSession();
+            callSession.setStatus(CallSession.STATUS_PREPARING);
+            callSession.setFromNum(oneTelnumber);
+            callSession.setToNum(selector.getToUri());
+            callSession.setApp(app);
+            callSession.setTenant(app.getTenant());
+            callSession.setRelevanceId(callId);
+            callSession.setType(CallSession.TYPE_VOICE_IVR);
+            callSession.setResId(null);
+            callSession = callSessionService.save(callSession);
+        }
 
         Map<String, Object> params = new MapBuilder<String,Object>()
-                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
+                .putIfNotEmpty("to_uri",selector.getToUri())
                 .putIfNotEmpty("from_uri",oneTelnumber)
                 .putIfNotEmpty("parent_call_res_id",parent_call_res_id)
                 .putIfNotEmpty("ring_play_file",ring_play_file)
                 .put("max_answer_seconds",maxCallDuration, IVRActionService.MAX_DURATION_SEC)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
-                .put("areaId ",areaId)
+                .put("areaId",areaId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
@@ -225,22 +236,24 @@ public class DialActionHandler extends ActionHandler{
                 .setTenantId(tenantId)
                 .setAppId(appId)
                 .setId(callId)
-                .setType("ivr_dial")
+                .setType(BusinessState.TYPE_IVR_DIAL)
+                .setCallBackUrl(app.getUrl())
                 .setAreaId(areaId)
-                .setLineGatewayId(lineGateway.getId())
-                .setBusinessData(new MapBuilder<String,Object>()
+                .setLineGatewayId(lineId)
+                .setBusinessData(new MapBuilder<String,String>()
+                        .putIfNotEmpty(CallCenterUtil.ISCC_FIELD,isCC?CallCenterUtil.ISCC_TRUE:null)
                         .putIfNotEmpty("ivr_call_id",ivr_call_id)
                         .putIfNotEmpty("from",from)
                         .putIfNotEmpty("to",to)
-                        .put("max_seconds",max_seconds, IVRActionService.MAX_DURATION_SEC)
-                        .put("connect_mode",connect_mode,1)
+                        .put("max_seconds",max_seconds, ""+IVRActionService.MAX_DURATION_SEC)
+                        .put("connect_mode",connect_mode,"1")
                         .putIfNotEmpty("volume1",volume1)
                         .putIfNotEmpty("volume2",volume2)
                         .putIfNotEmpty("play_time",play_time)
                         .putIfNotEmpty("play_file",play_file)
-                        .put("play_repeat",play_repeat,1)
+                        .put("play_repeat",play_repeat,"1")
                         .putIfNotEmpty("recording",recording)
-                        .putIfNotEmpty("sessionid",callSession.getId())
+                        .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
                 .build();
         businessStateService.save(callstate);

@@ -5,21 +5,20 @@
     <parent>
         <artifactId>yunhuni</artifactId>
         <groupId>com.lsxy</groupId>
-        <version>1.2.0-RC5</version>
+        <version>1.2.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>app-backend</artifactId>
 
     <properties>
-        <start-class>com.lsxy.app.backend.MainClass</start-class>
         <java.version>1.8</java.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter</artifactId>
         </dependency>
         <!--<dependency>-->
             <!--<groupId>org.springframework.boot</groupId>-->
@@ -50,11 +49,6 @@
 
         <dependency>
             <groupId>com.lsxy</groupId>
-            <artifactId>module-framework-web</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.lsxy</groupId>
             <artifactId>module-service-api</artifactId>
         </dependency>
         <dependency>
@@ -81,12 +75,26 @@
 
         <dependency>
             <groupId>com.lsxy</groupId>
-            <artifactId>module-framework-cache</artifactId>
+            <artifactId>module-framework-monitor</artifactId>
         </dependency>
 
         <dependency>
             <groupId>com.lsxy</groupId>
-            <artifactId>module-framework-monitor</artifactId>
+            <artifactId>module-service-call-center-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-dubbo</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>javax.servlet-api</artifactId>
+                    <groupId>javax.servlet</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-oss</artifactId>
         </dependency>
     </dependencies>
 
@@ -94,44 +102,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
-                <!-- The configuration of the plugin -->
-                <configuration>
-                    <!-- Configuration of the archiver -->
-                    <archive>
-
-                        <!--
-                            生成的jar中，不要包含pom.xml和pom.properties这两个文件
-                        -->
-                        <addMavenDescriptor>false</addMavenDescriptor>
-
-                        <!-- Manifest specific configuration -->
-                        <manifest>
-                            <!--
-                                是否要把第三方jar放到manifest的classpath中
-                            -->
-                            <addClasspath>true</addClasspath>
-                            <!--
-                               生成的manifest中classpath的前缀，因为要把第三方jar放到lib目录下，所以classpath的前缀是lib/
-                           -->
-                            <classpathPrefix>lib/</classpathPrefix>
-                            <!--
-                                应用的main class
-                            -->
-                            <mainClass>com.lsxy.app.api.gatewayMainClass</mainClass>
-                        </manifest>
-                    </archive>
-                    <!--
-                        过滤掉不希望包含在jar中的文件
-                    -->
-                    <excludes>
-                        <exclude>${project.basedir}/xml/*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
 
             <plugin>
                 <groupId>org.springframework.boot</groupId>

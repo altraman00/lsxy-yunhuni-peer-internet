@@ -162,10 +162,10 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
         try {
             RestResponse<App> appResp = this.getAppById(request, appId);
             if(appResp.isSuccess() && appResp.getData() != null){
-                App app = appResp.getData();
-                if(app.getStatus() == App.STATUS_OFFLINE){
-                    throw new RuntimeException("请先上线应用");
-                }
+//                App app = appResp.getData();
+//                if(app.getStatus() == App.STATUS_OFFLINE){
+//                    throw new RuntimeException("请先上线应用");
+//                }
             }else{
                 throw new RuntimeException("获取app失败");
             }
@@ -198,15 +198,15 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                     if(size > 5*1024*1024) {
                         return RestResponse.failed("0000", "上传失败,文件超过5M");
                     }
-                    RestResponse response1 = getBilling(request);
-                    if(response1.isSuccess()) {
-                        Billing billing = (Billing) response1.getData();
-                        if(billing.getFileRemainSize()<size){
-                            return RestResponse.failed("0000", "存储空间不足，无法上传");
-                        }
-                    }else{
-                        return response1;
-                    }
+//                    RestResponse response1 = getBilling(request);
+//                    if(response1.isSuccess()) {
+//                        Billing billing = (Billing) response1.getData();
+//                        if(billing.getFileRemainSize()<size){
+//                            return RestResponse.failed("0000", "存储空间不足，无法上传");
+//                        }
+//                    }else{
+//                        return response1;
+//                    }
                     String type = name.substring(name.lastIndexOf("."), name.length());
                     //如果文件夹不存在，则创建文件夹
                     String folder = getFolder(tenantId, appId, ymd);

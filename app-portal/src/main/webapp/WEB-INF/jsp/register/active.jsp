@@ -16,7 +16,7 @@
         <a a href="#" onclick="window.location.href='<%=SystemConfig.getProperty("global.official.website.url")%>'">
         <img class="logo" src="${resPrefixUrl }/images/index/logo_top.png" /></a>
         <div class="text">
-            如以有云呼你账号，<a href="${ctx }/login">立即登录</a>
+            如果有壹耘账号，<a href="${ctx }/login">立即登录</a>
         </div>
     </div>
 </div>
@@ -85,7 +85,7 @@
 <!-- /container -->
 <!--footer-->
 <div class="register_footer">
-    <p>Copyright 2016 云呼你 粤ICP备16048993号 All Rights Reserved 广州流水行云科技有限公司</p>
+    <p>Copyright 2016 壹耘 粤ICP备16048993号 All Rights Reserved 广州流水行云科技有限公司</p>
 </div>
 <!--/footer-->
 

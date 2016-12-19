@@ -4,6 +4,7 @@ import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.BeanUtils;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
@@ -13,6 +14,7 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -45,7 +47,6 @@ public class HomeController extends AbstractPortalController {
         model.put("homeVO",homeVO);
         return new ModelAndView("console/home/index",model);
     }
-
     /**
      * 用户变更secretKey所调用的接口
      */
@@ -59,6 +60,25 @@ public class HomeController extends AbstractPortalController {
         return response;
     }
 
+    /**
+     * 获取今日数据和本月数据
+     * @param request
+     * @param type
+     * @return
+     */
+    @RequestMapping(value = "/get_avg_der/{type}",method = RequestMethod.GET)
+    @ResponseBody
+    public RestResponse getAvgDer(HttpServletRequest request,@PathVariable String type){
+        String token = getSecurityToken(request);
+        String searchType;
+        if("today".equals(type)) {
+            searchType = "today";
+        }else {
+            searchType = "month";
+        }
+        String url = PortalConstants.REST_PREFIX_URL +   "/rest/day_statics/get?type={1}";
+        return RestRequest.buildSecurityRequest(token).get(url, Map.class,searchType);
+    }
 
     /**
      * 根据token构建首页vo
@@ -105,10 +125,13 @@ public class HomeController extends AbstractPortalController {
         //TODO 获取当前线路状况，从redis里取
         //当前线路情况(暂时给个数字)
         vo.setLineNum(1);
+
         //获取通话状况
-        Map callStatus = getCallStatus(token);
-        vo.setLineAverageCallTime((Integer) callStatus.get("lineAverageCallTime"));
-        vo.setLineLinkRate((Double) callStatus.get("lineLinkRate"));
+        Map callStatus = getAvgDdr(token,"all");
+        //总平均通话时长
+        vo.setLineAverageCallTime(callStatus.get("avgCostTime"));
+        //总接通率
+        vo.setLineLinkRate(callStatus.get("avgCall"));
 
         //此处调用鉴权账号（凭证）RestApi
         ApiCertificate cert = getApiCertificate(token);
@@ -119,33 +142,17 @@ public class HomeController extends AbstractPortalController {
         }
         List<App> appList = getApps(token);
 
-        List<AppStateVO> appStateVOs = new ArrayList<>();
+        vo.setAppSize(appList.size());
+        int onlineApp = 0;
         if(appList != null){
             for(App app:appList){
-                AppStateVO appStateVO = new AppStateVO();
-                try {
-                    BeanUtils.copyProperties2(appStateVO,app,false);
-                } catch (Exception e) {
-                    logger.error("复制类属性异常",e);
+                if(app.getStatus() == App.STATUS_ONLINE){
+                    onlineApp++;
                 }
-                Map map = getStatistics(token, app);
-
-                appStateVO.setCallOfDay((Integer) map.get("dayCount"));
-                appStateVO.setCallOfHour((Integer) map.get("hourCount"));
-                appStateVO.setCurrentCall((Integer) map.get("currentSession"));
-                if(app.getStatus() == App.STATUS_ONLINE &&app.getIsIvrService() != null && app.getIsIvrService() == 1){
-                    ResourcesRent rent = getIvrNumber(token,app.getId());
-                    if(rent != null){
-                        if(rent.getResourceTelenum()!=null) {
-                            appStateVO.setIvr(rent.getResourceTelenum().getTelNumber());
-                        }
-                        appStateVO.setIvrExpire(new Date().getTime() > rent.getRentExpire().getTime());
-                    }
-                }
-                appStateVOs.add(appStateVO);
             }
         }
-        vo.setAppStateVOs(appStateVOs);
+        vo.setOnLineApp(onlineApp);
+        vo.setTime(org.apache.tools.ant.util.DateUtils.format(new Date(),"yyyy-MM"));
         return vo;
     }
 
@@ -159,6 +166,10 @@ public class HomeController extends AbstractPortalController {
         return RestRequest.buildSecurityRequest(token).get(url, ResourcesRent.class,appId).getData();
     }
 
+    private Map getAvgDdr(String token,String type){
+        String url = PortalConstants.REST_PREFIX_URL +   "/rest/day_statics/get?type={1}";
+        return RestRequest.buildSecurityRequest(token).get(url, Map.class,type).getData();
+    }
     /**
      * 获取未读消息
      * @return

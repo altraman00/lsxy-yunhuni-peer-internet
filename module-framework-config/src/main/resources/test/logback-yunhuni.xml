@@ -38,7 +38,7 @@
     </appender>
 
     <appender name="gelf" class="biz.paluch.logging.gelf.logback.GelfLogbackAppender">
-        <host>tcp:graylog.yunhuni.cn</host>
+        <host>tcp:10.163.3.165</host>
         <port>12205</port>
         <version>1.1</version>
         <facility>java-test</facility>
@@ -63,20 +63,13 @@
     </appender>
 
 
-    <root level="INFO">
-        <appender-ref ref="STDOUT" />
-        <appender-ref ref="gelf" />
-        <appender-ref ref="ROLLINGFILE"/>
-    </root>
-
-
     <logger name="com.lsxy" level="DEBUG" additivity="true" />
-    <logger name="com.lsxy.framework.rpc" level="INFO" additivity="true" />
+    <logger name="com.lsxy.framework.rpc.netty.codec" level="INFO" additivity="true" />
     <logger name="com.lsxy.framework.config" level="INFO" additivity="true" />
     <logger name="com.lsxy.framework.monitor" level="INFO" additivity="true" />
     <logger name="org.springframework" level="ERROR" additivity="true" />
     <logger name="org.hibernate" level="ERROR" additivity="true" />
-    <logger name="org.springframework.web.servlet.mvc" level="ERROR" additivity="true" />
+    <logger name="org.springframework.web.servlet.mvc" level="INFO" additivity="true" />
 
 
 </included>
