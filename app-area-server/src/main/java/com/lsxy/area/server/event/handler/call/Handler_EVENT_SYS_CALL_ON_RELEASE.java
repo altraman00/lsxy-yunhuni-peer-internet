@@ -177,7 +177,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                             }
                         }else{
                             if(callCenter.getAgent() != null && callCenter.getToManualResult() !=null &&
-                                    callCenter.getToManualResult().equals(CallCenter.TO_MANUAL_RESULT_SUCESS)){
+                                    callCenter.getToManualResult().equals(""+CallCenter.TO_MANUAL_RESULT_SUCESS)){
                                 callCenter.setOverReason(CallCenter.OVER_REASON_AGENT_HANGUP);
                             }
                         }
