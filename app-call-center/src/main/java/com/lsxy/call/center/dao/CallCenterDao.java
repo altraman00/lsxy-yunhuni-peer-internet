@@ -5,6 +5,7 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -16,6 +17,7 @@ import java.math.BigDecimal;
 public interface CallCenterDao extends BaseDaoInterface<CallCenter, Serializable> {
 
     @Modifying
+    @Transactional
     @Query("update CallCenter a set a.cost=a.cost+:cost where a.id=:id")
     public void incrCost(@Param("id") String id,@Param("cost") BigDecimal cost);
 }

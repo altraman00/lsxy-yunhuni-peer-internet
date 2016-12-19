@@ -4,6 +4,7 @@ import com.lsxy.call.center.CallCenterMainClass;
 import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
+import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.call.center.api.service.EnQueueService;
 import com.lsxy.call.center.api.utils.EnQueueDecoder;
 import com.lsxy.framework.config.Constants;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.math.BigDecimal;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -28,6 +30,9 @@ public class CallcenterTest {
 
     @Autowired
     private AppExtensionService appExtensionService;
+
+    @Autowired
+    private CallCenterService callCenterService;
 
     @Autowired
     private EnQueueService enQueueService;
@@ -141,5 +146,10 @@ public class CallcenterTest {
                 "    </filter>\n" +
                 "</enqueue>");
         enQueueService.lookupAgent("40288ac9575612a30157561c7ff50004","40288ac957e1812e0157e18a994e0000","","",enQueue);
+    }
+
+    @Test
+    public void test6(){
+        callCenterService.incrCost("40288ae258f7d97d0158f7d9adc3000a",new BigDecimal(1));
     }
 }
