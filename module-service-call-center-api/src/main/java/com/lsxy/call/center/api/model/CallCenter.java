@@ -22,8 +22,9 @@ public class CallCenter extends IdEntity {
 
     public static int TO_MANUAL_RESULT_SUCESS = 1;//接听
     public static int TO_MANUAL_RESULT_AGENT_FAIL = 2; //呼叫坐席失败
-    public static int TO_MANUAL_RESULT_FAIL = 3; //主动放弃
-    public static int TO_MANUAL_RESULT_TIME_OUT = 4;//超时
+    public static int TO_MANUAL_RESULT_GIVEUP = 3; //主动放弃
+    public static int TO_MANUAL_RESULT_TIME_OUT = 4;//转接超时（排队）
+    public static int TO_MANUAL_RESULT_FAIL = 5;//转接失败（排队）
 
     public static String OVER_REASON_USER = "用户挂断";
     public static String OVER_REASON_AGENT_HANGUP = "坐席挂断";

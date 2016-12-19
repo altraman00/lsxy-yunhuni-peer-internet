@@ -6,11 +6,9 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
-import com.lsxy.call.center.api.model.BaseEnQueue;
-import com.lsxy.call.center.api.model.CallCenterAgent;
-import com.lsxy.call.center.api.model.CallCenterQueue;
-import com.lsxy.call.center.api.model.EnQueueResult;
+import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.CallCenterQueueService;
+import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.StringUtil;
@@ -67,6 +65,9 @@ public class DeQueueServiceImpl implements DeQueueService {
 
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterQueueService callCenterQueueService;
+
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterService callCenterService;
 
     @Autowired
     private CallCenterStatisticsService callCenterStatisticsService;
@@ -162,6 +163,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         }
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
 
+        updateCallCenterTOMANUALRESULT(state,""+CallCenter.TO_MANUAL_RESULT_TIME_OUT);
         try{
             callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
                     .Builder(state.getTenantId(),state.getAppId(),new Date())
@@ -200,6 +202,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         }
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
 
+        updateCallCenterTOMANUALRESULT(state,""+CallCenter.TO_MANUAL_RESULT_FAIL);
         try{
             callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
                     .Builder(state.getTenantId(),state.getAppId(),new Date())
@@ -267,6 +270,24 @@ public class DeQueueServiceImpl implements DeQueueService {
         }
     }
 
+    public void updateCallCenterTOMANUALRESULT(BusinessState state,String result){
+        try{
+            String callCenterId = conversationService.getCallCenter(state);
+            CallCenter callCenter = null;
+            if(callCenterId!=null){
+                callCenter = callCenterService.findById(callCenterId);
+            }
+            if(callCenter != null){
+                if(callCenter.getToManualResult() == null){
+                    callCenter.setToManualResult(result);
+                    callCenterService.save(callCenter);
+                }
+            }
+        }catch (Throwable t){
+            logger.error("更新CallCenter失败",t);
+        }
+    }
+
     /**
      * 停止播放排队等待音
      * @param area_id
@@ -298,7 +319,6 @@ public class DeQueueServiceImpl implements DeQueueService {
         if(StringUtil.isNotEmpty(reserveState)){
             innerFields.add(CallCenterUtil.RESERVE_STATE_FIELD);
             innerFields.add(reserveState);
-
         }
         if(playNum){
             if(StringUtil.isNotEmpty(result.getAgent().getNum())){

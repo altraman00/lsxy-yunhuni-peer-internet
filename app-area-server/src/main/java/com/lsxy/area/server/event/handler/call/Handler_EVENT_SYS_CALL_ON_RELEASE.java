@@ -172,12 +172,16 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                         }
                         if(params.get("dropped_by").equals("user")){//由用户挂断挂断
                             callCenter.setOverReason(CallCenter.OVER_REASON_USER);
+                            if(callCenter.getToManualResult() == null){
+                                callCenter.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_GIVEUP);
+                            }
                         }else{
                             if(callCenter.getAgent() != null && callCenter.getToManualResult() !=null &&
                                     callCenter.getToManualResult().equals(CallCenter.TO_MANUAL_RESULT_SUCESS)){
                                 callCenter.setOverReason(CallCenter.OVER_REASON_AGENT_HANGUP);
                             }
                         }
+
                         callCenterService.save(callCenter);
                         if(callLongTime != null){
                             try{
