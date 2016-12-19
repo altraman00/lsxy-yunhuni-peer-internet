@@ -7,9 +7,23 @@
     <!--<logger name="org.springframework.boot" level="DEBUG" additivity="true" />-->
     <!--<logger name="io.netty" level="INFO" additivity="false" />-->
 
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+        <!--<appender-ref ref="gelf" />-->
+        <!--<appender-ref ref="ROLLINGFILE"/>-->
+    </root>
+
     <logger name="com.lsxy" level="DEBUG" additivity="true" />
     <logger name="com.lsxy.area" level="DEBUG" additivity="true" />
     <!--<logger name="com.lsxy.framework.rpc.api.server" level="DEBUG" additivity="true" />-->
     <!--<logger name="com.lsxy.framework.rpc.netty.codec" level="INFO" additivity="false"/>-->
+
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+        <!--<appender-ref ref="gelf" />-->
+        <!--<appender-ref ref="ROLLINGFILE"/>-->
+    </root>
 
 </configuration>

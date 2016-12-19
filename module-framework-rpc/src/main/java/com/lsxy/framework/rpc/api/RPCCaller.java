@@ -119,15 +119,22 @@ public class RPCCaller {
 				logger.error("RPC连接会话不存在,无法发送请求,请求消息丢入修正队列:{}", request);
 				throw new RightSessionNotFoundExcepiton("会话不存在："+request.getSessionid());
 			}
-			logger.debug(">>*"+request);
-			session.write(request);
+			invoke(session,request);
 		} catch (SessionWriteException | RightSessionNotFoundExcepiton e) {
 			logger.error("RPC请求发送失败,请求消息丢入修正队列:"+request,e);
 			fixQueue.fix(request);
 			throw e;
 		}
 	}
-
+	/**
+	 * 调用远程服务，无返回值
+	 * @param session 允许外接session为空,将为空判断放入方法体主要是为了统一处理会话丢失导致的消息丢失,将消息丢入修正队列
+	 * @throws RequestWriteException
+	 */
+	public void invoke(Session session, RPCRequest request) throws RightSessionNotFoundExcepiton, SessionWriteException {
+		logger.debug(">>*"+request);
+		session.write(request);
+	}
 
 	/**
 	 * 异步调用，并指定回调函数 ,无超时限制,不期待有返回值,如果有返回值,则执行回调

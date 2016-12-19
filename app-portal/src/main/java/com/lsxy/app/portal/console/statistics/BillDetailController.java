@@ -268,18 +268,32 @@ public class BillDetailController extends AbstractPortalController {
         RestResponse<List<VoiceCdr>> result = RestRequest.buildSecurityRequest(token).getList(uri, VoiceCdr.class, type, time, appId);
         if(result.isSuccess() && result.getData() != null){
             List<VoiceCdr> voiceCdrs = result.getData();
-            if(voiceCdrs != null && voiceCdrs.size() > 0){
-                for(VoiceCdr cdr:voiceCdrs){
-                    String toNum = cdr.getToNum();
-                    if(StringUtils.isNotBlank(toNum)){
-                        String[] split = toNum.split("@");
-                        cdr.setToNum(split[0]);
-                    }
-                }
-            }
+            formatNum(voiceCdrs);
         }
         return result;
     }
+
+    /**
+     * 格式化主叫被叫
+     * @param voiceCdrs
+     */
+    private void formatNum(List<VoiceCdr> voiceCdrs) {
+        if(voiceCdrs != null && voiceCdrs.size() > 0){
+            for(VoiceCdr cdr:voiceCdrs){
+                String toNum = cdr.getToNum();
+                if(StringUtils.isNotBlank(toNum)){
+                    String[] split = toNum.split("@");
+                    cdr.setToNum(split[0]);
+                }
+                String fromNum = cdr.getFromNum();
+                if(StringUtils.isNotBlank(fromNum)){
+                    String[] split = fromNum.split("@");
+                    cdr.setFromNum(split[0]);
+                }
+            }
+        }
+    }
+
     /**
      * 获取页面分页数据
      * @param request
@@ -296,15 +310,7 @@ public class BillDetailController extends AbstractPortalController {
         RestResponse<Page<VoiceCdr>> result = RestRequest.buildSecurityRequest(token).getPage(uri, VoiceCdr.class, pageNo, pageSize, type, time, appId);
         if(result.isSuccess() && result.getData() != null){
             List<VoiceCdr> voiceCdrs = result.getData().getResult();
-            if(voiceCdrs != null && voiceCdrs.size() > 0){
-                for(VoiceCdr cdr:voiceCdrs){
-                    String toNum = cdr.getToNum();
-                    if(StringUtils.isNotBlank(toNum)){
-                        String[] split = toNum.split("@");
-                        cdr.setToNum(split[0]);
-                    }
-                }
-            }
+            formatNum(voiceCdrs);
         }
         return result;
     }
