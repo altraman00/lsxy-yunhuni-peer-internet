@@ -124,6 +124,7 @@ public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayT
 
     @Override
     public void removeTenantLine(String id,String tenantId) {
+        int o3 = this.getMaxPriority(tenantId);
         LineGatewayToTenant lineGatewayToTenant = this.findById(id);
         //删除线路关系
         try {
@@ -132,7 +133,6 @@ public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayT
             throw new RuntimeException("删除失败");
         }
         //修正优先级
-        int o3 = this.getMaxPriority(tenantId);
         if(o3!=lineGatewayToTenant.getPriority()){
             int re = this.upPriority(lineGatewayToTenant.getPriority(),o3,null);
             if(re==-1){

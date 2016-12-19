@@ -494,17 +494,13 @@
                 this.paylist = []
             },
             sort :function(v){
-                this.orderby = v
+                this.orderby = v;
                 modalPage()
             },
             canne:function(){
                 window.location.href=ctx+"/console/telenum/callnum/index";
             },
             payOrder:function(){
-//                var id = $('#orderid').html();
-//                if(id!=''){
-//                    showtoast("您有未支付的订单，请完成支付后，再进行号码租用");
-//                }
                 $('#call-modal').modal('hide');
                 var ids = "";
                 for(var i = 0;i<this.shop.length;i++){
@@ -613,7 +609,7 @@
         if(vue.serach.place==-1){
             vue.serach.place='';
         }
-        var params = {'${_csrf.parameterName}':'${_csrf.token}','pageNo':gnowPage,'pageSize':glistRows,'telnum':vue.serach.name,'type':vue.serach.phone,'eaCode':vue.serach.place,'order':''};
+        var params = {'${_csrf.parameterName}':'${_csrf.token}','pageNo':gnowPage,'pageSize':glistRows,'telnum':vue.serach.name,'type':vue.serach.phone,'areaCode':vue.serach.place,'order':''};
         //获取数据总数
         var count = 0;
         ajaxsync("${ctx}/console/telenum/callnum/telnum/plist",params,function(result) {
