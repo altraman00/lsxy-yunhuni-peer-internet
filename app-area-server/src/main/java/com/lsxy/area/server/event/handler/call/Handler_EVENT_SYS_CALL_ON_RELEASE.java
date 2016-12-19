@@ -170,7 +170,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                             callLongTime = (new Date().getTime() - callCenter.getStartTime().getTime()) / 1000;
                             callCenter.setCallTimeLong(callLongTime);
                         }
-                        if(params.get("dropped_by").equals("user")){//由用户挂断挂断
+                        if("usr".equals(params.get("dropped_by"))){//由用户挂断挂断
                             callCenter.setOverReason(CallCenter.OVER_REASON_USER);
                             if(callCenter.getToManualResult() == null){
                                 callCenter.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_GIVEUP);
