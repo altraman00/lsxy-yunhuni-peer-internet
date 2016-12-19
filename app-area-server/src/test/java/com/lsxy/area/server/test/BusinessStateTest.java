@@ -1,8 +1,10 @@
 package com.lsxy.area.server.test;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaServerMainClass;
+import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.config.Constants;
 import com.lsxy.framework.core.utils.MapBuilder;
 import org.junit.Test;
