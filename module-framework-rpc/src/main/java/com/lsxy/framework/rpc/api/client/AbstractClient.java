@@ -17,6 +17,7 @@ import org.springframework.util.Assert;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -46,7 +47,19 @@ public abstract class AbstractClient implements Client{
 
     @Override
     public void bind() {
-        executorService = Executors.newFixedThreadPool(serverUrls.length);
+        executorService = Executors.newFixedThreadPool(serverUrls.length, new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+
+                Thread thread = new Thread(r);
+                String name = "AgentDeamonThread-"+thread.getId();
+                thread.setName(name);
+                if(logger.isDebugEnabled()){
+                    logger.debug("创建代理心跳线程：{}",name);
+                }
+                return thread;
+            }
+        });
         for (String serverUrl:serverUrls) {
             ServerDeamonTask task = new ServerDeamonTask(serverUrl,this.areaid);
             //刚刚开始就执行一次绑定
