@@ -160,8 +160,8 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
 
             if(productCode == ProductCode.call_center){
                 if(logger.isDebugEnabled()){
-                    logger.info("[{}][{}]callcenterid=[],cost={},呼叫中心消费额累计",businessState.getTenantId(),businessState.getAppId(),
-                            conversationService.getCallCenter(businessState),voiceCdr.getCost());
+                    logger.info("[{}][{}]callcenterid={},cost={},呼叫中心消费额累计state={}",businessState.getTenantId(),businessState.getAppId(),
+                            conversationService.getCallCenter(businessState),voiceCdr.getCost(),businessState);
                 }
                 if(voiceCdr.getCost() != null && voiceCdr.getCost().compareTo(BigDecimal.ZERO) == 1){
                     String callCenterId = conversationService.getCallCenter(businessState);
