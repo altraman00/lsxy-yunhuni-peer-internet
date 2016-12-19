@@ -143,39 +143,42 @@ public abstract class AbstractClient implements Client{
 
         @Override
         public void run() {
-            while(true){
-                try {
-                    TimeUnit.SECONDS.sleep(5);
+            try {
+                while (true) {
+                    try {
+                        TimeUnit.SECONDS.sleep(5);
 
-                    Session session = sessionContext.getSession(serverUrl);
-                    if(session != null && session.isValid()){
+                        Session session = sessionContext.getSession(serverUrl);
+                        if (session != null && session.isValid()) {
 
-                        RPCRequest echoRequest = RPCRequest.newRequest(ServiceConstants.CH_MN_HEARTBEAT_ECHO,"");
-                        RPCResponse echoResponse = rpcCaller.invokeWithReturn(session,echoRequest);
-                        if(echoResponse.isOk()) {
-                            if (logger.isDebugEnabled() && SystemConfig.getProperty("area.agent.log.show.heartbeat","true").equals("true")) {
-                                logger.debug("连接着呢:{}", this.serverUrl);
+                            RPCRequest echoRequest = RPCRequest.newRequest(ServiceConstants.CH_MN_HEARTBEAT_ECHO, "");
+                            RPCResponse echoResponse = rpcCaller.invokeWithReturn(session, echoRequest);
+                            if (echoResponse.isOk()) {
+                                if (logger.isDebugEnabled() && SystemConfig.getProperty("area.agent.log.show.heartbeat", "true").equals("true")) {
+                                    logger.debug("连接着呢:{}", this.serverUrl);
+                                }
                             }
+                            continue;
                         }
-                        continue;
-                    }
 
-                    sessionContext.remove(serverUrl);
-                    session = doBind(this.serverUrl);
-                    if(session != null){
-                        sessionContext.putSession(session);
-                        logger.info("连接区域管理服务{}:{}】成功,",session.getRemoteAddress().getAddress().getHostAddress(),session.getRemoteAddress().getPort());
+                        sessionContext.remove(serverUrl);
+                        session = doBind(this.serverUrl);
+                        if (session != null) {
+                            sessionContext.putSession(session);
+                            logger.info("连接区域管理服务{}:{}】成功,", session.getRemoteAddress().getAddress().getHostAddress(), session.getRemoteAddress().getPort());
+                        }
+                    } catch (RequestTimeOutException e) {
+                        logger.error("心跳请求超时:" + serverUrl, e);
+                    } catch (InterruptedException e) {
+                        logger.error("出现异常", e);
+                    } catch (ClientBindException e) {
+                        logger.error("客户端连接异常:" + serverUrl, e);
+                    } catch (HaveNoExpectedRPCResponseException e) {
+                        logger.error("非期待响应对象:" + serverUrl, e);
                     }
-                } catch (RequestTimeOutException e) {
-                    logger.error("心跳请求超时:" + serverUrl,  e);
-                } catch (InterruptedException e) {
-                    logger.error("出现异常",e);
-                } catch (ClientBindException e) {
-                    logger.error("客户端连接异常:" + serverUrl,e);
-                } catch (HaveNoExpectedRPCResponseException e) {
-                    logger.error("非期待响应对象:" + serverUrl,e);
-
                 }
+            }catch(Exception ex){
+                logger.error("后台心跳线程竟然退出了:"+serverUrl,ex);
             }
         }
     }
