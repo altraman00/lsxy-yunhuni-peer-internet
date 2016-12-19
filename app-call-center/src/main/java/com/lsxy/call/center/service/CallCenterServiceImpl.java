@@ -7,6 +7,8 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,9 @@ import java.util.Map;
 @Service
 @com.alibaba.dubbo.config.annotation.Service
 public class CallCenterServiceImpl extends AbstractService<CallCenter> implements CallCenterService {
+
+    private static final Logger logger = LoggerFactory.getLogger(CallCenterServiceImpl.class);
+
     @Autowired
     private CallCenterDao callCenterDao;
     @Autowired
@@ -117,6 +122,9 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
 
     @Override
     public void incrCost(String callCenterId, BigDecimal cost) {
+        if(logger.isDebugEnabled()){
+            logger.info("累计callcenter={}消费={}",callCenterId,cost);
+        }
         if(callCenterId != null && cost.compareTo(BigDecimal.ZERO) == 1){
             callCenterDao.incrCost(callCenterId,cost);
         }
