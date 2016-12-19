@@ -30,6 +30,7 @@ import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
 
@@ -180,6 +181,7 @@ public class DialActionHandler extends ActionHandler{
             callCenter.setToNum(to);
             callCenter.setStartTime(new Date());
             callCenter.setType(""+CallCenter.CALL_DIAL);
+            callCenter.setCost(BigDecimal.ZERO);
             callId = callCenterService.save(callCenter).getId();
 
             callSession = new CallSession();
