@@ -62,7 +62,7 @@ public class InitTestData {
         }
 
         String skill_prefix = UUIDGenerator.uuid();
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 51; i++) {
             CallCenterAgent agent = new CallCenterAgent();
             agent.setTenantId(channel.getTenantId());
             agent.setAppId(channel.getAppId());

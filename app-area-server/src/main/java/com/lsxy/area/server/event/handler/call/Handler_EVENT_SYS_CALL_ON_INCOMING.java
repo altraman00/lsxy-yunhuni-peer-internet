@@ -81,6 +81,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
      */
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
+        long start = System.currentTimeMillis();
         RPCResponse res = null;
         Map<String,Object> params = request.getParamMap();
         if(MapUtils.isEmpty(params)){
@@ -91,7 +92,15 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         String to_uri = (String)params.get("to_uri");//被叫号码sip地址
         String begin_time = (String)params.get("begin_time");
         String to = resourceTelenumService.findNumByCallUri(to_uri);//被叫号码
+        if(to ==null){
+            logger.info("被叫号码不存在{}",request);
+            return null;
+        }
         LineGateway calledLine = telnumToLineGatewayService.getCalledLineByNumber(to);
+        if(calledLine == null){
+            logger.info("线路不存在{}",request);
+            return null;
+        }
         String from = resolveFromTelNum(from_uri,calledLine);//主叫号码
 
         Tenant tenant = null;
@@ -149,6 +158,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("[{}][{}]开始处理ivr",tenant.getId(),app.getId());
         }
+        logger.info("incoming找号码耗时:{}",(System.currentTimeMillis() - start));
         ivrActionService.doActionIfAccept(app,tenant,res_id,from,to,calledLine.getId(),isCallCenter);
         return res;
     }

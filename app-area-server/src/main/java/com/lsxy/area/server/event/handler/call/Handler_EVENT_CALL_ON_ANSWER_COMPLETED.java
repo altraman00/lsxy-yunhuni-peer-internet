@@ -1,15 +1,18 @@
 package com.lsxy.area.server.event.handler.call;
 
+import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
-import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.service.ivr.IVRActionService;
+import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
+import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -17,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -38,6 +42,9 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
 
     @Autowired
     private IVRActionService ivrActionService;
+
+    @Autowired
+    private CallCenterStatisticsService callCenterStatisticsService;
 
     @Override
     public String getEventName() {
@@ -63,8 +70,18 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
             return res;
         }
         String call_id = (String)params.get("user_data");
-        if(call_id == null){
+        if(StringUtils.isBlank(call_id)){
             throw new InvalidParamException("call_id=null");
+        }
+        BusinessState state = businessStateService.get(call_id);
+        if(state == null){
+            throw new InvalidParamException("businessstate is null");
+        }
+        try{
+            callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(state.getTenantId(),state.getAppId(),
+                    new Date()).setCallInSuccess(1L).build());
+        }catch (Throwable t){
+            logger.error("incrIntoRedis失败",t);
         }
         //删除等待应答标记
         businessStateService.deleteInnerField(call_id,IVRActionService.IVR_ANSWER_WAITTING_FIELD);

@@ -25,6 +25,8 @@ import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceIvr;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
+import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
+import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -76,6 +78,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
     @Autowired
     private CallCenterUtil callCenterUtil;
 
+    @Autowired
+    private CallCenterStatisticsService callCenterStatisticsService;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CALL_ON_RELEASE;
@@ -97,7 +102,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         String call_id = (String)params.get("user_data");
 
         if(StringUtils.isBlank(call_id)){
-            throw new InvalidParamException("call_id is null");
+            //throw new InvalidParamException("call_id is null");
+            logger.info("call_id is null");
+            return null;
         }
 
         BusinessState state = businessStateService.get(call_id);
@@ -147,14 +154,46 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             }
         }else{
             try{
-                CallCenter callCenter = callCenterService.findById(call_id);
+                CallCenter callCenter = null;
+                if(conversationService.getCallCenter(state)!=null){
+                    callCenter = callCenterService.findById(conversationService.getCallCenter(state));
+                }
+                if(logger.isDebugEnabled()){
+                    logger.info("[{}][{}][{}]更新CallCenter,callCenter={}",
+                            state.getTenantId(),state.getAppId(),call_id,callCenter);
+                }
                 if(callCenter != null){
-                    callCenter.setEndTime(new Date());
-                    if(callCenter.getStartTime() != null){
-                        Long callLongTime = (new Date().getTime() - callCenter.getStartTime().getTime()) / 1000;
-                        callCenter.setCallTimeLong(callLongTime.toString());
+                    if(conversationService.isCC(state)){
+                        callCenter.setEndTime(new Date());
+                        Long callLongTime  = null;
+                        if(callCenter.getStartTime() != null){
+                            callLongTime = (new Date().getTime() - callCenter.getStartTime().getTime()) / 1000;
+                            callCenter.setCallTimeLong(callLongTime);
+                        }
+                        if("usr".equals(params.get("dropped_by"))){//由用户挂断挂断
+                            callCenter.setOverReason(CallCenter.OVER_REASON_USER);
+                            if(callCenter.getToManualResult() == null){
+                                callCenter.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_GIVEUP);
+                            }
+                        }else{
+                            if(callCenter.getAgent() != null && callCenter.getToManualResult() !=null &&
+                                    callCenter.getToManualResult().equals(""+CallCenter.TO_MANUAL_RESULT_SUCESS)){
+                                callCenter.setOverReason(CallCenter.OVER_REASON_AGENT_HANGUP);
+                            }
+                        }
+
+                        callCenterService.save(callCenter);
+                        if(callLongTime != null){
+                            try{
+                                callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
+                                        .Builder(state.getTenantId(),state.getAppId(),new Date())
+                                        .setCallTimeLong(callLongTime)
+                                        .build());
+                            }catch (Throwable t){
+                                logger.error("incrIntoRedis失败",t);
+                            }
+                        }
                     }
-                    callCenterService.save(callCenter);
                 }
             }catch (Throwable t){
                 logger.error("更新CallCenter失败",t);

@@ -54,9 +54,9 @@ public abstract class AbstractServerRPCHandler extends RPCHandler {
         if(message instanceof RPCRequest){
             RPCRequest request = (RPCRequest) message;
             RPCResponse response = null;
-            if(logger.isDebugEnabled()){
-                logger.debug("消息统一处理入口:{}",message);
-            }
+//            if(logger.isDebugEnabled()){
+//                logger.debug("消息统一处理入口:{}",message);
+//            }
 
 
             if(request.getName().equals(ServiceConstants.CH_MN_CONNECT)){

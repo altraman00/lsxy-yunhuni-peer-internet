@@ -203,6 +203,8 @@ public abstract class AbstractClient implements Client{
                 if (bindCallback != null) {
                     bindCallback.doCallback(session);
                 }
+
+
             } else {
                 logger.error("连接异常不成功:{}",response.getBodyAsString());
                 session.close(true);
@@ -211,4 +213,5 @@ public abstract class AbstractClient implements Client{
             throw new ClientConnecException(ex);
         }
     }
+
 }

@@ -122,7 +122,7 @@ public class VoiceFileRecordDeletedEventHandler implements MQMessageHandler<Voic
                             logger.debug("本次删除录音文件信息:{}", param);
                         }
                         Map<String, Object> params = new HashMap<>();
-                        params.put("areaId ", area.getId());
+                        params.put("areaId", area.getId());
                         RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_RF_DELETED, params);
                         request.setBody(param);
                         try {
