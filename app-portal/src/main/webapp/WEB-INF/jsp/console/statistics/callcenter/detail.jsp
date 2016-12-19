@@ -83,8 +83,9 @@
 
                                                 <span class="search-bigger-title inline-block text-center ">呼叫类型</span>
                                                 <select name="type" class="form-control inline-block search-input">
-                                                    <option <c:if test="${type == '1'}"> selected</c:if> value="1">呼出</option>
-                                                    <option <c:if test="${type == '2'}"> selected</c:if> value="2">呼入</option>
+                                                    <option  value="">全部</option>
+                                                    <option <c:if test="${type == '1'}"> selected</c:if> value="1">呼入</option>
+                                                    <option <c:if test="${type == '2'}"> selected</c:if> value="2">呼出</option>
                                                 </select>
 
                                                 <button class="btn btn-primary margin-left-20" type="submit"> 查询</button>

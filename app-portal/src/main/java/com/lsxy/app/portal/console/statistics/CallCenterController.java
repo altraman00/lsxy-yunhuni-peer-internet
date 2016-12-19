@@ -59,6 +59,9 @@ public class CallCenterController extends AbstractPortalController {
         if(StringUtils.isEmpty(endTime)){
             endTime = map.get("time");
         }
+        if(StringUtils.isBlank(appId)){
+            appId = map.get("appId");
+        }
         map.put("type",type);
         map.put("callnum",callnum);
         map.put("agent",agent);
