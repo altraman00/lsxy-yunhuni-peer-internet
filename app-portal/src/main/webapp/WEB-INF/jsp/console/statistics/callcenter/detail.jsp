@@ -139,6 +139,7 @@
                                                         <c:if test="${result.toManualResult==2}">呼叫坐席失败</c:if>
                                                         <c:if test="${result.toManualResult==3}">主动放弃</c:if>
                                                         <c:if test="${result.toManualResult==4}">超时</c:if>
+                                                        <c:if test="${result.toManualResult==5}">转接失败</c:if>
                                                     </td>
                                                     <td>${result.overReason}</td>
                                                     <td><fmt:formatDate value="${result.toManualTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate></td>
