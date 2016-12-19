@@ -24,18 +24,21 @@ public class CallCenter extends IdEntity {
     public static int TO_MANUAL_RESULT_AGENT_FAIL = 2; //呼叫坐席失败
     public static int TO_MANUAL_RESULT_FAIL = 3; //主动放弃
     public static int TO_MANUAL_RESULT_TIME_OUT = 4;//超时
+
+    public static String OVER_REASON_USER = "用户挂断";
+    public static String OVER_REASON_AGENT_HANGUP = "坐席挂断";
+    public static String OVER_REASON_TIMEOUT = "呼叫超时";
+
     @Column( name = "tenant_id")
     private String tenantId;
     @Column( name = "app_id")
     private String appId;
     @Column( name = "start_time")
     private Date startTime;//发起时间
-    @Column( name = "answer_time")
-    private Date answerTime;//接听时间
     @Column( name = "end_time")
     private Date endTime;//结束时间
     @Column( name = "call_time_long")
-    private String callTimeLong;//通话时间
+    private Long callTimeLong;//通话时间
     @Column( name = "from_num")
     private String fromNum;//主叫号
     @Column( name = "to_num")
@@ -45,9 +48,13 @@ public class CallCenter extends IdEntity {
     @Column( name = "cost")
     private BigDecimal cost;//费用
     @Column( name = "to_manual_time")
-    private Long toManualTime;//转人工时间
+    private Date toManualTime;//开始转坐席时间
+    @Column( name = "answer_time")
+    private Date answerTime;//转接坐席接听时间
     @Column( name = "to_manual_result")
     private String toManualResult;//转接结果
+    @Column( name = "to_manual_time_long")
+    private Long toManualTimeLong;//转人工花费时长
     @Column( name = "agent")
     private String agent;//座席
     @Column( name = "over_reason")
@@ -93,11 +100,11 @@ public class CallCenter extends IdEntity {
         this.endTime = endTime;
     }
 
-    public String getCallTimeLong() {
+    public Long getCallTimeLong() {
         return callTimeLong;
     }
 
-    public void setCallTimeLong(String callTimeLong) {
+    public void setCallTimeLong(Long callTimeLong) {
         this.callTimeLong = callTimeLong;
     }
 
@@ -133,11 +140,11 @@ public class CallCenter extends IdEntity {
         this.cost = cost;
     }
 
-    public Long getToManualTime() {
+    public Date getToManualTime() {
         return toManualTime;
     }
 
-    public void setToManualTime(Long toManualTime) {
+    public void setToManualTime(Date toManualTime) {
         this.toManualTime = toManualTime;
     }
 
@@ -147,6 +154,14 @@ public class CallCenter extends IdEntity {
 
     public void setToManualResult(String toManualResult) {
         this.toManualResult = toManualResult;
+    }
+
+    public Long getToManualTimeLong() {
+        return toManualTimeLong;
+    }
+
+    public void setToManualTimeLong(Long toManualTimeLong) {
+        this.toManualTimeLong = toManualTimeLong;
     }
 
     public String getAgent() {
