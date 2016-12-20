@@ -3,6 +3,7 @@ package com.lsxy.area.server.mq.handler;
 import com.lsxy.area.server.mq.CdrEvent;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.callcenter.CallCenterIncrCostEvent;
@@ -43,7 +44,12 @@ public class CdrEventHandler implements MQMessageHandler<CdrEvent> {
         if(logger.isDebugEnabled()){
             logger.debug("处理cdr事件{}",message.toJson());
         }
-        VoiceCdr voiceCdr = message.getVoiceCdr();
+        VoiceCdr voiceCdr = null;
+        try{
+            voiceCdr = JSONUtil2.fromJson(message.getVoiceCdr(),VoiceCdr.class);
+        }catch (Throwable t){
+            logger.error("cdr反序列化失败{}",t);
+        }
         String callCenterId = message.getCallCenterId();
         //扣费
         if(voiceCdr.getCallAckDt() != null){

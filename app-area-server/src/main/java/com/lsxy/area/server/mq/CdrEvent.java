@@ -2,23 +2,19 @@ package com.lsxy.area.server.mq;
 
 import com.lsxy.framework.mq.api.AbstractMQEvent;
 import com.lsxy.framework.mq.topic.MQTopicConstants;
-import com.lsxy.yunhuni.api.product.enums.ProductCode;
-import com.lsxy.yunhuni.api.session.model.VoiceCdr;
-
-import java.util.Map;
 
 /**
  * Created by Administrator on 2016/12/20.
  */
 public class CdrEvent extends AbstractMQEvent {
 
-    private VoiceCdr voiceCdr;
+    private String voiceCdr;
 
     private String callCenterId;
 
     public CdrEvent(){}
 
-    public CdrEvent(VoiceCdr voiceCdr,String callCenterId){
+    public CdrEvent(String voiceCdr,String callCenterId){
         this.voiceCdr = voiceCdr;
         this.callCenterId = callCenterId;
     }
@@ -28,11 +24,11 @@ public class CdrEvent extends AbstractMQEvent {
         return MQTopicConstants.TOPIC_AREA_SERVER;
     }
 
-    public VoiceCdr getVoiceCdr() {
+    public String getVoiceCdr() {
         return voiceCdr;
     }
 
-    public void setVoiceCdr(VoiceCdr voiceCdr) {
+    public void setVoiceCdr(String voiceCdr) {
         this.voiceCdr = voiceCdr;
     }
 

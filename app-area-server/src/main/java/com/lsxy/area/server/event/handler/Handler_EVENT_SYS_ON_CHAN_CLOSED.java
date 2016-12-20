@@ -175,7 +175,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
                 }
             }
         }
-        mqService.publish(new CdrEvent(voiceCdr,callCenterId));
+        mqService.publish(new CdrEvent(JSONUtil.objectToJson(voiceCdr),callCenterId));
         return null;
     }
 
