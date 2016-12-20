@@ -121,8 +121,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         try{
             CallSession callSession = callSessionService.findById(state.getBusinessData().get(BusinessState.SESSIONID));
             if(callSession != null){
-                callSession.setStatus(CallSession.STATUS_OVER);
-                callSessionService.save(callSession);
+                CallSession updateSession = new CallSession();
+                updateSession.setStatus(CallSession.STATUS_OVER);
+                callSessionService.update(callSession.getId(),updateSession);
             }
         }catch (Throwable t){
             logger.error("更新会话记录失败",t);

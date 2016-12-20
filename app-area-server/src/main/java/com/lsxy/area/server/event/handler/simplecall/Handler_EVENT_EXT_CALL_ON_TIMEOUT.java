@@ -84,8 +84,9 @@ public class Handler_EVENT_EXT_CALL_ON_TIMEOUT extends EventHandler{
                     String sessionId = entry.getValue();
                     CallSession callSession = callSessionService.findById(sessionId);
                     if(callSession != null){
-                        callSession.setStatus(CallSession.STATUS_EXCEPTION);
-                        callSessionService.save(callSession);
+                        CallSession updateSession = new CallSession();
+                        updateSession.setStatus(CallSession.STATUS_EXCEPTION);
+                        callSessionService.update(callSession.getId(),updateSession);
                     }
                 }
                 event = "duo_callback.end";
@@ -95,8 +96,9 @@ public class Handler_EVENT_EXT_CALL_ON_TIMEOUT extends EventHandler{
                 //处理会话表数据
                 CallSession callSession = callSessionService.findById(state.getBusinessData().get(BusinessState.SESSIONID));
                 if(callSession != null){
-                    callSession.setStatus(CallSession.STATUS_EXCEPTION);
-                    callSessionService.save(callSession);
+                    CallSession updateSession = new CallSession();
+                    updateSession.setStatus(CallSession.STATUS_EXCEPTION);
+                    callSessionService.update(callSession.getId(),updateSession);
                 }
                 event = "notify_call.end";
                 break;
@@ -105,8 +107,9 @@ public class Handler_EVENT_EXT_CALL_ON_TIMEOUT extends EventHandler{
                 //处理会话表数据
                 CallSession callSession = callSessionService.findById(state.getBusinessData().get(BusinessState.SESSIONID));
                 if(callSession != null){
-                    callSession.setStatus(CallSession.STATUS_EXCEPTION);
-                    callSessionService.save(callSession);
+                    CallSession updateSession = new CallSession();
+                    updateSession.setStatus(CallSession.STATUS_EXCEPTION);
+                    callSessionService.update(callSession.getId(),updateSession);
                 }
                 event = "verify_call.end";
                 break;
