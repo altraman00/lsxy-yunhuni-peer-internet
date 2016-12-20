@@ -1,17 +1,11 @@
 package com.lsxy.area.agent;
 
-import com.lsxy.framework.rpc.api.client.ClientBindCallback;
-import com.lsxy.framework.rpc.api.session.Session;
-
 /**
  * Created by tandy on 16/12/10.
  */
 //@Component
-public class AreaClientBindCallBack implements ClientBindCallback {
-    @Override
-    public void doCallback(Session session) throws Exception {
-
-    }
+//public class AreaClientBindCallBack implements ClientBindCallback {
+//    private static final Logger logger = LoggerFactory.getLogger(AreaClientBindCallBack.class);
 //    @Autowired
 //    private ClientSessionContext sessionContext;
 //
@@ -60,27 +54,4 @@ public class AreaClientBindCallBack implements ClientBindCallback {
 //        }
 //    }
 //
-////
-////    public void doTestRequest(int threads,int count){
-////
-////        for(int i=0;i<threads ; i++){
-////            final int k = i;
-////            Thread t = new Thread(new Runnable() {
-////                @Override
-////                public void run() {
-////                    for(int j = 0;j<count;j++){
-////                        String param = "Thread=test-"+k+"&Count="+j;
-////                        RPCRequest rpcRequest = RPCRequest.newRequest(ServiceConstants.MN_CH_TEST_ECHO,param);
-////                        try {
-////                            rpcCaller.invoke(sessionContext,rpcRequest);
-////                        } catch (Exception ex) {
-////                            logger.error("RPC 异常",ex);
-////                        }
-////                    }
-////                }
-////            });
-////            t.setName("test-"+i);
-////            t.start();
-////        }
-////    }
-}
+//}

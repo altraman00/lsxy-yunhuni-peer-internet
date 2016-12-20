@@ -6,11 +6,9 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
-import com.lsxy.call.center.api.model.BaseEnQueue;
-import com.lsxy.call.center.api.model.CallCenterAgent;
-import com.lsxy.call.center.api.model.CallCenterQueue;
-import com.lsxy.call.center.api.model.EnQueueResult;
+import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.CallCenterQueueService;
+import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.StringUtil;
@@ -68,6 +66,9 @@ public class DeQueueServiceImpl implements DeQueueService {
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterQueueService callCenterQueueService;
 
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterService callCenterService;
+
     @Autowired
     private CallCenterStatisticsService callCenterStatisticsService;
 
@@ -113,7 +114,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         Integer conversationTimeout = enQueue.getConversation_timeout();
 
         //开始呼叫坐席
-        String agentCallId = conversationService.inviteAgent(appId,conversation,result.getAgent().getId(),
+        String agentCallId = conversationService.inviteAgent(appId,state.getId(),conversation,result.getAgent().getId(),
                 result.getAgent().getName(),result.getExtension().getId(),
                 result.getExtension().getTelnum(),result.getExtension().getType(),
                 result.getExtension().getUser(),conversationTimeout,45);
@@ -126,7 +127,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         setAgentState(agentCallId,enQueue,result);
 
         //更新排队结果
-        updateQueue(queueId,callId,conversation,result.getAgent().getId(),agentCallId,CallCenterQueue.RESULT_SELETEED);
+        updateQueue(queueId,callId,conversation,result.getAgent().getName(),agentCallId,CallCenterQueue.RESULT_SELETEED);
 
         try{
             //更新呼叫中心统计数据
@@ -162,6 +163,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         }
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
 
+        updateCallCenterTOMANUALRESULT(state,""+CallCenter.TO_MANUAL_RESULT_TIME_OUT);
         try{
             callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
                     .Builder(state.getTenantId(),state.getAppId(),new Date())
@@ -200,6 +202,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         }
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
 
+        updateCallCenterTOMANUALRESULT(state,""+CallCenter.TO_MANUAL_RESULT_FAIL);
         try{
             callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
                     .Builder(state.getTenantId(),state.getAppId(),new Date())
@@ -231,12 +234,12 @@ public class DeQueueServiceImpl implements DeQueueService {
      * @param id
      * @param callId
      * @param conversationId
-     * @param agentId
+     * @param agentName
      * @param agentCallId
      * @param result
      */
     private void updateQueue(String id,String callId,String conversationId,
-                             String agentId,String agentCallId,String result){
+                             String agentName,String agentCallId,String result){
         //更新排队记录
         try{
             if(id == null){
@@ -251,8 +254,8 @@ public class DeQueueServiceImpl implements DeQueueService {
             if(conversationId != null){
                 callCenterQueue.setConversation(conversationId);
             }
-            if(agentId != null){
-                callCenterQueue.setAgent(agentId);
+            if(agentName != null){
+                callCenterQueue.setAgent(agentName);
             }
             if(agentCallId != null){
                 callCenterQueue.setAgentCallId(agentCallId);
@@ -264,6 +267,24 @@ public class DeQueueServiceImpl implements DeQueueService {
             callCenterQueueService.save(callCenterQueue);
         }catch (Throwable t){
             logger.error("更新排队记录失败",t);
+        }
+    }
+
+    public void updateCallCenterTOMANUALRESULT(BusinessState state,String result){
+        try{
+            String callCenterId = conversationService.getCallCenter(state);
+            CallCenter callCenter = null;
+            if(callCenterId!=null){
+                callCenter = callCenterService.findById(callCenterId);
+            }
+            if(callCenter != null){
+                if(callCenter.getToManualResult() == null){
+                    callCenter.setToManualResult(result);
+                    callCenterService.save(callCenter);
+                }
+            }
+        }catch (Throwable t){
+            logger.error("更新CallCenter失败",t);
         }
     }
 
@@ -298,7 +319,6 @@ public class DeQueueServiceImpl implements DeQueueService {
         if(StringUtil.isNotEmpty(reserveState)){
             innerFields.add(CallCenterUtil.RESERVE_STATE_FIELD);
             innerFields.add(reserveState);
-
         }
         if(playNum){
             if(StringUtil.isNotEmpty(result.getAgent().getNum())){

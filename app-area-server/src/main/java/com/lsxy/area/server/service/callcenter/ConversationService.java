@@ -17,6 +17,8 @@ import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
+import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.agentserver.EnterConversationEvent;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
@@ -94,6 +96,9 @@ public class ConversationService {
 
     @Autowired
     private CallCenterUtil callCenterUtil;
+
+    @Autowired
+    private MQService mqService;
 
     @Value(value = "${app.cc.opensips.ip}")
     private String sip_address;
@@ -279,7 +284,7 @@ public class ConversationService {
      * @return
      * @throws YunhuniApiException
      */
-    public String inviteAgent(String appId, String conversationId,String agentId,String agentName,String extension,
+    public String inviteAgent(String appId,String initiator, String conversationId,String agentId,String agentName,String extension,
                          String telnum,String type,String user,
                           Integer maxDuration, Integer maxDialDuration) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
@@ -338,7 +343,7 @@ public class ConversationService {
                         .putIfNotEmpty(CallCenterUtil.AGENT_ID_FIELD,agentId)
                         .putIfNotEmpty(CallCenterUtil.AGENT_NAME_FIELD,agentName)
                         .putIfNotEmpty(CallCenterUtil.AGENT_EXTENSION_FIELD,extension)
-                        .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(conversationId))
+                        .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(initiator))
                         .putIfNotEmpty("from",from)
                         .putIfNotEmpty("to",to)
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
@@ -426,12 +431,11 @@ public class ConversationService {
     /**
      * 加入交谈
      */
-    public boolean join(String appId, String conversationId, String callId, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException{
+    public boolean join(String conversationId, String callId, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException{
 
         if(this.outOfParts(conversationId)){
             throw new OutOfConversationMaxPartsException();
         }
-
         return this.enter(callId,conversationId,maxDuration,playFile,voiceMode);
     }
 
@@ -450,6 +454,15 @@ public class ConversationService {
 
         if(call_state.getClosed()!= null && call_state.getClosed()){
             throw new SystemBusyException();
+        }
+
+        if(conversation_state != null &&
+                conversation_state.getResId() == null &&
+                (conversation_state.getClosed() == null ||
+                        !conversation_state.getClosed())){
+            logger.info("交谈={}尚未初始化完成，callid={}",conversation_id,call_id);
+            mqService.publish(new EnterConversationEvent(call_id,conversation_id,maxDuration,playFile,voiceMode));
+            return false;
         }
 
         if(conversation_state == null || conversation_state.getResId() == null){

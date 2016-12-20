@@ -1,6 +1,5 @@
-package com.lsxy.call.center.utils;
+package com.lsxy.framework.cache.utils;
 
-import com.lsxy.framework.core.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +13,10 @@ import java.nio.charset.Charset;
  * Created by liuws on 2016/11/15.
  */
 public class Lua {
+
     private static final Logger logger = LoggerFactory.getLogger(Lua.class);
+
+    public static final String LOCK = loadLua("/lua/lock.lua");
 
     public static final String LOOKUPAGENT = loadLua("/lua/lookupAgent.lua");
 
@@ -43,7 +45,7 @@ public class Lua {
                     //忽略单行注释 节省网络io
                     continue;
                 }
-                if(StringUtil.isEmpty(read)){
+                if(read == null || read.length() == 0){
                     //忽略空行
                     continue;
                 }

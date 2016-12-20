@@ -154,23 +154,44 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             }
         }else{
             try{
-                CallCenter callCenter = callCenterService.findById(call_id);
+                CallCenter callCenter = null;
+                if(conversationService.getCallCenter(state)!=null){
+                    callCenter = callCenterService.findById(conversationService.getCallCenter(state));
+                }
+                if(logger.isDebugEnabled()){
+                    logger.info("[{}][{}][{}]更新CallCenter,callCenter={}",
+                            state.getTenantId(),state.getAppId(),call_id,callCenter);
+                }
                 if(callCenter != null){
-                    callCenter.setEndTime(new Date());
-                    Long callLongTime  = null;
-                    if(callCenter.getStartTime() != null){
-                        callLongTime = (new Date().getTime() - callCenter.getStartTime().getTime()) / 1000;
-                        callCenter.setCallTimeLong(callLongTime.toString());
-                    }
-                    callCenterService.save(callCenter);
-                    if(callLongTime != null){
-                        try{
-                            callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
-                                    .Builder(state.getTenantId(),state.getAppId(),new Date())
-                                    .setCallTimeLong(callLongTime)
-                                    .build());
-                        }catch (Throwable t){
-                            logger.error("incrIntoRedis失败",t);
+                    if(conversationService.isCC(state)){
+                        callCenter.setEndTime(new Date());
+                        Long callLongTime  = null;
+                        if(callCenter.getStartTime() != null){
+                            callLongTime = (new Date().getTime() - callCenter.getStartTime().getTime()) / 1000;
+                            callCenter.setCallTimeLong(callLongTime);
+                        }
+                        if(params.get("dropped_by").equals("user")){//由用户挂断挂断
+                            callCenter.setOverReason(CallCenter.OVER_REASON_USER);
+                            if(callCenter.getToManualResult() == null){
+                                callCenter.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_GIVEUP);
+                            }
+                        }else{
+                            if(callCenter.getAgent() != null && callCenter.getToManualResult() !=null &&
+                                    callCenter.getToManualResult().equals(CallCenter.TO_MANUAL_RESULT_SUCESS)){
+                                callCenter.setOverReason(CallCenter.OVER_REASON_AGENT_HANGUP);
+                            }
+                        }
+
+                        callCenterService.save(callCenter);
+                        if(callLongTime != null){
+                            try{
+                                callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
+                                        .Builder(state.getTenantId(),state.getAppId(),new Date())
+                                        .setCallTimeLong(callLongTime)
+                                        .build());
+                            }catch (Throwable t){
+                                logger.error("incrIntoRedis失败",t);
+                            }
                         }
                     }
                 }
