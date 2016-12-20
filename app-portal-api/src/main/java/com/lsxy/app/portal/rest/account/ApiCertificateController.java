@@ -38,7 +38,8 @@ public class ApiCertificateController extends AbstractRestController {
     @RequestMapping("/change_sk")
     public RestResponse changeSecretKey() throws MatchMutiEntitiesException {
         try{
-            String secretKey = apiCertificateService.changeSecretKeyByUserName(getCurrentAccountUserName());
+            ApiCertificate cert = apiCertificateService.findApiCertificateByUserName(getCurrentAccountUserName());
+            String secretKey = apiCertificateService.changeSecretKey(cert);
             return RestResponse.success(secretKey);
         }catch (SkChangeCountLimitException e){
             return RestResponse.failed("0000",e.getMessage());

@@ -5,6 +5,7 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.model.LineGatewayToPublic;
+import com.lsxy.yunhuni.api.config.model.LineGatewayVO;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayToPublicService;
 import com.lsxy.yunhuni.config.dao.LineGatewayToPublicDao;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Query;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -99,9 +101,21 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
     }
 
     @Override
-    public List<LineGateway> findAllLineGatewayByAreaId(String areaId) {
+    public List<LineGatewayVO> findAllLineGatewayByAreaId(String areaId) {
+        String sql = "SELECT line.*,ltp.priority AS priority FROM db_lsxy_bi_yunhuni.tb_oc_config_line_gateway line " +
+                "INNER JOIN db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public ltp " +
+                "ON ltp.line_id = line.id " +
+                "WHERE line.area_id= :areaId AND line.status='1' AND line.deleted = 0 AND ltp.deleted = 0";
+        Query query = this.getEm().createNativeQuery(sql, "lineGatewayVO");
+        query.setParameter("areaId",areaId);
+        List resultList = query.getResultList();
+        return resultList;
+    }
+
+    @Override
+    public List<LineGateway> findAllLineGateway() {
+        Iterable<LineGatewayToPublic> ltps = lineGatewayToPublicDao.findAll();
         List<LineGateway> lineGateways = new ArrayList<>();
-        List<LineGatewayToPublic> ltps = lineGatewayToPublicDao.findByLineGateway_AreaId(areaId);
         for (LineGatewayToPublic ltp:ltps){
             LineGateway lineGateway = ltp.getLineGateway();
             //TODO 判断线路是否可用
@@ -137,6 +151,7 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
 
     @Override
     public void removePublic(String id) {
+        int o3 = this.getMaxPriority();
         LineGatewayToPublic lineGatewayToPublic = this.findById(id);
         //删除线路关系
         try {
@@ -151,7 +166,6 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
             lineGatewayService.save(lineGateway);
         }
         //修正优先级
-        int o3 = this.getMaxPriority();
         if(o3!=lineGatewayToPublic.getPriority()){
             int re = upPriority(lineGatewayToPublic.getPriority(),o3,null);
             if(re==-1){

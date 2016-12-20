@@ -6,6 +6,7 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.model.LineGatewayToTenant;
+import com.lsxy.yunhuni.api.config.model.LineGatewayVO;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayToTenantService;
 import com.lsxy.yunhuni.config.dao.LineGatewayToTenantDao;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Query;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -41,9 +43,22 @@ public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayT
     }
 
     @Override
-    public List<LineGateway> findByTenantIdAndAreaId(String tenantId,String areaId) {
+    public List<LineGatewayVO> findByTenantIdAndAreaId(String tenantId,String areaId) {
+        String sql = "SELECT line.*,ltt.priority AS priority FROM db_lsxy_bi_yunhuni.tb_oc_config_line_gateway line " +
+                "INNER JOIN db_lsxy_bi_yunhuni.tb_oc_linegateway_to_tenant ltt " +
+                "ON ltt.line_id = line.id " +
+                "WHERE line.area_id= :areaId AND line.status='1' AND line.deleted = 0 AND ltt.tenant_id=:tenantId AND ltt.deleted = 0";
+        Query query = this.getEm().createNativeQuery(sql, "lineGatewayVO");
+        query.setParameter("areaId",areaId);
+        query.setParameter("tenantId",tenantId);
+        List resultList = query.getResultList();
+        return resultList;
+    }
+
+    @Override
+    public List<LineGateway> findLineGatewayByTenantId(String tenantId) {
+        List<LineGatewayToTenant> list =  lineGatewayToTenantDao.findByTenantId(tenantId);
         List<LineGateway> lineGateways = new ArrayList<>();
-        List<LineGatewayToTenant> list =  lineGatewayToTenantDao.findByTenantIdAndLineGateway_AreaId(tenantId,areaId);
         if(list != null && list.size() > 0){
             for(LineGatewayToTenant ltt:list){
                 LineGateway lineGateway = ltt.getLineGateway();
@@ -109,6 +124,7 @@ public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayT
 
     @Override
     public void removeTenantLine(String id,String tenantId) {
+        int o3 = this.getMaxPriority(tenantId);
         LineGatewayToTenant lineGatewayToTenant = this.findById(id);
         //删除线路关系
         try {
@@ -117,7 +133,6 @@ public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayT
             throw new RuntimeException("删除失败");
         }
         //修正优先级
-        int o3 = this.getMaxPriority(tenantId);
         if(o3!=lineGatewayToTenant.getPriority()){
             int re = this.upPriority(lineGatewayToTenant.getPriority(),o3,null);
             if(re==-1){
@@ -125,4 +140,6 @@ public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayT
             }
         }
     }
+
+
 }

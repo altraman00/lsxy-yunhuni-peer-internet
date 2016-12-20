@@ -60,7 +60,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         if(App.PRODUCT_CALL_CENTER.equals(type)){
             types = CallSession.PRODUCT_CODE;
         }
-        String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,types)+ " deleted=0 and   last_time BETWEEN ? and ?";
+        String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,types)+ " deleted=0 and   call_end_dt BETWEEN ? and ?";
         sql = "select "+StringUtil.sqlName(VoiceCdr.class)+sql+" order by call_end_dt desc ";
         List rows = jdbcTemplate.queryForList(sql,new Object[]{date1,date2});
         List<VoiceCdr> list = new ArrayList();
