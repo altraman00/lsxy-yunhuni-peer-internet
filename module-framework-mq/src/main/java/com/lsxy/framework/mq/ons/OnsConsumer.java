@@ -119,7 +119,9 @@ public class OnsConsumer extends AbstractMQConsumer implements MessageListener,I
 
 			MQEvent event = parseMessage(msg);
 			if (event != null) {
-				logger.debug("parse msg to MQEvent object and id is :" + event.getId());
+				if(logger.isDebugEnabled()) {
+					logger.debug("parse msg to MQEvent object and id is :" + event.getId());
+				}
 				Set<Class<? extends MQMessageHandler>> handlers = this.getMqHandlerFactory().getHandler(event);
 				if (handlers != null) {
 					for (Class hc : handlers) {
