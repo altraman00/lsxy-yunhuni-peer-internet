@@ -41,10 +41,10 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             hql += " AND  obj.appId='"+appId+"' ";
         }
         if(StringUtil.isNotEmpty(startTime)){
-            hql += " AND  obj.endTime >= '"+startTime+"' ";
+            hql += " AND  obj.startTime >= '"+startTime+"' ";
         }
         if(StringUtil.isNotEmpty(endTime)){
-            hql += " AND  obj.endTime <= '"+endTime+"' ";
+            hql += " AND  obj.startTime <= '"+endTime+"' ";
         }
         if(StringUtil.isNotEmpty(type)){
             hql += " AND  obj.type='"+type+"' ";
@@ -55,7 +55,7 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
         if(StringUtil.isNotEmpty(agent)){
             hql += " AND  obj.agent = '"+agent+"'";
         }
-        hql += " order by obj.endTime desc";
+        hql += " order by obj.startTime desc";
         Page<CallCenter> page = this.pageList(hql,pageNo,pageSize);
         return page;
     }
@@ -70,10 +70,10 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             hql += " AND  obj.appId='"+appId+"' ";
         }
         if(StringUtil.isNotEmpty(startTime)){
-            hql += " AND  obj.endTime >= '"+startTime+"' ";
+            hql += " AND  obj.startTime >= '"+startTime+"' ";
         }
         if(StringUtil.isNotEmpty(endTime)){
-            hql += " AND  obj.endTime <= '"+endTime+"' ";
+            hql += " AND  obj.startTime <= '"+endTime+"' ";
         }
         if(StringUtil.isNotEmpty(type)){
             hql += " AND  obj.type='"+type+"' ";
@@ -84,7 +84,7 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
         if(StringUtil.isNotEmpty(agent)){
             hql += " AND  obj.agent = '"+agent+"'";
         }
-        hql += " order by obj.endTime desc";
+        hql += " order by obj.startTime desc";
         List<CallCenter> list = this.list(hql);
         return list;
     }
@@ -99,10 +99,10 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             sql += " AND  app_id='"+appId+"' ";
         }
         if(StringUtil.isNotEmpty(startTime)){
-            sql += " AND  end_time >= '"+startTime+"' ";
+            sql += " AND  start_time >= '"+startTime+"' ";
         }
         if(StringUtil.isNotEmpty(endTime)){
-            sql += " AND  end_time <= '"+endTime+"' ";
+            sql += " AND  start_time <= '"+endTime+"' ";
         }
         if(StringUtil.isNotEmpty(type)){
             sql += " AND  type='"+type+"' ";
