@@ -33,9 +33,6 @@ public class CallcenterTest {
     private AppExtensionService appExtensionService;
 
     @Autowired
-    private CallCenterService callCenterService;
-
-    @Autowired
     private EnQueueService enQueueService;
 
     @Autowired
