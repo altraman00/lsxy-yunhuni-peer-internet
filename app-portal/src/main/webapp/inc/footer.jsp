@@ -5,6 +5,7 @@
 <script src="${resPrefixUrl }/js/bootbox.min.js"></script>
 <script src="${resPrefixUrl }/js/charts/flot/demo.js" cache="false"></script>
 <script src="${resPrefixUrl }/bower_components/bootstrapvalidator/dist/js/bootstrapValidator.min.js"></script>
+<script src="${resPrefixUrl }/js/jquery.cookie.min.js" ></script>
 <script src="${resPrefixUrl }/js/yunhuni.js" ></script>
 <script>
 	$(function(){
@@ -68,5 +69,23 @@
 			}
 		}
 		return o;
+	}
+	function getAmont(amont){
+		var cost = new String(amont).split(".");
+		var cost2 = "";
+		if(cost.length==1){
+			cost2="000";
+		}else{
+			cost2 = cost[1];
+			if(cost[1].length>3){
+				cost2 = cost[1].substring(0,3);
+			}else if(cost[1].length<3){
+				var tleng =3 - cost[1].length;
+				for(var i=0;i<tleng;i++){
+					cost2+="0";
+				}
+			}
+		}
+		return cost[0]+"."+cost2;
 	}
 </script>

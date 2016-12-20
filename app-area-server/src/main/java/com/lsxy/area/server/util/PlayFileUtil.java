@@ -1,6 +1,6 @@
 package com.lsxy.area.server.util;
 
-import com.lsxy.area.api.exceptions.PlayFileNotExistsException;
+import com.lsxy.framework.core.exceptions.api.PlayFileNotExistsException;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +17,11 @@ import java.util.List;
  */
 @Component
 public class PlayFileUtil {
+
     @Autowired
     private VoiceFilePlayService voiceFilePlayService;
 
-    private String FORMAT = "/data/prd/p/0/%s/%s/%s.%s";
+    private static final String FORMAT = "/data/prd/p/0/%s/%s/%s.%s";
 
     /**
      * 将aaaa.wav|bbb.wav|ccc.wav转换成uuid1.wav|uuid2.wav|uuid3.wav

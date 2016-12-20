@@ -1,10 +1,16 @@
 package com.lsxy.area.server.event.handler;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.ConversationService;
+import com.lsxy.call.center.api.model.CallCenter;
+import com.lsxy.call.center.api.service.CallCenterService;
+import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
@@ -19,7 +25,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
 
@@ -27,6 +35,7 @@ import java.util.Map;
  * Created by liuws on 2016/8/29.
  */
 @Component
+@Transactional
 public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
 
     private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_SYS_ON_CHAN_CLOSED.class);
@@ -37,6 +46,13 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
     CalCostService calCostService;
     @Autowired
     VoiceCdrService voiceCdrService;
+    @Autowired
+    CalBillingService calBillingService;
+    @Autowired
+    ConversationService conversationService;
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterService callCenterService;
+
     @Override
     public String getEventName() {
         return Constants.SYS_ON_CHAN_CLOSED;
@@ -44,11 +60,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        logger.info("正在处理{}",getEventName());
         Object cdrObj = request.getParamMap().get("data");
-        if(logger.isDebugEnabled()){
-            logger.info("开始处理CDR数据：{}",cdrObj);
-        }
         if(cdrObj == null){
             throw new InvalidParamException("cdr数据为空");
         }
@@ -59,14 +71,20 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         String[] cdrSplit = cdrOriginalTemp.split(",");
 
         BusinessState businessState;
-        String cdr_additionalinfo2 = cdrSplit[25].trim();
-        if(StringUtils.isNotBlank(cdr_additionalinfo2)){
-            businessState = businessStateService.get(cdr_additionalinfo2);
-        }else{
-            throw new InvalidParamException("CDR没有业务数据字段，可能是非法调用：{}", cdrObj);
+        String call_id = cdrSplit[25].trim();
+        if(StringUtil.isBlank(call_id)){
+            //throw new InvalidParamException("CDR没有业务数据字段，可能是非法调用：{}", cdrObj);
+            logger.info("CDR没有业务数据字段，可能是非法调用：{}", cdrObj);
+            return null;
         }
+
+        if(logger.isDebugEnabled()){
+            logger.info("开始处理CDR数据：{}",cdrObj);
+        }
+
+        businessState = businessStateService.get(call_id);
+
         if(businessState == null){
-//            voiceCdrService.save(voiceCdr);
             throw new InvalidParamException("返回CDR找不到关联的业务数据,cdr.id：{}",voiceCdr.getId());
         }
         voiceCdr.setAreaId(businessState.getAreaId());
@@ -75,29 +93,46 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         voiceCdr.setLineId(businessState.getLineGatewayId());
         //产品编码，可根据些判断此cdr是哪个产品的cdr
 
+
         ProductCode productCode = ProductCode.changeApiCmdToProductCode(businessState.getType());
 
-        if("sys_conf".equals(businessState.getType())){
+        if(BusinessState.TYPE_SYS_CONF.equals(businessState.getType())){
             voiceCdr.setJoinType(1);
         }else if(businessState.getBusinessData().get("conf_id") != null){
             productCode = ProductCode.sys_conf;
             voiceCdr.setJoinType(2);
         }
 
-        if("ivr_incoming".equals(businessState.getType())){
-            voiceCdr.setIvrType(1);
-        }else if("ivr_call".equals(businessState.getType())){
+        if(BusinessState.TYPE_IVR_INCOMING.equals(businessState.getType())){
+            if(conversationService.isCC(businessState)){
+                productCode = ProductCode.call_center;
+            }else{
+                voiceCdr.setIvrType(1);
+            }
+        }else if(BusinessState.TYPE_IVR_CALL.equals(businessState.getType())){
             voiceCdr.setIvrType(2);
-        }else if("ivr_dial".equals(businessState.getType())){
+        }else if(BusinessState.TYPE_IVR_DIAL.equals(businessState.getType())){
             voiceCdr.setIvrType(2);
+        }
+
+        if(productCode == ProductCode.call_center){
+            String callCenterId = conversationService.getCallCenter(businessState);
+            if(callCenterId != null){
+                try{
+                    CallCenter callCenter = callCenterService.findById(callCenterId);
+                    if(callCenter != null && callCenter.getType()!= null){
+                        voiceCdr.setIvrType(Integer.parseInt(callCenter.getType()));
+                    }
+                }catch (Throwable t){
+                    logger.error("设置cdr的呼入呼出类型失败",t);
+                }
+            }
         }
 
         voiceCdr.setType(productCode.name());
 
         voiceCdr.setRelevanceId(businessState.getId());
-        //TODO 录音文件路径跟大小
-        voiceCdr.setRecordUrl(null);
-        voiceCdr.setRecordSize(null);
+
         voiceCdr.setFromNum(cdrSplit[7].trim());
         voiceCdr.setToNum(cdrSplit[8].trim());
         voiceCdr.setCallStartDt(getCallDate(cdrSplit[18].trim()));
@@ -105,26 +140,39 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         voiceCdr.setCallEndDt(getCallDate(cdrSplit[20].trim()));
         voiceCdr.setCallTimeLong(Long.parseLong(cdrSplit[21].trim()));
         //扣费
-        calCostService.callConsume(voiceCdr);
+        if(voiceCdr.getCallAckDt() != null){
+            calCostService.callConsume(voiceCdr);
+        }else{
+            voiceCdr.setCostTimeLong(0L);
+            voiceCdr.setCost(BigDecimal.ZERO);
+            voiceCdr.setDeduct(0L);
+            voiceCdr.setCostType(VoiceCdr.COST_TYPE_COST);
+        }
         //sessionId和一些与具体业务相关的信息根据不同的产品业务进行设置
-        Map<String, Object> data = businessState.getBusinessData();
+        Map<String, String> data = businessState.getBusinessData();
         if(data != null){
             switch (productCode){
                 case duo_call:{
-                    String sessionId = (String) data.get(voiceCdr.getToNum());
+                    String sessionId = data.get(voiceCdr.getToNum());
                     voiceCdr.setSessionId(sessionId);
                     break;
                 }
                 default:{
-                    String sessionId = (String) data.get("sessionid");
+                    String sessionId = data.get(BusinessState.SESSIONID);
                     voiceCdr.setSessionId(sessionId);
                     break;
                 }
             }
         }
         if(logger.isDebugEnabled()){
-            logger.info("插入cdr数据：{}", JSONUtil.objectToJson(voiceCdr));
+            logger.debug("插入cdr数据：{}", JSONUtil.objectToJson(voiceCdr));
         }
+
+        calBillingService.incCallSum(voiceCdr.getTenantId(),voiceCdr.getCallEndDt());
+        if(voiceCdr.getCallAckDt() != null){
+            calBillingService.incCallConnect(voiceCdr.getTenantId(),voiceCdr.getCallEndDt());
+        }
+        calBillingService.incCallCostTime(voiceCdr.getTenantId(),voiceCdr.getCallEndDt(),voiceCdr.getCostTimeLong());
         voiceCdrService.save(voiceCdr);
         return null;
     }

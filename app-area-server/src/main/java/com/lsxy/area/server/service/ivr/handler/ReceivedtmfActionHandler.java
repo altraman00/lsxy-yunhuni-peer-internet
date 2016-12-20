@@ -2,6 +2,7 @@ package com.lsxy.area.server.service.ivr.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -15,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,17 +44,7 @@ public class ReceivedtmfActionHandler extends ActionHandler{
     }
 
     @Override
-    public boolean handle(String callId, Element root,String next) {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr动作，callId={},ivr={}",callId,getAction());
-        }
-
-        BusinessState state = businessStateService.get(callId);
-        if(state == null){
-            logger.info("没有找到call_id={}的state",callId);
-            return false;
-        }
-
+    public boolean handle(String callId,BusinessState state, Element root,String next) {
         String valid_keys = root.attributeValue("valid_keys");
         String max_keys = root.attributeValue("max_keys");
         String finish_keys = root.attributeValue("finish_keys");
@@ -64,16 +54,13 @@ public class ReceivedtmfActionHandler extends ActionHandler{
         String if_break_on_key = root.attributeValue("if_break_on_key");
         List<String> plays = getPlay(root);
 
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr[{}]动作，valid_keys={},max_keys={},finish_keys={}",
-                    getAction(),valid_keys,max_keys,finish_keys);
-        }
-
-        Map<String,Object> businessData = state.getBusinessData();
         String res_id = state.getResId();
-
         try {
             plays = playFileUtil.convertArray(state.getTenantId(),state.getAppId(),plays);
+            String play_content = null;
+            if(plays!=null && plays.size()>0){
+                play_content = JSONUtil2.objectToJson(new Object[][]{new Object[]{StringUtils.join(plays,"|"),7,""}});
+            }
             Map<String, Object> params = new MapBuilder<String,Object>()
                     .putIfNotEmpty("res_id",res_id)
                     .putIfNotEmpty("valid_keys",valid_keys)
@@ -81,7 +68,7 @@ public class ReceivedtmfActionHandler extends ActionHandler{
                     .putIfNotEmpty("finish_keys",finish_keys)
                     .putIfNotEmpty("first_key_timeout",first_key_timeout)
                     .putIfNotEmpty("continues_keys_timeout",continues_keys_timeout)
-                    .putIfNotEmpty("play_content", JSONUtil2.objectToJson(new Object[][]{new Object[]{StringUtils.join(plays,"|"),7,""}}))
+                    .putIfNotEmpty("play_content", play_content)
                     .putIfNotEmpty("play_repeat",play_repeat)
                     .putIfNotEmpty("breaking_on_key",if_break_on_key)
                     .putIfNotEmpty("user_data",callId)
@@ -93,12 +80,7 @@ public class ReceivedtmfActionHandler extends ActionHandler{
         } catch (Throwable e) {
             logger.error("调用失败",e);
         }
-        if(businessData == null){
-            businessData = new HashMap<>();
-        }
-        businessData.put("next",next);
-        state.setBusinessData(businessData);
-        businessStateService.save(state);
+        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT_FIELD,next);
         return true;
     }
 

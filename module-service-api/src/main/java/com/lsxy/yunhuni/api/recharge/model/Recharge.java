@@ -27,6 +27,15 @@ public class Recharge  extends IdEntity {
     private String status;                //充值状态 参考RechargeStatus
     private String orderId;               //订单ID
     private Date payTime;                   //付款时间,人工充值的付款时间为创建时的时间
+    private Date deadline;//过期时间
+    @Column(name = "deadline")
+    public Date getDeadline() {
+        return deadline;
+    }
+
+    public void setDeadline(Date deadline) {
+        this.deadline = deadline;
+    }
 
     public Recharge() {
     }
@@ -40,7 +49,16 @@ public class Recharge  extends IdEntity {
         this.orderId = orderId;
         this.payTime = payTime;
     }
-
+    public Recharge(Tenant tenant, BigDecimal amount, RechargeSource source, RechargeType type, RechargeStatus status, String orderId, Date payTime,Date deadline) {
+        this.tenant = tenant;
+        this.amount = amount;
+        this.source = source.name();
+        this.type = type.name();
+        this.status = status.name();
+        this.orderId = orderId;
+        this.payTime = payTime;
+        this.deadline = deadline;
+    }
     @ManyToOne
     @JoinColumn(name = "tenant_id")
     public Tenant getTenant() {

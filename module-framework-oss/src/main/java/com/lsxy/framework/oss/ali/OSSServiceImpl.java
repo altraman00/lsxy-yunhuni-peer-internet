@@ -10,7 +10,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -65,6 +64,26 @@ public class OSSServiceImpl implements OSSService{
             OSSClient client = afb.getObject();
             InputStream inputStream = new FileInputStream(file);
             client.putObject(repository, fileKey, inputStream);
+        }catch(Exception ex){
+            logger.error("上传文件异常",ex);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean uploadFileLocal(File file, String repository, String fileKey, String contentType, String contentDisposition) throws Exception {
+        try {
+            OSSClient client = afb.getObject();
+            InputStream inputStream = new FileInputStream(file);
+            // 创建上传Object的Metadata
+            ObjectMetadata meta = new ObjectMetadata();
+            // 设置上传文件长度
+            meta.setContentLength(file.length());
+            // 设置上传内容类型
+            meta.setContentType(contentType);
+            meta.setContentDisposition(contentDisposition);
+            client.putObject(repository, fileKey, inputStream,meta);
         }catch(Exception ex){
             logger.error("上传文件异常",ex);
             return false;

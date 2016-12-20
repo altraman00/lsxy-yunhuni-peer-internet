@@ -12,11 +12,12 @@
 
     <groupId>com.lsxy</groupId>
     <artifactId>yunhuni</artifactId>
-    <version>1.2.0-RC5</version>
+    <version>1.2.1-SNAPSHOT</version>
     <properties>
         <spring-security-version>3.2.5.RELEASE</spring-security-version>
         <skip_maven_deploy>false</skip_maven_deploy>
     </properties>
+
     <modules>
         <module>app-portal</module>
         <module>app-area-server</module>
@@ -26,6 +27,7 @@
         <module>app-api-gateway</module>
         <module>app-portal-api</module>
         <module>app-third-join-gateway</module>
+        <module>app-call-center</module>
         <module>module-framework-core</module>
         <module>module-framework-web</module>
         <module>module-framework-mq</module>
@@ -39,10 +41,13 @@
         <module>module-service</module>
         <module>module-framework-oss</module>
         <module>module-framework-rpc</module>
-        <module>app-user-app-demo</module>
+        <module>app-user-demo</module>
         <module>module-service-area-api</module>
         <module>module-framework-jmx</module>
         <module>module-framework-monitor</module>
+        <module>module-service-call-center-api</module>
+        <module>app-mc</module>
+        <module>app-opensips-proxy</module>
 
     </modules>
     <packaging>pom</packaging>
@@ -114,7 +119,7 @@
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-mq</artifactId>
-                <version>1.2.0-RC5</version>
+                <version>1.2.1-SNAPSHOT</version>
             </dependency>
             <dependency>
             <groupId>com.lsxy</groupId>
@@ -134,6 +139,11 @@
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-service-area-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lsxy</groupId>
+                <artifactId>module-service-call-center-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -169,7 +179,7 @@
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-oss</artifactId>
-                <version>1.2.0-RC5</version>
+                <version>1.2.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -303,21 +313,12 @@
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-monitor</artifactId>
-                <version>1.2.0-RC5</version>
+                <version>1.2.1-SNAPSHOT</version>
             </dependency>
 
         </dependencies>
     </dependencyManagement>
-    <distributionManagement>
-        <repository>
-            <id>nexus-lsxy-release</id>
-            <url>http://nexus.liushuixingyun.com/nexus/content/repositories/releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>nexus-lsxy-snapshot</id>
-            <url>http://nexus.liushuixingyun.com/nexus/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
+
 
 
     <dependencies>
@@ -367,6 +368,16 @@
             <properties>
                 <profiles.active>production</profiles.active>
             </properties>
+            <distributionManagement>
+                <repository>
+                    <id>nexus-lsxy-release</id>
+                    <url>http://10.44.185.24:8081/nexus/content/repositories/releases/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>nexus-lsxy-snapshot</id>
+                    <url>http://10.44.185.24:8081/nexus/content/repositories/snapshots/</url>
+                </snapshotRepository>
+            </distributionManagement>
         </profile>
         <profile>
             <!-- 本地开发，连接局域网数据库 -->
@@ -377,6 +388,16 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <distributionManagement>
+                <repository>
+                    <id>nexus-lsxy-release</id>
+                    <url>http://nexus.liushuixingyun.com/nexus/content/repositories/releases/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>nexus-lsxy-snapshot</id>
+                    <url>http://nexus.liushuixingyun.com/nexus/content/repositories/snapshots/</url>
+                </snapshotRepository>
+            </distributionManagement>
         </profile>
         <profile>
             <!-- 开发环境 -->
@@ -384,6 +405,16 @@
             <properties>
                 <profiles.active>development</profiles.active>
             </properties>
+            <distributionManagement>
+                <repository>
+                    <id>nexus-lsxy-release</id>
+                    <url>http://10.44.185.24:8081/nexus/content/repositories/releases/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>nexus-lsxy-snapshot</id>
+                    <url>http://10.44.185.24:8081/nexus/content/repositories/snapshots/</url>
+                </snapshotRepository>
+            </distributionManagement>
         </profile>
         <profile>
             <!-- 开发环境 -->
@@ -398,6 +429,16 @@
             <properties>
                 <profiles.active>test</profiles.active>
             </properties>
+            <distributionManagement>
+                <repository>
+                    <id>nexus-lsxy-release</id>
+                    <url>http://10.44.185.24:8081/nexus/content/repositories/releases/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>nexus-lsxy-snapshot</id>
+                    <url>http://10.44.185.24:8081/nexus/content/repositories/snapshots/</url>
+                </snapshotRepository>
+            </distributionManagement>
         </profile>
     </profiles>
 </project>

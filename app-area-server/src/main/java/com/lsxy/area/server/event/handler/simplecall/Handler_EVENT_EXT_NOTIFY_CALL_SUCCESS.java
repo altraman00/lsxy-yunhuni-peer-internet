@@ -18,9 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-import java.util.Set;
-
 /**
  * Created by liups on 2016/8/31.
  */
@@ -53,15 +50,14 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_SUCCESS extends EventHandler {
             throw new InvalidParamException("businessstate is null");
         }
         if(StringUtils.isNotBlank(resId)){
-            state.setResId(resId);
-            businessStateService.save(state);
+            businessStateService.updateResId(callId,resId);
             NotifyCall notifyCall = notifyCallService.findById(callId);
             if(notifyCall != null){
                 notifyCall.setResId(resId);
                 notifyCallService.save(notifyCall);
             }
             //更新会话记录状态
-            CallSession callSession = callSessionService.findById((String)state.getBusinessData().get("sessionid"));
+            CallSession callSession = callSessionService.findById(state.getBusinessData().get(BusinessState.SESSIONID));
             if(callSession != null){
                 callSession.setResId(resId);
                 callSession.setStatus(CallSession.STATUS_CALLING);

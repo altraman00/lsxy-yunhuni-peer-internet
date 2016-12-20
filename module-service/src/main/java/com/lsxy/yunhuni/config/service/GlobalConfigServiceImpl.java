@@ -27,4 +27,9 @@ public class GlobalConfigServiceImpl extends AbstractService<GlobalConfig> imple
     public GlobalConfig findByTypeAndName(String type, String name) {
         return configGlobalDao.findByTypeAndName(type,name);
     }
+
+    @Override
+    public GlobalConfig findByTypeAndKeyName(String type, String keyName) {
+        return configGlobalDao.findByTypeAndKeyName(type,keyName);
+    }
 }

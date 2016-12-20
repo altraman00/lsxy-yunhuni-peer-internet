@@ -14,7 +14,7 @@
     <section class='aside-section'>
         <section class="hbox stretch">
             <!-- .aside -->
-            <aside class="bg-Green lter aside hidden-print"  id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
+            <%@include file="/inc/leftMenu.jsp"%>
             <!-- /.aside -->
 
         <section id="content">
@@ -49,14 +49,19 @@
                                                 <a href="${ctx}/console/statistics/billdetail/code">语音验证码</a>
                                             </div>
                                         </li>
-                                        <%--<li>--%>
-                                            <%--<div class="aside-li-a active">--%>
-                                                <%--<a href="${ctx}/console/statistics/billdetail/recording">通话录音</a>--%>
-                                            <%--</div>--%>
-                                        <%--</li>--%>
                                         <li>
                                             <div class="aside-li-a">
                                                 <a href="${ctx}/console/statistics/billdetail/ivr">自定义IVR</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="aside-li-a">
+                                                <a href="${ctx}/console/statistics/billdetail/callcenter">呼叫中心</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="aside-li-a active">
+                                                <a href="${ctx}/console/statistics/billdetail/recording">通话录音</a>
                                             </div>
                                         </li>
                                     </ul>
@@ -97,6 +102,17 @@
                                             <div class="col-md-2">
                                                 <input type="text" name="time" class="form-control currentDay " value="${time}" />
                                             </div>
+                                            <div class="col-md-1">
+                                                类型
+                                            </div>
+                                            <div class="col-md-2">
+                                                <select name="type" class="form-control">
+                                                    <option value=""></option>
+                                                    <c:forEach items="${types}" var="type1">
+                                                        <option value="${type1}" <c:if test="${type1==type}">selected="selected"</c:if> >${type1}</option>
+                                                    </c:forEach>
+                                                </select>
+                                            </div>
                                             <div class="col-md-2">
                                                 <button class="btn btn-primary" type="submit"> 查询</button>
                                             </div>
@@ -107,35 +123,32 @@
                                             <thead>
                                             <tr>
                                                 <c:set var="sum_money" value="0.00"></c:set>
-                                                <c:set var="sum_size" value="0"></c:set>
                                                 <c:if test="${sum!=null}">
-                                                    <c:if test="${ sum.money!=null}">
-                                                        <c:set value="${sum.money}" var="sum_money"></c:set>
-                                                    </c:if>
-                                                    <c:if test="${ sum.size!=null}">
-                                                        <c:set value="${sum.size}" var="sum_size"></c:set>
+                                                    <c:if test="${ sum.cost!=null}">
+                                                        <c:set value="${sum.cost}" var="sum_money"></c:set>
                                                     </c:if>
                                                 </c:if>
-                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum_money}" pattern="0.000"></fmt:formatNumber>元&nbsp;&nbsp;&nbsp;&nbsp;存储容量：<fmt:formatNumber value="${sum_size}" pattern="0.000"></fmt:formatNumber> M</span></th>
+                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum_money}" pattern="0.000"></fmt:formatNumber>元&nbsp;&nbsp;&nbsp;&nbsp;存储容量：${ sum.size}</span></th>
                                             </tr>
+                                            <thead>
                                             <tr>
                                                 <th>呼叫时间</th>
-                                                <th>主叫</th>
-                                                <th>被叫</th>
+                                                <th>产品类型</th>
+                                                <th>时长（秒）</th>
                                                 <th>大小</th>
                                                 <th><span style="float:left;width: 80px" ><span style="float:right;" >消费金额</span></span></th>
-                                                <th>时长（秒）</th>
+                                                <th>操作</th>
                                             </tr>
                                             </thead>
                                             <tbody>
                                             <c:forEach items="${pageObj.result}" var="result" varStatus="s">
                                                 <tr>
-                                                    <td><fmt:formatDate value="${result.callStartDt}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
-                                                    <td>${result.fromNum}</td>
-                                                    <td>${result.toNum}</td>
-                                                    <td></td>
-                                                    <td><span style="float:left;width: 80px" ><span style="float:right;" ><fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber></span></span></td>
+                                                    <td>${result.time}</td>
+                                                    <td>${result.type}</td>
                                                     <td>${result.costTimeLong}</td>
+                                                    <td>${result.size}</td>
+                                                    <td><span style="float:left;width: 80px" ><span style="float:right;" ><fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber></span></span></td>
+                                                    <td><a id="downVoid${result.id}" onclick="downVoid('${result.id}')" data-statu="1">录音下载</a></td>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>
@@ -163,6 +176,28 @@
     function appSubmit(appId){
         $('#appId').val(appId);
         $('#mainForm').submit();
+    }
+    function downVoid(id) {
+        var tag  = $('#downVoid'+id);
+        var ststus = tag.attr('data-statu');
+        if(ststus==1){
+            //查询录音是否下载到oss,是下载到本地，否下载到oss显示 正在下载 ,下载oss失败，显示重试
+            var params = {'${_csrf.parameterName}':'${_csrf.token}'};
+            tag.html('正在下载<span class="download"></span>').attr("data-statu","2");
+            ajaxsubmit("${ctx}/console/app/file/record/file/download/"+id,params,function(result) {
+                if(result.success){
+                    window.open(result.data);
+                    tag.html('录音下载').attr("data-statu","1");
+                }else{
+                    showtoast(result.errorMsg);
+                    tag.html('下载失败,请重试').attr("data-statu","1");
+                }
+            });
+        }else if(ststus==2){
+            tag.html('下载失败,请重试').attr("data-statu","1");
+        }else{
+            tag.html('录音下载').attr("data-statu","1");
+        }
     }
 </script>
 </body>

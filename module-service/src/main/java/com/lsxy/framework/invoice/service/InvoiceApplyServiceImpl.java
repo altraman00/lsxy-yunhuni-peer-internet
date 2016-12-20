@@ -95,7 +95,7 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
         //个人增值税普通发票(100元起)，企业增值税普通发票(100元起)
         if((apply.getType() == 1 || apply.getType() == 2) && amount.compareTo(new BigDecimal(100)) == -1){
             throw new RuntimeException("个人增值税普通发票(100元起)，企业增值税普通发票(100元起),金额太小，不足以开发票");
-        }else if(apply.getType() == 3 && amount.compareTo(new BigDecimal(1000)) == -1){
+        }else if(apply.getType() == 3 && amount.compareTo(new BigDecimal(100)) == -1){
             //企业增值税专用发票(1000元起)
             throw new RuntimeException("企业增值税专用发票(1000元起),金额太小，不足以开发票");
         }

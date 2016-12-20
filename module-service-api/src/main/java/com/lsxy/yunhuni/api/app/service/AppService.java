@@ -19,7 +19,12 @@ public interface AppService extends BaseService<App> {
      * @return
      */
     List<App> findAppByUserName(String tenantId)  ;
-
+    /**
+     * 获取记录的集合
+     * @param tenantId 租户id
+     * @return
+     */
+    List<App> findAppByTenantIdAndServiceType(String tenantId, String serviceType)  ;
     /**
      * 获取分页信息
      * @param tenantId 租户id
@@ -65,9 +70,10 @@ public interface AppService extends BaseService<App> {
     List<App> getAppsByTenantId(String tenantId);
 
     /**
-     * 用于呼叫号码选择，有ivr号码则选择绑定的ivr号码，没有则随便给一个可以用的
+     * 创建应用
      * @param app
-     * @return
      */
-    String findOneAvailableTelnumber(App app);
+    App create(App app);
+
+    boolean enabledService(String tenantId,String appId,ServiceType service);
 }

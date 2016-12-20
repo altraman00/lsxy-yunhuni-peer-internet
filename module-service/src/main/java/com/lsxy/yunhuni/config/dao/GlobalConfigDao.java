@@ -11,4 +11,5 @@ import java.io.Serializable;
  */
 public interface GlobalConfigDao extends BaseDaoInterface<GlobalConfig, Serializable> {
     GlobalConfig findByTypeAndName(String type, String name);
+    GlobalConfig findByTypeAndKeyName(String type,String keyName);
 }

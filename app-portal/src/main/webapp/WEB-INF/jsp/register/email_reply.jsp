@@ -16,7 +16,7 @@
         <a a href="#" onclick="window.location.href='<%=SystemConfig.getProperty("global.official.website.url")%>'">
         <img class="logo" src="${resPrefixUrl }/images/index/logo_top.png"/></a>
         <div class="text">
-            如果有云呼你账号，<a href="${ctx}/login">立即登录</a>
+            如果有壹耘账号，<a href="${ctx}/login">立即登录</a>
         </div>
     </div>
 </div>
@@ -27,7 +27,7 @@
         <div class="col-md-12 text-left article-box">
             <p class="size16"><strong>尊敬的会员用户：</strong></p>
             <br/>
-            <p>感谢您注册为云呼你会员用户，以下为云呼你账号激活链接，点击以下链接并设置初始密码，完成账号激活：</p>
+            <p>感谢您注册为壹耘会员用户，以下为壹耘账号激活链接，点击以下链接并设置初始密码，完成账号激活：</p>
             <br/>
             <a href="#">http://localhost/forget/resetpassword?key=123456</a>
             <br/>
@@ -40,7 +40,7 @@
             <br/>
             <br/>
             <br/>
-            <p>云呼你团队</p>
+            <p>壹耘团队</p>
             <p>2016年06月22日</p>
         </div>
     </div>
@@ -48,7 +48,7 @@
 <!--/container -->
 <!--footer-->
 <div class="register_footer">
-    <p>Copyright 2016 云呼你 粤ICP备16048993号 All Rights Reserved 广州流水行云科技有限公司</p>
+    <p>Copyright 2016 壹耘 粤ICP备16048993号 All Rights Reserved 广州流水行云科技有限公司</p>
 </div>
 <!--/footer-->
 

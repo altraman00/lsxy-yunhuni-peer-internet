@@ -63,7 +63,7 @@ public class ForgetPasswordController {
             model.put("email",email);
             returnView = "forget/mail_success";
         }else{
-            model.put("erInfo","无效的邮箱");
+            model.put("erInfo","该账户不存在");
             returnView = "forget/reset_fail";
         }
         return new ModelAndView(returnView,model);
@@ -78,7 +78,7 @@ public class ForgetPasswordController {
             model.put("flag",true);
         }else{
             model.put("flag",false);
-            model.put("err","无效的手机号");
+            model.put("err","该账户不存在");
         }
         return model;
     }

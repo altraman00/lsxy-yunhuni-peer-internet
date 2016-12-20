@@ -14,7 +14,7 @@
 <section class='aside-section'>
     <section class="hbox stretch">
         <!-- .aside -->
-        <aside class="bg-Green lter aside hidden-print" id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
+        <%@include file="/inc/leftMenu.jsp"%>
         <!-- /.aside -->
 
         <section id="content">
@@ -53,9 +53,10 @@
                 <aside>
                     <section class="vbox xbox">
                         <!-- 如果没有三级导航 这段代码注释-->
-                        <div class="head-box"><a href="#subNav" data-toggle="class:hide"> <i
-                                class="fa fa-angle-left text"></i> <i class="fa fa-angle-right text-active"></i> </a>
-                        </div>
+                        <div class="head-box"><a href="#subNav" data-toggle="class:hide">
+                            <i class=" iconfont icon-menu-left text"></i>
+                            <i class=" iconfont icon-menu-right text-active"></i>
+                        </a></div>
                         <div class="wrapper header"><span class="border-left">&nbsp;安全设置</span></div>
                         <section class=" wrapper w-f">
                             <section class="panel panel-default yunhuni-personal">
@@ -137,7 +138,7 @@
                                             <div class="col-md-9 ">
                                                     <span class="help-block"><font style="color: #428bca;">邮箱绑定</font> <c:if test="${ safetyVo.isEmail==0}" ><i class="fa fa-exclamation-triangle"></i>变更邮箱[${modifyEmail}]的过程中，只有新邮箱被重新认证才能启用，未验证之前请使用旧邮箱登录</span></c:if><br/>
                                                         <c:if test="${ safetyVo.isEmail!=-1}" ><small class="help-small">您已经绑定了邮箱  ${ safetyVo.email}</small></c:if>
-                                                        <c:if test="${ safetyVo.isEmail==-1}" ><small class="help-small">您可以绑定邮箱地址，绑定邮箱地址后，可使用邮箱地址登陆，并可接受来自云呼你相关邮件通知</small></c:if>
+                                                        <c:if test="${ safetyVo.isEmail==-1}" ><small class="help-small">您可以绑定邮箱地址，绑定邮箱地址后，可使用邮箱地址登陆，并可接受来自壹耘相关邮件通知</small></c:if>
                                                     </span>
                                             </div>
                                             <div class="col-md-2 right">

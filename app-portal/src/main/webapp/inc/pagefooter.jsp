@@ -2,6 +2,7 @@
     <nav class='pageWrap'>
         <ul class="pagination">
             <!--设置显示的页数-->
+            <c:if test="${pageObj!=null}">
             <c:set var="startPageNo" value="1"></c:set>
             <c:set var="endPageNo" value="5"></c:set>
             <c:if test="${ pageObj.currentPageNo + 2 >5}">
@@ -43,6 +44,7 @@
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>
+            </c:if>
             </c:if>
         </ul>
     </nav>

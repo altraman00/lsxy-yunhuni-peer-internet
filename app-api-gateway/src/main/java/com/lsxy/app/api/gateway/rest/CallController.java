@@ -6,9 +6,9 @@ import com.lsxy.app.api.gateway.dto.NotifyCallDTO;
 import com.lsxy.app.api.gateway.dto.VerifyCallInputDTO;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.area.api.CallService;
-import com.lsxy.area.api.exceptions.DuoCallbackNumIsSampleException;
-import com.lsxy.area.api.exceptions.RequestIllegalArgumentException;
-import com.lsxy.area.api.exceptions.YunhuniApiException;
+import com.lsxy.framework.core.exceptions.api.DuoCallbackNumIsSampleException;
+import com.lsxy.framework.core.exceptions.api.RequestIllegalArgumentException;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.utils.WebUtils;
 import org.apache.commons.lang.StringUtils;
@@ -30,7 +30,7 @@ import java.util.Map;
 public class CallController extends AbstractAPIController{
     private static final Logger logger = LoggerFactory.getLogger(CallController.class);
 
-    @Reference(timeout=3000)
+    @Reference(timeout=3000,check = false,lazy = true)
     private CallService callService;
 
 //    @Autowired

@@ -63,11 +63,11 @@
     </appender>
 
 
-    <root level="INFO">
-        <appender-ref ref="STDOUT" />
-        <appender-ref ref="gelf" />
-        <appender-ref ref="ROLLINGFILE"/>
-    </root>
+    <!--<root level="INFO">-->
+        <!--<appender-ref ref="STDOUT" />-->
+        <!--<appender-ref ref="gelf" />-->
+        <!--<appender-ref ref="ROLLINGFILE"/>-->
+    <!--</root>-->
 
 
     <logger name="com.lsxy" level="DEBUG" additivity="true" />

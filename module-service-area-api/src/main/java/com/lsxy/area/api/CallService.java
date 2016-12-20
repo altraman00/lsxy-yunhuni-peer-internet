@@ -1,6 +1,6 @@
 package com.lsxy.area.api;
 
-import com.lsxy.area.api.exceptions.YunhuniApiException;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 
 import java.util.List;
 
@@ -43,16 +43,6 @@ public interface CallService {
                       Integer repeat,Integer max_dial_duration,String user_data) throws YunhuniApiException;
 
     /**
-     * 语音验证码/高级版 有收码功能
-     * @param ip
-     * @param appId
-     * @return
-     */
-    @Deprecated
-    String captchaCall(String ip, String appId, String from,String to,String verify_code,
-                       String max_dial_duration,String max_keys,List<String> files,String user_data)  throws YunhuniApiException;
-
-    /**
      * 语音验证码/拨通电话 告诉用户验证码
      * @param ip
      * @param appId
@@ -66,4 +56,5 @@ public interface CallService {
      */
     String verifyCall(String ip, String appId, String from, String to, Integer maxDialDuration,
                       String verifyCode, String playFile,Integer repeat, String userData) throws YunhuniApiException;
+
 }

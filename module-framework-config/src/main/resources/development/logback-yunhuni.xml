@@ -49,9 +49,9 @@
         <maximumMessageSize>8192</maximumMessageSize>
 
         <!-- This are static fields -->
-        <additionalFields>fieldName1=fieldValue1,fieldName2=fieldValue2</additionalFields>
+        <additionalFields>systemId=${systemId},env=development</additionalFields>
         <!-- Optional: Specify field types -->
-        <additionalFieldTypes>fieldName1=String,fieldName2=Double,fieldName3=Long</additionalFieldTypes>
+        <additionalFieldTypes>systemId=String,env=String</additionalFieldTypes>
 
         <!-- This are fields using MDC -->
         <mdcFields>mdcField1,mdcField2</mdcFields>
@@ -65,7 +65,6 @@
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />
-        <appender-ref ref="gelf" />
         <appender-ref ref="ROLLINGFILE"/>
     </root>
 

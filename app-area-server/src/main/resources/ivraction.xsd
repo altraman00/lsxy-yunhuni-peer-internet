@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="unqualified">
+
+    <xs:simpleType name="positivenumber">
+        <xs:restriction base="xs:int">
+            <xs:minInclusive value="1"></xs:minInclusive>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="boolnumber">
+        <xs:restriction base="xs:int">
+            <xs:minInclusive value="0"></xs:minInclusive>
+            <xs:maxInclusive value="1"></xs:maxInclusive>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="modenumber">
+        <xs:restriction base="xs:int">
+            <xs:minInclusive value="1"></xs:minInclusive>
+            <xs:maxInclusive value="3"></xs:maxInclusive>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="finish_keys">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[0123456789*#ABCD]"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="playfile">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="\s*\S+\.wav\s*"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="play">
+        <xs:simpleContent>
+            <xsd:extension base="playfile">
+                <xs:attribute name="finish_keys" type="finish_keys"></xs:attribute>
+            </xsd:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="playlist">
+        <xs:sequence minOccurs="1" maxOccurs="unbounded">
+            <xs:element name="play" type="play"></xs:element>
+        </xs:sequence>
+        <xs:attribute name="finish_keys" type="finish_keys"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="record">
+        <xs:simpleContent>
+            <xsd:extension base="xs:string">
+                <xs:attribute name="max_duration" type="positivenumber"></xs:attribute>
+                <xs:attribute name="beeping" type="xs:boolean"></xs:attribute>
+                <xs:attribute name="finish_keys" type="finish_keys"></xs:attribute>
+            </xsd:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:simpleType name="dtmf">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[0123456789*#ABCD]+"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="get">
+        <xs:choice minOccurs="1" maxOccurs="1">
+            <xs:element name="play" type="play"></xs:element>
+            <xs:element name="playlist" type="playlist"></xs:element>
+        </xs:choice>
+        <xs:attribute name="valid_keys" type="dtmf"></xs:attribute>
+        <xs:attribute name="max_keys" type="positivenumber"></xs:attribute>
+        <xs:attribute name="finish_keys" type="finish_keys"></xs:attribute>
+        <xs:attribute name="first_key_timeout" type="positivenumber"></xs:attribute>
+        <xs:attribute name="continues_keys_timeout" type="positivenumber"></xs:attribute>
+        <xs:attribute name="play_repeat" type="positivenumber"></xs:attribute>
+        <xs:attribute name="if_break_on_key" type="xs:boolean"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="hangup">
+        <xs:simpleContent>
+            <xsd:extension base="xs:string">
+            </xsd:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="pause">
+        <xs:simpleContent>
+            <xsd:extension base="xs:string">
+                <xs:attribute name="duration" type="positivenumber" use="required"></xs:attribute>
+            </xsd:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="connect">
+        <xs:choice>
+            <xs:element name="play" type="play" minOccurs="0" maxOccurs="1"></xs:element>
+        </xs:choice>
+        <xs:attribute name="max_duration" type="positivenumber"></xs:attribute>
+        <xs:attribute name="mode" type="modenumber"></xs:attribute>
+        <xs:attribute name="recording" type="xs:boolean"></xs:attribute>
+        <xs:attribute name="volume1" type="positivenumber"></xs:attribute>
+        <xs:attribute name="volume2" type="positivenumber"></xs:attribute>
+        <xs:attribute name="play_time" type="positivenumber"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="dial">
+        <xs:choice minOccurs="2" maxOccurs="3">
+            <xs:element name="play" type="play" minOccurs="0" maxOccurs="1"></xs:element>
+            <xs:element name="number" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+            <xs:element name="connect" type="connect" minOccurs="1" maxOccurs="1"></xs:element>
+        </xs:choice>
+        <xs:attribute name="from" type="xs:string"></xs:attribute>
+        <xs:attribute name="max_call_duration" type="positivenumber"></xs:attribute>
+        <xs:attribute name="max_dial_duration" type="positivenumber"></xs:attribute>
+        <xs:attribute name="dial_voice_stop_cond" type="boolnumber"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="condition">
+        <xs:attribute name="id" type="xs:string" use="required"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="route">
+        <xs:choice minOccurs="1" maxOccurs="1">
+            <xs:element name="condition" type="condition" minOccurs="1" maxOccurs="1"></xs:element>
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="enqueue">
+        <xs:choice minOccurs="1" maxOccurs="1">
+            <xs:element name="route" type="route" minOccurs="1" maxOccurs="1"></xs:element>
+        </xs:choice>
+        <xs:attribute name="channel" type="xs:string" use="required"></xs:attribute>
+        <xs:attribute name="conversation_level" type="positivenumber"></xs:attribute>
+        <xs:attribute name="conversation_timeout" type="positivenumber"></xs:attribute>
+        <xs:attribute name="choice" type="xs:string"></xs:attribute>
+        <xs:attribute name="reserve_state" type="xs:string"></xs:attribute>
+        <xs:attribute name="fail_overflow" type="xs:boolean"></xs:attribute>
+        <xs:attribute name="wait_voice" type="xs:string"></xs:attribute>
+        <xs:attribute name="ring_mode" type="positivenumber"></xs:attribute>
+        <xs:attribute name="ring_voice" type="xs:string"></xs:attribute>
+        <xs:attribute name="hold_voice" type="xs:string"></xs:attribute>
+        <xs:attribute name="play_num" type="xs:boolean"></xs:attribute>
+        <xs:attribute name="pre_num_voice" type="xs:string"></xs:attribute>
+        <xs:attribute name="post_num_voice" type="xs:string"></xs:attribute>
+        <xs:attribute name="data" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:element name="response">
+        <xs:complexType>
+            <xs:choice minOccurs="1" maxOccurs="2">
+                <xs:choice minOccurs="1" maxOccurs="1">
+                    <xs:element name="play" type="play"></xs:element>
+                    <xs:element name="playlist" type="playlist"/>
+                    <xs:element name="record" type="record"/>
+                    <xs:element name="send_dtmf" type="dtmf"/>
+                    <xs:element name="get" type="get"/>
+                    <xs:element name="hangup" type="hangup"/>
+                    <xs:element name="pause" type="pause"/>
+                    <xs:element name="dial" type="dial"/>
+                    <xs:element name="enqueue" type="enqueue"/>
+                </xs:choice>
+                <xs:choice minOccurs="1" maxOccurs="1">
+                    <xs:element name="next" type="xs:string"/>
+                </xs:choice>
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

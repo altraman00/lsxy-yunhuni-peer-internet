@@ -1,6 +1,7 @@
 package com.lsxy.area.server.mq.handler;
 
 import com.alibaba.fastjson.JSON;
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.mq.events.oc.VoiceFilePlayAuditCompletedEvent;
@@ -90,10 +91,13 @@ public class VoiceFilePlayAuditCompletedEventHandler implements MQMessageHandler
         }
         Map<String, Object> params = new HashMap<>();
         App app = appService.findById(appId);
-        if(app.getStatus() == App.STATUS_OFFLINE){
-            throw new RuntimeException("应用没上线");
+        String areaId;
+        if(app.getArea()!= null){
+            areaId = app.getArea().getId();
+        }else{
+            areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
         }
-        params.put("areaId ",app.getArea().getId());
+        params.put("areaId",areaId);
         RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_SYNC,params);
         request.setBody(param);
         try {

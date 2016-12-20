@@ -3,9 +3,12 @@ package com.lsxy.yunhuni.api.resourceTelenum.service;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
+import com.lsxy.yunhuni.api.resourceTelenum.model.TelenumOrder;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 租户号码租用service
@@ -33,7 +36,12 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @return
      */
     ResourcesRent findByResourceTelenumIdAndStatus(String id, int status);
-
+    /**
+     * 根据号码和租用状态查询租用关系
+     * @param id
+     * @return
+     */
+    ResourcesRent findByResourceTelenumId(String id);
     /**
      * 根据号码查询租用关系
      * @param resData
@@ -47,7 +55,7 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @param tenant
      * @return
      */
-    String[] findOwnUnusedNum(Tenant tenant);
+    List<ResourceTelenum> findOwnUnusedNum(Tenant tenant);
 
     /**
      * 清除过期号资源和租户的关系
@@ -55,8 +63,38 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
     void cleanExpireTelnumResourceRent();
 
     /**
+     * 月租费
+     */
+    void monthlyRentTask();
+    /**
      * 号码租用自动扣费任务
      */
     void resourcesRentTask();
+    /**
+     * 录音容量月租扣费
+     */
+    void recordingVoiceFileTask();
 
+    /**
+     * 释放号码
+     */
+    void release(String id);
+
+    /**
+     * 支付订单
+     * @param id
+     * @param tenant
+     * @return
+     */
+    void telnumPlay(String id,Tenant tenant);
+    /**
+     * 取消订单
+     */
+    void telnumDelete(String id,Tenant tenant);
+    /**
+     * 创建订单
+     */
+    TelenumOrder telnumNew(Tenant tenant, String[] numIds);
+    /** 对录音进行扣费*/
+    boolean recordCost(String tenantId,String appId);
 }

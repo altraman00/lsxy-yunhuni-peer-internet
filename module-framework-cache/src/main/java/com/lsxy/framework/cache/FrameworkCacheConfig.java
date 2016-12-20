@@ -7,26 +7,18 @@ import com.lsxy.framework.config.SystemConfig;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.SerializationException;
 
-import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
@@ -54,6 +46,19 @@ public class FrameworkCacheConfig extends CachingConfigurerSupport {
         jackson2JsonRedisSerializer.setObjectMapper(om);
 
         template.setValueSerializer(jackson2JsonRedisSerializer);
+        template.setConnectionFactory(factory);
+        return template;
+    }
+
+    @Bean(name="businessRedisTemplate")
+    public RedisTemplate<String, String> hashAndSetRedisTemplate(
+            RedisConnectionFactory factory) {
+        final RedisTemplate template = new RedisTemplate();
+        template.setKeySerializer(template.getStringSerializer());
+        template.setHashKeySerializer(template.getStringSerializer());
+
+        template.setHashValueSerializer(template.getStringSerializer());
+        template.setValueSerializer(template.getStringSerializer());
         template.setConnectionFactory(factory);
         return template;
     }

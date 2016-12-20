@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+    <contextName>area-server</contextName>
+    <property name="APP_NAME" value="call-center" />
+    <property name="systemId" value="call.center" />
+    <include resource="logback-yunhuni.xml"/>
+    <!--<logger name="org.springframework.web" level="DEBUG" additivity="true" />-->
+    <logger name="io.netty" level="INFO" additivity="false" />
+    <logger name="com.lsxy" level="DEBUG" additivity="true" />
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="gelf" />
+        <!--<appender-ref ref="ROLLINGFILE"/>-->
+    </root>
+</configuration>

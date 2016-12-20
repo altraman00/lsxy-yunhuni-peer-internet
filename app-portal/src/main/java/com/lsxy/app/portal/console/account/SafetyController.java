@@ -2,6 +2,7 @@ package com.lsxy.app.portal.console.account;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.MobileCodeUtils;
+import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;
@@ -37,8 +38,6 @@ public class SafetyController extends AbstractPortalController {
     private static final String IS_TRUE = "1";//表示成功
     private static final String RESULT_SUCESS = "2";//处理结果-成功
     private static final String RESULT_FIAL = "-2";//处理结果-失败
-    //配置rest请求地址
-    private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
     /**
      * 安全设置首页
      * @param request
@@ -101,7 +100,7 @@ public class SafetyController extends AbstractPortalController {
      */
     private RestResponse modifyPwd(HttpServletRequest request,String oldPassword,String newPassword){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl + "/rest/account/safety/modify_pwd";
+        String uri = PortalConstants.REST_PREFIX_URL  + "/rest/account/safety/modify_pwd";
         Map map = new HashMap();
         map.put("oldPassword",oldPassword);
         map.put("newPassword",newPassword);
@@ -134,7 +133,7 @@ public class SafetyController extends AbstractPortalController {
     @ResponseBody
     public RestResponse modifyEmailBind(HttpServletRequest request,String email ){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/account/safety/modify_email_bind?email={1}";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/account/safety/modify_email_bind?email={1}";
         RestResponse restResponse = RestRequest.buildSecurityRequest(token).get(uri,  String.class,email);
         return restResponse;
     }
@@ -146,7 +145,7 @@ public class SafetyController extends AbstractPortalController {
      */
     private RestResponse validationPassword(HttpServletRequest request,String oldPws){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/account/safety/validation_password?password={1}";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/account/safety/validation_password?password={1}";
         return  RestRequest.buildSecurityRequest(token).get(uri,  String.class,oldPws);
     }
 
@@ -160,7 +159,7 @@ public class SafetyController extends AbstractPortalController {
     @ResponseBody
     public RestResponse editMobile(String mobile ,HttpServletRequest request ){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +  "/rest/account/safety/save_mobile?mobile={1}";
+        String uri = PortalConstants.REST_PREFIX_URL  +  "/rest/account/safety/save_mobile?mobile={1}";
         RestResponse restResponse =  RestRequest.buildSecurityRequest(token).get(uri,Account.class,mobile);
         if(restResponse.isSuccess()) {
             MobileCodeUtils.removeMobileCodeChecker(request);

@@ -65,6 +65,14 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
             chain.doFilter(req,resp);
             return;
         }
+        //TODO 测试环境暗码凭证生成
+        if((req.getHeader("MASKCODE")!=null && "kj38kghl6d93kgj8".equals(req.getHeader("MASKCODE")))){
+            RestToken codeToken = new RestToken("MASKCODE", null, new Date(), null, null);
+            //认证成功，设置认证token
+            SecurityContextHolder.getContext().setAuthentication(codeToken);
+            chain.doFilter(req, resp);
+            return;
+        }
 
         long start = System.currentTimeMillis();
 
@@ -93,6 +101,11 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
                     logger.debug("没有签名认证凭证：" + request.getRequestURI());
                 }
                 throw new AuthenticationCredentialsNotFoundException("没有找到授权凭证");
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("CertID:" + certID+";");
+                logger.debug("Timestamp:" + timestamp+";");
+                logger.debug("AppID:" + appid+";");
             }
 
             // Authorization header is in the form <public_access_key>:<signature>
@@ -132,7 +145,7 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
                 RestToken restToken = (RestToken) successfulAuthentication;
                 tenantId = restToken.getTenantId();
             }
-            getSaveApiLogTask().invokeApiSaveDB(appid, payload, contentType, method, signature, apiuri,tenantId,certID);
+            getSaveApiLogTask().invokeApiSaveDB(req.getRequestURI(),req.getMethod(),appid, payload, contentType, signature,tenantId,certID);
 
             if(logger.isDebugEnabled()){
                 logger.debug("签名校验完毕,花费{}ms",(System.currentTimeMillis()-start));
@@ -142,6 +155,7 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
             // Continue with the Filters
             chain.doFilter(request, response);
             if(logger.isDebugEnabled()){
+                logger.debug("API调用完成：{}", apiuri);
                 logger.debug("执行体执行完毕,花费:{}ms",(System.currentTimeMillis() - start));
             }
 

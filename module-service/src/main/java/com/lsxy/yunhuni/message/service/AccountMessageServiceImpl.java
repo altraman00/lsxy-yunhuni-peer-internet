@@ -201,16 +201,30 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
         String serviceHql = "  FROM Feedback obj WHERE obj.status=?1 ";
         long awaitService = this.countByCustom(serviceHql, Feedback.UNREAD);
         //财务中心
-        String invoiceHql = "  FROM InvoiceApply obj WHERE (obj.status=?1) OR (obj.status=?2  and obj.expressNo is null) ";
-        long awaitInvoice = this.countByCustom(invoiceHql,InvoiceApply.STATUS_SUBMIT,InvoiceApply.STATUS_DONE);
+//        String invoiceHql = "  FROM InvoiceApply obj WHERE (obj.status=?1) OR (obj.status=?2  and obj.expressNo is null) ";
+//        long awaitInvoice = this.countByCustom(invoiceHql,InvoiceApply.STATUS_SUBMIT,InvoiceApply.STATUS_DONE);
+        String hql = " from InvoiceApply obj where obj.status=?1 ";
+        long awaitInvoiceApply =  this.countByCustom(hql,InvoiceApply.STATUS_SUBMIT);//发票审核
+        String hql2 = "  from InvoiceApply obj where obj.status=?1  and obj.expressNo is null ";
+        long awaitInvoiceApplySend = this.countByCustom(hql2,InvoiceApply.STATUS_DONE);//发票审核发送
+        long awaitInvoice = awaitInvoiceApply+awaitInvoiceApplySend;//财务中心
         //审核中心
         String demandHql1 = "  FROM Tenant obj WHERE obj.isRealAuth in('"+Tenant.AUTH_WAIT+"','"+Tenant.AUTH_ONESELF_WAIT+"','"+Tenant.AUTH_UPGRADE_WAIT+"') ";
         String demandHql2 = "  from VoiceFilePlay obj where obj.status='"+VoiceFilePlay.STATUS_WAIT+"'  ";
-        long awaitDemand = this.countByCustom(demandHql1)+this.countByCustom(demandHql2);
+        long awaitTenant = this.countByCustom(demandHql1);//会员认证
+        long awaitPlayVoiceFile = this.countByCustom(demandHql2);//放音文件
+        long awaitDemand = awaitTenant+awaitPlayVoiceFile;//审核中心
         Map map = new HashMap();
-        map.put("awaitService",awaitService);
-        map.put("awaitInvoice",awaitInvoice);
-        map.put("awaitDemand",awaitDemand);
+        Map map1 = new HashMap();
+        map.put("awaitService",awaitService);//客服中心
+        map.put("awaitInvoice",awaitInvoice);//财务中心
+        map.put("awaitDemand",awaitDemand);//审核中心
+        map1.put("awaitService",awaitService);//客服中心
+        map1.put("awaitInvoiceApply",awaitInvoiceApply);//发票审核
+        map1.put("awaitInvoiceApplySend",awaitInvoiceApplySend);//发票审核发送
+        map1.put("awaitTenant",awaitTenant);//会员认证
+        map1.put("awaitPlayVoiceFile",awaitPlayVoiceFile);//放音文件
+        map.put("son",map1);
         return map;
     }
 }

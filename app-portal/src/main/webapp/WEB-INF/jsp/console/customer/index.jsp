@@ -22,7 +22,7 @@
     <section class='aside-section'>
         <section class="hbox stretch">
             <!-- .aside -->
-            <aside class="bg-Green lter aside hidden-print" data-include="aside" id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
+            <%@include file="/inc/leftMenu.jsp"%>
             <!-- /.aside -->
 
         <section id="content">
@@ -79,7 +79,7 @@
         if(result&&text.length>0){
             ajaxsync(ctx+"/console/customer/edit",getFormJson("#customForm"),function(data){
                 if(data.success){
-                    showtoast("提交成功",ctx+"/console/customer/index");
+                    showtoast("提交成功",ctx+"/console/customer/index",1000);
                 }else{
                     showtoast(data.errorMsg);
                     $('#validateBtn').removeAttr('disabled');

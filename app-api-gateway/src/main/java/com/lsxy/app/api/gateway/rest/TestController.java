@@ -4,7 +4,6 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.api.gateway.StasticsCounter;
 import com.lsxy.area.api.CallService;
 import com.lsxy.framework.api.test.TestService;
-import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mq.MQStasticCounter;
 import com.lsxy.framework.mq.api.MQService;
@@ -18,9 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -37,10 +34,10 @@ public class TestController {
     private static final Logger logger = LoggerFactory.getLogger(TestController.class);
 
 
-    @Reference(timeout = 3000)
+    @Reference(timeout = 3000,check = false,lazy = true)
     private TestService testService;
 
-    @Reference(timeout = 3000)
+    @Reference(timeout = 3000,check = false,lazy = true)
     private CallService callService;
 
     @Autowired(required = false)
@@ -55,6 +52,7 @@ public class TestController {
 
     @Autowired
     private AsyncRequestContext asyncRequestContext;
+
 
 
     @RequestMapping("/test/clean/sa")
@@ -87,26 +85,26 @@ public class TestController {
     @RequestMapping("/test/call/presure/{threads}/{count}")
     public RestResponse<String> doCallPressureTest(@PathVariable int threads,@PathVariable  int count){
         ExecutorService es = Executors.newFixedThreadPool(threads);
-
-        long starttime = System.currentTimeMillis();
-        long result = 0L;
-        for(int i=0;i<threads;i++){
-            es.submit(new CallTask(count));
-        }
-        es.shutdown();;
-        try {
-            while (!es.awaitTermination(10000, TimeUnit.MILLISECONDS)) {
-                System.out.println("还在跑,线程池没有关闭");
-            }
-
-            result = System.currentTimeMillis() - starttime;
-            if(logger.isDebugEnabled()){
-                logger.debug("整个测试全部完成,共耗时:{}ms",result);
-            }
-        } catch (InterruptedException e) {
-            logger.error("线程池异常",e);
-        }
-        return RestResponse.success("测试完毕,共耗时:"+result+"ms");
+        testService.testPresure(threads,count);
+//        long starttime = System.currentTimeMillis();
+//        long result = 0L;
+//        for(int i=0;i<threads;i++){
+//            es.submit(new CallTask(count));
+//        }
+//        es.shutdown();;
+//        try {
+//            while (!es.awaitTermination(10000, TimeUnit.MILLISECONDS)) {
+//                System.out.println("还在跑,线程池没有关闭");
+//            }
+//
+//            result = System.currentTimeMillis() - starttime;
+//            if(logger.isDebugEnabled()){
+//                logger.debug("整个测试全部完成,共耗时:{}ms",result);
+//            }
+//        } catch (InterruptedException e) {
+//            logger.error("线程池异常",e);
+//        }
+        return RestResponse.success("调用完毕");
     }
 
 
@@ -132,7 +130,7 @@ public class TestController {
                         logger.debug("[{}]收到返回值:{},共花费:{}ms", c , xx, System.currentTimeMillis() - startdt);
                     }
                 }catch (Exception ex){
-
+                    logger.error("出现异常",ex);
                 }
             }
             if(logger.isDebugEnabled()){

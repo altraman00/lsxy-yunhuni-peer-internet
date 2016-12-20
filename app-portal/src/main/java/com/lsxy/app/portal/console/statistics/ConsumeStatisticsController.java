@@ -1,6 +1,7 @@
 package com.lsxy.app.portal.console.statistics;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
+import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.yunhuni.api.statistics.model.ConsumeDay;
 import com.lsxy.yunhuni.api.statistics.model.ConsumeMonth;
 import com.lsxy.framework.config.SystemConfig;
@@ -29,7 +30,6 @@ import java.util.*;
 @RequestMapping("/console/statistics/consume/")
 public class ConsumeStatisticsController extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(ConsumeStatisticsController.class);
-    private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
     /**
      * 消费统计首页
      * @param request
@@ -101,7 +101,7 @@ public class ConsumeStatisticsController extends AbstractPortalController {
         String token = getSecurityToken(request);
         appId = "-1".equals(appId)?null:appId;
         String tenantId = getCurrentAccount(request).getTenant().getId();
-        String uri = restPrefixUrl +   "/rest/consume_day/list?tenantId={1}&appId={2}&startTime={3}";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/consume_day/list?tenantId={1}&appId={2}&startTime={3}";
         RestResponse<List<ConsumeDay>> restResponse =  RestRequest.buildSecurityRequest(token).getList(uri, ConsumeDay.class,tenantId,appId,startTime);
         List<ConsumeDay> list =  restResponse.getData();
         Map map = new HashMap();
@@ -121,7 +121,7 @@ public class ConsumeStatisticsController extends AbstractPortalController {
         String token = getSecurityToken(request);
         appId = "-1".equals(appId)?null:appId;
         String tenantId = getCurrentAccount(request).getTenant().getId();
-        String uri = restPrefixUrl +   "/rest/consume_month/list?tenantId={1}&appId={2}&startTime={3}";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/consume_month/list?tenantId={1}&appId={2}&startTime={3}";
         RestResponse<List<ConsumeMonth>> restResponse =  RestRequest.buildSecurityRequest(token).getList(uri, ConsumeMonth.class,tenantId,appId,startTime);
         List<ConsumeMonth> list =  restResponse.getData();
         Map map = new HashMap();
@@ -144,18 +144,18 @@ public class ConsumeStatisticsController extends AbstractPortalController {
      * @param list 待处理的list
      * @return
      */
-    private double[] getArrays(List list,Object date) {
+    private String[] getArrays(List list,Object date) {
         int leng = getLong(date);
-        double[] list1 = new double[leng];
+        String[] list1 = new String[leng];
         for(int j=0;j<leng;j++){
-            list1[j]=0;
+            list1[j]="0";
         }
         for(int i=0;i<list.size();i++){
             Object obj = list.get(i);
             if(obj instanceof ConsumeMonth){
-                list1[((ConsumeMonth)obj).getMonth()-1]=((ConsumeMonth)obj).getAmongAmount().doubleValue();
+                list1[((ConsumeMonth)obj).getMonth()-1]=StringUtil.getDecimal(((ConsumeMonth)obj).getAmongAmount().toString(),3);
             }else if(obj instanceof ConsumeDay){
-                list1[((ConsumeDay)obj).getDay()-1]=((ConsumeDay)obj).getAmongAmount().doubleValue();
+                list1[((ConsumeDay)obj).getDay()-1]=StringUtil.getDecimal(((ConsumeDay)obj).getAmongAmount().toString(),3);
             }
         }
         return list1;
@@ -175,7 +175,7 @@ public class ConsumeStatisticsController extends AbstractPortalController {
         if(StringUtil.isNotEmpty(consumeStatisticsVo.getEndTime())){
             compare="compare_";
         }
-        String uri = restPrefixUrl + "/rest/consume_"+consumeStatisticsVo.getType()+"/"+compare+"page?tenantId={1}&appId={2}&type={3}&startTime={4}&endTime={5}&pageNo={6}&pageSize={7}";
+        String uri = PortalConstants.REST_PREFIX_URL  + "/rest/consume_"+consumeStatisticsVo.getType()+"/"+compare+"page?tenantId={1}&appId={2}&type={3}&startTime={4}&endTime={5}&pageNo={6}&pageSize={7}";
         Class clazz = ConsumeMonth.class;
         if(ConsumeStatisticsVo.TYPE_DAY.equals(consumeStatisticsVo.getType())){
             clazz = ConsumeDay.class;

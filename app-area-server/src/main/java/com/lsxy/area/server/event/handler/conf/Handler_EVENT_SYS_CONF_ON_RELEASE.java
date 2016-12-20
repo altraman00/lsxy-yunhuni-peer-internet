@@ -1,10 +1,14 @@
 package com.lsxy.area.server.event.handler.conf;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.call.center.api.model.CallCenterConversation;
+import com.lsxy.call.center.api.service.CallCenterConversationService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -14,7 +18,6 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
-import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.session.model.Meeting;
 import com.lsxy.yunhuni.api.session.service.MeetingService;
@@ -58,6 +61,12 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
     @Autowired
     private ConfService confService;
 
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterConversationService callCenterConversationService;
+
+    @Autowired
+    private CallCenterUtil callCenterUtil;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CONF_ON_RELEASE;
@@ -90,25 +99,43 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.info("confi_id={},state={}",conf_id,state);
         }
+        if(BusinessState.TYPE_CC_CONVERSATION.equals(state.getType())){
+            conversation(state,params,conf_id);
+        }else{
+            conf(state,params,conf_id);
+        }
 
-        String appId = state.getAppId();
+        return res;
+    }
+
+    private void conversation(BusinessState state, Map<String, Object> params, String conversation_id) {
+        CallCenterConversation conversation = null;
+        try{
+            conversation = callCenterConversationService.findById(conversation_id);
+            if(conversation!=null){
+                conversation.setEndTime(new Date());
+                callCenterConversationService.save(conversation);
+            }
+        }catch (Throwable t){
+            logger.error("更新交谈记录失败",t);
+        }
+        if(conversation!=null){
+            callCenterUtil.conversationEndEvent(state.getCallBackUrl(),conversation_id,
+                    CallCenterUtil.CONVERSATION_TYPE_QUEUE,
+                    conversation.getStartTime().getTime(),null,null,null,null,null,null);
+        }
+    }
+
+    private void conf(BusinessState state,Map<String,Object> params,String conf_id){
         String user_data = state.getUserdata();
-        Map<String,Object> businessData = state.getBusinessData();
+        Map<String,String> businessData = state.getBusinessData();
         Boolean auto_hangup = Boolean.FALSE;
         if(businessData!=null){
-            auto_hangup = (Boolean)businessData.get("auto_hangup");
+            auto_hangup = Boolean.parseBoolean(businessData.get("auto_hangup"));
         }
         if(auto_hangup != null && auto_hangup){
             handupParts(conf_id);
         }
-        if(StringUtils.isBlank(appId)){
-            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
-        }
-        App app = appService.findById(state.getAppId());
-        if(app == null){
-            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
-        }
-
         //开始通知开发者
         if(logger.isDebugEnabled()){
             logger.debug("开始发送会议解散通知给开发者");
@@ -122,7 +149,7 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
             end_time = (Long.parseLong(params.get("end_time").toString())) * 1000;
         }
 
-        if(StringUtils.isNotBlank(app.getUrl())){
+        if(StringUtils.isNotBlank(state.getCallBackUrl())){
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","conf.end")
                     .putIfNotEmpty("id",conf_id)
@@ -132,7 +159,7 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
                     .putIfNotEmpty("record_files",null)
                     .putIfNotEmpty("user_data",user_data)
                     .build();
-            notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+            notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,3);
         }
 
         if(logger.isDebugEnabled()){
@@ -142,14 +169,16 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
             logger.debug("处理{}事件完成",getEventName());
         }
 
-        Meeting meeting = meetingService.findById(conf_id);
-        if(meeting!=null){
-            meeting.setEndTime(new Date());
-            meetingService.save(meeting);
+        try{
+            Meeting meeting = meetingService.findById(conf_id);
+            if(meeting!=null){
+                meeting.setEndTime(new Date());
+                meetingService.save(meeting);
+            }
+        }catch (Throwable t){
+            logger.error("更新会议记录失败",t);
         }
-        return res;
     }
-
     private void handupParts(String confId) {
         logger.info("开始处理会议={}解散自动挂断与会方",confId);
         Set<String> parts = confService.popParts(confId);

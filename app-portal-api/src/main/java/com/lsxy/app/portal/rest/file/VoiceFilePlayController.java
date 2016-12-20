@@ -57,9 +57,9 @@ public class VoiceFilePlayController extends AbstractRestController {
     }
 
     private VoiceFilePlay deleteOneVoiceFilePlay(String id) throws IllegalAccessException, InvocationTargetException {
-        String repository= SystemConfig.getProperty("global.oss.aliyun.bucket");
         VoiceFilePlay voiceFilePlay =  voiceFilePlayService.findById(id);
         try {
+            String repository= SystemConfig.getProperty("global.oss.aliyun.bucket");
             ossService.deleteObject(repository, voiceFilePlay.getFileKey());
             voiceFilePlay.setOssDeleted(VoiceFilePlay.DELETED_SUCCESS);
         }catch(Exception e){

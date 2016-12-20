@@ -1,8 +1,8 @@
 package com.lsxy.app.api.gateway.rest;
 
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
-import com.lsxy.area.api.ApiReturnCodeEnum;
-import com.lsxy.area.api.exceptions.YunhuniApiException;
+import com.lsxy.framework.core.exceptions.api.ApiReturnCodeEnum;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -29,14 +29,21 @@ public class AbstractAPIController {
     @ExceptionHandler(Exception.class)
     public ApiGatewayResponse exp(HttpServletRequest request, HttpServletResponse response, Exception ex) {
         ApiGatewayResponse failed;
-        if(ex instanceof YunhuniApiException){
-            failed = ApiGatewayResponse.failed(((YunhuniApiException) ex).getCode(),ex.getMessage());
-        }else if(ex instanceof MethodArgumentNotValidException){
+        Throwable resultEx;
+        Throwable cause = ex.getCause();
+        if(cause != null){
+            resultEx = cause;
+        }else{
+            resultEx = ex;
+        }
+        if(resultEx instanceof YunhuniApiException){
+            failed = ApiGatewayResponse.failed(((YunhuniApiException) resultEx).getCode(),resultEx.getMessage());
+        }else if(resultEx instanceof MethodArgumentNotValidException){
             failed = ApiGatewayResponse.failed(ApiReturnCodeEnum.IllegalArgument.getCode(), ApiReturnCodeEnum.IllegalArgument.getMsg());
         }else{
             failed = ApiGatewayResponse.failed(ApiReturnCodeEnum.UnknownFail.getCode(), ApiReturnCodeEnum.UnknownFail.getMsg());
         }
-        logger.info("调用接口出现异常：",ex);
+        logger.error("调用接口出现异常：",resultEx);
         return failed;
     }
 }

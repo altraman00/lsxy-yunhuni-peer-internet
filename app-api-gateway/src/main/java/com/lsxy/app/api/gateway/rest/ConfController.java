@@ -4,7 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.api.gateway.dto.*;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.area.api.ConfService;
-import com.lsxy.area.api.exceptions.YunhuniApiException;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.web.utils.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ import java.util.Map;
 public class ConfController extends AbstractAPIController{
     private static final Logger logger = LoggerFactory.getLogger(ConfController.class);
 
-    @Reference(timeout=3000)
+    @Reference(timeout=3000,check = false,lazy = true)
     private ConfService confService;
 
     @RequestMapping(value = "/{accountId}/conf/create",method = RequestMethod.POST)

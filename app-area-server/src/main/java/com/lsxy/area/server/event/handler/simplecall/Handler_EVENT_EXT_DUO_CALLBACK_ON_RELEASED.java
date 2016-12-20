@@ -94,10 +94,10 @@ public class Handler_EVENT_EXT_DUO_CALLBACK_ON_RELEASED extends EventHandler {
             voiceCallbackService.save(duoCall);
         }
         //处理会话表数据
-        Map<String, Object> data = state.getBusinessData();
-        Set<Map.Entry<String, Object>> entries = data.entrySet();
-        for(Map.Entry entry:entries){
-            String sessionId = (String) entry.getValue();
+        Map<String, String> data = state.getBusinessData();
+        Set<Map.Entry<String, String>> entries = data.entrySet();
+        for(Map.Entry<String,String> entry:entries){
+            String sessionId = entry.getValue();
             CallSession callSession = callSessionService.findById(sessionId);
             if(callSession != null){
                 callSession.setStatus(CallSession.STATUS_OVER);

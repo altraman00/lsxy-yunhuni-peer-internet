@@ -28,7 +28,13 @@ public interface OSSService {
      * @return
      */
     public boolean uploadFileLocal(File file,String repository, String fileKey) throws Exception;
-
+    /**
+     * 上传本地文件到云存储空间
+     * @param file
+     * @param repository
+     * @return
+     */
+    public boolean uploadFileLocal(File file,String repository, String fileKey,String contentType,String contentDisposition) throws Exception;
 
     /**
      * 获取云存储文件流

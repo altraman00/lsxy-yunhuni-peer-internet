@@ -45,7 +45,7 @@ public class RechargeHourServiceImpl extends AbstractService<RechargeHour> imple
                 " IFNULL(sum(amount),0) as among_amount," +
                 " COUNT(1) as among_num, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version ";
-        sql +=  " from db_lsxy_base.tb_base_recharge a where status='PAID' and last_time BETWEEN ? AND ? "+groupbys;
+        sql +=  " from db_lsxy_base.tb_base_recharge a where status='PAID' and pay_time BETWEEN ? AND ? "+groupbys;
         //拼装条件
         Timestamp sqlDate1 = new Timestamp(date1.getTime());
         long times = new Date().getTime();

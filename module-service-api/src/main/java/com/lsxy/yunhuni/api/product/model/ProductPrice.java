@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 
 /**
- * 产品资费表
+ * 产品计费项资费表
  * Created by liups on 2016/8/27.
  */
 @Entity
@@ -16,24 +16,39 @@ import java.math.BigDecimal;
 public class ProductPrice extends IdEntity {
     public static int STATUS_VALID = 1;
     public static int STATUS_INVALID = 0;
-
-    private Product product;    //产品
+    private ProductItem productItem;    //产品
     private BigDecimal price;   //单价
     private Integer status;     //1启用，0未启用
     private Integer priority;   //优先级，数字大的优先
     private Long priceVersion;  //资费版本号，同一套资费版本号一样，创建后不可修改，用时间戳
     private String remark;
+    private Integer timeUnit;   //单位时长(单位秒)
+    private String unit;   //单位
+    @Column(name = "time_unit")
+    public Integer getTimeUnit() {
+        return timeUnit;
+    }
 
+    public void setTimeUnit(Integer timeUnit) {
+        this.timeUnit = timeUnit;
+    }
+    @Column(name = "unit")
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
     @ManyToOne
-    @JoinColumn(name = "product_id")
-    public Product getProduct() {
-        return product;
+    @JoinColumn(name = "product_item_id")
+    public ProductItem getProductItem() {
+        return productItem;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProductItem(ProductItem productItem) {
+        this.productItem = productItem;
     }
-
     @Column(name = "price")
     public BigDecimal getPrice() {
         return price;
@@ -43,7 +58,7 @@ public class ProductPrice extends IdEntity {
         this.price = price;
     }
 
-    @Column(name = "STATUS")
+    @Column(name = "status")
     public Integer getStatus() {
         return status;
     }

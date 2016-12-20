@@ -1,6 +1,7 @@
 package com.lsxy.app.portal.console.cost;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
+import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
@@ -29,7 +30,6 @@ import java.util.List;
 @RequestMapping("/console/cost/consume")
 public class ConsumeController extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(ConsumeController.class);
-    private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
     /**
      * 返回消费记录
      * @param request
@@ -61,7 +61,7 @@ public class ConsumeController extends AbstractPortalController {
         if(startTime==null){startTime = DateUtils.formatDate(new Date(),"yyyy-MM");}
         if(endTime==null){endTime = DateUtils.formatDate(new Date(),"yyyy-MM");}
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl + "/rest/consume/list?startTime={1}&endTime={2}&appId={3}";
+        String uri = PortalConstants.REST_PREFIX_URL  + "/rest/consume/list?startTime={1}&endTime={2}&appId={3}";
         RestResponse<List<Consume>> restResponse = RestRequest.buildSecurityRequest(token).getList(uri,Consume.class ,startTime,endTime,appId);
         List<Consume> list = restResponse.getData();
         String appName = "";
@@ -81,7 +81,7 @@ public class ConsumeController extends AbstractPortalController {
      */
     private RestResponse getPageList(HttpServletRequest request, Integer pageNo, Integer pageSize,String startTime,String endTime,String appId){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl + "/rest/consume/page?pageNo={1}&pageSize={2}&startTime={3}&endTime={4}&appId={5}";
+        String uri = PortalConstants.REST_PREFIX_URL  + "/rest/consume/page?pageNo={1}&pageSize={2}&startTime={3}&endTime={4}&appId={5}";
         return RestRequest.buildSecurityRequest(token).getPage(uri,Consume.class ,pageNo,pageSize,startTime,endTime,appId);
     }
 }
