@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.regex.Pattern;
 
 
 /**
@@ -17,24 +16,11 @@ import java.util.regex.Pattern;
  */
 public class RPCRequest extends  RPCMessage{
 
-	private static final String EQ = "=";
-	private static final String AND = "&";
-	private static final String SPACE = " ";
-	private static final String EQ_ENCODE = "%3D";
-	private static final String AND_ENCODE = "%26";
-	private static final String SPACE_ENCODE = "%20";
-
-	private final static Pattern eq_pattern = Pattern.compile(EQ);
-	private final static Pattern and_pattern = Pattern.compile(AND);
-	private final static Pattern space_pattern = Pattern.compile(SPACE);
-	private final static Pattern eqencode_pattern = Pattern.compile(EQ_ENCODE);
-	private final static Pattern andencode_pattern = Pattern.compile(AND_ENCODE);
-	private final static Pattern spaceencode_pattern = Pattern.compile(SPACE_ENCODE);
 	private String name;		//RQ
 	private String param;		//PM
 
 
-	private Map<String,Object> paramMap;		//参数解析后放入map中以方便调用
+	private Map<String,String> paramMap;		//参数解析后放入map中以方便调用
 
 
 	public String getParam() {
@@ -51,7 +37,7 @@ public class RPCRequest extends  RPCMessage{
 	}
 	@Override
 	public String toString() {
-		String sBody = this.getBodyAsString();
+		String sBody = this.getBody();
 		return "R["+this.getSessionid()+"]["+ this.getTimestamp()+"]["+this.name+"]["+this.tryTimes+"]["+this.lastTryTimestamp+"]>>PM:" + this.param+">>SESSIONID:"+this.getSessionid() + ">>BODY:"+sBody;
 	}
 
@@ -76,7 +62,7 @@ public class RPCRequest extends  RPCMessage{
 	 * @param name
 	 * @return
 	 */
-	public Object getParameter(String name){
+	public String getParameter(String name){
 		if(paramMap==null){
 			_parseParam();
 		}
@@ -95,7 +81,7 @@ public class RPCRequest extends  RPCMessage{
 		}
 		return ret;
 	}
-	public Map<String,Object > getParamMap() {
+	public Map<String,String > getParamMap() {
 		if (this.paramMap == null && this.param != null)
 		{
 			this._parseParam();
@@ -150,46 +136,10 @@ public class RPCRequest extends  RPCMessage{
 		return newRequest(name,sb.toString());
 	}
 
-	/**
-	 * 将=转化为%3D
-	 * &转为%26
-	 * @return
-	 */
-	public static String encode(String value){
-		if(value == null){
-			return null;
-		}
-		if(value.indexOf(EQ) > -1){
-			value = eq_pattern.matcher(value).replaceAll(EQ_ENCODE);
-		}
-		if(value.indexOf(AND) > -1){
-			value = and_pattern.matcher(value).replaceAll(AND_ENCODE);
-		}
-		if(value.indexOf(SPACE) > -1){
-			value = space_pattern.matcher(value).replaceAll(SPACE_ENCODE);
-		}
-		return value;
-	}
-
-	public static String decode(String value){
-		if(value == null){
-			return null;
-		}
-		if(value.indexOf(EQ_ENCODE) > -1){
-			value = eqencode_pattern.matcher(value).replaceAll(EQ);
-		}
-		if(value.indexOf(AND_ENCODE) > -1){
-			value = andencode_pattern.matcher(value).replaceAll(AND);
-		}
-		if(value.indexOf(SPACE_ENCODE) > -1){
-			value = spaceencode_pattern.matcher(value).replaceAll(SPACE);
-		}
-		return value;
-	}
 
 	/**
 	 * 序列化request
-	 * RQ:SESSIONID TIMESTAMP REQUESTNAME PARAMURL
+	 * RQ:SESSIONID TIMESTAMP REQUESTNAME PARAMURL BODY
 	 * @return
 	 */
 	@Override
@@ -202,6 +152,7 @@ public class RPCRequest extends  RPCMessage{
 		sb.append(this.getName());
 		sb.append(" ");
 		sb.append(this.getParam());
+		sb.append("&body="+encode(this.getBody()));
 		return sb.toString();
 	}
 
@@ -216,29 +167,51 @@ public class RPCRequest extends  RPCMessage{
 			if(parts.length>=4) {
 				request.setParam(parts[3]);
 			}
+			request.setBody(request.getParameter("body"));
 		}
 		return request;
 	}
 
 	public static void main(String[] args) {
-		String value = "RQ:810724b022c4800013339b20a0fc37b8 1481804145625 MN_CH_SYS_CALL max_answer_seconds=30&from_uri=02066304057&to_uri=02066304058@192.168.22.10&areaId =area001&max_ring_seconds=45&user_data=8a2d9fed590267f001590268e3900000&";
-//		Pattern pt = Pattern.compile("RQ:\\w[32]\\s\\w+\\s.*");
-		System.out.println(value.matches("RQ:\\w{32}\\s\\d{13}+\\s\\w+\\s.*"));
-		String[] parts = value.split(" ");
-		String sessionid = parts[0].substring(3);
-		String timestamp = parts[1];
-		String name = parts[2];
-		if(parts.length>=4) {
-			String param = parts[3];
-			System.out.println(param);
-		}
+//		String value = "RQ:810724b022c4800013339b20a0fc37b8 1481804145625 MN_CH_SYS_CALL max_answer_seconds=30&from_uri=02066304057&to_uri=02066304058@192.168.22.10&areaId =area001&max_ring_seconds=45&user_data=8a2d9fed590267f001590268e3900000&";
+////		Pattern pt = Pattern.compile("RQ:\\w[32]\\s\\w+\\s.*");
+//		System.out.println(value.matches("RQ:\\w{32}\\s\\d{13}+\\s\\w+\\s.*"));
+//		String[] parts = value.split(" ");
+//		String sessionid = parts[0].substring(3);
+//		String timestamp = parts[1];
+//		String name = parts[2];
+//		if(parts.length>=4) {
+//			String param = parts[3];
+//			System.out.println(param);
+//		}
+//
+//		System.out.println(sessionid);
+//		System.out.println(name);
+//		System.out.println(System.currentTimeMillis());
+//
+//		RPCRequest request = RPCRequest.unserialize(value);
+//		System.out.println(request.getParam());
+//		String value = "{value:111,value2:341234}{value:111,value2:341234}{value:111,value2:341234}{value:111,value2:341234}{value:111,value2:341234}{value:111,value2:341234}{value:111,value2:341234}{value:111,value2:341234}";
+//		String encodeValue =Base64Utils.encodeToString(value.getBytes());
+//		System.out.println(StringUtil.encodeChars(value," ,$,{,:"));
+//		String original = new String(Base64Utils.decodeFromString(encodeValue));
+//		System.out.println(original);
 
-		System.out.println(sessionid);
-		System.out.println(name);
-		System.out.println(System.currentTimeMillis());
+		RPCRequest request = RPCRequest.newRequest("MN_CH_REQUEST","");
+		request.setBody("{\"value\":\"hah,$%^&*( )ah\"}");
+		String sReq = request.serialize();
+		System.out.println(request.serialize());
+		RPCRequest request2 = RPCRequest.unserialize(sReq);
+		System.out.println(request2.getParam());
 
-		RPCRequest request = RPCRequest.unserialize(value);
-		System.out.println(request.getParam());
-
+		RPCResponse response = RPCResponse.buildResponse(request);
+		response.setMessage(RPCResponse.STATE_OK);
+		response.setBody("{value:111,value2:341234}{value:/1/1/1/,value2:341234}{value:111,value2:341234}{value:111,value2:341234}{value:111,v alue2:341234}{valu e:111,value2: 341234}{value: 111,value2:34123 4}{value:111,va lue2:341234}");
+		String xx = response.serialize();
+		System.out.println(response.serialize());
+		RPCResponse rep2 = RPCResponse.unserialize(xx);
+		System.out.println(rep2.getBody());
 	}
+
+
 }
