@@ -20,7 +20,7 @@ public class RPCRequest extends  RPCMessage{
 	private String param;		//PM
 
 
-	private Map<String,String> paramMap;		//参数解析后放入map中以方便调用
+	private Map<String,Object> paramMap;		//参数解析后放入map中以方便调用
 
 
 	public String getParam() {
@@ -62,7 +62,7 @@ public class RPCRequest extends  RPCMessage{
 	 * @param name
 	 * @return
 	 */
-	public String getParameter(String name){
+	public Object getParameter(String name){
 		if(paramMap==null){
 			_parseParam();
 		}
@@ -81,7 +81,7 @@ public class RPCRequest extends  RPCMessage{
 		}
 		return ret;
 	}
-	public Map<String,String > getParamMap() {
+	public Map<String,Object > getParamMap() {
 		if (this.paramMap == null && this.param != null)
 		{
 			this._parseParam();
@@ -167,7 +167,9 @@ public class RPCRequest extends  RPCMessage{
 			if(parts.length>=4) {
 				request.setParam(parts[3]);
 			}
-			request.setBody(request.getParameter("body"));
+			if(request.getParameter("body") != null){
+				request.setBody(request.getParameter("body").toString());
+			}
 		}
 		return request;
 	}
