@@ -247,8 +247,9 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                     }
                     if(callCenter != null){
                         if(callCenter.getToManualResult() == null){
+                            callCenter = new CallCenter();
                             callCenter.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_AGENT_FAIL);
-                            callCenterService.save(callCenter);
+                            callCenterService.update(callCenterId,callCenter);
                         }
                     }
                 }catch (Throwable t){
@@ -310,9 +311,10 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         if(queueId != null){
                             CallCenterQueue callCenterQueue = callCenterQueueService.findById(queueId);
                             if(callCenterQueue != null && callCenterQueue.getDialTime() == null){
+                                callCenterQueue = new CallCenterQueue();
                                 callCenterQueue.setDialTime(new Date());
                                 callCenterQueue.setResult(StringUtils.isBlank(error)?CallCenterQueue.RESULT_DIAL_SUCC:CallCenterQueue.RESULT_DIAL_FAIL);
-                                callCenterQueueService.save(callCenterQueue);
+                                callCenterQueueService.update(queueId,callCenterQueue);
                             }
                         }
                     }
@@ -342,29 +344,23 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                     state.getTenantId(),state.getAppId(),call_id,callCenter,state);
                         }
                         if(callCenter != null){
-                            boolean update = false;
+                            callCenter = new CallCenter();
                             if(callCenter.getAnswerTime() == null){
                                 callCenter.setAnswerTime(new Date());
-                                update = true;
                             }
                             if(callCenter.getToManualTime() != null &&
                                     callCenter.getToManualTimeLong() == null){
                                 Long toManualTimeLong = (callCenter.getAnswerTime().getTime()
                                         - callCenter.getToManualTime().getTime()) / 1000;
                                 callCenter.setToManualTimeLong(toManualTimeLong);
-                                update = true;
                             }
                             if(callCenter.getToManualResult() == null){
                                 callCenter.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_SUCESS);
-                                update = true;
                             }
                             if(callCenter.getAgent() == null){
                                 callCenter.setAgent(businessData.get(CallCenterUtil.AGENT_NAME_FIELD));
-                                update = true;
                             }
-                            if(update){
-                                callCenterService.save(callCenter);
-                            }
+                            callCenterService.update(callCenterId,callCenter);
                         }
                     }catch (Throwable t){
                         logger.error("更新CallCenter失败",t);
