@@ -105,8 +105,9 @@ public class EnqueueHandler extends ActionHandler{
         if(callCenterId != null){
             CallCenter callCenter = callCenterService.findById(callCenterId);
             if(callCenter!=null && callCenter.getToManualTime() == null){//更新转人工时间
-                callCenter.setToManualTime(new Date());
-                callCenterService.save(callCenter);
+                CallCenter updateCallcenter = new CallCenter();
+                updateCallcenter.setToManualTime(new Date());
+                callCenterService.update(callCenterId,updateCallcenter);
             }
         }
 

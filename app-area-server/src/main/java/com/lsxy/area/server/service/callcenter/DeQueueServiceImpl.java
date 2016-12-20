@@ -249,22 +249,26 @@ public class DeQueueServiceImpl implements DeQueueService {
             if(callCenterQueue == null){
                 return;
             }
+            CallCenterQueue updateCallCenterQueue = new CallCenterQueue();
+
             Date cur = new Date();
-            callCenterQueue.setRelevanceId(callId);
+            updateCallCenterQueue.setRelevanceId(callId);
             if(conversationId != null){
-                callCenterQueue.setConversation(conversationId);
+                updateCallCenterQueue.setConversation(conversationId);
             }
             if(agentName != null){
-                callCenterQueue.setAgent(agentName);
+                updateCallCenterQueue.setAgent(agentName);
             }
             if(agentCallId != null){
-                callCenterQueue.setAgentCallId(agentCallId);
-                callCenterQueue.setInviteTime(cur);
+                updateCallCenterQueue.setAgentCallId(agentCallId);
+                updateCallCenterQueue.setInviteTime(cur);
             }
-            callCenterQueue.setEndTime(cur);
-            callCenterQueue.setToManualTime((callCenterQueue.getEndTime().getTime() - callCenterQueue.getStartTime().getTime()) / 1000);
-            callCenterQueue.setResult(result);
-            callCenterQueueService.save(callCenterQueue);
+            updateCallCenterQueue.setEndTime(cur);
+            if(callCenterQueue.getStartTime()!=null){
+                updateCallCenterQueue.setToManualTime((cur.getTime() - callCenterQueue.getStartTime().getTime()) / 1000);
+            }
+            updateCallCenterQueue.setResult(result);
+            callCenterQueueService.update(id,updateCallCenterQueue);
         }catch (Throwable t){
             logger.error("更新排队记录失败",t);
         }
@@ -279,8 +283,9 @@ public class DeQueueServiceImpl implements DeQueueService {
             }
             if(callCenter != null){
                 if(callCenter.getToManualResult() == null){
-                    callCenter.setToManualResult(result);
-                    callCenterService.save(callCenter);
+                    CallCenter updateCallcenter = new CallCenter();
+                    updateCallcenter.setToManualResult(result);
+                    callCenterService.update(callCenterId,updateCallcenter);
                 }
             }
         }catch (Throwable t){

@@ -4,10 +4,13 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.exceptions.PageSizeTooLargeException;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.HqlUtil;
 import com.lsxy.framework.core.utils.Page;
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -16,21 +19,19 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.Column;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Date;
-import java.util.List;
+import java.lang.reflect.*;
+import java.util.*;
 
 @SuppressWarnings({"unchecked","rawtypes"})
 @Transactional
 public abstract class AbstractService<T extends IdEntity> implements BaseService<T> {
 
-    private Logger logger = LoggerFactory.getLogger(AbstractService.class);
+    private static Logger logger = LoggerFactory.getLogger(AbstractService.class);
 
     public abstract BaseDaoInterface<T,Serializable> getDao();
 
@@ -312,4 +313,94 @@ public abstract class AbstractService<T extends IdEntity> implements BaseService
     public Iterable<T> save(Iterable<T> list){
         return getDao().save(list);
     }
+
+    /***
+     * 更新实体类，只更新不为null的属性，用于代替save更新实体类，save是全部更新，并发下会导致更新被覆盖
+     * PS:只能修改当前类的属性,不能修改父类(IdEntity)的属性
+     * @param id
+     * @param obj
+     */
+    @Override
+    @CacheEvict(value = "entity", key = "'entity_' + #id", beforeInvocation = true)
+    public void update(String id,T obj){
+        if(id == null || obj == null){
+            return;
+        }
+        boolean update = false;
+        String className = obj.getClass().getSimpleName();
+        StringBuilder hql = new StringBuilder("update "+className+" a set");
+        Set<Map.Entry<String,Object>> fields = attrValues(obj).entrySet();
+        List<String> colums = new ArrayList<>();
+        for (Map.Entry<String,Object> field: fields) {
+            colums.add(" a."+field.getKey()+"=:"+field.getKey());
+            update = true;
+        }
+        if(update){
+            hql.append(StringUtils.join(colums,","));
+            Query query = this.em.createQuery(hql.append(" where a.id=:id").toString());
+            query.setParameter("id",id);
+            for (Map.Entry<String,Object> field: fields) {
+                query.setParameter(field.getKey(),field.getValue());
+            }
+            query.executeUpdate();
+        }
+    }
+
+    private Map<String,Object> attrValues(T obj){
+        Map<String,Object> values = new HashedMap();
+        Set<String> fields = getFields(obj.getClass());
+        for (String field: fields) {
+            Object attrValue = getAttrValue(obj,field);
+            if(attrValue!=null){
+                values.put(field,attrValue);
+            }
+        }
+        return values;
+    }
+    private Object getAttrValue(T obj, String attr) {
+        try {
+            Field privateField = obj.getClass().
+                    getDeclaredField(attr);
+
+            privateField.setAccessible(true);
+
+            Object fieldValue = privateField.get(obj);
+            return fieldValue;
+        } catch (Exception e) {
+            logger.info("反射获取属性值失败obj={},{}",obj,e);
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    private static Set<String> getFields(Class c){
+        Set<String> fields = new HashSet<>();
+        try {
+            Method[] methods = c.getDeclaredMethods();
+            Field[] attrs = c.getDeclaredFields();
+            for (Method method : methods) {
+                //判断方法上是否存在Column这个注解
+                if (method.isAnnotationPresent(Column.class)) {
+                    String field = method.getName();
+                    field = field.replace("get","").replace("set","");
+                    field= field.substring(0,1).toLowerCase()
+                            .concat(field.substring(1));
+                    fields.add(field);
+                }
+            }
+            for (Field field: attrs) {
+                //判断方法上是否存在Column这个注解
+                if (field.isAnnotationPresent(Column.class)) {
+                    fields.add(field.getName());
+                }
+            }
+        } catch (Throwable e) {
+            logger.info("反射获取实体类属性失败class={},{}",c,e);
+            throw new IllegalArgumentException(e);
+        }
+        return fields;
+    }
+
+    /*public static void main(String[] args) {
+        System.out.println(getFields(Tenant.class));
+    }*/
 }
