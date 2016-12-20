@@ -68,7 +68,7 @@ public class CdrEventHandler implements MQMessageHandler<CdrEvent> {
         }
 
         if(logger.isDebugEnabled()){
-            logger.debug("插入cdr数据：{}", JSONUtil.objectToJson(voiceCdr));
+            logger.debug("插入cdr数据： {}", JSONUtil.objectToJson(voiceCdr));
         }
         calBillingService.incCallSum(voiceCdr.getTenantId(),voiceCdr.getCallEndDt());
         if(voiceCdr.getCallAckDt() != null){
