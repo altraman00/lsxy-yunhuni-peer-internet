@@ -115,11 +115,24 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             voiceCdr.setIvrType(2);
         }
 
+        if(logger.isDebugEnabled()){
+            logger.info("[{}][{}][{}]设置cdr的呼入呼出类型,isCallCenter={},state={}",
+                    businessState.getTenantId(),businessState.getAppId(),call_id,productCode == ProductCode.call_center,businessState);
+        }
+
         if(productCode == ProductCode.call_center){
             String callCenterId = conversationService.getCallCenter(businessState);
+            if(logger.isDebugEnabled()){
+                logger.info("[{}][{}][{}]设置cdr的呼入呼出类型,callCenterId={},state={}",
+                        businessState.getTenantId(),businessState.getAppId(),call_id,callCenterId,businessState);
+            }
             if(callCenterId != null){
                 try{
                     CallCenter callCenter = callCenterService.findById(callCenterId);
+                    if(logger.isDebugEnabled()){
+                        logger.info("[{}][{}][{}]设置cdr的呼入呼出类型,callCenter={},state={}",
+                                businessState.getTenantId(),businessState.getAppId(),call_id,callCenter,businessState);
+                    }
                     if(callCenter != null && callCenter.getType()!= null){
                         voiceCdr.setIvrType(Integer.parseInt(callCenter.getType()));
                     }
@@ -135,13 +148,28 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
 
         voiceCdr.setFromNum(cdrSplit[7].trim());
         voiceCdr.setToNum(cdrSplit[8].trim());
-        voiceCdr.setCallStartDt(getCallDate(cdrSplit[18].trim()));
+        Date callStartDate = getCallDate(cdrSplit[18].trim());
+        voiceCdr.setCallStartDt(callStartDate == null?new Date():callStartDate);
         voiceCdr.setCallAckDt(getCallDate(cdrSplit[19].trim()));
-        voiceCdr.setCallEndDt(getCallDate(cdrSplit[20].trim()));
+        Date callEndDate = getCallDate(cdrSplit[20].trim());
+        voiceCdr.setCallEndDt(callEndDate == null?new Date():callEndDate);
         voiceCdr.setCallTimeLong(Long.parseLong(cdrSplit[21].trim()));
         //扣费
         if(voiceCdr.getCallAckDt() != null){
             calCostService.callConsume(voiceCdr);
+
+            if(productCode == ProductCode.call_center){
+                if(logger.isDebugEnabled()){
+                    logger.info("[{}][{}]callcenterid={},cost={},呼叫中心消费额累计state={}",businessState.getTenantId(),businessState.getAppId(),
+                            conversationService.getCallCenter(businessState),voiceCdr.getCost(),businessState);
+                }
+                if(voiceCdr.getCost() != null && voiceCdr.getCost().compareTo(BigDecimal.ZERO) == 1){
+                    String callCenterId = conversationService.getCallCenter(businessState);
+                    if(callCenterId != null){
+                        callCenterService.incrCost(callCenterId,voiceCdr.getCost());
+                    }
+                }
+            }
         }else{
             voiceCdr.setCostTimeLong(0L);
             voiceCdr.setCost(BigDecimal.ZERO);
