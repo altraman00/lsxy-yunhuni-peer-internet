@@ -59,9 +59,10 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_SUCCESS extends EventHandler {
             //更新会话记录状态
             CallSession callSession = callSessionService.findById(state.getBusinessData().get(BusinessState.SESSIONID));
             if(callSession != null){
-                callSession.setResId(resId);
-                callSession.setStatus(CallSession.STATUS_CALLING);
-                callSessionService.save(callSession);
+                CallSession updateSession = new CallSession();
+                updateSession.setResId(resId);
+                updateSession.setStatus(CallSession.STATUS_CALLING);
+                callSessionService.update(callSession.getId(),updateSession);
             }
         }
         return res;
