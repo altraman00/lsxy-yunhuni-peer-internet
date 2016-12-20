@@ -249,6 +249,8 @@ public class DeQueueServiceImpl implements DeQueueService {
             if(callCenterQueue == null){
                 return;
             }
+            callCenterQueue = new CallCenterQueue();
+
             Date cur = new Date();
             callCenterQueue.setRelevanceId(callId);
             if(conversationId != null){
@@ -264,7 +266,7 @@ public class DeQueueServiceImpl implements DeQueueService {
             callCenterQueue.setEndTime(cur);
             callCenterQueue.setToManualTime((callCenterQueue.getEndTime().getTime() - callCenterQueue.getStartTime().getTime()) / 1000);
             callCenterQueue.setResult(result);
-            callCenterQueueService.save(callCenterQueue);
+            callCenterQueueService.update(id,callCenterQueue);
         }catch (Throwable t){
             logger.error("更新排队记录失败",t);
         }
@@ -279,8 +281,9 @@ public class DeQueueServiceImpl implements DeQueueService {
             }
             if(callCenter != null){
                 if(callCenter.getToManualResult() == null){
+                    callCenter = new CallCenter();
                     callCenter.setToManualResult(result);
-                    callCenterService.save(callCenter);
+                    callCenterService.update(callCenterId,callCenter);
                 }
             }
         }catch (Throwable t){

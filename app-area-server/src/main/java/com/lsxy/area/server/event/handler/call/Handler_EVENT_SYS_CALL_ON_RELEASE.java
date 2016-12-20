@@ -154,9 +154,10 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             }
         }else{
             try{
+                String callCenterId = conversationService.getCallCenter(state);
                 CallCenter callCenter = null;
-                if(conversationService.getCallCenter(state)!=null){
-                    callCenter = callCenterService.findById(conversationService.getCallCenter(state));
+                if(callCenterId!=null){
+                    callCenter = callCenterService.findById(callCenterId);
                 }
                 if(logger.isDebugEnabled()){
                     logger.info("[{}][{}][{}]更新CallCenter,callCenter={}",
@@ -164,6 +165,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 }
                 if(callCenter != null){
                     if(conversationService.isCC(state)){
+                        callCenter = new CallCenter();
                         callCenter.setEndTime(new Date());
                         Long callLongTime  = null;
                         if(callCenter.getStartTime() != null){
@@ -181,8 +183,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                                 callCenter.setOverReason(CallCenter.OVER_REASON_AGENT_HANGUP);
                             }
                         }
-
-                        callCenterService.save(callCenter);
+                        callCenterService.update(callCenterId,callCenter);
                         if(callLongTime != null){
                             try{
                                 callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics

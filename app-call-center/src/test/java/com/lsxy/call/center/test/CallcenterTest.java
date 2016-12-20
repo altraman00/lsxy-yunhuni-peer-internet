@@ -1,6 +1,7 @@
 package com.lsxy.call.center.test;
 
 import com.lsxy.call.center.CallCenterMainClass;
+import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
@@ -36,6 +37,9 @@ public class CallcenterTest {
 
     @Autowired
     private EnQueueService enQueueService;
+
+    @Autowired
+    private CallCenterService callCenterService;
 
     static {
         //将 spring boot 的默认配置文件设置为系统配置文件
@@ -150,6 +154,10 @@ public class CallcenterTest {
 
     @Test
     public void test6(){
-        callCenterService.incrCost("40288ae258f7d97d0158f7d9adc3000a",new BigDecimal(1));
+        CallCenter c = new CallCenter();
+        c.setCost(new BigDecimal(600));
+        c.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_AGENT_FAIL);
+        c.setId("fwfw");//不会被修改
+        callCenterService.update("40288ae258f7d97d0158f7d9adc3000a",c);
     }
 }
