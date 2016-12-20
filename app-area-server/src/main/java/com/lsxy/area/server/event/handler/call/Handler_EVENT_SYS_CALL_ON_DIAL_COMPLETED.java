@@ -247,9 +247,9 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                     }
                     if(callCenter != null){
                         if(callCenter.getToManualResult() == null){
-                            callCenter = new CallCenter();
-                            callCenter.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_AGENT_FAIL);
-                            callCenterService.update(callCenterId,callCenter);
+                            CallCenter updateCallcenter = new CallCenter();
+                            updateCallcenter.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_AGENT_FAIL);
+                            callCenterService.update(callCenterId,updateCallcenter);
                         }
                     }
                 }catch (Throwable t){
@@ -344,23 +344,23 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                     state.getTenantId(),state.getAppId(),call_id,callCenter,state);
                         }
                         if(callCenter != null){
-                            callCenter = new CallCenter();
+                            CallCenter updateCallcenter = new CallCenter();
                             if(callCenter.getAnswerTime() == null){
-                                callCenter.setAnswerTime(new Date());
+                                updateCallcenter.setAnswerTime(new Date());
                             }
                             if(callCenter.getToManualTime() != null &&
                                     callCenter.getToManualTimeLong() == null){
-                                Long toManualTimeLong = (callCenter.getAnswerTime().getTime()
+                                Long toManualTimeLong = (new Date().getTime()
                                         - callCenter.getToManualTime().getTime()) / 1000;
-                                callCenter.setToManualTimeLong(toManualTimeLong);
+                                updateCallcenter.setToManualTimeLong(toManualTimeLong);
                             }
                             if(callCenter.getToManualResult() == null){
-                                callCenter.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_SUCESS);
+                                updateCallcenter.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_SUCESS);
                             }
                             if(callCenter.getAgent() == null){
-                                callCenter.setAgent(businessData.get(CallCenterUtil.AGENT_NAME_FIELD));
+                                updateCallcenter.setAgent(businessData.get(CallCenterUtil.AGENT_NAME_FIELD));
                             }
-                            callCenterService.update(callCenterId,callCenter);
+                            callCenterService.update(callCenterId,updateCallcenter);
                         }
                     }catch (Throwable t){
                         logger.error("更新CallCenter失败",t);
