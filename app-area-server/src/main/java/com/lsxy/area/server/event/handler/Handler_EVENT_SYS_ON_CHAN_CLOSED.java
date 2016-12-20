@@ -11,6 +11,8 @@ import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.callcenter.CallCenterIncrCostEvent;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
@@ -52,6 +54,9 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
     ConversationService conversationService;
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterService callCenterService;
+
+    @Autowired
+    private MQService mqService;
 
     @Override
     public String getEventName() {
@@ -166,7 +171,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
                 if(voiceCdr.getCost() != null && voiceCdr.getCost().compareTo(BigDecimal.ZERO) == 1){
                     String callCenterId = conversationService.getCallCenter(businessState);
                     if(callCenterId != null){
-                        callCenterService.incrCost(callCenterId,voiceCdr.getCost());
+                        mqService.publish(new CallCenterIncrCostEvent(callCenterId,voiceCdr.getCost()));
                     }
                 }
             }

@@ -674,8 +674,9 @@ public class ConversationService {
         try{
             CallCenterConversationMember member = callCenterConversationMemberService.findOne(conversationId,callId);
             if(member != null){
-                member.setEndTime(new Date());
-                callCenterConversationMemberService.save(member);
+                CallCenterConversationMember updateMember = new CallCenterConversationMember();
+                updateMember.setEndTime(new Date());
+                callCenterConversationMemberService.update(member.getId(),updateMember);
             }
         }catch (Throwable t){
             logger.error("设置交谈成员的结束时间失败",t);
