@@ -124,7 +124,8 @@ public class OnsConsumer extends AbstractMQConsumer implements MessageListener,I
 				if (handlers != null) {
 					for (Class hc : handlers) {
 						MQMessageHandler handler = (MQMessageHandler) applicationContext.getBean(hc);
-						messageHandlerExcutorTask.doTask(handler, event);
+//						messageHandlerExcutorTask.doTask(handler, event);
+						handler.handleMessage(event);
 					}
 				} else {
 					if (logger.isDebugEnabled()) {
