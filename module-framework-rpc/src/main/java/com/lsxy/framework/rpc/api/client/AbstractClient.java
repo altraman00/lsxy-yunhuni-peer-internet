@@ -220,7 +220,7 @@ public abstract class AbstractClient implements Client{
                     bindCallback.doCallback(session);
                 }
             } else {
-                logger.error("连接异常不成功:{}",response.getBodyAsString());
+                logger.error("连接异常不成功:{}",response.getBody());
                 session.close(true);
             }
         }catch (Exception ex){
