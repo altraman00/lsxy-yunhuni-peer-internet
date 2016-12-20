@@ -140,15 +140,15 @@
                                                             <p><c:if test="${app.whiteList==null||app.whiteList==''}">无</c:if><c:if test="${app.whiteList!=null}">${app.whiteList}</c:if></p>
                                                         </div>
                                                     </div>
-                                                    <div class="row ">
-                                                        <div class="col-md-1 dev">
-                                                            监听通知：
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <p><c:if test="${app.isAuth=='1'}">启用监听    启用了鉴权</c:if>
-                                                                <c:if test="${app.isAuth!='1'}">没有启动监听</c:if></p>
-                                                        </div>
-                                                    </div>
+                                                    <%--<div class="row ">--%>
+                                                        <%--<div class="col-md-1 dev">--%>
+                                                            <%--监听通知：--%>
+                                                        <%--</div>--%>
+                                                        <%--<div class="col-md-6">--%>
+                                                            <%--<p><c:if test="${app.isAuth=='1'}">启用监听    启用了鉴权</c:if>--%>
+                                                                <%--<c:if test="${app.isAuth!='1'}">没有启动监听</c:if></p>--%>
+                                                        <%--</div>--%>
+                                                    <%--</div>--%>
                                                     <div class="row ">
                                                         <div class="col-md-1 dev">
                                                             回调URL：
