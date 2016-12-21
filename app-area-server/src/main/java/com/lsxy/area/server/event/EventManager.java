@@ -60,12 +60,20 @@ public class EventManager {
         if(logger.isDebugEnabled()){
             logger.debug("开始处理{}事件,{}",handler.getEventName(),request);
         }
+        long start = 0;
+        if(logger.isDebugEnabled()){
+            start = System.currentTimeMillis();
+        }
         try{
             return handler.handle(request,session);
         }catch (InvalidParamException e){
             logger.error("非法调用参数:"+request,e);
         }catch (Throwable t){
             logger.error("处理失败"+request,t);
+        }finally {
+            if(logger.isDebugEnabled()){
+                logger.info("处理callevent={}耗时：{}",handler.getEventName(),(System.currentTimeMillis() - start));
+            }
         }
         return null;
     }

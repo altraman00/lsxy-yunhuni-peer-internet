@@ -110,17 +110,13 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         if(StringUtils.isBlank(appId)){
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
-        App app = appService.findById(state.getAppId());
-        if(app == null){
-            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
-        }
 
         String initiator = conversationService.getInitiator(conversationId);
         if(initiator != null){
             try {
                 conversationService.join(conversationId,initiator,null,null,null);
             } catch (YunhuniApiException e) {
-                e.printStackTrace();
+                logger.info("加入交谈失败:{}",e.getCode());
             }
         }
     }
