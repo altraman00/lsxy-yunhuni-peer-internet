@@ -3,7 +3,6 @@ package com.lsxy.framework.rpc.netty.client;
 import com.lsxy.framework.rpc.api.RPCMessage;
 import com.lsxy.framework.rpc.api.client.AbstractClientRPCHandler;
 import com.lsxy.framework.rpc.api.session.Session;
-import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -49,22 +48,16 @@ public class NettyClientHandler extends AbstractClientRPCHandler {
         private final Logger logger = LoggerFactory.getLogger(IOHandler.class);
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
-//            if(logger.isDebugEnabled()){
-//                logger.debug("收到消息:{}",msg);
-//            }
             RPCMessage rpcMessage = RPCMessage.unserialize(msg);
             if(logger.isDebugEnabled()){
                 logger.debug("收到消息耗时:{} ms  [{}]",(System.currentTimeMillis() - rpcMessage.getTimestamp()),rpcMessage.getSessionid());
             }
 
-            workerThreadService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        process(ctx, rpcMessage);
-                    } catch (SessionWriteException e) {
-                        logger.error("处理RPC消息异常:"+rpcMessage,e);
-                    }
+            workerThreadService.execute(() -> {
+                try {
+                    process(ctx, rpcMessage);
+                } catch (Exception e) {
+                    logger.error("处理RPC消息异常:"+rpcMessage,e);
                 }
             });
         }
@@ -89,4 +82,5 @@ public class NettyClientHandler extends AbstractClientRPCHandler {
     public IOHandler getIoHandler() {
         return ioHandler;
     }
+
 }

@@ -58,21 +58,15 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
     class IOHandle extends SimpleChannelInboundHandler<String>{
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
-//            if(logger.isDebugEnabled()){
-//                logger.debug("收到消息：{}",msg);
-//            }
             final RPCMessage rpcMessage = RPCMessage.unserialize(msg);
             if(logger.isDebugEnabled()){
                 logger.debug("收到消息耗时:{} ms  [{}]",(System.currentTimeMillis() - rpcMessage.getTimestamp()),rpcMessage.getSessionid());
             }
-            workerThreadService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        process(ctx, rpcMessage);
-                    } catch (SessionWriteException e) {
-                        logger.error("处理RPC消息异常:"+rpcMessage,e);
-                    }
+            workerThreadService.execute(() -> {
+                try {
+                    process(ctx, rpcMessage);
+                } catch (Exception e) {
+                    logger.error("处理RPC消息异常:"+rpcMessage,e);
                 }
             });
         }
