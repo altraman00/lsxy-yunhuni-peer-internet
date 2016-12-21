@@ -60,9 +60,6 @@ public abstract class AbstractService<T extends IdEntity> implements BaseService
     @Caching(
             evict = {
                     @CacheEvict(value = "entity", key = "'entity_' + #entity.id", beforeInvocation = true)
-            },
-            put = {
-                    @CachePut(value = "entity", key = "'entity_' + #entity.id",unless = "#entity == null")
             }
     )
     public T save(T entity) {

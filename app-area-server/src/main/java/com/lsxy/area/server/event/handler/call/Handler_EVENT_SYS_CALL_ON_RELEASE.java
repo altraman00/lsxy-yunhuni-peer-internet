@@ -121,8 +121,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         try{
             CallSession callSession = callSessionService.findById(state.getBusinessData().get(BusinessState.SESSIONID));
             if(callSession != null){
-                callSession.setStatus(CallSession.STATUS_OVER);
-                callSessionService.save(callSession);
+                CallSession updateSession = new CallSession();
+                updateSession.setStatus(CallSession.STATUS_OVER);
+                callSessionService.update(callSession.getId(),updateSession);
             }
         }catch (Throwable t){
             logger.error("更新会话记录失败",t);
@@ -146,8 +147,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             try{
                 VoiceIvr voiceIvr = voiceIvrService.findById(call_id);
                 if(voiceIvr != null){
-                    voiceIvr.setEndTime(new Date());
-                    voiceIvrService.save(voiceIvr);
+                    VoiceIvr updateVoiceIvr= new VoiceIvr();
+                    updateVoiceIvr.setEndTime(new Date());
+                    voiceIvrService.update(voiceIvr.getId(),updateVoiceIvr);
                 }
             }catch (Throwable t){
                 logger.error("更新voiceIvr失败",t);
@@ -261,13 +263,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                     if(logger.isDebugEnabled()){
                         logger.info("[{}][{}]坐席挂机agentId={}",state.getTenantId(),state.getAppId(),agentId);
                     }
-                    callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,reserve_state,true);
+                    curState = callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,reserve_state,true);
                 } catch (Throwable e) {
                     logger.error("坐席挂机事件设置坐席状态失败agent="+agentId,e);
-                }
-                try {
-                    curState = callCenterAgentService.getState(agentId);
-                } catch (YunhuniApiException e) {
                 }
                 if(preState!=null && curState != null){
                     if(!preState.equals(curState)){

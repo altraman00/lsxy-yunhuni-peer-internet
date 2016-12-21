@@ -18,6 +18,7 @@ import com.lsxy.call.center.api.service.CallCenterAgentService;
 import com.lsxy.call.center.api.service.CallCenterQueueService;
 import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.api.tenant.service.TenantService;
+import com.lsxy.framework.core.exceptions.api.PlayFileNotExistsException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -282,7 +283,10 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, _params);
                         rpcCaller.invoke(sessionContext, rpcrequest);
                     }
-                } catch (Throwable e) {
+                }catch(PlayFileNotExistsException e){
+                    logger.info("[{}][{}]放音文件不存在{},{},{},{}",state.getTenantId(),state.getAppId(),
+                            agent_num,prevoice,postvoice,e);
+                }catch(Throwable e) {
                     logger.error("调用失败 ",e);
                 }
                 if(agentId != null){

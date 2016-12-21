@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.mq.CdrEvent;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.service.CallCenterService;
@@ -11,6 +12,8 @@ import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.callcenter.CallCenterIncrCostEvent;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
@@ -35,7 +38,6 @@ import java.util.Map;
  * Created by liuws on 2016/8/29.
  */
 @Component
-@Transactional
 public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
 
     private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_SYS_ON_CHAN_CLOSED.class);
@@ -52,6 +54,9 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
     ConversationService conversationService;
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterService callCenterService;
+
+    @Autowired
+    private MQService mqService;
 
     @Override
     public String getEventName() {
@@ -120,8 +125,9 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
                     businessState.getTenantId(),businessState.getAppId(),call_id,productCode == ProductCode.call_center,businessState);
         }
 
+        String callCenterId = null;
         if(productCode == ProductCode.call_center){
-            String callCenterId = conversationService.getCallCenter(businessState);
+            callCenterId = conversationService.getCallCenter(businessState);
             if(logger.isDebugEnabled()){
                 logger.info("[{}][{}][{}]设置cdr的呼入呼出类型,callCenterId={},state={}",
                         businessState.getTenantId(),businessState.getAppId(),call_id,callCenterId,businessState);
@@ -143,9 +149,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         }
 
         voiceCdr.setType(productCode.name());
-
         voiceCdr.setRelevanceId(businessState.getId());
-
         voiceCdr.setFromNum(cdrSplit[7].trim());
         voiceCdr.setToNum(cdrSplit[8].trim());
         Date callStartDate = getCallDate(cdrSplit[18].trim());
@@ -154,28 +158,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         Date callEndDate = getCallDate(cdrSplit[20].trim());
         voiceCdr.setCallEndDt(callEndDate == null?new Date():callEndDate);
         voiceCdr.setCallTimeLong(Long.parseLong(cdrSplit[21].trim()));
-        //扣费
-        if(voiceCdr.getCallAckDt() != null){
-            calCostService.callConsume(voiceCdr);
 
-            if(productCode == ProductCode.call_center){
-                if(logger.isDebugEnabled()){
-                    logger.info("[{}][{}]callcenterid={},cost={},呼叫中心消费额累计state={}",businessState.getTenantId(),businessState.getAppId(),
-                            conversationService.getCallCenter(businessState),voiceCdr.getCost(),businessState);
-                }
-                if(voiceCdr.getCost() != null && voiceCdr.getCost().compareTo(BigDecimal.ZERO) == 1){
-                    String callCenterId = conversationService.getCallCenter(businessState);
-                    if(callCenterId != null){
-                        callCenterService.incrCost(callCenterId,voiceCdr.getCost());
-                    }
-                }
-            }
-        }else{
-            voiceCdr.setCostTimeLong(0L);
-            voiceCdr.setCost(BigDecimal.ZERO);
-            voiceCdr.setDeduct(0L);
-            voiceCdr.setCostType(VoiceCdr.COST_TYPE_COST);
-        }
         //sessionId和一些与具体业务相关的信息根据不同的产品业务进行设置
         Map<String, String> data = businessState.getBusinessData();
         if(data != null){
@@ -192,16 +175,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
                 }
             }
         }
-        if(logger.isDebugEnabled()){
-            logger.debug("插入cdr数据：{}", JSONUtil.objectToJson(voiceCdr));
-        }
-
-        calBillingService.incCallSum(voiceCdr.getTenantId(),voiceCdr.getCallEndDt());
-        if(voiceCdr.getCallAckDt() != null){
-            calBillingService.incCallConnect(voiceCdr.getTenantId(),voiceCdr.getCallEndDt());
-        }
-        calBillingService.incCallCostTime(voiceCdr.getTenantId(),voiceCdr.getCallEndDt(),voiceCdr.getCostTimeLong());
-        voiceCdrService.save(voiceCdr);
+        mqService.publish(new CdrEvent(JSONUtil.objectToJson(voiceCdr),callCenterId));
         return null;
     }
 

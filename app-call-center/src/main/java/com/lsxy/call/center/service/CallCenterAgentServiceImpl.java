@@ -454,7 +454,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
-    public void state(String appId, String agentName, String state) throws YunhuniApiException{
+    public String state(String appId, String agentName, String state) throws YunhuniApiException{
         if(StringUtils.isBlank(appId)){
             throw new RequestIllegalArgumentException();
         }
@@ -469,11 +469,11 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             // 座席不存在
             throw new AgentNotExistException();
         }
-        this.state(agent.getTenantId(),agent.getAppId(),agent.getId(),state,false);
+        return this.state(agent.getTenantId(),agent.getAppId(),agent.getId(),state,false);
     }
 
     @Override
-    public void state(String tenantId,String appId,String agentId, String state,boolean force) throws YunhuniApiException{
+    public String state(String tenantId,String appId,String agentId, String state,boolean force) throws YunhuniApiException{
         if(logger.isDebugEnabled()){
             logger.info("[{}][{}]agent={},state={}",tenantId,appId,agentId,state);
         }
@@ -495,11 +495,16 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 state = CallCenterAgent.STATE_IDLE;
             }
             agentState.setState(agentId,state);
+            if(state.contains(CallCenterAgent.STATE_IDLE)){
+                try{
+                    enQueueService.lookupQueue(tenantId,appId,null,agentId);
+                }catch (Throwable t){
+                    logger.info("座席空闲，查找排队出错:{}",t);
+                }
+            }
+            return state;
         }finally {
             agentLock.unlock();
-        }
-        if(state.contains(CallCenterAgent.STATE_IDLE)){
-            enQueueService.lookupQueue(tenantId,appId,null,agentId);
         }
     }
 
