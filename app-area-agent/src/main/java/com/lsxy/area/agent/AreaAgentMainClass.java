@@ -1,6 +1,7 @@
 package com.lsxy.area.agent;
 
 import com.lsxy.area.agent.oss.OSSClientFactory;
+import com.lsxy.framework.cache.FrameworkCacheConfig;
 import com.lsxy.framework.oss.FrameworkOSSConfig;
 import com.lsxy.framework.oss.ali.AliOSSClientFactoryBean;
 import com.lsxy.framework.rpc.FrameworkRPCConfig;
@@ -20,7 +21,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  */
 @SpringBootApplication
 @ComponentScan
-@Import(value = {FrameworkRPCConfig.class, FrameworkOSSConfig.class})
+@Import(value = {FrameworkCacheConfig.class,FrameworkRPCConfig.class, FrameworkOSSConfig.class})
 @EnableScheduling
 public class AreaAgentMainClass extends AbstractSpringBootWebStarter {
 

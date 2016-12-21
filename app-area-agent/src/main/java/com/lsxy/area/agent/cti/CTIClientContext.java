@@ -1,10 +1,12 @@
 package com.lsxy.area.agent.cti;
 
 import com.lsxy.app.area.cti.Commander;
-import org.apache.commons.collections.map.ListOrderedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by tandy on 16/8/5.
@@ -13,10 +15,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class CTIClientContext {
     private static final Logger logger = LoggerFactory.getLogger(CTIClientContext.class);
-    public ListOrderedMap clients = new ListOrderedMap();
+    public Map<String,Commander> clients = new HashMap<>();
 
 
-    public void add(Byte clientid, Commander client) {
+    public void add(String clientid, Commander client) {
         clients.put(clientid, client);
     }
 
@@ -28,13 +30,21 @@ public class CTIClientContext {
      */
     public Commander getAvalibleClient() {
         //TODO 选择CTI客户端的规则
-        Commander client = null;
-        try {
+//        Commander client = null;
+//        try {
+//            client = (Commander) clients.getValue(0);
+//        } catch (Exception ex) {
+//            logger.error("没有找到一个有效的CTI客户端");
+//        }
+//        return client;
+        return null;
+    }
 
-            client = (Commander) clients.getValue(0);
-        } catch (Exception ex) {
-            logger.error("没有找到一个有效的CTI客户端");
-        }
-        return client;
+    public boolean isNotExist(String serverIp) {
+        return this.clients.containsKey(serverIp);
+    }
+
+    public void remove(String ip) {
+        clients.remove(ip);
     }
 }

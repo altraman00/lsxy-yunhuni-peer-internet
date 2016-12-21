@@ -51,6 +51,7 @@ public class FrameworkCacheConfig extends CachingConfigurerSupport {
     }
 
     @Bean(name="businessRedisTemplate")
+//    @ConditionalOnMissingBean
     public RedisTemplate<String, String> hashAndSetRedisTemplate(
             RedisConnectionFactory factory) {
         final RedisTemplate template = new RedisTemplate();

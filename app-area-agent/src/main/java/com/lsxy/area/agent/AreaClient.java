@@ -6,9 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
@@ -16,8 +13,7 @@ import javax.annotation.PostConstruct;
  * Created by tandy on 16/7/30.
  * 区域客户端
  */
-@Component
-@Order(Ordered.LOWEST_PRECEDENCE)
+//@Component
 public class AreaClient {
 
     private static final Logger logger = LoggerFactory.getLogger(AreaClient.class);
@@ -36,20 +32,6 @@ public class AreaClient {
     @Autowired
     private Client client;
 
-//    @Bean
-//    public AbstractClientServiceHandler getServiceHandler(){
-//        return new AbstractClientServiceHandler() {
-//            @Override
-//            public RPCResponse handleService(RPCRequest request, Session session) {
-//                if(logger.isDebugEnabled()){
-//                    logger.debug("处理响应");
-//                }
-//                RPCResponse response = RPCResponse.buildResponse(request);
-//                response.setMessage("hahauhuha");
-//                return response;
-//            }
-//        };
-//    }
 
     @PostConstruct
     public void start() throws ClientBindException {

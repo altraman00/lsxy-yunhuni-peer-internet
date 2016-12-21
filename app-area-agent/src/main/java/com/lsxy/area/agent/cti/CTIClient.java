@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by tandy on 16/8/5.
@@ -22,13 +23,18 @@ import java.util.Set;
  */
 @Component
 @Profile(value={"test","production", "development","localdev"})
-public class CTIClient implements RpcEventListener,MonitorEventListener{
+public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable,UnitCallbacks{
 
 
     private static final Logger logger = LoggerFactory.getLogger(CTIClient.class);
 
     @Autowired(required = false)
     private StasticsCounter sc;
+
+    @Autowired
+    private CTIConfigService ctiConfigService;
+
+    private int clientId;
 
     //本地unitid 由于需要通过环境变量设置值,所以不适用"." 而适用_
     @Value("${area_agent_client_cti_unitid:20}")
@@ -54,19 +60,43 @@ public class CTIClient implements RpcEventListener,MonitorEventListener{
 
         Unit.initiate(localUnitID);
         try {
-            Set<CTIClientConfigFactory.CTIClientConfig> configs = ctiClientConfigFactory.getConfigs();
-            for (CTIClientConfigFactory.CTIClientConfig config : configs) {
-                Commander commander = Unit.createCommander(config.clientId, config.ctiHost, this,this);
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug("client id {} create invoke complete, connect to {}", config.clientId, config.ctiHost);
-                }
-                clientContext.add(config.clientId, commander);
+            Set<String> servers = ctiConfigService.ctiServers();
+            for(String serverIp:servers) {
+                createNewCTICommander(serverIp);
             }
 
         } catch (Exception ex) {
             logger.error("CTI客户端启动失败",ex);
         }
+        runDaemonThread();
+
+
+    }
+
+    /**
+     * 创建新的CTI Commander连接对象
+     * @param serverIp
+     * @throws InterruptedException
+     */
+    private void createNewCTICommander(String serverIp) throws InterruptedException {
+        Commander commander = Unit.createCommander((byte)clientId, serverIp, this, this);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("client id {} create invoke complete, connect to {}", clientId, serverIp);
+        }
+        clientContext.add(serverIp, commander);
+        clientId = clientId + 2;
+    }
+
+    /**
+     * 启动监控线程
+     */
+    private void runDaemonThread() {
+        //启动监听线程
+        Thread deamonThread = new Thread(this);
+        deamonThread.setDaemon(true);
+        deamonThread.setName("CTIClientMonitorThread");
+        deamonThread.start();
     }
 
     @Override
@@ -115,5 +145,51 @@ public class CTIClient implements RpcEventListener,MonitorEventListener{
         if(logger.isDebugEnabled()){
             logger.debug("收到负载数据："+serverInfo);
         }
+    }
+
+    @Override
+    public void run() {
+        while(true){
+            try {
+                TimeUnit.SECONDS.sleep(5);
+                if(logger.isDebugEnabled()){
+                    logger.debug("查询Redis");
+                }
+                Set<String> servers = ctiConfigService.ctiServers();
+                for (String serverIp : servers) {
+                    if(clientContext.isNotExist(serverIp)){
+                        createNewCTICommander(serverIp);
+                    }
+                }
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void connectSucceed(Client client) {
+        if(logger.isDebugEnabled()){
+            logger.debug("CTI 服务连接成功：" + client.getIp() +":" + client.getPort());
+        }
+    }
+
+    @Override
+    public void connectFailed(Client client, int i) {
+
+    }
+
+    @Override
+    public void connectLost(Client client) {
+        logger.error("CTI 连接丢失："+client.getIp());
+
+        String ip = client.getIp();
+        clientContext.remove(ip);
+    }
+
+    @Override
+    public void globalConnectStateChanged(byte b, byte b1, byte b2, byte b3, String s) {
+
     }
 }
