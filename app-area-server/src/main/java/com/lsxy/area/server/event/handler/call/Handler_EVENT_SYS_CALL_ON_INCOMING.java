@@ -163,6 +163,9 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
     }
 
     private String resolveFromTelNum(String from,LineGateway lineGateway){
+        if(logger.isDebugEnabled()){
+            logger.debug("开始处理呼入号码{}",from);
+        }
         /*
         1、去掉前缀,去掉@后面部分
         2、1开头肯定是手机号
