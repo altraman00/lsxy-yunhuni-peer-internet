@@ -113,8 +113,9 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
         try{
             conversation = callCenterConversationService.findById(conversation_id);
             if(conversation!=null){
-                conversation.setEndTime(new Date());
-                callCenterConversationService.save(conversation);
+                CallCenterConversation updateCallCenterConversation = new CallCenterConversation();
+                updateCallCenterConversation.setEndTime(new Date());
+                callCenterConversationService.update(conversation.getId(),updateCallCenterConversation);
             }
         }catch (Throwable t){
             logger.error("更新交谈记录失败",t);

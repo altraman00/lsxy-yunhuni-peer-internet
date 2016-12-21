@@ -121,8 +121,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         try{
             CallSession callSession = callSessionService.findById(state.getBusinessData().get(BusinessState.SESSIONID));
             if(callSession != null){
-                callSession.setStatus(CallSession.STATUS_OVER);
-                callSessionService.save(callSession);
+                CallSession updateSession = new CallSession();
+                updateSession.setStatus(CallSession.STATUS_OVER);
+                callSessionService.update(callSession.getId(),updateSession);
             }
         }catch (Throwable t){
             logger.error("更新会话记录失败",t);
@@ -146,31 +147,54 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             try{
                 VoiceIvr voiceIvr = voiceIvrService.findById(call_id);
                 if(voiceIvr != null){
-                    voiceIvr.setEndTime(new Date());
-                    voiceIvrService.save(voiceIvr);
+                    VoiceIvr updateVoiceIvr= new VoiceIvr();
+                    updateVoiceIvr.setEndTime(new Date());
+                    voiceIvrService.update(voiceIvr.getId(),updateVoiceIvr);
                 }
             }catch (Throwable t){
                 logger.error("更新voiceIvr失败",t);
             }
         }else{
             try{
-                CallCenter callCenter = callCenterService.findById(call_id);
+                String callCenterId = conversationService.getCallCenter(state);
+                CallCenter callCenter = null;
+                if(callCenterId!=null){
+                    callCenter = callCenterService.findById(callCenterId);
+                }
+                if(logger.isDebugEnabled()){
+                    logger.info("[{}][{}][{}]更新CallCenter,callCenter={}",
+                            state.getTenantId(),state.getAppId(),call_id,callCenter);
+                }
                 if(callCenter != null){
-                    callCenter.setEndTime(new Date());
-                    Long callLongTime  = null;
-                    if(callCenter.getStartTime() != null){
-                        callLongTime = (new Date().getTime() - callCenter.getStartTime().getTime()) / 1000;
-                        callCenter.setCallTimeLong(callLongTime.toString());
-                    }
-                    callCenterService.save(callCenter);
-                    if(callLongTime != null){
-                        try{
-                            callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
-                                    .Builder(state.getTenantId(),state.getAppId(),new Date())
-                                    .setCallTimeLong(callLongTime)
-                                    .build());
-                        }catch (Throwable t){
-                            logger.error("incrIntoRedis失败",t);
+                    if(conversationService.isCC(state)){
+                        CallCenter updateCallcenter = new CallCenter();
+                        updateCallcenter.setEndTime(new Date());
+                        Long callLongTime  = null;
+                        if(callCenter.getStartTime() != null){
+                            callLongTime = (new Date().getTime() - callCenter.getStartTime().getTime()) / 1000;
+                            updateCallcenter.setCallTimeLong(callLongTime);
+                        }
+                        if("usr".equals(params.get("dropped_by"))){//由用户挂断挂断
+                            updateCallcenter.setOverReason(CallCenter.OVER_REASON_USER);
+                            if(callCenter.getToManualResult() == null){
+                                updateCallcenter.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_GIVEUP);
+                            }
+                        }else{
+                            if(callCenter.getAgent() != null && callCenter.getToManualResult() !=null &&
+                                    callCenter.getToManualResult().equals(""+CallCenter.TO_MANUAL_RESULT_SUCESS)){
+                                updateCallcenter.setOverReason(CallCenter.OVER_REASON_AGENT_HANGUP);
+                            }
+                        }
+                        callCenterService.update(callCenterId,updateCallcenter);
+                        if(callLongTime != null){
+                            try{
+                                callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
+                                        .Builder(state.getTenantId(),state.getAppId(),new Date())
+                                        .setCallTimeLong(callLongTime)
+                                        .build());
+                            }catch (Throwable t){
+                                logger.error("incrIntoRedis失败",t);
+                            }
                         }
                     }
                 }
@@ -239,13 +263,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                     if(logger.isDebugEnabled()){
                         logger.info("[{}][{}]坐席挂机agentId={}",state.getTenantId(),state.getAppId(),agentId);
                     }
-                    callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,reserve_state,true);
+                    curState = callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,reserve_state,true);
                 } catch (Throwable e) {
                     logger.error("坐席挂机事件设置坐席状态失败agent="+agentId,e);
-                }
-                try {
-                    curState = callCenterAgentService.getState(agentId);
-                } catch (YunhuniApiException e) {
                 }
                 if(preState!=null && curState != null){
                     if(!preState.equals(curState)){

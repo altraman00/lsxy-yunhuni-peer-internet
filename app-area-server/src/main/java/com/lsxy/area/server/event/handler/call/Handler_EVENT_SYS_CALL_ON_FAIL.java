@@ -80,8 +80,9 @@ public class Handler_EVENT_SYS_CALL_ON_FAIL extends EventHandler{
         //更新会话记录状态
         CallSession callSession = callSessionService.findById(state.getBusinessData().get(BusinessState.SESSIONID));
         if(callSession != null){
-            callSession.setStatus(CallSession.STATUS_EXCEPTION);
-            callSessionService.save(callSession);
+            CallSession updateSession = new CallSession();
+            updateSession.setStatus(CallSession.STATUS_EXCEPTION);
+            callSessionService.update(callSession.getId(),updateSession);
         }
 
         if(BusinessState.TYPE_IVR_DIAL.equals(state.getType())){//ivr拨号失败需要继续ivr

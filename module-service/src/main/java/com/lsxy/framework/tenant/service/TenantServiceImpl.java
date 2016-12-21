@@ -85,7 +85,7 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
     private String getTid(){
         long incTid = cacheManager.incr(INCREASE_TID);
         //生成用户Tid
-        String incTidStr = DateUtils.getTime("yyyyMMdd") + incTid;
+        String incTidStr = DateUtils.getTime("yyyyMMdd") + (incTid % 10000);
         return incTidStr;
     }
 
