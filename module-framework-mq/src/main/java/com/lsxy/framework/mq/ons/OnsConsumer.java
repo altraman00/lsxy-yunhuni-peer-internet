@@ -116,11 +116,11 @@ public class OnsConsumer extends AbstractMQConsumer implements MessageListener,I
 			if(logger.isDebugEnabled()){
 				logger.debug("消息解析后 :" + msg);
 			}
-
 			MQEvent event = parseMessage(msg);
 			if (event != null) {
+				long cur = System.currentTimeMillis();
 				if(logger.isDebugEnabled()) {
-					logger.debug("parse msg to MQEvent object and id is :" + event.getId());
+					logger.debug("messageId={},event={},消息到达花费={}",message.getMsgID(),event.getEventName(),(cur - event.getTimestamp()));
 				}
 				Set<Class<? extends MQMessageHandler>> handlers = this.getMqHandlerFactory().getHandler(event);
 				if (handlers != null) {
@@ -133,6 +133,9 @@ public class OnsConsumer extends AbstractMQConsumer implements MessageListener,I
 					if (logger.isDebugEnabled()) {
 						logger.debug("not found any handler to hand this mq event:{}", event);
 					}
+				}
+				if(logger.isDebugEnabled()) {
+					logger.debug("messageId={},event={},消息消费花费={}",message.getMsgID(),event.getEventName(),(cur - System.currentTimeMillis()));
 				}
 			}
 		} catch (Exception ex) {
