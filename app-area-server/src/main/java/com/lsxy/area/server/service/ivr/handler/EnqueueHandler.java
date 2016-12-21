@@ -4,8 +4,10 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.PlayFileUtil;
+import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.call.center.api.service.DeQueueService;
@@ -53,6 +55,9 @@ public class EnqueueHandler extends ActionHandler{
     @Autowired
     private PlayFileUtil playFileUtil;
 
+    @Autowired
+    private ConversationService conversationService;
+
     @Override
     public String getAction() {
         return "enqueue";
@@ -95,6 +100,16 @@ public class EnqueueHandler extends ActionHandler{
                 CallCenterUtil.CHANNEL_ID_FIELD,enQueue.getChannel(),
                 CallCenterUtil.CONDITION_ID_FIELD,enQueue.getRoute().getCondition().getId(),
                 IVRActionService.IVR_NEXT_FIELD,next);
+
+        String callCenterId = conversationService.getCallCenter(state);
+        if(callCenterId != null){
+            CallCenter callCenter = callCenterService.findById(callCenterId);
+            if(callCenter!=null && callCenter.getToManualTime() == null){//更新转人工时间
+                CallCenter updateCallcenter = new CallCenter();
+                updateCallcenter.setToManualTime(new Date());
+                callCenterService.update(callCenterId,updateCallcenter);
+            }
+        }
 
         try {
             enQueueService.lookupAgent(state.getTenantId(), state.getAppId(), businessData.get("to"), callId, enQueue);

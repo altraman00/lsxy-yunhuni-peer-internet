@@ -40,23 +40,6 @@ public class CallCenterQueueServiceImpl extends AbstractService<CallCenterQueue>
         return callCenterQueueDao;
     }
 
-    @Override
-    public void update(String id,CallCenterQueue queue){
-        if(queue == null){
-            return;
-        }
-        CallCenterQueue q = this.findById(id);
-        if(q == null){
-            return;
-        }
-        try {
-            BeanUtils.copyProperties2(q,queue,false);
-        } catch (Throwable e) {
-            logger.error("更新排队记录失败",e);
-        }
-        this.save(q);
-    }
-
     private String getValue(Object obj,Class target){
         if(obj == null){
             return "null";

@@ -7,11 +7,14 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +24,9 @@ import java.util.Map;
 @Service
 @com.alibaba.dubbo.config.annotation.Service
 public class CallCenterServiceImpl extends AbstractService<CallCenter> implements CallCenterService {
+
+    private static final Logger logger = LoggerFactory.getLogger(CallCenterServiceImpl.class);
+
     @Autowired
     private CallCenterDao callCenterDao;
     @Autowired
@@ -40,10 +46,10 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             hql += " AND  obj.appId='"+appId+"' ";
         }
         if(StringUtil.isNotEmpty(startTime)){
-            hql += " AND  obj.endTime >= '"+startTime+"' ";
+            hql += " AND  obj.startTime >= '"+startTime+"' ";
         }
         if(StringUtil.isNotEmpty(endTime)){
-            hql += " AND  obj.endTime <= '"+endTime+"' ";
+            hql += " AND  obj.startTime <= '"+endTime+"' ";
         }
         if(StringUtil.isNotEmpty(type)){
             hql += " AND  obj.type='"+type+"' ";
@@ -54,7 +60,7 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
         if(StringUtil.isNotEmpty(agent)){
             hql += " AND  obj.agent = '"+agent+"'";
         }
-        hql += " order by obj.endTime desc";
+        hql += " order by obj.startTime desc";
         Page<CallCenter> page = this.pageList(hql,pageNo,pageSize);
         return page;
     }
@@ -69,10 +75,10 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             hql += " AND  obj.appId='"+appId+"' ";
         }
         if(StringUtil.isNotEmpty(startTime)){
-            hql += " AND  obj.endTime >= '"+startTime+"' ";
+            hql += " AND  obj.startTime >= '"+startTime+"' ";
         }
         if(StringUtil.isNotEmpty(endTime)){
-            hql += " AND  obj.endTime <= '"+endTime+"' ";
+            hql += " AND  obj.startTime <= '"+endTime+"' ";
         }
         if(StringUtil.isNotEmpty(type)){
             hql += " AND  obj.type='"+type+"' ";
@@ -83,7 +89,7 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
         if(StringUtil.isNotEmpty(agent)){
             hql += " AND  obj.agent = '"+agent+"'";
         }
-        hql += " order by obj.endTime desc";
+        hql += " order by obj.startTime desc";
         List<CallCenter> list = this.list(hql);
         return list;
     }
@@ -98,10 +104,10 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             sql += " AND  app_id='"+appId+"' ";
         }
         if(StringUtil.isNotEmpty(startTime)){
-            sql += " AND  end_time >= '"+startTime+"' ";
+            sql += " AND  start_time >= '"+startTime+"' ";
         }
         if(StringUtil.isNotEmpty(endTime)){
-            sql += " AND  end_time <= '"+endTime+"' ";
+            sql += " AND  start_time <= '"+endTime+"' ";
         }
         if(StringUtil.isNotEmpty(type)){
             sql += " AND  type='"+type+"' ";
@@ -114,5 +120,15 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
         }
         Map result = this.jdbcTemplate.queryForMap(sql);
         return result;
+    }
+
+    @Override
+    public void incrCost(String callCenterId, BigDecimal cost) {
+        if(logger.isDebugEnabled()){
+            logger.info("累计callcenter={}消费={}",callCenterId,cost);
+        }
+        if(callCenterId != null && cost.compareTo(BigDecimal.ZERO) == 1){
+            callCenterDao.incrCost(callCenterId,cost);
+        }
     }
 }

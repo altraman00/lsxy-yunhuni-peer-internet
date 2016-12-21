@@ -107,7 +107,7 @@
                                             </div>
                                             <div class="col-md-2">
                                                 <select name="type" class="form-control">
-                                                    <option value=""></option>
+                                                    <option value="">全部</option>
                                                     <c:forEach items="${types}" var="type1">
                                                         <option value="${type1}" <c:if test="${type1==type}">selected="selected"</c:if> >${type1}</option>
                                                     </c:forEach>

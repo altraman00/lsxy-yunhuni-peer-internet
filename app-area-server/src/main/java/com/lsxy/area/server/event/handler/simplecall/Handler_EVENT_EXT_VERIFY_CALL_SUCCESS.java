@@ -70,9 +70,10 @@ public class Handler_EVENT_EXT_VERIFY_CALL_SUCCESS extends EventHandler {
         //更新会话记录状态
         CallSession callSession = callSessionService.findById(state.getBusinessData().get(BusinessState.SESSIONID));
         if(callSession != null){
-            callSession.setResId(res_id);
-            callSession.setStatus(CallSession.STATUS_CALLING);
-            callSessionService.save(callSession);
+            CallSession updateSession = new CallSession();
+            updateSession.setResId(res_id);
+            updateSession.setStatus(CallSession.STATUS_CALLING);
+            callSessionService.update(callSession.getId(),updateSession);
         }
 
         CaptchaCall captchaCall = captchaCallService.findById(call_id);
