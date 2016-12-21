@@ -729,11 +729,6 @@ public class ConversationService {
             if(logger.isDebugEnabled()) {
                 logger.debug("开始挂断坐席callid={}", callId);
             }
-            App app = appService.findById(call_state.getAppId());
-            if(app == null){
-                logger.info("(app == null)conversationId={},callId={}",conversationId,callId);
-                return;
-            }
             hangup(call_state.getResId(),callId,call_state.getAreaId());
         }
     }
