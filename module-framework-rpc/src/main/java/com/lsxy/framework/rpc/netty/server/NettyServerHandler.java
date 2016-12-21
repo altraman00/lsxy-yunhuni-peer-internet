@@ -33,7 +33,7 @@ import java.util.concurrent.*;
 public class NettyServerHandler extends AbstractServerRPCHandler {
 
     // 业务逻辑线程池(业务逻辑最好跟netty io线程分开处理，线程切换虽会带来一定的性能损耗，但可以防止业务逻辑阻塞io线程)
-    private final static ExecutorService workerThreadService = newBlockingExecutorsUseCallerRun(500);
+    private final static ExecutorService workerThreadService = newBlockingExecutorsUseCallerRun(20,500);
 
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
@@ -49,15 +49,16 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
     /**
      * 阻塞的ExecutorService
      *
-     * @param size
+     * @param minsize
      * @return
      */
-    public static ExecutorService newBlockingExecutorsUseCallerRun(int size) {
-        return new ThreadPoolExecutor(size, size, 0L, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(),
+    public static ExecutorService newBlockingExecutorsUseCallerRun(int minsize,int maxsize) {
+        return new ThreadPoolExecutor(minsize, maxsize, 0L, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(),
                 new RejectedExecutionHandler() {
                     @Override
                     public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
                         try {
+                            logger.error("线程不够用了，任务处理被拒绝，重新加入");
                             executor.getQueue().put(r);
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
