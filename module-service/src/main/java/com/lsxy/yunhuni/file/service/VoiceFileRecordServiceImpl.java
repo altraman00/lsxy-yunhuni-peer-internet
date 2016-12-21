@@ -91,7 +91,7 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
         if(rList!=null&&rList.size()>0) {
             for (int i=0;i<rList.size();i++){
                 Map map = rList.get(i);
-                map.put("type",ProductCode.changeApiCmdToProductCode((String)map.get("type")).getRemark());
+                map.put("type",ProductCode.valueOf((String)map.get("type")).getRemark());
                 map.put("time",DateUtils.formatDate((Date)map.get("time"),"yyyy-MM-dd HH:mm:ss"));
                 map.put("size",getSizeStr((Double) map.get("size")));
                 list.add(map);
