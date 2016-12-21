@@ -58,19 +58,9 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
             sql+=" AND b.tenantId='"+tenantId+"'";
         }
         if(StringUtils.isNotEmpty(type)){
-            String[] types = ProductCode.getApiCmdByRemark(type);
-            if(types.length==1){
-                sql+="AND b.type = '"+types[0]+"'";
-            }else {
-                String temp = " (";
-                for (int i = 0; i < types.length; i++) {
-                    temp+= "'"+types[i]+"'";
-                    if(i!=types.length-1){
-                        temp+=",";
-                    }
-                }
-                temp+=") ";
-                sql+="AND b.type in "+temp+"";
+            String typeName = ProductCode.getApiCmdByRemark(type.trim());
+            if(StringUtils.isNotBlank(tenantId)){
+                sql+="AND b.type = '"+typeName+"'";
             }
         }
         if(start!=null&&end!=null){
@@ -122,19 +112,9 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
             sql+=" AND b.tenantId='"+tenantId+"'";
         }
         if(StringUtils.isNotEmpty(type)){
-            String[] types = ProductCode.getApiCmdByRemark(type);
-            if(types.length==1){
-                sql+="AND b.type = '"+types[0]+"'";
-            }else {
-                String temp = " (";
-                for (int i = 0; i < types.length; i++) {
-                    temp+= "'"+types[i]+"'";
-                    if(i!=types.length-1){
-                        temp+=",";
-                    }
-                }
-                temp+=") ";
-                sql+="AND b.type in "+temp+"";
+            String typeName = ProductCode.getApiCmdByRemark(type);
+            if(StringUtils.isNotBlank(typeName)){
+                sql+="AND b.type = '"+typeName+"'";
             }
         }
         if(start!=null&&end!=null){
