@@ -203,7 +203,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         //TODO 座席呼平台多少位？
         //TODO 如何判断座席
         //TODO 用于座席呼入压力测试,所以把"system"排除掉
-        if(!from.contains("system")){
+        if(!from.contains("10000")){
             if(from.length() >= 7 && from.length() <= 8){
                 //固话不带区号，加上区号
                 from = lineGateway.getAreaCode() + from;
