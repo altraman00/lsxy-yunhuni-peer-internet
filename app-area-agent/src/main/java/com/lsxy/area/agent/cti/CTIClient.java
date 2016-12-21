@@ -22,7 +22,7 @@ import java.util.Set;
  */
 @Component
 @Profile(value={"test","production", "development","localdev"})
-public class CTIClient implements RpcEventListener{
+public class CTIClient implements RpcEventListener,MonitorEventListener{
 
 
     private static final Logger logger = LoggerFactory.getLogger(CTIClient.class);
@@ -56,7 +56,7 @@ public class CTIClient implements RpcEventListener{
         try {
             Set<CTIClientConfigFactory.CTIClientConfig> configs = ctiClientConfigFactory.getConfigs();
             for (CTIClientConfigFactory.CTIClientConfig config : configs) {
-                Commander commander = Unit.createCommander(config.clientId, config.ctiHost, this);
+                Commander commander = Unit.createCommander(config.clientId, config.ctiHost, this,this);
 
                 if (logger.isDebugEnabled()) {
                     logger.debug("client id {} create invoke complete, connect to {}", config.clientId, config.ctiHost);
@@ -110,4 +110,10 @@ public class CTIClient implements RpcEventListener{
         }
     }
 
+    @Override
+    public void onServerLoadChanged(BusAddress busAddress, ServerInfo serverInfo) {
+        if(logger.isDebugEnabled()){
+            logger.debug("收到负载数据："+serverInfo);
+        }
+    }
 }
