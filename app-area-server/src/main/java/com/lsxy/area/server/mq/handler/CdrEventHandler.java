@@ -1,13 +1,10 @@
 package com.lsxy.area.server.mq.handler;
 
 import com.lsxy.area.server.mq.CdrEvent;
-import com.lsxy.framework.api.billing.service.CalBillingService;
-import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.callcenter.CallCenterIncrCostEvent;
-import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
 import com.lsxy.yunhuni.api.session.service.VoiceCdrService;
 import org.slf4j.Logger;
@@ -31,13 +28,7 @@ public class CdrEventHandler implements MQMessageHandler<CdrEvent> {
     private MQService mqService;
 
     @Autowired
-    private CalCostService calCostService;
-
-    @Autowired
     private VoiceCdrService voiceCdrService;
-
-    @Autowired
-    private CalBillingService calBillingService;
 
     @Override
     public void handleMessage(CdrEvent message) throws JMSException {
@@ -50,30 +41,13 @@ public class CdrEventHandler implements MQMessageHandler<CdrEvent> {
         }catch (Throwable t){
             logger.error("cdr反序列化失败{}",t);
         }
-        String callCenterId = message.getCallCenterId();
-        //扣费
-        if(voiceCdr.getCallAckDt() != null){
-            calCostService.callConsume(voiceCdr);
-        }else{
-            voiceCdr.setCostTimeLong(0L);
-            voiceCdr.setCost(BigDecimal.ZERO);
-            voiceCdr.setDeduct(0L);
-            voiceCdr.setCostType(VoiceCdr.COST_TYPE_COST);
+        if(voiceCdr == null){
+            return;
         }
-
-        if(logger.isDebugEnabled()){
-            logger.debug("插入cdr数据： {}", JSONUtil.objectToJson(voiceCdr));
-        }
-        calBillingService.incCallSum(voiceCdr.getTenantId(),voiceCdr.getCallEndDt());
-        if(voiceCdr.getCallAckDt() != null){
-            calBillingService.incCallConnect(voiceCdr.getTenantId(),voiceCdr.getCallEndDt());
-        }
-        calBillingService.incCallCostTime(voiceCdr.getTenantId(),voiceCdr.getCallEndDt(),voiceCdr.getCostTimeLong());
         voiceCdrService.save(voiceCdr);
-
-        if(callCenterId!=null){
+        if(message.getCallCenterId()!=null){
             if(voiceCdr.getCost() != null && voiceCdr.getCost().compareTo(BigDecimal.ZERO) == 1){
-                mqService.publish(new CallCenterIncrCostEvent(callCenterId,voiceCdr.getCost()));
+                mqService.publish(new CallCenterIncrCostEvent(message.getCallCenterId(),voiceCdr.getCost()));
             }
         }
     }
