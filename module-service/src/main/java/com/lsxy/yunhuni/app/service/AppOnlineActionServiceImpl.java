@@ -230,6 +230,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         }
         if((app.getIsIvrService() != null && app.getIsIvrService() == 1)||(app.getIsCallCenter() != null && app.getIsCallCenter() == 1)) {
             if(!isCalled) {
+                //TODO 应用原来是否已绑定了呼入号码，没有则抛异常
                 //抛异常，没有可呼出号码
                 throw new RuntimeException("没有选定可呼入的号码");
             }
@@ -269,6 +270,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             app.setAreaSip(areaSip);
             appService.save(app);
             //改变号码的租用关系
+            //TODO 应用下线不解除号码绑定
             List<ResourcesRent> rents = resourcesRentService.findByAppId(app.getId());
             if(rents != null && rents.size() >0){
                 for(ResourcesRent rent:rents){

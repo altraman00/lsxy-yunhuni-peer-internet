@@ -38,7 +38,7 @@ public class MethodExecAspect {
         // 获取执行的方法名
         long endTime = System.currentTimeMillis();
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        String methodName = signature.getDeclaringTypeName() + "." + signature.getName();
+        String methodName = joinPoint.getTarget().getClass() + "." + signature.getName();
 
         // 打印耗时的信息
         this.printExecTime(methodName, startTime, endTime);

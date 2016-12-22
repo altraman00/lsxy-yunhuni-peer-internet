@@ -14,6 +14,8 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.portal.VoiceFileRecordSyncEvent;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
 import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
@@ -57,6 +59,8 @@ public class BillDetailController extends AbstractRestController {
     MQService mqService;
     @Autowired
     TenantService tenantService;
+    @Autowired
+    AppService appService;
     /**
      * 会话详单查询
      * @param pageNo 第几页
@@ -131,7 +135,12 @@ public class BillDetailController extends AbstractRestController {
         Map re = new HashMap();
         re.put("page",page);
         re.put("total",map);
-        re.put("types",VoiceFileRecord.types);
+        String serviceType = "";
+        if(StringUtils.isNotEmpty(appId)) {
+            App app = appService.findById(appId);
+            serviceType = app.getServiceType();
+        }
+        re.put("types",VoiceFileRecord.getRecordType(serviceType));
         return RestResponse.success(re);
     }
     @RequestMapping(value = "/{uid}/file/download/{id}" ,method = RequestMethod.GET)
@@ -242,40 +251,42 @@ public class BillDetailController extends AbstractRestController {
         VoiceCdr voiceCdr = voiceCdrService.findById(id);
         List list = null;
         if(voiceCdr!=null&& StringUtils.isNotEmpty(voiceCdr.getId())) {
-            ProductCode p1 = ProductCode.changeApiCmdToProductCode(voiceCdr.getType());
-            //语音会议
-            if (ProductCode.sys_conf.getRemark().equals(p1.getRemark())) {
-                //获取会议操作者
-                MeetingMember meetingMember = meetingMemberService.findById(voiceCdr.getSessionId());
-                if (meetingMember!=null) {
-                    //使用会议id
-                    list = voiceFileRecordService.getListBySessionId(meetingMember.getMeeting().getId());
-                }
-            }
-            //自定义IVR
-            else if (ProductCode.ivr_call.getRemark().equals(p1.getRemark())) {
-                //使用ivr的id
-                list = voiceFileRecordService.getListBySessionId(voiceCdr.getSessionId());
-            }
-            //语音回拔
-            else if (ProductCode.duo_call.getRemark().equals(p1.getRemark())) {
-                //使用双向回拨的id
-                list = voiceFileRecordService.getListBySessionId(voiceCdr.getSessionId());
-            }
-            //呼叫中心
-            else if (ProductCode.call_center.getRemark().equals(p1.getRemark())) {
-                //根据sessionid获取呼叫中心交互成员，在获取呼叫中心交谈，在获取文件
-                List<String> temp = callCenterConversationMemberService.getListBySessionId(voiceCdr.getSessionId());
-                if (temp!=null&&temp.size() == 0) {
-                    String te = "";
-                    for (int i = 0; i < temp.size(); i++) {
-                        te += "'" + temp.get(i) + "'";
-                        if (i != temp.size() - 1) {
-                            te += ",";
-                        }
+            ProductCode p1 = ProductCode.valueOf(voiceCdr.getType());
+            switch(p1){
+                case sys_conf:{
+                    //获取会议操作者
+                    MeetingMember meetingMember = meetingMemberService.findById(voiceCdr.getSessionId());
+                    if (meetingMember!=null) {
+                        //使用会议id
+                        list = voiceFileRecordService.getListBySessionId(meetingMember.getMeeting().getId());
                     }
+                    break;
+                }
+                case ivr_call:{
                     //使用ivr的id
-                    list = voiceFileRecordService.getListBySessionId( te);
+                    list = voiceFileRecordService.getListBySessionId(voiceCdr.getSessionId());
+                    break;
+                }
+                case duo_call:{
+                    //使用双向回拨的id
+                    list = voiceFileRecordService.getListBySessionId(voiceCdr.getSessionId());
+                    break;
+                }
+                case call_center:{
+                    //根据sessionid获取呼叫中心交互成员，在获取呼叫中心交谈，在获取文件
+                    List<String> temp = callCenterConversationMemberService.getListBySessionId(voiceCdr.getSessionId());
+                    if (temp!=null&&temp.size() == 0) {
+                        String te = "";
+                        for (int i = 0; i < temp.size(); i++) {
+                            te += "'" + temp.get(i) + "'";
+                            if (i != temp.size() - 1) {
+                                te += ",";
+                            }
+                        }
+                        //使用ivr的id
+                        list = voiceFileRecordService.getListBySessionId( te);
+                    }
+                    break;
                 }
             }
         }

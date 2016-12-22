@@ -11,7 +11,7 @@ import com.lsxy.call.center.states.state.ExtensionState;
 import com.lsxy.call.center.states.statics.ACs;
 import com.lsxy.call.center.states.statics.CAs;
 import com.lsxy.call.center.states.statics.CQs;
-import com.lsxy.call.center.utils.Lua;
+import com.lsxy.framework.cache.utils.Lua;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.Constants;
 import org.junit.Test;
@@ -103,8 +103,23 @@ public class LuaTest {
     }
 
     @Test
-    public void  test2(){
-        System.out.println(redisCacheService.eval("return redis.call('HGETALL','callcenter.agent.state_40288ae2586715c601586715f5cd0000')"));;
+    public void  test2() throws InterruptedException {
+        System.out.println(redisCacheService.eval(Lua.LOOKUPAGENT,1,"1","1111","10"));;
+        /*for (int i = 0; i < 5000; i++) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    System.out.println(redisCacheService.eval(Lua.LOOKUPAGENT,1,"1","1111","10"));;
+                }
+            }).start();
+        }
+        Thread.currentThread().join();*/
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 1000; i++) {
+            System.out.println(redisCacheService.eval(Lua.LOOKUPAGENT,1,"1","1111","10"));;
+        }
+
+        System.out.println("好事="+(System.currentTimeMillis()-start));
     }
 
     public static void main(String[] args) {

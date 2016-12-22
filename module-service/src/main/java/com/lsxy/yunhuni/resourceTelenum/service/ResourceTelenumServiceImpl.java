@@ -111,9 +111,9 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         String ttlSql = "SELECT DISTINCT ttl.tel_number FROM db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway ttl WHERE ttl.line_id  IN (:lineIds) AND ttl.deleted = 0 ";
         if(StringUtils.isNotEmpty(type)){
             if("callin".equals(type)){
-                ttlSql += " AND ttl.is_dialing=1 ";
+                ttlSql += " AND ttl.is_called= " + ResourceTelenum.ISCALLED_TRUE;
             }else if("callout".equals(type)){
-                ttlSql += " AND (ttl.is_through=1 or ttl.is_through=1 ) ";
+                ttlSql += " AND (ttl.is_through= "+ ResourceTelenum.ISTHROUGH_TRUE +" or ttl.is_dialing="+ ResourceTelenum.ISDIALING_TRUE +" ) ";
             }
         }
         //查询总数

@@ -63,6 +63,7 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.Future;
@@ -362,6 +363,7 @@ public class IVRActionService {
                 callCenter.setToNum(to);
                 callCenter.setStartTime(new Date());
                 callCenter.setType(""+CallCenter.CALL_IN);
+                callCenter.setCost(BigDecimal.ZERO);
                 callCenterService.save(callCenter);
                 try{
                     callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(tenant.getId(),app.getId(),

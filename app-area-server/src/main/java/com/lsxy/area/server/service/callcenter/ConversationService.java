@@ -284,7 +284,7 @@ public class ConversationService {
      * @return
      * @throws YunhuniApiException
      */
-    public String inviteAgent(String appId, String conversationId,String agentId,String agentName,String extension,
+    public String inviteAgent(String appId,String initiator, String conversationId,String agentId,String agentName,String extension,
                          String telnum,String type,String user,
                           Integer maxDuration, Integer maxDialDuration) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
@@ -302,7 +302,7 @@ public class ConversationService {
             lineId = selector.getLineId();
         }else{
             areaId = areaAndTelNumSelector.getAreaId(app);
-            from = "system@"+areaId+".area.oneyun.com";
+            from = "10000@"+areaId+".area.oneyun.com";
             to = user + "@" + sip_address;
         }
         CallSession callSession = new CallSession();
@@ -343,7 +343,7 @@ public class ConversationService {
                         .putIfNotEmpty(CallCenterUtil.AGENT_ID_FIELD,agentId)
                         .putIfNotEmpty(CallCenterUtil.AGENT_NAME_FIELD,agentName)
                         .putIfNotEmpty(CallCenterUtil.AGENT_EXTENSION_FIELD,extension)
-                        .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(conversationId))
+                        .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(initiator))
                         .putIfNotEmpty("from",from)
                         .putIfNotEmpty("to",to)
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
@@ -674,8 +674,9 @@ public class ConversationService {
         try{
             CallCenterConversationMember member = callCenterConversationMemberService.findOne(conversationId,callId);
             if(member != null){
-                member.setEndTime(new Date());
-                callCenterConversationMemberService.save(member);
+                CallCenterConversationMember updateMember = new CallCenterConversationMember();
+                updateMember.setEndTime(new Date());
+                callCenterConversationMemberService.update(member.getId(),updateMember);
             }
         }catch (Throwable t){
             logger.error("设置交谈成员的结束时间失败",t);
@@ -727,11 +728,6 @@ public class ConversationService {
             //不是ivr 不需要下一步  直接挂断
             if(logger.isDebugEnabled()) {
                 logger.debug("开始挂断坐席callid={}", callId);
-            }
-            App app = appService.findById(call_state.getAppId());
-            if(app == null){
-                logger.info("(app == null)conversationId={},callId={}",conversationId,callId);
-                return;
             }
             hangup(call_state.getResId(),callId,call_state.getAreaId());
         }
