@@ -116,20 +116,26 @@ public class OnsConsumer extends AbstractMQConsumer implements MessageListener,I
 			if(logger.isDebugEnabled()){
 				logger.debug("消息解析后 :" + msg);
 			}
-
 			MQEvent event = parseMessage(msg);
 			if (event != null) {
-				logger.debug("parse msg to MQEvent object and id is :" + event.getId());
+				long cur = System.currentTimeMillis();
+				if(logger.isDebugEnabled()) {
+					logger.debug("messageId={},event={},消息到达花费={}",message.getMsgID(),event.getEventName(),(cur - event.getTimestamp()));
+				}
 				Set<Class<? extends MQMessageHandler>> handlers = this.getMqHandlerFactory().getHandler(event);
 				if (handlers != null) {
 					for (Class hc : handlers) {
 						MQMessageHandler handler = (MQMessageHandler) applicationContext.getBean(hc);
-						messageHandlerExcutorTask.doTask(handler, event);
+//						messageHandlerExcutorTask.doTask(handler, event);
+						handler.handleMessage(event);
 					}
 				} else {
 					if (logger.isDebugEnabled()) {
 						logger.debug("not found any handler to hand this mq event:{}", event);
 					}
+				}
+				if(logger.isDebugEnabled()) {
+					logger.debug("messageId={},event={},消息消费花费={}",message.getMsgID(),event.getEventName(),(cur - System.currentTimeMillis()));
 				}
 			}
 		} catch (Exception ex) {
