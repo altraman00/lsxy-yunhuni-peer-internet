@@ -31,9 +31,6 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
     @Autowired(required = false)
     private StasticsCounter sc;
 
-    @Autowired
-    private CTIConfigService ctiConfigService;
-
     private int clientId;
 
     //本地unitid 由于需要通过环境变量设置值,所以不适用"." 而适用_
@@ -54,13 +51,15 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
 
     @PostConstruct
     public void start() {
+        clientContext.init();
+
         if (logger.isDebugEnabled()) {
             logger.debug("开始启动CTI客户端,初始化UnitID:{}", localUnitID);
         }
 
         Unit.initiate(localUnitID);
         try {
-            Set<String> servers = ctiConfigService.ctiServers();
+            Set<String> servers = clientContext.getCTIServers();
             for(String serverIp:servers) {
                 createNewCTICommander(serverIp);
             }
@@ -68,9 +67,8 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
         } catch (Exception ex) {
             logger.error("CTI客户端启动失败",ex);
         }
+
         runDaemonThread();
-
-
     }
 
     /**
@@ -84,7 +82,7 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
         if (logger.isDebugEnabled()) {
             logger.debug("client id {} create invoke complete, connect to {}", clientId, serverIp);
         }
-        clientContext.add(serverIp, commander);
+        clientContext.registerCommander(serverIp, commander);
         clientId = clientId + 2;
     }
 
@@ -145,6 +143,10 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
         if(logger.isDebugEnabled()){
             logger.debug("收到负载数据："+serverInfo);
         }
+
+        String unitId = busAddress.getUnitId() + "";
+        String pid = busAddress.getClientId() + "";
+        clientContext.updateNodeLoadData(unitId,pid,serverInfo.getLoads());
     }
 
     @Override
@@ -155,7 +157,9 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
                 if(logger.isDebugEnabled()){
                     logger.debug("查询Redis");
                 }
-                Set<String> servers = ctiConfigService.ctiServers();
+                //重新加载一次redis配置
+                clientContext.loadConfig();
+                Set<String> servers = clientContext.getCTIServers();
                 for (String serverIp : servers) {
                     if(clientContext.isNotExist(serverIp)){
                         createNewCTICommander(serverIp);

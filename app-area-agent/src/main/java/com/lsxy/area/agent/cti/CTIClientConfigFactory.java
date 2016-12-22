@@ -4,10 +4,6 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Created by tandy on 16/8/5.
  * CTI CLIENT 配置
@@ -17,10 +13,6 @@ import java.util.Set;
 @Component
 public class CTIClientConfigFactory {
 
-
-    @Autowired
-    private CTIConfigService ctiConfigService;
-    private Set<CTIClientConfig> configs = new HashSet<>();
 
     private int clientId= 0;
 
@@ -37,35 +29,32 @@ public class CTIClientConfigFactory {
         }
     }
 
-    /**
-     * 初始化配置
-     * 到REDIS获取配置信息,初始化配置对象集合
-     */
-    @PostConstruct
-    public void initConfig(){
-        Set<String> servers = ctiConfigService.ctiServers();
+//    /**
+//     * 初始化配置
+//     * 到REDIS获取配置信息,初始化配置对象集合
+//     */
+//    @PostConstruct
+//    public void initConfig(){
+//        Set<String> servers = ctiConfigService.ctiServers();
+//
+//        servers.forEach((serverIp)->{
+//            newConfig(serverIp);
+//        });
+//    }
 
-        servers.forEach((serverIp)->{
-            newConfig(serverIp);
-        });
-    }
+//    /**
+//     * 发现新的配置
+//     * @param serverIp
+//     * @return
+//     */
+//    public CTIClientConfig newConfig(String serverIp){
+//        CTIClientConfig config = new CTIClientConfig((byte)((clientId)), serverIp);
+//        //客户端clientId采用偶数ID  基数为CTI Monitor
+//        clientId = clientId + 2;
+//        this.configs.registerCommander(config);
+//        return config;
+//    }
 
-    /**
-     * 发现新的配置
-     * @param serverIp
-     * @return
-     */
-    public CTIClientConfig newConfig(String serverIp){
-        CTIClientConfig config = new CTIClientConfig((byte)((clientId)), serverIp);
-        //客户端clientId采用偶数ID  基数为CTI Monitor
-        clientId = clientId + 2;
-        this.configs.add(config);
-        return config;
-    }
-
-    public Set<CTIClientConfig> getConfigs() {
-        return configs;
-    }
 
 
 }
