@@ -14,7 +14,9 @@ YUNHUNI_HOME=/opt/yunhuni
 TOMCAT_HOME=/opt/apach-tomcat
 BUILDNUM=""
 
+
 source /etc/profile
+ulimit -c unlimited
 
 if [ -z $NEXUS_PATH ]; then
     NEXUS_PATH=http://10.44.185.24:8081/nexus/content/groups/public
