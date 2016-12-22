@@ -46,8 +46,8 @@ public class VoiceCdrHourServiceImpl extends AbstractService<VoiceCdrHour> imple
                 " select "+selects+"  REPLACE(UUID(), '-', '') as id, ? as dt,? as day, "+
                 " IFNULL(sum(cost_time_long),0) as among_cost_time," +
                 " IFNULL(sum(call_time_long),0) as among_duration," +
-                " (select count(1) from db_lsxy_bi_yunhuni.tb_bi_voice_cdr c1 where "+wheres+"  c1.call_ack_dt is not null AND call_end_dt BETWEEN ? AND ? ) as among_connect," +
-                " (select count(1) from db_lsxy_bi_yunhuni.tb_bi_voice_cdr c1 where "+wheres+" c1.call_ack_dt is null AND call_end_dt BETWEEN ? AND ?) as  among_not_connect ," +
+                " count(call_ack_dt) as among_connect," +
+                " (count(1) - count(call_ack_dt)) as  among_not_connect ," +
                 " count(1) as among_call,"+
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version "+
                 " from db_lsxy_bi_yunhuni.tb_bi_voice_cdr a where call_end_dt BETWEEN ? AND ? "+groupbys;
