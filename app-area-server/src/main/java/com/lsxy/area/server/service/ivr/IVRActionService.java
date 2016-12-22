@@ -210,11 +210,11 @@ public class IVRActionService {
      * @return
      */
     public String getFirstIvr(final String call_id,final String url,String from){
-        long start = System.currentTimeMillis();
         String res = null;
         boolean success = false;
         int re_times = 0;
         do{
+            long start = System.currentTimeMillis();
             try{
                 HttpPost post = new HttpPost(url);
                 Map<String,Object> data = new MapBuilder<String,Object>()
@@ -236,14 +236,14 @@ public class IVRActionService {
                     res = receiveResponse(response);
                     success = true;
                 }
+                if(logger.isDebugEnabled()){
+                    logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
+                }
             }catch (Throwable t){
-                logger.error("调用{}失败",url);
+                logger.error("调用{}失败,耗时={}",url,(System.currentTimeMillis() - start));
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
-        if(logger.isDebugEnabled()){
-            logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
-        }
         return res;
     }
 
@@ -278,11 +278,11 @@ public class IVRActionService {
      * @return
      */
     private String getNextRequest(String call_id,String url,String prevAction,Map<String,Object> prevResults){
-        long start = System.currentTimeMillis();
         String res = null;
         boolean success = false;
         int re_times = 0;
         do{
+            long start = System.currentTimeMillis();
             try{
                 String target = inputUrl(url,"call_id",call_id);
                 if(prevAction != null){
@@ -311,14 +311,14 @@ public class IVRActionService {
                     res = receiveResponse(response);
                     success = true;
                 }
+                if(logger.isDebugEnabled()){
+                    logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
+                }
             }catch (Throwable t){
-                logger.error("调用{}失败",url);
+                logger.error("调用{}失败,耗时={}",url,(System.currentTimeMillis() - start));
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
-        if(logger.isDebugEnabled()){
-            logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
-        }
         return res;
     }
 
