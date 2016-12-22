@@ -86,7 +86,7 @@ public class BillDetailController extends AbstractPortalController {
         ModelAndView mav = new ModelAndView();
         Map map = init(request,time,appId);
         map.put("type",type);
-        map.put("types",VoiceFileRecord.types);
+        map.put("types", VoiceFileRecord.getRecordType((String )map.get("serviceType")));
         mav.addAllObjects(map);
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/sum?appId={1}&type={2}&startTime={3}&endTime={4}";
@@ -343,12 +343,14 @@ public class BillDetailController extends AbstractPortalController {
         Map map = new HashMap();
         List<App> appList = (List<App>)getAppList(request).getData();
         map.put("appList",appList);
-        if(StringUtil.isEmpty(appId)){
-            if(StringUtils.isEmpty(appId)){
-                if(appList.size()>0) {
-                    appId = appList.get(0).getId();
-                }
+        if(StringUtils.isEmpty(appId)){
+            if(appList.size()>0) {
+                appId = appList.get(0).getId();
+                map.put("serviceType",appList.get(0).getServiceType());
             }
+        }else{
+            App app = (App)getAppById(request,appId).getData();
+            map.put("serviceType",app.getServiceType());
         }
         map.put("appId",appId);
         if(StringUtils.isEmpty(time)){
