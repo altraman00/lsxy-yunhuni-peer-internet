@@ -6,6 +6,7 @@ import org.hibernate.annotations.Where;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  * Created by liups on 2016/9/2.
@@ -28,6 +29,10 @@ public class TelnumToLineGateway extends IdEntity {
     private String isCalled;//可被叫
     private String isThrough;//可透传
     private String isBuy;//是否采购线路 1是 0否
+
+    @Transient
+    private ResourceTelenum resourceTelenum;
+
     @Column( name = "is_buy")
     public String getIsBuy() {
         return isBuy;
@@ -96,5 +101,14 @@ public class TelnumToLineGateway extends IdEntity {
         this.isCalled = isCalled;
         this.isThrough = isThrough;
         this.isBuy = isBuy;
+    }
+
+    @Transient
+    public ResourceTelenum getResourceTelenum() {
+        return resourceTelenum;
+    }
+
+    public void setResourceTelenum(ResourceTelenum resourceTelenum) {
+        this.resourceTelenum = resourceTelenum;
     }
 }

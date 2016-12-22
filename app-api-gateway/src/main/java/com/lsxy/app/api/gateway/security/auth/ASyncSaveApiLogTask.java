@@ -8,13 +8,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Tandy on 2016/7/7.
@@ -23,7 +25,7 @@ import java.util.*;
 public class ASyncSaveApiLogTask {
     private static final Logger logger = LoggerFactory.getLogger(ASyncSaveApiLogTask.class);
 
-    private static List<RequestMappingInfo> requestMappingInfoList = null;
+    private static Set<String> requestMappingPatternList = null;
 
     @Autowired
     private ApiInvokeLogService apiInvokeLogService;
@@ -33,37 +35,31 @@ public class ASyncSaveApiLogTask {
 
     /**
      * 调用日志异步入库
-     * @param req
      * @param appid
      * @param contentType
      * @param signature
      */
     @Async
-    public void invokeApiSaveDB(HttpServletRequest req, String appid,String payload, String contentType, String signature, String tenantId, String certId){
+    public void invokeApiSaveDB(String uri,String method, String appid,String payload, String contentType, String signature, String tenantId, String certId){
         ApiInvokeLog log = new ApiInvokeLog();
         log.setAppid(appid);
         log.setBody(payload);
         log.setContentType(contentType);
-        log.setMethod(req.getMethod());
+        log.setMethod(method);
         log.setSignature(signature);
-        log.setUri(req.getRequestURI());
+        log.setUri(uri);
         log.setCertid(certId);
         log.setTenantId(tenantId);
         //TODO 设置api调用类型
         String type = "unknown";
-        List<RequestMappingInfo> mappingInfoList = getRequestMappingInfoList();
-        for(RequestMappingInfo mappingInfo : mappingInfoList){
-            RequestMappingInfo info = mappingInfo.getMatchingCondition(req);
-            if(info != null){
-                PatternsRequestCondition patternsCondition = info.getPatternsCondition();
-                if(patternsCondition !=null){
-                    Set<String> patterns = patternsCondition.getPatterns();
-                    for(String s:patterns){
-                        if(StringUtils.isNotBlank(s)){
-                            type = s;
-                            break;
-                        }
-                    }
+        Set<String> patterns = getRequestMappingPatternList();
+        for(String pattern : patterns){
+            if(StringUtils.isNotBlank(pattern)){
+                //匹配路径
+                AntPathMatcher antPathMatcher = new AntPathMatcher();
+                String matchingPattern =  antPathMatcher.match(pattern, uri)?pattern:( !pattern.endsWith("/") && antPathMatcher.match(pattern + "/", uri)? pattern:null);
+                if(StringUtils.isNotBlank(matchingPattern)){
+                    type = matchingPattern;
                     break;
                 }
             }
@@ -84,21 +80,22 @@ public class ASyncSaveApiLogTask {
      * 获取所有RequestMapping的信息
      * @return
      */
-    public List<RequestMappingInfo> getRequestMappingInfoList(){
-        if(requestMappingInfoList != null){
-            return requestMappingInfoList;
+    public Set<String> getRequestMappingPatternList(){
+        if(requestMappingPatternList != null){
+            return requestMappingPatternList;
         }else{
             synchronized(ASyncSaveApiLogTask.class){
-                if(requestMappingInfoList != null){
-                    return requestMappingInfoList;
+                if(requestMappingPatternList != null){
+                    return requestMappingPatternList;
                 }else{
-                    requestMappingInfoList = new ArrayList<>();
+                    requestMappingPatternList = new HashSet<>();
                     Map<RequestMappingInfo, HandlerMethod> map = requestMappingHandlerMapping.getHandlerMethods();
                     for (Iterator<RequestMappingInfo> iterator = map.keySet().iterator(); iterator.hasNext();) {
                         RequestMappingInfo info = iterator.next();
-                        requestMappingInfoList.add(info);
+                        Set<String> patterns = info.getPatternsCondition().getPatterns();
+                        requestMappingPatternList.addAll(patterns);
                     }
-                    return requestMappingInfoList;
+                    return requestMappingPatternList;
                 }
             }
         }

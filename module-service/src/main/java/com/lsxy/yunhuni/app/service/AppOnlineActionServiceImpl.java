@@ -196,7 +196,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         for(String num : nums){
             ResourceTelenum resourceTelenum = resourceTelenumService.findByTelNumber(num);
             if(resourceTelenum != null){
-                if(resourceTelenum.getStatus()== ResourceTelenum.STATUS_RENTED && tenant.getId().equals(resourceTelenum.getTenant().getId())){
+                if(resourceTelenum.getStatus()== ResourceTelenum.STATUS_RENTED && tenant.getId().equals(resourceTelenum.getTenantId())){
                    //是这个租户，则查询租用记录，有没有正在用的
                    ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumIdAndStatus(resourceTelenum.getId(),ResourcesRent.RENT_STATUS_UNUSED);
                    if(resourcesRent == null){
@@ -215,10 +215,12 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                        if("1".equals(resourceTelenum.getIsCalled())){
                            isCalled = true;
                        }
-
                        resourcesRent.setApp(app);
                        resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_USING);
                        resourcesRentService.save(resourcesRent);
+                       //更新号码信息，设置应用
+                       resourceTelenum.setAppId(app.getId());
+                       resourceTelenumService.save( resourceTelenum);
                    }
                 }else{
                     //如果号码被占用，则抛出异常
@@ -228,6 +230,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         }
         if((app.getIsIvrService() != null && app.getIsIvrService() == 1)||(app.getIsCallCenter() != null && app.getIsCallCenter() == 1)) {
             if(!isCalled) {
+                //TODO 应用原来是否已绑定了呼入号码，没有则抛异常
                 //抛异常，没有可呼出号码
                 throw new RuntimeException("没有选定可呼入的号码");
             }
@@ -267,12 +270,17 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             app.setAreaSip(areaSip);
             appService.save(app);
             //改变号码的租用关系
+            //TODO 应用下线不解除号码绑定
             List<ResourcesRent> rents = resourcesRentService.findByAppId(app.getId());
             if(rents != null && rents.size() >0){
                 for(ResourcesRent rent:rents){
                     rent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
                     rent.setApp(null);
                     resourcesRentService.save(rent);
+                    //更新号码信息，清除应用
+                    ResourceTelenum resourceTelenum = rent.getResourceTelenum();
+                    resourceTelenum.setAppId(null);
+                    resourceTelenumService.save( resourceTelenum);
                 }
             }
             return app;

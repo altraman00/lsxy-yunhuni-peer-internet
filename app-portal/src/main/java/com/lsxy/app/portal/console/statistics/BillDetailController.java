@@ -86,7 +86,7 @@ public class BillDetailController extends AbstractPortalController {
         ModelAndView mav = new ModelAndView();
         Map map = init(request,time,appId);
         map.put("type",type);
-        map.put("types",VoiceFileRecord.types);
+        map.put("types", VoiceFileRecord.getRecordType((String )map.get("serviceType")));
         mav.addAllObjects(map);
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/sum?appId={1}&type={2}&startTime={3}&endTime={4}";
@@ -268,18 +268,32 @@ public class BillDetailController extends AbstractPortalController {
         RestResponse<List<VoiceCdr>> result = RestRequest.buildSecurityRequest(token).getList(uri, VoiceCdr.class, type, time, appId);
         if(result.isSuccess() && result.getData() != null){
             List<VoiceCdr> voiceCdrs = result.getData();
-            if(voiceCdrs != null && voiceCdrs.size() > 0){
-                for(VoiceCdr cdr:voiceCdrs){
-                    String toNum = cdr.getToNum();
-                    if(StringUtils.isNotBlank(toNum)){
-                        String[] split = toNum.split("@");
-                        cdr.setToNum(split[0]);
-                    }
-                }
-            }
+            formatNum(voiceCdrs);
         }
         return result;
     }
+
+    /**
+     * 格式化主叫被叫
+     * @param voiceCdrs
+     */
+    private void formatNum(List<VoiceCdr> voiceCdrs) {
+        if(voiceCdrs != null && voiceCdrs.size() > 0){
+            for(VoiceCdr cdr:voiceCdrs){
+                String toNum = cdr.getToNum();
+                if(StringUtils.isNotBlank(toNum)){
+                    String[] split = toNum.split("@");
+                    cdr.setToNum(split[0]);
+                }
+                String fromNum = cdr.getFromNum();
+                if(StringUtils.isNotBlank(fromNum)){
+                    String[] split = fromNum.split("@");
+                    cdr.setFromNum(split[0]);
+                }
+            }
+        }
+    }
+
     /**
      * 获取页面分页数据
      * @param request
@@ -296,15 +310,7 @@ public class BillDetailController extends AbstractPortalController {
         RestResponse<Page<VoiceCdr>> result = RestRequest.buildSecurityRequest(token).getPage(uri, VoiceCdr.class, pageNo, pageSize, type, time, appId);
         if(result.isSuccess() && result.getData() != null){
             List<VoiceCdr> voiceCdrs = result.getData().getResult();
-            if(voiceCdrs != null && voiceCdrs.size() > 0){
-                for(VoiceCdr cdr:voiceCdrs){
-                    String toNum = cdr.getToNum();
-                    if(StringUtils.isNotBlank(toNum)){
-                        String[] split = toNum.split("@");
-                        cdr.setToNum(split[0]);
-                    }
-                }
-            }
+            formatNum(voiceCdrs);
         }
         return result;
     }
@@ -337,12 +343,14 @@ public class BillDetailController extends AbstractPortalController {
         Map map = new HashMap();
         List<App> appList = (List<App>)getAppList(request).getData();
         map.put("appList",appList);
-        if(StringUtil.isEmpty(appId)){
-            if(StringUtils.isEmpty(appId)){
-                if(appList.size()>0) {
-                    appId = appList.get(0).getId();
-                }
+        if(StringUtils.isEmpty(appId)){
+            if(appList.size()>0) {
+                appId = appList.get(0).getId();
+                map.put("serviceType",appList.get(0).getServiceType());
             }
+        }else{
+            App app = (App)getAppById(request,appId).getData();
+            map.put("serviceType",app.getServiceType());
         }
         map.put("appId",appId);
         if(StringUtils.isEmpty(time)){

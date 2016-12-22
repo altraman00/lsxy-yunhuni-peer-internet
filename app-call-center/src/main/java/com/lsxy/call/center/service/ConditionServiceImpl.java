@@ -72,9 +72,6 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
         if(!ExpressionUtils.validWhereExpression(condition.getWhereExpression())){
             throw new ConditionExpressionException();
         }
-        if(!appService.enabledService(tenantId, appId, ServiceType.CallCenter)){
-            throw new AppServiceInvalidException();
-        }
 
         if(condition.getId() != null){
             Condition oldCondition = this.findById(condition.getId());
@@ -165,9 +162,6 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
 
     @Override
     public void delete(String tenantId,String appId,String conditionId) throws YunhuniApiException{
-        if(!appService.enabledService(tenantId, appId, ServiceType.CallCenter)){
-            throw new AppServiceInvalidException();
-        }
         Condition condition = this.findOne(tenantId,appId,conditionId);
         ModifyConditionLock lock = new ModifyConditionLock(redisCacheService,condition.getId());
         if(!lock.lock()){
@@ -195,9 +189,6 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
         if(appId == null){
             throw new RequestIllegalArgumentException();
         }
-        if(!appService.enabledService(tenantId, appId, ServiceType.CallCenter)){
-            throw new AppServiceInvalidException();
-        }
         Condition condition = this.findById(conditionId);
         if(condition == null){
             throw new ConditionNotExistException();
@@ -219,9 +210,6 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
         if(appId == null){
             throw new RequestIllegalArgumentException();
         }
-        if(!appService.enabledService(tenantId, appId, ServiceType.CallCenter)){
-            throw new AppServiceInvalidException();
-        }
         return this.conditionDao.findByTenantIdAndAppId(tenantId,appId);
     }
 
@@ -235,9 +223,6 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
         }
         if(channelId == null){
             throw new RequestIllegalArgumentException();
-        }
-        if(!appService.enabledService(tenantId, appId, ServiceType.CallCenter)){
-            throw new AppServiceInvalidException();
         }
         return this.conditionDao.findByTenantIdAndAppIdAndChannelId(tenantId,appId,channelId);
     }

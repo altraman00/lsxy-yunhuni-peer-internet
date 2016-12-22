@@ -8,12 +8,14 @@ import com.lsxy.app.api.gateway.rest.callcenter.vo.AgentSkillVO;
 import com.lsxy.app.api.gateway.rest.callcenter.vo.AgentVO;
 import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
+import com.lsxy.framework.core.exceptions.api.AppServiceInvalidException;
 import com.lsxy.framework.core.exceptions.api.RequestIllegalArgumentException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.app.service.ServiceType;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,9 @@ public class AgentController extends AbstractAPIController {
     @RequestMapping(value = "/{account_id}/callcenter/agent",method = RequestMethod.POST)
     public ApiGatewayResponse login(HttpServletRequest request, @RequestBody CallCenterAgent agent, @RequestHeader("AppID") String appId) throws YunhuniApiException {
         App app = appService.findById(appId);
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
+            throw new AppServiceInvalidException();
+        }
         agent.setAppId(appId);
         agent.setTenantId(app.getTenant().getId());
         callCenterAgentService.login(agent);
@@ -53,6 +58,9 @@ public class AgentController extends AbstractAPIController {
             logger.debug("开始注销座席：{}",agentName);
         }
         App app = appService.findById(appId);
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
+            throw new AppServiceInvalidException();
+        }
         callCenterAgentService.logout(app.getTenant().getId(),appId,agentName,force);
         if(logger.isDebugEnabled()){
             logger.debug("注销座席结束：{}",agentName);
@@ -63,6 +71,10 @@ public class AgentController extends AbstractAPIController {
     @RequestMapping(value = "/{account_id}/callcenter/agent/{agent_name}/keepalive",method = RequestMethod.GET)
     public ApiGatewayResponse keepAlive(HttpServletRequest request, @RequestHeader("AppID") String appId,
                                           @PathVariable("agent_name") String agentName) throws YunhuniApiException {
+        App app = appService.findById(appId);
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
+            throw new AppServiceInvalidException();
+        }
         callCenterAgentService.keepAlive(appId,agentName);
         return ApiGatewayResponse.success();
     }
@@ -70,6 +82,10 @@ public class AgentController extends AbstractAPIController {
     @RequestMapping(value = "/{account_id}/callcenter/agent/{agent_name}",method = RequestMethod.GET)
     public ApiGatewayResponse get(HttpServletRequest request, @RequestHeader("AppID") String appId,
                                    @PathVariable("agent_name") String agentName) throws YunhuniApiException {
+        App app = appService.findById(appId);
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
+            throw new AppServiceInvalidException();
+        }
         CallCenterAgent agent = callCenterAgentService.get(appId,agentName);
         AgentVO agentVO = getAgentVO(agent);
         return ApiGatewayResponse.success(agentVO);
@@ -104,6 +120,10 @@ public class AgentController extends AbstractAPIController {
     public ApiGatewayResponse page(HttpServletRequest request, @RequestHeader("AppID") String appId,
                                    @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
                                    @RequestParam(defaultValue = "20",required = false)  Integer pageSize) throws YunhuniApiException {
+        App app = appService.findById(appId);
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
+            throw new AppServiceInvalidException();
+        }
         Page page  = callCenterAgentService.getPage(appId,pageNo,pageSize);
         List<AgentVO> agentVOs = new ArrayList<>();
         List<CallCenterAgent> result = page.getResult();
@@ -115,6 +135,10 @@ public class AgentController extends AbstractAPIController {
     @RequestMapping(value = "/{account_id}/callcenter/agent/{agent_name}/extension",method = RequestMethod.POST)
     public ApiGatewayResponse extension(HttpServletRequest request, @RequestHeader("AppID") String appId,
                                         @PathVariable("agent_name") String agentName,@RequestBody Map map) throws YunhuniApiException {
+        App app = appService.findById(appId);
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
+            throw new AppServiceInvalidException();
+        }
         String extensionId = (String) map.get("id");
         callCenterAgentService.extension(appId,agentName,extensionId);
         return ApiGatewayResponse.success();
@@ -123,6 +147,10 @@ public class AgentController extends AbstractAPIController {
     @RequestMapping(value = "/{account_id}/callcenter/agent/{agent_name}/state",method = RequestMethod.POST)
     public ApiGatewayResponse state(HttpServletRequest request, @RequestHeader("AppID") String appId,
                                         @PathVariable("agent_name") String agentName,@RequestBody Map map) throws YunhuniApiException {
+        App app = appService.findById(appId);
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
+            throw new AppServiceInvalidException();
+        }
         String state = (String) map.get("state");
         //TODO 校验数据有效性
         if(StringUtils.isBlank(state)){
@@ -144,6 +172,9 @@ public class AgentController extends AbstractAPIController {
             throw new RequestIllegalArgumentException();
         }
         App app = appService.findById(appId);
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
+            throw new AppServiceInvalidException();
+        }
         callCenterAgentService.skills(app.getTenant().getId(),appId,agentName,skillOpts.getOpts());
         return ApiGatewayResponse.success();
     }

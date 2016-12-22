@@ -47,7 +47,7 @@ public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serial
      * @param expireTime
      */
     @Modifying(clearAutomatically = true)
-    @Query("update ResourcesRent rent set rent.app=null,rent.rentStatus=3 where rent.rentExpire<:expireTime and rent.resType=1 and rent.rentStatus in (1,2)")
+    @Query("update ResourcesRent rent set rent.rentStatus=3 where rent.rentExpire<:expireTime and rent.resType=1 and rent.rentStatus in (1,2)")
     void cleanExpireTelnumResourceRent(@Param("expireTime") Date expireTime);
 
     /**
