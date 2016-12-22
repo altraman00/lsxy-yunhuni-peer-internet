@@ -5,6 +5,7 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -17,12 +18,14 @@ import java.util.*;
 public class CTIClientContext {
 
     public static final String KEY_CTI_CLUSTER = "hesong:ipsc:cluster:nodeid";
+
+    @Autowired
     private RedisCacheService cacheService;
 
+    //服务器连接 <ips>
     private Set<String> servers = new HashSet<>();
-
+    //CTI节点 通过CTI事件初始化
     private Map<String,CTINode> nodes = new TreeMap<>();
-
 
     public void init(){
         if(logger.isDebugEnabled()){
@@ -30,8 +33,6 @@ public class CTIClientContext {
         }
         loadConfig();
     }
-
-
     /**
      * 加载CTI配置
      */
@@ -64,10 +65,7 @@ public class CTIClientContext {
             }
         }
     }
-//
-//    public CTINode getAvalibleNode() {
-//        return getAvalibleNode(null);
-//    }
+
     /**
      * 获取一个有效的CTI客户端连接对象进行操作
      * 需要考虑:CTI负载情况  会话相关(会议成员需要被分配到同一个CTI服务)
@@ -114,16 +112,6 @@ public class CTIClientContext {
         return node;
     }
 
-    public Map<String, CTINode> sortMapByValue(Map<String, CTINode> map) {
-        if (map == null || map.isEmpty()) {
-            return null;
-        }
-
-        TreeMap<String,CTINode> sortMap = new TreeMap<>(new CTINodeCompareator(map));
-        sortMap.putAll(map);
-        return sortMap;
-    }
-
 
 
     public boolean isNotExist(String serverIp) {
@@ -159,74 +147,37 @@ public class CTIClientContext {
         String nodeKey = "1."+unitId+"."+pid;
         CTINode node = nodes.get(nodeKey);
 
-        node.setCinCount(loadData.get("callin.count="));
-        node.setCoutCount(loadData.get("callout.count"));
-        node.setCinNumber(loadData.get("callin.num"));
-        node.setCoutNumber(loadData.get("callout.num"));
+        if(node != null) {
+            node.setCinCount(loadData.get("callin.count="));
+            node.setCoutCount(loadData.get("callout.count"));
+            node.setCinNumber(loadData.get("callin.num"));
+            node.setCoutNumber(loadData.get("callout.num"));
 
-        node.setReady(true);
-    }
+            node.setReady(true);
 
-    class CTINodeCompareator implements  Comparator<String>{
-
-        Map<String,CTINode> nodes;
-
-        public CTINodeCompareator(Map<String,CTINode> nodes){
-            this.nodes = nodes;
-        }
-
-        @Override
-        public int compare(String o1, String o2) {
-            CTINode n1 = nodes.get(o1);
-            CTINode n2 = nodes.get(o2);
-
-            if((n1.getCinNumber() + n1.getCoutNumber()) > (n2.getCinNumber() + n2.getCoutNumber())){
-                return 1;
-            }else{
-                return -1;
+            if (logger.isDebugEnabled()) {
+                logger.debug("CTI节点更新负载数据：{}", node);
             }
         }
     }
 
-
-
-    public static void main(String[] args) {
-//        CTIClientContext x = new CTIClientContext();
-//
-//
-//        TreeMap<String,CTINode> treeMap = new TreeMap<>();
-//
-//        CTINode node1 = new CTINode("1.0.1","1");
-//        CTINode node2 = new CTINode("2.0.1","1");
-//        CTINode node3 = new CTINode("3.0.1","1");
-//        CTINode node4 = new CTINode("1.0.1","1");
-//        CTINode node5 = new CTINode("2.0.1","1");
-//        CTINode node6 = new CTINode("3.0.1","1");
-//        node1.setCinNumber(100);
-//        node2.setCinNumber(200);
-//        node3.setCinNumber(300);
-//        node5.setCinNumber(500);
-//        node4.setCinNumber(400);
-//        node6.setCinNumber(322);
-//
-//        treeMap.put("3",node1);
-//        treeMap.put("2",node3);
-//        treeMap.put("1",node2);
-//
-//        treeMap.put("5",node4);
-//        treeMap.put("7",node5);
-//        treeMap.put("9",node6);
-//        Map<String,CTINode> map1 = x.sortMapByValue(treeMap);
-//
-//        Iterator<String> it = map1.keySet().iterator();
-//        while(it.hasNext()){
-//            String key = it.next();
-//            CTINode node = map1.get(key);
-//            System.out.println(node.getCinNumber());
-//        }
-        System.out.println("12.202.02-sys.call-11000016035539044".matches("\\d+\\.\\d+\\.\\d+-.*"));
-        System.out.println("1.0.0-sys.call-11000016035539044".substring(0,"1.0.0-sys.call-11000016035539044".indexOf("-")));
-
+    /**
+     * 服务连接丢失
+     * @param ip
+     * @param unitid
+     */
+    public void ctiClientConnectionLost(String ip, byte unitid) {
+        if(logger.isDebugEnabled()){
+            logger.debug("CTI服务连接丢失：{}",ip);
+        }
+        servers.remove(ip);
+        for (String key:nodes.keySet()) {
+            if(key.startsWith("1."+unitid)){
+                if(logger.isDebugEnabled()){
+                    logger.debug("CTI服务连接丢失-清理节点: {}",key);
+                }
+                nodes.remove(key);
+            }
+        }
     }
-
 }

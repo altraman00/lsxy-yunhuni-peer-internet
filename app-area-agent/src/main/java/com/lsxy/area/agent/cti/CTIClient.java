@@ -186,10 +186,11 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
 
     @Override
     public void connectLost(Client client) {
-        logger.error("CTI 连接丢失："+client.getIp());
-
+        logger.error("CTI 服务连接丢失："+client.getIp());
         String ip = client.getIp();
-        clientContext.remove(ip);
+        byte unitid = client.getUnitId();
+        clientContext.ctiClientConnectionLost(ip,unitid);
+
     }
 
     @Override
