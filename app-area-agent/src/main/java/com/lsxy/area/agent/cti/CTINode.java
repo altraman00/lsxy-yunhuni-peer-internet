@@ -39,6 +39,9 @@ public class CTINode{
     }
 
     public CTINode(String snode, String sServer) {
+        if(logger.isDebugEnabled()){
+            logger.debug("构建cti node : {} => {}",snode,sServer);
+        }
         this.id = snode;
         this.ip = sServer;
         String snodeSplit[] = snode.split("\\.");

@@ -68,6 +68,7 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
             logger.error("CTI客户端启动失败",ex);
         }
 
+        //启动后台探测线程
         runDaemonThread();
     }
 
@@ -82,6 +83,7 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
         if (logger.isDebugEnabled()) {
             logger.debug("client id {} create invoke complete, connect to {}", clientId, serverIp);
         }
+
         clientContext.registerCommander(serverIp, commander);
         clientId = clientId + 2;
     }
@@ -153,19 +155,21 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
     public void run() {
         while(true){
             try {
-                TimeUnit.SECONDS.sleep(5);
+                TimeUnit.SECONDS.sleep(10);
                 if(logger.isDebugEnabled()){
-                    logger.debug("查询Redis");
+                    logger.debug("10秒一次尝试从Redis缓存加载CTI配置");
                 }
                 //重新加载一次redis配置
                 clientContext.loadConfig();
                 Set<String> servers = clientContext.getCTIServers();
                 for (String serverIp : servers) {
                     if(clientContext.isNotExist(serverIp)){
+                        if(logger.isDebugEnabled()){
+                            logger.debug("有新的CTI服务连接被发现：{}"+serverIp);
+                        }
                         createNewCTICommander(serverIp);
                     }
                 }
-
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -181,7 +185,7 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
 
     @Override
     public void connectFailed(Client client, int i) {
-
+        logger.error("CTI 服务连接失败：" + client.getIp() + ":" + client.getPort() +"=>"+i);
     }
 
     @Override
@@ -190,7 +194,6 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
         String ip = client.getIp();
         byte unitid = client.getUnitId();
         clientContext.ctiClientConnectionLost(ip,unitid);
-
     }
 
     @Override

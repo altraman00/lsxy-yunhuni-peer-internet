@@ -38,11 +38,19 @@ public class CTIClientContext {
      */
     public void loadConfig(){
         Set<String> ipscNodes = cacheService.smembers(KEY_CTI_CLUSTER);
+        if(logger.isDebugEnabled()){
+            logger.debug("load cti cluster config : {}",ipscNodes);
+        }
         ipscNodes.forEach((snode)->{
-            Object obj = cacheService.hget(KEY_CTI_CLUSTER + ":"+snode,"ip");
+            String key = KEY_CTI_CLUSTER + ":" + snode;
+            Object obj = cacheService.hget(key,"ip");
             String sServer = obj.toString();
-            servers.add(sServer.substring(0,sServer.indexOf("-")));
-            nodes.put(snode,new CTINode(snode,sServer));
+            if(servers.contains(sServer)){
+                servers.add(sServer.substring(0,sServer.indexOf("-")));
+            }
+            if(!nodes.keySet().contains(snode)){
+                nodes.put(snode,new CTINode(snode,sServer));
+            }
         });
     }
 
