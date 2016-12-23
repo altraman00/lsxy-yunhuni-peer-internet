@@ -18,10 +18,7 @@ import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
@@ -32,8 +29,8 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 @ConditionalOnProperty(value = "global.rpc.provider", havingValue = "netty", matchIfMissing = false)
-@Order(Ordered.HIGHEST_PRECEDENCE)
-@ConditionalOnClass(name="com.lsxy.area.agent.AreaClient")
+//@Order(Ordered.HIGHEST_PRECEDENCE)
+//@ConditionalOnClass(name="com.lsxy.area.agent.AreaClient")
 public class NettyClient extends AbstractClient{
 
     //连接失败次数

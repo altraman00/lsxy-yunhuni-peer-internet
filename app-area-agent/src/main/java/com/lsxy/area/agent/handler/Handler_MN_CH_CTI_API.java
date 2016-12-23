@@ -1,9 +1,8 @@
 package com.lsxy.area.agent.handler;
 
-import com.lsxy.app.area.cti.BusAddress;
-import com.lsxy.app.area.cti.Commander;
 import com.lsxy.area.agent.StasticsCounter;
 import com.lsxy.area.agent.cti.CTIClientContext;
+import com.lsxy.area.agent.cti.CTINode;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,9 +48,10 @@ public class Handler_MN_CH_CTI_API extends RpcRequestHandler{
         if(logger.isDebugEnabled()){
             logger.debug("响应CTI API:{}",request);
         }
-        Commander cticlient = cticlientContext.getAvalibleClient();
+
         String resId = (String) request.getParameter("res_id");
         String method = (String) request.getParameter("method");
+        CTINode cticlient = cticlientContext.getAvalibleNode(resId);
         Map<String, Object> params = new HashMap<>();
         if(method.equals("sys.call.answer")){
             /*收到应答指令次数计数*/
@@ -76,11 +75,11 @@ public class Handler_MN_CH_CTI_API extends RpcRequestHandler{
                 logger.debug("开始操作资源:{}{}",method,resId);
             }
 
-            cticlient.operateResource(new BusAddress((byte)0,(byte)0),resId,method,params,null);
+            cticlient.operateResource(resId,method,params,null);
 
             /*发送请求给CTI次数计数*/
             if(sc!=null) sc.getSendCTIRequestCount().incrementAndGet();
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("操作CTI资源异常{}",request,e);
         }
         return null;

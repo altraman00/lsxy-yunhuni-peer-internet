@@ -1,10 +1,9 @@
 package com.lsxy.area.agent.handler.simplecall;
 
-import com.lsxy.app.area.cti.BusAddress;
-import com.lsxy.app.area.cti.Commander;
 import com.lsxy.app.area.cti.RpcError;
 import com.lsxy.app.area.cti.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
+import com.lsxy.area.agent.cti.CTINode;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -20,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -47,7 +45,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK_CANCEL extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        Commander cticlient = cticlientContext.getAvalibleClient();
+        CTINode cticlient = cticlientContext.getAvalibleNode(null);
 
         if(logger.isDebugEnabled()){
             logger.debug("handler process_MN_CH_EXT_DUO_CALLBACK_CANCEL:{}",request);
@@ -59,7 +57,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK_CANCEL extends RpcRequestHandler{
             if(logger.isDebugEnabled()){
                 logger.debug("调用CTI取消双向回拔，参数为{}", JSONUtil.objectToJson(params));
             }
-            cticlient.operateResource(new BusAddress((byte)0,(byte)0), (String) params.get("res_id"),"ext.duo_callback.cancel", params,new RpcResultListener(){
+            cticlient.operateResource( (String) params.get("res_id"),"ext.duo_callback.cancel", params,new RpcResultListener(){
 
                 @Override
                 protected void onResult(Object o) {

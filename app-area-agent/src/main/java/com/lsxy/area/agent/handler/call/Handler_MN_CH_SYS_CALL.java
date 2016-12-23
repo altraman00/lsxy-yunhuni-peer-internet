@@ -1,10 +1,9 @@
 package com.lsxy.area.agent.handler.call;
 
-import com.lsxy.app.area.cti.BusAddress;
-import com.lsxy.app.area.cti.Commander;
 import com.lsxy.app.area.cti.RpcError;
 import com.lsxy.app.area.cti.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
+import com.lsxy.area.agent.cti.CTINode;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -45,12 +44,14 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        Commander cticlient = cticlientContext.getAvalibleClient();
+        //增加参考资源ID属性
+        String referenceResourceId = (String) request.getParameter("ref_res_id");
+        CTINode cticlient = cticlientContext.getAvalibleNode(referenceResourceId);
         try {
             Map<String, Object> params = request.getParamMap();
             String call_id = (String)params.get("user_data");
 
-            cticlient.createResource(new BusAddress((byte)0,(byte)0), "sys.call", params, new RpcResultListener(){
+            cticlient.createResource( "sys.call", params, new RpcResultListener(){
                 @Override
                 protected void onResult(Object o) {
                     Map<String,String> params = (Map<String,String>) o;

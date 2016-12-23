@@ -21,6 +21,10 @@
     </dependency>
     <dependency>
         <groupId>com.lsxy</groupId>
+        <artifactId>module-framework-cache</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.lsxy</groupId>
         <artifactId>module-framework-rpc</artifactId>
     </dependency>
 

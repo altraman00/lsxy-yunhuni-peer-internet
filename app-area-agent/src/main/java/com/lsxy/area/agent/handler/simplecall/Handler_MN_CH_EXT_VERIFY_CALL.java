@@ -1,10 +1,9 @@
 package com.lsxy.area.agent.handler.simplecall;
 
-import com.lsxy.app.area.cti.BusAddress;
-import com.lsxy.app.area.cti.Commander;
 import com.lsxy.app.area.cti.RpcError;
 import com.lsxy.app.area.cti.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
+import com.lsxy.area.agent.cti.CTINode;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -22,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -49,7 +47,7 @@ public class Handler_MN_CH_EXT_VERIFY_CALL extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        Commander cticlient = cticlientContext.getAvalibleClient();
+        CTINode cticlient = cticlientContext.getAvalibleNode(null);
 
         Map<String, Object> params = request.getParamMap();
         String call_id = (String)params.get("user_data");
@@ -61,7 +59,7 @@ public class Handler_MN_CH_EXT_VERIFY_CALL extends RpcRequestHandler{
             if(logger.isDebugEnabled()){
                 logger.debug("调用CTI创建语音验证码资源，参数为{}", JSONUtil.objectToJson(params));
             }
-            cticlient.createResource(new BusAddress((byte)0,(byte)0), "ext.notify_call", params, new RpcResultListener(){
+            cticlient.createResource("ext.notify_call", params, new RpcResultListener(){
 
                 @Override
                 protected void onResult(Object o) {
