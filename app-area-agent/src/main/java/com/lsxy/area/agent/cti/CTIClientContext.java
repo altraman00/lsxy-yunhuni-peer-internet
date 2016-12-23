@@ -93,7 +93,9 @@ public class CTIClientContext {
         if(StringUtil.isNotEmpty(referenceResId)){
             String nodeId = referenceResId.substring(0,referenceResId.indexOf("-"));
             node = nodes.get(nodeId);
-            logger.error("指定的参考资源ID未找到对应的CTI节点："+referenceResId);
+            if(logger.isDebugEnabled()){
+                logger.debug("根据参考资源ID{}找到对应的CTI节点:{}",referenceResId,node);
+            }
             return node;
         }
         //如果资源id为空，就查询负载最小的节点
@@ -120,7 +122,7 @@ public class CTIClientContext {
 
         }else {
             if (logger.isDebugEnabled()) {
-                logger.debug("找到有效的CTINode:" + node);
+                logger.debug("找到负载最低的CTI节点:{}" , node);
             }
         }
         return node;
@@ -239,7 +241,4 @@ public class CTIClientContext {
                 '}';
     }
 
-    public static void main(String[] args) {
-        System.out.println((byte)(2) == 2);
-    }
 }
