@@ -77,12 +77,11 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
      * @throws InterruptedException
      */
     private void createNewCTICommander(String serverIp) throws InterruptedException {
-        Commander commander = Unit.createCommander((byte)clientId, serverIp, this, this);
+        Unit.createCommander((byte)clientId, serverIp, this, this);
+        clientId = clientId + 2;
         if (logger.isDebugEnabled()) {
             logger.debug("client id {} create invoke complete, connect to {}", clientId, serverIp);
         }
-        clientContext.registerCommander(serverIp, commander);
-        clientId = clientId + 2;
     }
 
     /**
@@ -192,6 +191,12 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
         if(logger.isDebugEnabled()){
             logger.debug("CTI 服务连接成功：" + client.getIp() +":" + client.getPort());
         }
+
+        if(client instanceof  Commander){
+            String serverIp = client.getIp();
+            clientContext.registerCommander(serverIp, (Commander) client);
+        }
+
     }
 
     @Override
