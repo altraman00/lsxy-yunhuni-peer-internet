@@ -74,7 +74,7 @@ public class Handler_EVENT_SYS_CALL_ON_START extends EventHandler{
         if(res_id!=null){
             businessStateService.updateResId(call_id,res_id);
             if(state.getBusinessData().get(BusinessState.REF_RES_ID) == null){
-                businessStateService.updateInnerField(BusinessState.REF_RES_ID,res_id);
+                businessStateService.updateInnerField(call_id,BusinessState.REF_RES_ID,res_id);
             }
         }
 
