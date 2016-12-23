@@ -218,9 +218,10 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
     @Override
     public void globalConnectStateChanged(byte unitId, byte clientId, byte clientType, byte status, String addInfo) {
         //AA只关心类型为2的IPSC服务
-        if(clientId == 2){
+        if(clientType == 2){
             clientContext.connectStateChanged(unitId,clientId,status);
         }
-
     }
+
+
 }
