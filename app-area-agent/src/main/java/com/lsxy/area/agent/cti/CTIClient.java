@@ -137,6 +137,12 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
         }
     }
 
+    /**
+     *  负载数据触发条件：
+     *     有变化时1s一条 无变化时120s一条 有连接建立时，无条件触发
+     * @param busAddress
+     * @param serverInfo
+     */
     @Override
     public void onServerLoadChanged(BusAddress busAddress, ServerInfo serverInfo) {
         if(logger.isDebugEnabled()){
