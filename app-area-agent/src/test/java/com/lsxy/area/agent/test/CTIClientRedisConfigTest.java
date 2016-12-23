@@ -1,7 +1,7 @@
 package com.lsxy.area.agent.test;
 
 import com.lsxy.area.agent.AreaAgentMainClass;
-import com.lsxy.area.agent.cti.CTINode;
+import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.Constants;
 import org.junit.Test;
@@ -11,9 +11,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
-import java.util.TreeMap;
 
 /**
  * Created by tandy on 16/12/21.
@@ -28,6 +26,9 @@ public class CTIClientRedisConfigTest {
 
     @Autowired
     private RedisCacheService cacheService;
+
+    @Autowired
+    private CTIClientContext ctiClientContext;
 
     @Test
     public void test001(){
@@ -44,10 +45,8 @@ public class CTIClientRedisConfigTest {
         });
     }
 
+    @Test
     public void test002(){
-
-
-
-
+        ctiClientContext.loadConfig();
     }
 }

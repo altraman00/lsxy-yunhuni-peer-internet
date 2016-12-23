@@ -124,9 +124,13 @@ public class CTIClientContext {
     }
 
 
-
-    public boolean isNotExist(String serverIp) {
-        return this.clients.containsKey(serverIp);
+    /**
+     * 是否是一个新的serverIp
+     * @param serverIp
+     * @return
+     */
+    public boolean isNewServerFound(String serverIp) {
+        return !this.servers.contains(serverIp);
     }
 
     public void remove(String ip) {
@@ -182,6 +186,7 @@ public class CTIClientContext {
             logger.debug("CTI服务连接丢失：{}",ip);
         }
         servers.remove(ip);
+        clients.remove(ip);
         for (String key:nodes.keySet()) {
             if(key.startsWith("1."+unitid)){
                 if(logger.isDebugEnabled()){
