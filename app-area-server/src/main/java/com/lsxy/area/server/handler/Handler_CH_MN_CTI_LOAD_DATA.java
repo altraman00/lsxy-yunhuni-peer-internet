@@ -37,7 +37,8 @@ public class Handler_CH_MN_CTI_LOAD_DATA extends RpcRequestHandler {
                     request.getParameter("load"),
                     request.getParameter("cinNumber"),
                     request.getParameter("coutNumber"),
-                    request.getParameter("cinCount")
+                    request.getParameter("cinCount"),
+                    request.getParameter("coutCount")
             );
         }
         return null;
