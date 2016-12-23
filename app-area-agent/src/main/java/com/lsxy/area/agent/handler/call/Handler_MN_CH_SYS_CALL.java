@@ -46,8 +46,9 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
     public RPCResponse handle(RPCRequest request, Session session) {
         //增加参考资源ID属性
         String referenceResourceId = (String) request.getParameter("ref_res_id");
-        CTINode cticlient = cticlientContext.getAvalibleNode(referenceResourceId);
+
         try {
+            CTINode cticlient = cticlientContext.getAvalibleNode(referenceResourceId);
             Map<String, Object> params = request.getParamMap();
             String call_id = (String)params.get("user_data");
 

@@ -88,13 +88,16 @@ public class CTIClientContext {
      *                        eg:1.0.0-sys.call-11000016035539044
      * @return
      */
-    public CTINode getAvalibleNode(String referenceResId) {
+    public CTINode getAvalibleNode(String referenceResId) throws AvalibleCTINodeNotFoundException{
         CTINode node = null;
         if(StringUtil.isNotEmpty(referenceResId)){
             String nodeId = referenceResId.substring(0,referenceResId.indexOf("-"));
             node = nodes.get(nodeId);
             if(logger.isDebugEnabled()){
                 logger.debug("根据参考资源ID{}找到对应的CTI节点:{}",referenceResId,node);
+            }
+            if(node == null){
+                throw new AvalibleCTINodeNotFoundException(this,referenceResId);
             }
             return node;
         }
@@ -119,10 +122,10 @@ public class CTIClientContext {
 
         if (node == null) {
             logger.error("没有找到一个有效的CTI客户端");
-
+            throw new AvalibleCTINodeNotFoundException(this,referenceResId);
         }else {
             if (logger.isDebugEnabled()) {
-                logger.debug("找到负载最低的CTI节点:{}" , node);
+                logger.debug("找到负载最低的CTI节点:{},当前负载状况：{}" , node,nodes);
             }
         }
         return node;

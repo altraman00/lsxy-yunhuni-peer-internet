@@ -38,9 +38,10 @@ public class Handler_MN_CH_SYS_CONF_RECORD extends RpcRequestHandler{
         Map<String, Object> params = request.getParamMap();
         String conf_id = (String)params.get("user_data");
         String res_id = (String)params.get("res_id");
-        CTINode cticlient = cticlientContext.getAvalibleNode(res_id);
+
 
         try {
+            CTINode cticlient = cticlientContext.getAvalibleNode(res_id);
             cticlient.operateResource( res_id,"sys.conf.record_start", params, new RpcResultListener(){
 
                 @Override

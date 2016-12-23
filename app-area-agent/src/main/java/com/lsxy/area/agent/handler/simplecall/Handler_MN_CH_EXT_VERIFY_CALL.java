@@ -47,12 +47,13 @@ public class Handler_MN_CH_EXT_VERIFY_CALL extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        CTINode cticlient = cticlientContext.getAvalibleNode(null);
+
 
         Map<String, Object> params = request.getParamMap();
         String call_id = (String)params.get("user_data");
         String play_content = (String)params.get("play_content");
         try {
+            CTINode cticlient = cticlientContext.getAvalibleNode(null);
             if(StringUtils.isNotEmpty(play_content)){
                 params.put("play_content", JSONUtil2.fromJson(play_content,(new Object[1][]).getClass()));
             }

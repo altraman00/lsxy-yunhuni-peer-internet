@@ -45,7 +45,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        CTINode cticlient = cticlientContext.getAvalibleNode(null);
+
 
         if(logger.isDebugEnabled()){
             logger.debug("handler process_MN_CH_EXT_DUO_CALLBACK:{}",request);
@@ -56,6 +56,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK extends RpcRequestHandler{
         String call_id2= (String)params.get("user_data1");
 
         try {
+            CTINode cticlient = cticlientContext.getAvalibleNode(null);
             if(logger.isDebugEnabled()){
                 logger.debug("调用CTI创建双向回拔资源，参数为{}", JSONUtil.objectToJson(params));
             }
