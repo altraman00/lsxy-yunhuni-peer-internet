@@ -238,4 +238,8 @@ public class CTIClientContext {
                 ", clients=" + clients +
                 '}';
     }
+
+    public static void main(String[] args) {
+        System.out.println((byte)(2) == 2);
+    }
 }
