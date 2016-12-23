@@ -240,7 +240,7 @@ public class IVRActionService {
                     logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
                 }
             }catch (Throwable t){
-                logger.error("调用{}失败,耗时={}",url,(System.currentTimeMillis() - start));
+                logger.error("调用{}失败,耗时={},error={}",url,(System.currentTimeMillis() - start),t);
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
@@ -315,7 +315,7 @@ public class IVRActionService {
                     logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
                 }
             }catch (Throwable t){
-                logger.error("调用{}失败,耗时={}",url,(System.currentTimeMillis() - start));
+                logger.error("调用{}失败,耗时={},error={}",url,(System.currentTimeMillis() - start),t);
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
@@ -406,6 +406,8 @@ public class IVRActionService {
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
+                        //incoming是第一个会话所以是自己引用自己
+                        .put(BusinessState.REF_RES_ID,res_id)
                         //TYPE_IVR_INCOMING 才需要等待应答标记
                         .put(IVR_ANSWER_WAITTING_FIELD,"1")
                         //incoming事件from 和 to是相反的

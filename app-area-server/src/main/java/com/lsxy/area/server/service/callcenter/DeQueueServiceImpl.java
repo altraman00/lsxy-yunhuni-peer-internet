@@ -114,13 +114,13 @@ public class DeQueueServiceImpl implements DeQueueService {
         Integer conversationTimeout = enQueue.getConversation_timeout();
 
         //开始呼叫坐席
-        String agentCallId = conversationService.inviteAgent(appId,state.getId(),conversation,result.getAgent().getId(),
+        String agentCallId = conversationService.inviteAgent(appId,state.getBusinessData().get(BusinessState.REF_RES_ID),state.getId(),conversation,result.getAgent().getId(),
                 result.getAgent().getName(),result.getExtension().getId(),
                 result.getExtension().getTelnum(),result.getExtension().getType(),
                 result.getExtension().getUser(),conversationTimeout,45);
 
         //开始创建交谈
-        conversationService.create(conversation,state.getId(),state.getTenantId(),
+        conversationService.create(conversation,state.getBusinessData().get(BusinessState.REF_RES_ID),state.getId(),state.getTenantId(),
                 state.getAppId(),state.getAreaId(),state.getCallBackUrl(),conversationTimeout);
 
         //设置坐席的businessstate

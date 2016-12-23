@@ -224,6 +224,7 @@ public class DialActionHandler extends ActionHandler{
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
                 .put("areaId",areaId)
+                .putIfNotEmpty(BusinessState.REF_RES_ID,parent_call_res_id)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
@@ -243,6 +244,7 @@ public class DialActionHandler extends ActionHandler{
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
+                        .putIfNotEmpty(BusinessState.REF_RES_ID,parent_call_res_id)
                         .putIfNotEmpty(CallCenterUtil.ISCC_FIELD,isCC?CallCenterUtil.ISCC_TRUE:null)
                         .putIfNotEmpty("ivr_call_id",ivr_call_id)
                         .putIfNotEmpty("from",from)
