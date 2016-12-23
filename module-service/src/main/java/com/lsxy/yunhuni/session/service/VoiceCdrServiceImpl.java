@@ -67,8 +67,8 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         if(App.PRODUCT_CALL_CENTER.equals(type)){
             types = CallSession.PRODUCT_CODE;
         }
-        String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,types)+ " deleted=0 and   call_end_dt BETWEEN ? and ?";
-        sql = "select "+StringUtil.sqlName(VoiceCdr.class)+sql+" order by call_end_dt desc ";
+        String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,types)+ " deleted=0 and   call_start_dt BETWEEN ? and ?";
+        sql = "select "+StringUtil.sqlName(VoiceCdr.class)+sql+" order by call_start_dt desc ";
         List rows = jdbcTemplate.queryForList(sql,new Object[]{date1,date2});
         List<VoiceCdr> list = new ArrayList();
         for(int i=0;i<rows.size();i++){
@@ -96,10 +96,10 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         if(App.PRODUCT_CALL_CENTER.equals(type)){
             types = CallSession.PRODUCT_CODE;
         }
-        String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,types)+ " deleted=0 and   call_end_dt BETWEEN ? and ?";
+        String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,types)+ " deleted=0 and   call_start_dt BETWEEN ? and ?";
         String sqlCount = "select count(1) "+sql;
         Integer totalCount = jdbcTemplate.queryForObject(sqlCount,Integer.class,new Object[]{date1,date2});
-        sql = "select "+StringUtil.sqlName(VoiceCdr.class)+sql+" order by call_end_dt desc limit ?,?";
+        sql = "select "+StringUtil.sqlName(VoiceCdr.class)+sql+" order by call_start_dt desc limit ?,?";
         pageNo--;
         List rows = jdbcTemplate.queryForList(sql,new Object[]{date1,date2,pageNo*pageSize,pageSize});
         List list = new ArrayList();
@@ -133,7 +133,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         if(CallSession.TYPE_VOICE_RECORDING.equals(type)){
             costType = " sum(record_size) as size,sum(cost) as money ";
         }
-        String sql = "select "+costType+" from db_lsxy_bi_yunhuni.tb_bi_voice_cdr  where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,types)+ " deleted=0  and call_end_dt BETWEEN ? and ? ";
+        String sql = "select "+costType+" from db_lsxy_bi_yunhuni.tb_bi_voice_cdr  where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,types)+ " deleted=0  and call_start_dt BETWEEN ? and ? ";
         Map result = this.jdbcTemplate.queryForMap(sql,new Object[]{date1,date2});
         return result;
     }

@@ -28,8 +28,9 @@ FORCE_INSTALL=false
 FORCE_CLEAN=true
 #是否需要在最后TAIL LOG
 TAIL_LOG=false
-source /etc/profile
 
+source /etc/profile
+ulimit -c unlimited
 
 while getopts "A:P:H:STILDC" opt; do
   case $opt in
