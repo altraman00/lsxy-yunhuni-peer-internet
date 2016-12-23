@@ -162,7 +162,7 @@ public class CTINode{
 
     @Override
     public String toString() {
-        return String.format("cti node:%s(%s) ["+this.ready+"]["+this.status+"]=> cint count : %s , cout count : %s , cin number : %s , cout number : %s",id,ip,cinCount,coutCount,cinNumber,coutNumber);
+        return String.format("cti node:%s(%s) ["+this.ready+"]["+this.status+"]=> cint count : %s , cout count : %s , cin number : %s , cout number : %s , commander : %s",id,ip,cinCount,coutCount,cinNumber,coutNumber,this.ctiCommander);
     }
 
     /**

@@ -71,10 +71,16 @@ public class CTIClientContext {
      * @param commander
      */
     public void registerCommander(String serverIp, Commander commander) {
+        if(logger.isDebugEnabled()){
+            logger.debug("注册CTICommander{}:{}",serverIp,commander);
+        }
         clients.put(serverIp, commander);
         for(String key:nodes.keySet()){
             CTINode node = nodes.get(key);
             if(node.getUnitId().equals(commander.getUnitId()+"")){
+                if(logger.isDebugEnabled()){
+                    logger.debug("注册CTICommander到节点:{}->{}",node.getId(),commander);
+                }
                 node.setCtiCommander(commander);
             }
         }
