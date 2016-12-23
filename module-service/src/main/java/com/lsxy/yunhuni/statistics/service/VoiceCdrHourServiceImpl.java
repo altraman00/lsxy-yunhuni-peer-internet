@@ -61,7 +61,6 @@ public class VoiceCdrHourServiceImpl extends AbstractService<VoiceCdrHour> imple
         Timestamp sqlDate3 = new Timestamp(date3.getTime());
         Object[] obj = new Object[]{
                 sqlDate1,hour1,
-                sqlDate1,sqlDate3,sqlDate1,sqlDate3,
                 initDate,initDate,0,times,0,
                 sqlDate1,sqlDate3
         };
