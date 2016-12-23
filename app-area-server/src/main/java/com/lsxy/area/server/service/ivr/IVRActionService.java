@@ -64,8 +64,10 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -247,7 +249,7 @@ public class IVRActionService {
         return res;
     }
 
-    private static String inputUrl(String url,String key,String value){
+    private static String inputUrl(String url,String key,String value) throws UnsupportedEncodingException {
         URI uri = URI.create(url);
         String scheme = uri.getScheme();
         String host = uri.getHost();
@@ -257,9 +259,9 @@ public class IVRActionService {
         String query = uri.getQuery();
         String fragment = uri.getFragment();
         if(StringUtil.isEmpty(query)){
-            query = key + "=" + value;
+            query = key + "=" + URLEncoder.encode(value,"UTF-8");
         }else{
-            query = query + "&" + key + "=" + value;
+            query = query + "&" + key + "=" + URLEncoder.encode(value,"UTF-8");
         }
         if(p != -1){
             port = ":"+p;
