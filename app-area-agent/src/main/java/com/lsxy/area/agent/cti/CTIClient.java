@@ -154,7 +154,7 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
             try {
                 TimeUnit.SECONDS.sleep(10);
                 if(logger.isDebugEnabled()){
-                    logger.debug("10秒一次尝试从Redis缓存加载CTI配置");
+                    logger.debug("10秒一次尝试从Redis缓存加载CTI配置,当前状态：{}",clientContext );
                 }
                 //重新加载一次redis配置
                 clientContext.loadConfig();

@@ -209,14 +209,29 @@ public class CTIClientContext {
     public void connectStateChanged(byte unitId, byte clientId, byte status) {
         String key = "1." + unitId + "." + clientId;
         if(status == 0){ //如果有连接断开
+            if(logger.isDebugEnabled()){
+                logger.debug("CTI节点断开连接:1.{}.{}",unitId,clientId);
+            }
             this.nodes.remove(key);
         }else if(status == 1 || status == 2){  //如果有新建立的连接 或者初始已有连接
             if(!this.nodes.containsKey(key)){
+                if(logger.isDebugEnabled()){
+                    logger.debug("CTI新节点加入:1.{}.{}",unitId,clientId);
+                }
                 String nodeRedisKey = KEY_CTI__NODE_PREFIX + ":" + key;
                 String sServer = (String) cacheService.hget(nodeRedisKey,"ip");
                 sServer = sServer.substring(0,sServer.indexOf("-"));
                 nodes.put(key,new CTINode(key,sServer));
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return "CTIClientContext{" +
+                ", servers=" + servers +
+                ", nodes=" + nodes +
+                ", clients=" + clients +
+                '}';
     }
 }
