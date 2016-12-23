@@ -38,8 +38,9 @@ public class Handler_MN_CH_SYS_CONF_SET_PART_VOICE_MODE extends RpcRequestHandle
         Map<String, Object> params = request.getParamMap();
         String call_id = (String)params.get("user_data");
         String res_id = (String)params.get("res_id");
-        CTINode cticlient = cticlientContext.getAvalibleNode(res_id);
+
         try {
+            CTINode cticlient = cticlientContext.getAvalibleNode(res_id);
             cticlient.operateResource( res_id,"sys.conf.set_part_voice_mode", params, new RpcResultListener(){
 
                 @Override

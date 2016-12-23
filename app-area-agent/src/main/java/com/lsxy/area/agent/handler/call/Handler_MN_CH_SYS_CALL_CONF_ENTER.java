@@ -49,8 +49,9 @@ public class Handler_MN_CH_SYS_CALL_CONF_ENTER extends RpcRequestHandler{
         Map<String, Object> params = request.getParamMap();
         String res_id = (String)params.get("res_id");
         String call_id = (String)params.get("user_data");
-        CTINode cticlient = cticlientContext.getAvalibleNode(res_id);
+
         try {
+            CTINode cticlient = cticlientContext.getAvalibleNode(res_id);
             cticlient.operateResource( res_id, "sys.call.conf_enter", params, new RpcResultListener(){
                 @Override
                 protected void onResult(Object o) {

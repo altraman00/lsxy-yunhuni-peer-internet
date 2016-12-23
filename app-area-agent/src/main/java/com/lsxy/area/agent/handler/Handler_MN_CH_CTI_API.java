@@ -51,7 +51,7 @@ public class Handler_MN_CH_CTI_API extends RpcRequestHandler{
 
         String resId = (String) request.getParameter("res_id");
         String method = (String) request.getParameter("method");
-        CTINode cticlient = cticlientContext.getAvalibleNode(resId);
+
         Map<String, Object> params = new HashMap<>();
         if(method.equals("sys.call.answer")){
             /*收到应答指令次数计数*/
@@ -71,6 +71,7 @@ public class Handler_MN_CH_CTI_API extends RpcRequestHandler{
             }
         }
         try {
+            CTINode cticlient = cticlientContext.getAvalibleNode(resId);
             if(logger.isDebugEnabled()){
                 logger.debug("开始操作资源:{}{}",method,resId);
             }

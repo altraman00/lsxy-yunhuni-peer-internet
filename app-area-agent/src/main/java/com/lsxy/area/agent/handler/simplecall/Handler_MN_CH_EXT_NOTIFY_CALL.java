@@ -48,7 +48,7 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        CTINode cticlient = cticlientContext.getAvalibleNode(null);
+
 
         if(logger.isDebugEnabled()){
             logger.debug("handler process_MN_CH_EXT_NOTIFY_CALL:{}",request);
@@ -57,6 +57,7 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
         Map<String, Object> params = request.getParamMap();
         String call_id = (String)params.get("user_data");
         try {
+            CTINode cticlient = cticlientContext.getAvalibleNode(null);
             String play_content = (String)params.get("play_content");
             if(StringUtils.isNotEmpty(play_content)){
                 params.put("play_content", JSONUtil2.fromJson(play_content,(new Object[1][]).getClass()));
