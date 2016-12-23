@@ -45,13 +45,13 @@ public class RPCResponse extends RPCMessage{
 
 	@Override
 	public String toString() {
-		String sBody = this.getBodyAsString();
+		String sBody = this.getBody();
 		return "P["+this.getSessionid()+"]["+this.getTimestamp()+"]["+this.tryTimes+"]["+this.lastTryTimestamp+"]>>RP:" +this.message + ">>BODY:"+sBody;
 	}
 
 	/**
 	 * 序列化
-	 * RP:SESSIONID TIMESTAMP MESSAGE
+	 * RP:SESSIONID TIMESTAMP MESSAGE BODY
 	 * @return
 	 */
 	@Override
@@ -62,38 +62,44 @@ public class RPCResponse extends RPCMessage{
 		sb.append(this.getTimestamp());
 		sb.append(" ");
 		sb.append(this.getMessage());
+		sb.append(" ");
+		sb.append(encode(this.getBody()));
 		return sb.toString();
 	}
 
 
 	public static RPCResponse unserialize(String str){
 		RPCResponse response = null;
-		if(StringUtil.isNotEmpty(str) && str.matches("RP:\\w{32}\\s\\d{13}+\\s\\w+")){
+		if(StringUtil.isNotEmpty(str) && str.matches("RP:\\w{32}\\s\\d{13}+\\s\\w+\\s.*")){
 			response = new RPCResponse();
 			String[] parts = str.split(" ");
 			response.setSessionid(parts[0].substring(3));
 			response.setTimestamp(Long.valueOf(parts[1]));
 			response.setMessage(parts[2]);
+			if(parts.length>=4){
+				response.setBody(parts[3]);
+			}
+
 		}
 		return response;
 	}
 
 
 
-//	public static void main(String[] args) {
-//		String value = "RP:12341234123412341234123412341234 1481705348021 OK";
-////		Pattern pt = Pattern.compile("RQ:\\w[32]\\s\\w+\\s.*");
-//		System.out.println(value.matches("RP:\\w{32}\\s\\d{13}+\\s\\w+"));
-//		String[] parts = value.split(" ");
-//		String sessionid = parts[0].substring(3);
-//		String timestamp = parts[1];
-//		String message = parts[2];
-//		System.out.println(message);
-//		System.out.println(timestamp);
-//
-//		System.out.println(sessionid);
-//
-//		RPCResponse response = RPCResponse.unserialize(value);
-//		System.out.println(response.getMessage());
-//	}
+	public static void main(String[] args) {
+		String value = "RP:12341234123412341234123412341234 1481705348021 OK {{{{{s";
+//		Pattern pt = Pattern.compile("RQ:\\w[32]\\s\\w+\\s.*");
+		System.out.println(value.matches("RP:\\w{32}\\s\\d{13}+\\s\\w+\\s.*"));
+		String[] parts = value.split(" ");
+		String sessionid = parts[0].substring(3);
+		String timestamp = parts[1];
+		String message = parts[2];
+		System.out.println(message);
+		System.out.println(timestamp);
+
+		System.out.println(sessionid);
+
+		RPCResponse response = RPCResponse.unserialize(value);
+		System.out.println(response.getMessage());
+	}
 }

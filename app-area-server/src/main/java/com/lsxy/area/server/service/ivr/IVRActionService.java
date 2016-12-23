@@ -64,8 +64,10 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -240,14 +242,14 @@ public class IVRActionService {
                     logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
                 }
             }catch (Throwable t){
-                logger.error("调用{}失败,耗时={}",url,(System.currentTimeMillis() - start));
+                logger.error("调用{}失败,耗时={},error={}",url,(System.currentTimeMillis() - start),t);
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
         return res;
     }
 
-    private static String inputUrl(String url,String key,String value){
+    private static String inputUrl(String url,String key,String value) throws UnsupportedEncodingException {
         URI uri = URI.create(url);
         String scheme = uri.getScheme();
         String host = uri.getHost();
@@ -257,9 +259,9 @@ public class IVRActionService {
         String query = uri.getQuery();
         String fragment = uri.getFragment();
         if(StringUtil.isEmpty(query)){
-            query = key + "=" + value;
+            query = key + "=" + URLEncoder.encode(value,"UTF-8");
         }else{
-            query = query + "&" + key + "=" + value;
+            query = query + "&" + key + "=" + URLEncoder.encode(value,"UTF-8");
         }
         if(p != -1){
             port = ":"+p;
@@ -315,7 +317,7 @@ public class IVRActionService {
                     logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
                 }
             }catch (Throwable t){
-                logger.error("调用{}失败,耗时={}",url,(System.currentTimeMillis() - start));
+                logger.error("调用{}失败,耗时={},error={}",url,(System.currentTimeMillis() - start),t);
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
@@ -406,6 +408,8 @@ public class IVRActionService {
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
+                        //incoming是第一个会话所以是自己引用自己
+                        .put(BusinessState.REF_RES_ID,res_id)
                         //TYPE_IVR_INCOMING 才需要等待应答标记
                         .put(IVR_ANSWER_WAITTING_FIELD,"1")
                         //incoming事件from 和 to是相反的
