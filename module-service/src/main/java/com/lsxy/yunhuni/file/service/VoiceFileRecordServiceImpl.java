@@ -191,7 +191,7 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
 
     @Override
     public List<Map> getOssListByDeleted() {
-        String sql = " SELECT id as id ,file_key as ossUrl FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_record WHERE deleted=1 and sync==1 and file_key is not null and file_key<>'' and (oss_deleted is null or oss_deleted<>1)";
+        String sql = " SELECT id as id ,oss_url as ossUrl FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_record WHERE deleted=1 and status=1 and oss_url is not null and oss_url<>'' and (oss_deleted is null or oss_deleted<>1)";
         List<Map> list = jdbcTemplate.queryForList(sql,Map.class);
         return list;
     }
