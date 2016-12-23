@@ -77,6 +77,9 @@ public class CTIClientContext {
         clients.put(serverIp, commander);
         for(String key:nodes.keySet()){
             CTINode node = nodes.get(key);
+            if(logger.isDebugEnabled()){
+                logger.debug("注册CTICommand到节点 {} vs {}",node.getUnitId(),commander.getUnitId());
+            }
             if(node.getUnitId().equals(commander.getUnitId()+"")){
                 if(logger.isDebugEnabled()){
                     logger.debug("注册CTICommander到节点:{}->{}",node.getId(),commander);
