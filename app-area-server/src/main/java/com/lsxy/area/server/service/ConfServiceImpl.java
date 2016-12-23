@@ -298,6 +298,7 @@ public class ConfServiceImpl implements ConfService {
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
                 .putIfNotEmpty("areaId",areaId)
+                .putIfNotEmpty(BusinessState.REF_RES_ID,state.getBusinessData().get(BusinessState.REF_RES_ID))
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
@@ -316,6 +317,7 @@ public class ConfServiceImpl implements ConfService {
                                     .setAreaId(areaId)
                                     .setLineGatewayId(lineId)
                                     .setBusinessData(new MapBuilder<String,String>()
+                                        .putIfNotEmpty(BusinessState.REF_RES_ID,state.getBusinessData().get(BusinessState.REF_RES_ID))
                                         .putIfNotEmpty("from",oneTelnumber)
                                         .putIfNotEmpty("to",to)
                                         .putIfNotEmpty("max_seconds",maxDuration==null?null:maxDuration.toString())//最大时间

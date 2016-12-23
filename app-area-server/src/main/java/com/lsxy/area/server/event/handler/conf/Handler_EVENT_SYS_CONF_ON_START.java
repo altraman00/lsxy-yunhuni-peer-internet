@@ -92,6 +92,9 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         }
         if(res_id!=null){
             businessStateService.updateResId(conf_id,res_id);
+            if(state.getBusinessData().get(BusinessState.REF_RES_ID) == null){
+                businessStateService.updateInnerField(BusinessState.REF_RES_ID,res_id);
+            }
         }
         if(logger.isDebugEnabled()){
             logger.info("confi_id={},state={}",conf_id,state);
