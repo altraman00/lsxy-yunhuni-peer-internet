@@ -43,10 +43,10 @@ public class CTIClientContext {
         }
         ipscNodes.forEach((snode)->{
             String key = KEY_CTI_CLUSTER + ":" + snode;
-            Object obj = cacheService.hget(key,"ip");
-            String sServer = obj.toString();
-            if(servers.contains(sServer)){
-                servers.add(sServer.substring(0,sServer.indexOf("-")));
+            String sServer = (String) cacheService.hget(key,"ip");
+            sServer = sServer.substring(0,sServer.indexOf("-"));
+            if(!servers.contains(sServer)){
+                servers.add(sServer);
             }
             if(!nodes.keySet().contains(snode)){
                 nodes.put(snode,new CTINode(snode,sServer));
@@ -185,6 +185,29 @@ public class CTIClientContext {
                     logger.debug("CTI服务连接丢失-清理节点: {}",key);
                 }
                 nodes.remove(key);
+            }
+        }
+    }
+
+    /**
+     * 连接状态变化事件
+     * @param unitId
+     * @param clientId
+     * @param status
+     *                   <li>0: 断开连接</li>
+     *                   <li>1: 新建连接</li>
+     *                   <li>2: 已有的连接</li>
+     */
+    public void connectStateChanged(byte unitId, byte clientId, byte status) {
+        String key = "1." + unitId + "." + clientId;
+        if(status == 0){ //如果有连接断开
+            this.nodes.remove(key);
+        }else if(status == 1 || status == 2){  //如果有新建立的连接 或者初始已有连接
+            if(!this.nodes.containsKey(key)){
+                String nodeRedisKey = KEY_CTI_CLUSTER + ":" + key;
+                String sServer = (String) cacheService.hget(nodeRedisKey,"ip");
+                sServer = sServer.substring(0,sServer.indexOf("-"));
+                nodes.put(key,new CTINode(key,sServer));
             }
         }
     }

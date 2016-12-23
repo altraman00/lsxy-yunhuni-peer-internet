@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 @Profile(value={"test","production", "development","localdev"})
 public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable,UnitCallbacks{
 
-
     private static final Logger logger = LoggerFactory.getLogger(CTIClient.class);
 
     @Autowired(required = false)
@@ -57,7 +56,7 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
             logger.debug("开始启动CTI客户端,初始化UnitID:{}", localUnitID);
         }
 
-        Unit.initiate(localUnitID);
+        Unit.initiate(localUnitID,this);
         try {
             Set<String> servers = clientContext.getCTIServers();
             for(String serverIp:servers) {
@@ -196,8 +195,34 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
         clientContext.ctiClientConnectionLost(ip,unitid);
     }
 
+    /**
+     * 全局（整个 CTI BUS 上的连接状态变化事件）
+     *
+     * @param unitId     产生连接状态变化的BUS节点的Unit ID
+     * @param clientId   产生连接状态变化的BUS节点的Client ID。是node中心节点连接时，client id 值为 -1
+     * @param clientType 产生连接状态变化的BUS节点的Client Type<br>
+     *                   类型定义：
+     *                   <ul>
+     *                   <li>0: NULL</li>
+     *                   <li>1: BUS 服务</li>
+     *                   <li>2: IPSC（CTI服务进程）服务</li>
+     *                   <li>3: IPSC 监控服务</li>
+     *                   </ul>
+     * @param status     产生连接状态变化的BUS节点的连接状态 <br>
+     *                   状态值：
+     *                   <ul>
+     *                   <li>0: 断开连接</li>
+     *                   <li>1: 新建连接</li>
+     *                   <li>2: 已有的连接</li>
+     *                   </ul>
+     * @param addInfo    产生连接状态变化的BUS节点的附加信息
+     */
     @Override
-    public void globalConnectStateChanged(byte b, byte b1, byte b2, byte b3, String s) {
+    public void globalConnectStateChanged(byte unitId, byte clientId, byte clientType, byte status, String addInfo) {
+        //AA只关心类型为2的IPSC服务
+        if(clientId == 2){
+            clientContext.connectStateChanged(unitId,clientId,status);
+        }
 
     }
 }
