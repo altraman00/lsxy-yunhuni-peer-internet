@@ -79,7 +79,7 @@ public class CTIClientContext {
         for(String key:nodes.keySet()){
             CTINode node = nodes.get(key);
             if(logger.isDebugEnabled()){
-                logger.debug("注册CTICommand到节点 {} vs {}",node.getUnitId(),commander.getUnitId());
+                logger.debug("注册CTICommand到节点 {} vs {}",node.getUnitId(),commander.getConnectingUnitId());
             }
             if(node.getUnitId().equals(commander.getConnectingUnitId()+"")){
                 if(logger.isDebugEnabled()){
