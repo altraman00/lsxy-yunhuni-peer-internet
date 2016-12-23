@@ -18,6 +18,7 @@ import java.util.*;
 public class CTIClientContext {
 
     public static final String KEY_CTI_CLUSTER = "hesong:ipsc:cluster:nodeid";
+    public static final String KEY_CTI__NODE_PREFIX = "hesong:ipsc:cluster:node";
 
     @Autowired
     private RedisCacheService cacheService;
@@ -42,14 +43,16 @@ public class CTIClientContext {
             logger.debug("load cti cluster config : {}",ipscNodes);
         }
         ipscNodes.forEach((snode)->{
-            String key = KEY_CTI_CLUSTER + ":" + snode;
+            String key = KEY_CTI__NODE_PREFIX + ":" + snode;
             String sServer = (String) cacheService.hget(key,"ip");
-            sServer = sServer.substring(0,sServer.indexOf("-"));
-            if(!servers.contains(sServer)){
-                servers.add(sServer);
-            }
-            if(!nodes.keySet().contains(snode)){
-                nodes.put(snode,new CTINode(snode,sServer));
+            if(StringUtil.isNotEmpty(sServer)){
+                sServer = sServer.substring(0,sServer.indexOf("-"));
+                if(!servers.contains(sServer)){
+                    servers.add(sServer);
+                }
+                if(!nodes.keySet().contains(snode)){
+                    nodes.put(snode,new CTINode(snode,sServer));
+                }
             }
         });
     }
@@ -156,7 +159,7 @@ public class CTIClientContext {
         CTINode node = nodes.get(nodeKey);
 
         if(node != null) {
-            node.setCinCount(loadData.get("callin.count="));
+            node.setCinCount(loadData.get("callin.count"));
             node.setCoutCount(loadData.get("callout.count"));
             node.setCinNumber(loadData.get("callin.num"));
             node.setCoutNumber(loadData.get("callout.num"));
@@ -204,7 +207,7 @@ public class CTIClientContext {
             this.nodes.remove(key);
         }else if(status == 1 || status == 2){  //如果有新建立的连接 或者初始已有连接
             if(!this.nodes.containsKey(key)){
-                String nodeRedisKey = KEY_CTI_CLUSTER + ":" + key;
+                String nodeRedisKey = KEY_CTI__NODE_PREFIX + ":" + key;
                 String sServer = (String) cacheService.hget(nodeRedisKey,"ip");
                 sServer = sServer.substring(0,sServer.indexOf("-"));
                 nodes.put(key,new CTINode(key,sServer));
