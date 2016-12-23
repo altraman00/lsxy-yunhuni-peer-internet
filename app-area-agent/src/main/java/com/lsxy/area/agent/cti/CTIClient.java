@@ -236,6 +236,4 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
             clientContext.connectStateChanged(unitId,clientId,status);
         }
     }
-
-
 }
