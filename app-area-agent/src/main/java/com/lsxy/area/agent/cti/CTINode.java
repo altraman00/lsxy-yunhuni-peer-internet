@@ -154,7 +154,7 @@ public class CTINode{
         if(this.ctiCommander != null){
             BusAddress ba = new BusAddress((byte)Integer.parseInt(this.getUnitId()),(byte)Integer.parseInt(this.getPid()));
             if(logger.isDebugEnabled()){
-                logger.debug("创建资源:{}->{}",ba,this);
+                logger.debug("CTI节点创建资源:{}->{}",ba,this);
             }
             return ctiCommander.createResource(ba,name,params,rpcResultListener);
         }else{
@@ -181,7 +181,7 @@ public class CTINode{
         if(this.ctiCommander != null){
             BusAddress ba = new BusAddress((byte)Integer.parseInt(this.getUnitId()),(byte)Integer.parseInt(this.getPid()));
             if(logger.isDebugEnabled()){
-                logger.debug("操作资源:{}->{}",ba,this);
+                logger.debug("CTI节点操作资源:{}->{}",ba,this);
             }
             ctiCommander.operateResource(ba,resId,method,params,o);
         }else{
