@@ -145,7 +145,15 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
 
         String unitId = busAddress.getUnitId() + "";
         String pid = busAddress.getClientId() + "";
-        clientContext.updateNodeLoadData(unitId,pid,serverInfo.getLoads());
+        CTINode node = clientContext.updateNodeLoadData(unitId,pid,serverInfo.getLoads());
+        if(node != null){
+            String param = String.format("node=%s&load=%s&cinNumber=%s&coutNumber=%s&cinCount=%s&coutCount=%s",node.getId(),node.getLoadValue(),node.getCinNumber(),node.getCoutNumber(),node.getCinCount(),node.getCoutCount());
+            try {
+                rpcCaller.invoke(sessionContext,RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_LOAD_DATA,param));
+            } catch (Exception e) {
+                logger.error("出现异常："+busAddress +":"+serverInfo,e);
+            }
+        }
     }
 
     @Override

@@ -177,7 +177,7 @@ public class CTIClientContext {
      * sip.out.total.num=1000,
      * callout.num=405
      */
-    public void updateNodeLoadData(String unitId, String pid, Map<String, Integer> loadData) {
+    public CTINode updateNodeLoadData(String unitId, String pid, Map<String, Integer> loadData) {
         String nodeKey = "1."+unitId+"."+pid;
         CTINode node = nodes.get(nodeKey);
 
@@ -193,6 +193,7 @@ public class CTIClientContext {
                 logger.debug("CTI节点更新负载数据：{}", node);
             }
         }
+        return node;
     }
 
     /**
