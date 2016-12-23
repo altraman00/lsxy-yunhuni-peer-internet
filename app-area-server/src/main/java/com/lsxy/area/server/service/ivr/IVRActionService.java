@@ -240,7 +240,7 @@ public class IVRActionService {
                     logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
                 }
             }catch (Throwable t){
-                logger.error("调用{}失败,耗时={}",url,(System.currentTimeMillis() - start));
+                logger.error("调用{}失败,耗时={},error={}",url,(System.currentTimeMillis() - start),t);
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
@@ -315,7 +315,7 @@ public class IVRActionService {
                     logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
                 }
             }catch (Throwable t){
-                logger.error("调用{}失败,耗时={}",url,(System.currentTimeMillis() - start));
+                logger.error("调用{}失败,耗时={},error={}",url,(System.currentTimeMillis() - start),t);
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
