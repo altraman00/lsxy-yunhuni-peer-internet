@@ -197,7 +197,7 @@ public class ConversationService {
      * @return
      * @throws YunhuniApiException
      */
-    public String create(String id,String initiator,String tenantId,String appId, String areaId,String callBackUrl, Integer maxDuration) throws YunhuniApiException {
+    public String create(String id,String ref_res_id,String initiator,String tenantId,String appId, String areaId,String callBackUrl, Integer maxDuration) throws YunhuniApiException {
         if(maxDuration == null || maxDuration > MAX_DURATION){
             maxDuration = MAX_DURATION;
         }
@@ -206,6 +206,7 @@ public class ConversationService {
                 //.putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(tenantId, appId))
                 .put("max_seconds",maxDuration)
                 .putIfNotEmpty("areaId",areaId)
+                .putIfNotEmpty(BusinessState.REF_RES_ID,ref_res_id)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF, map);
         try {
@@ -222,6 +223,7 @@ public class ConversationService {
                 .setCallBackUrl(callBackUrl)
                 .setAreaId(areaId)
                 .setBusinessData(new MapBuilder<String,String>()
+                        .putIfNotEmpty(BusinessState.REF_RES_ID,ref_res_id)
                         .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,initiator)//交谈发起者的callid
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(initiator))
                         .putIfNotEmpty("max_seconds",maxDuration.toString())//交谈最大持续时长
@@ -284,7 +286,7 @@ public class ConversationService {
      * @return
      * @throws YunhuniApiException
      */
-    public String inviteAgent(String appId,String initiator, String conversationId,String agentId,String agentName,String extension,
+    public String inviteAgent(String appId,String ref_res_id,String initiator, String conversationId,String agentId,String agentName,String extension,
                          String telnum,String type,String user,
                           Integer maxDuration, Integer maxDialDuration) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
@@ -322,6 +324,7 @@ public class ConversationService {
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
                 .put("areaId",areaId)
+                .putIfNotEmpty(BusinessState.REF_RES_ID,ref_res_id)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
         try {
@@ -339,6 +342,7 @@ public class ConversationService {
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
+                        .putIfNotEmpty(BusinessState.REF_RES_ID,ref_res_id)
                         .putIfNotEmpty(CallCenterUtil.CONVERSATION_FIELD,conversationId)
                         .putIfNotEmpty(CallCenterUtil.AGENT_ID_FIELD,agentId)
                         .putIfNotEmpty(CallCenterUtil.AGENT_NAME_FIELD,agentName)
@@ -366,7 +370,7 @@ public class ConversationService {
      * @return
      * @throws YunhuniApiException
      */
-    public String inviteOut(String appId, String conversationId,
+    public String inviteOut(String appId,String ref_res_id, String conversationId,
                               String from, String to, Integer maxDuration, Integer maxDialDuration,
                               String playFile, Integer voiceMode) throws YunhuniApiException{
         App app = appService.findById(appId);
@@ -396,6 +400,7 @@ public class ConversationService {
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
                 .put("areaId",areaId)
+                .putIfNotEmpty(BusinessState.REF_RES_ID,ref_res_id)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
@@ -415,6 +420,7 @@ public class ConversationService {
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
+                        .putIfNotEmpty(BusinessState.REF_RES_ID,ref_res_id)
                         .putIfNotEmpty(CallCenterUtil.CONVERSATION_FIELD,conversationId)
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(conversationId))
                         .putIfNotEmpty("from",oneTelnumber)

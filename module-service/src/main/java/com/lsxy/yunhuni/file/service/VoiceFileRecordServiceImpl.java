@@ -58,19 +58,9 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
             sql+=" AND b.tenantId='"+tenantId+"'";
         }
         if(StringUtils.isNotEmpty(type)){
-            String[] types = ProductCode.getApiCmdByRemark(type);
-            if(types.length==1){
-                sql+="AND b.type = '"+types[0]+"'";
-            }else {
-                String temp = " (";
-                for (int i = 0; i < types.length; i++) {
-                    temp+= "'"+types[i]+"'";
-                    if(i!=types.length-1){
-                        temp+=",";
-                    }
-                }
-                temp+=") ";
-                sql+="AND b.type in "+temp+"";
+            String typeName = ProductCode.getApiCmdByRemark(type.trim());
+            if(StringUtils.isNotBlank(tenantId)){
+                sql+="AND b.type = '"+typeName+"'";
             }
         }
         if(start!=null&&end!=null){
@@ -101,7 +91,7 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
         if(rList!=null&&rList.size()>0) {
             for (int i=0;i<rList.size();i++){
                 Map map = rList.get(i);
-                map.put("type",ProductCode.changeApiCmdToProductCode((String)map.get("type")).getRemark());
+                map.put("type",ProductCode.valueOf((String)map.get("type")).getRemark());
                 map.put("time",DateUtils.formatDate((Date)map.get("time"),"yyyy-MM-dd HH:mm:ss"));
                 map.put("size",getSizeStr((Double) map.get("size")));
                 list.add(map);
@@ -122,19 +112,9 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
             sql+=" AND b.tenantId='"+tenantId+"'";
         }
         if(StringUtils.isNotEmpty(type)){
-            String[] types = ProductCode.getApiCmdByRemark(type);
-            if(types.length==1){
-                sql+="AND b.type = '"+types[0]+"'";
-            }else {
-                String temp = " (";
-                for (int i = 0; i < types.length; i++) {
-                    temp+= "'"+types[i]+"'";
-                    if(i!=types.length-1){
-                        temp+=",";
-                    }
-                }
-                temp+=") ";
-                sql+="AND b.type in "+temp+"";
+            String typeName = ProductCode.getApiCmdByRemark(type);
+            if(StringUtils.isNotBlank(typeName)){
+                sql+="AND b.type = '"+typeName+"'";
             }
         }
         if(start!=null&&end!=null){
@@ -211,7 +191,7 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
 
     @Override
     public List<Map> getOssListByDeleted() {
-        String sql = " SELECT id as id ,file_key as ossUrl FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_record WHERE deleted=1 and sync==1 and file_key is not null and file_key<>'' and (oss_deleted is null or oss_deleted<>1)";
+        String sql = " SELECT id as id ,oss_url as ossUrl FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_record WHERE deleted=1 and status=1 and oss_url is not null and oss_url<>'' and (oss_deleted is null or oss_deleted<>1)";
         List<Map> list = jdbcTemplate.queryForList(sql,Map.class);
         return list;
     }
