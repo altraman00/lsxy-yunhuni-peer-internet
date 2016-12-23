@@ -45,6 +45,9 @@ public class CTIClientContext {
         ipscNodes.forEach((snode)->{
             String key = KEY_CTI__NODE_PREFIX + ":" + snode;
             String sServer = (String) cacheService.hget(key,"ip");
+            if(logger.isDebugEnabled()){
+                logger.debug("cti node {} ip is {}",snode,sServer);
+            }
             if(StringUtil.isNotEmpty(sServer)){
                 sServer = sServer.substring(0,sServer.indexOf("-"));
                 if(!servers.contains(sServer)){
@@ -126,11 +129,12 @@ public class CTIClientContext {
 
     /**
      * 是否是一个新的serverIp
+     * 新的serverIp 是没有创建 commaonder对象的，如果有创建commander对象，需要在clients中注册
      * @param serverIp
      * @return
      */
     public boolean isNewServerFound(String serverIp) {
-        return !this.servers.contains(serverIp);
+        return !this.clients.containsKey(serverIp);
     }
 
     public void remove(String ip) {
