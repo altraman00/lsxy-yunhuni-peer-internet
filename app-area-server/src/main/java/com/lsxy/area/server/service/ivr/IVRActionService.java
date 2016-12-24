@@ -155,8 +155,8 @@ public class IVRActionService {
     }
 
     private void initWorker(){
-        //初始化100个线程，最多500个线程，最多积压1024个任务
-        worker = new ThreadPoolExecutor(100, 500, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1024),
+        //初始化100个线程，最多1000个线程，最多积压1024个任务
+        worker = new ThreadPoolExecutor(100, 1000, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1024),
                 new BasicThreadFactory.Builder().namingPattern("ivr-action-%s").build());
     }
     private void initIVRSchema() {
@@ -180,9 +180,9 @@ public class IVRActionService {
                                 .setSocketTimeout(5000)
                                 .setConnectTimeout(5000).build())
                 //总共最多1000并发
-                .setMaxConnTotal(1000)
-                //每个host最多100并发
-                .setMaxConnPerRoute(100)
+                .setMaxConnTotal(3000)
+                //每个host最多300并发
+                .setMaxConnPerRoute(1000)
                 //禁用cookies
                 .disableCookieManagement()
                 .build();
