@@ -91,13 +91,13 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
                     logger.error("调用sys.call超时call_id={}",call_id);
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
-                                    .put("method", Constants.EVENT_SYS_CALL_ON_TIMEOUT)
+                                    .put("method", Constants.EVENT_SYS_CALL_ON_FAIL)
                                     .put("user_data",call_id)
                                     .build());
                     try {
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
-                        logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_ON_TIMEOUT,e);
+                        logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_ON_FAIL,e);
                     }
                 }
             });
