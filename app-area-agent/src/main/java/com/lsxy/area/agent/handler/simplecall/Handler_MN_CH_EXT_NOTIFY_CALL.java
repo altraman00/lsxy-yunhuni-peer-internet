@@ -81,7 +81,7 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
                                     .put("user_data",call_id)
                                     .build());
                     try {
-                        rpcCaller.invoke(sessionContext,req);
+                        rpcCaller.invoke(sessionContext,req,true);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败", Constants.EVENT_EXT_NOTIFY_CALL_SUCCESS,e);
                     }
@@ -96,7 +96,7 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
                                     .put("user_data",call_id)
                                     .build());
                     try {
-                        rpcCaller.invoke(sessionContext,req);
+                        rpcCaller.invoke(sessionContext,req,true);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_FAIL,e);
                     }
@@ -111,7 +111,7 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
                                     .put("user_data",call_id)
                                     .build());
                     try {
-                        rpcCaller.invoke(sessionContext,req);
+                        rpcCaller.invoke(sessionContext,req,true);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_TIMEOUT,e);
                     }

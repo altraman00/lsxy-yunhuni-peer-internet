@@ -3,12 +3,14 @@ package com.lsxy.area.server.service.ivr.handler;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
+import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,6 +33,12 @@ public class RecordActionHandler extends ActionHandler{
     @Autowired
     private SessionContext sessionContext;
 
+    @Autowired
+    private NotifyCallbackUtil notifyCallbackUtil;
+
+    @Autowired
+    private IVRActionService ivrActionService;
+
     @Override
     public String getAction() {
         return "record";
@@ -43,6 +51,7 @@ public class RecordActionHandler extends ActionHandler{
         String finish_keys = root.attributeValue("finish_keys");
 
         String res_id = state.getResId();
+        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT_FIELD,next);
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",res_id)
                 .putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(state.getTenantId(),state.getAppId()))
@@ -58,8 +67,20 @@ public class RecordActionHandler extends ActionHandler{
             rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Throwable e) {
             logger.error("调用失败",e);
+            if(StringUtils.isNotBlank(state.getCallBackUrl())){
+                Map<String, Object> notify_data = new MapBuilder<String, Object>()
+                        .putIfNotEmpty("event", "ivr.record_end")
+                        .putIfNotEmpty("id", callId)
+                        .putIfNotEmpty("begin_time", System.currentTimeMillis())
+                        .putIfNotEmpty("end_time", System.currentTimeMillis())
+                        .putIfNotEmpty("error", "record error")
+                        .build();
+                notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
+            }
+            ivrActionService.doAction(callId,new MapBuilder<String,Object>()
+                    .putIfNotEmpty("error","record error")
+                    .build());
         }
-        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT_FIELD,next);
         return true;
     }
 }

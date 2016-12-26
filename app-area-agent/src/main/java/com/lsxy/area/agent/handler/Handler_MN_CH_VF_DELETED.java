@@ -63,7 +63,7 @@ public class Handler_MN_CH_VF_DELETED extends RpcRequestHandler {
         request1.setBody(param);
         try {
             logger.error("发送删除放音文件成功指令成功:");
-            rpcCaller.invoke(sessionContext,request1);
+            rpcCaller.invoke(sessionContext,request1,true);
         } catch (Exception ex) {
             logger.error("发送删除放音文件成功指令失败:"+request1,ex);
         }
