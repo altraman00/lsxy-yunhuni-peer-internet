@@ -774,10 +774,11 @@
                             }else {
                                 currentPage = pagePlay.nowPage - 1;
                             }
-                            if(currentPage<=0){
-                                currentPage=1;
+                            if(currentPage> 0){
+                                $('#page' + currentPage + pagePlay.obj).click();
+                            }else{
+                                $('#play-'+id).remove();
                             }
-                            $('#page' + currentPage + pagePlay.obj).click();
                         }
                     }else{
                         showtoast("删除失败");
@@ -857,7 +858,7 @@
             var html ='';
             //数据列表
             for(var i = 0 ; i<data.length; i++){
-                html +='<tr class="playtr" id="play-'+data[i][5]+'"><td class="voice-format">'+data[i][1]+'</td>';
+                html +='<tr class="playtr" id="play-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
                 if(data[i][2]==-1){
                     html+='<td  title="审核不通过原因：'+data[i][5]+'"><span class="nosuccess">审核不通过</span><i class="fa fa-exclamation-triangle"></i></td>';
                 }else if(data[i][2]==1&&data[i][6]==1){
