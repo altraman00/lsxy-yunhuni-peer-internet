@@ -9,7 +9,6 @@ public class Constants {
     public static final String EVENT_SYS_CALL_ON_DIAL_COMPLETED = "sys.call.on_dial_completed";//拨号结束事件
     public static final String EVENT_SYS_CALL_ON_START = "EVENT_SYS_CALL_ON_START";//呼叫资源创建成功事件
     public static final String EVENT_SYS_CALL_ON_FAIL = "EVENT_SYS_CALL_ON_FAIL";//呼叫资源创建失败事件
-    public static final String EVENT_SYS_CALL_ON_TIMEOUT = "EVENT_SYS_CALL_ON_TIMEOUT";//呼叫资源创建超时事件
     public static final String EVENT_SYS_CALL_ON_CONF_COMPLETED = "sys.call.on_conf_completed";//呼叫加入会议结束
     public static final String EVENT_SYS_CALL_CONF_ENTER_SUCC = "EVENT_SYS_CALL_CONF_ENTER_SUCC";//将呼叫加入会议成功事件
     public static final String EVENT_SYS_CALL_CONF_ENTER_FAIL = "EVENT_SYS_CALL_CONF_ENTER_FAIL";//将呼叫加入会议失败事件

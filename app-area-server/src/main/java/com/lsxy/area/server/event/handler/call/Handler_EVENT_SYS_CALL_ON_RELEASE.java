@@ -6,12 +6,14 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationService;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
 import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -74,6 +76,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
 
     @Autowired
     private ConversationService conversationService;
+
+    @Autowired
+    private IVRActionService ivrActionService;
 
     @Autowired
     private CallCenterUtil callCenterUtil;
@@ -249,6 +254,24 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                     conversationService.logicExit(conversation_id,call_id);
                 }
             }
+        }else if(BusinessState.TYPE_IVR_DIAL.equals(state.getType())){//ivr拨号失败需要继续ivr
+            Map<String,String> businessData = state.getBusinessData();
+            if(businessData != null){
+                String ivr_call_id = businessData.get("ivr_call_id");
+                if(StringUtil.isNotEmpty(ivr_call_id)){
+                    Map<String, Object> notify_data = new MapBuilder<String, Object>()
+                            .putIfNotEmpty("event", "ivr.connect_end")
+                            .putIfNotEmpty("id", ivr_call_id)
+                            .putIfNotEmpty("begin_time", System.currentTimeMillis())
+                            .putIfNotEmpty("end_time", System.currentTimeMillis())
+                            .putIfNotEmpty("error", "dial error")
+                            .build();
+                    notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
+                    ivrActionService.doAction(ivr_call_id,new MapBuilder<String,Object>()
+                            .putIfNotEmpty("error","dial error")
+                            .build());
+                }
+            }
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
             String agentId = state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD);
             if(agentId != null){
@@ -287,7 +310,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
         try {
-            rpcCaller.invoke(sessionContext, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest,true);
         } catch (Throwable e) {
             logger.error("调用失败",e);
         }

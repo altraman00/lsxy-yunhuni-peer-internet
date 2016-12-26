@@ -63,7 +63,7 @@ public class Handler_MN_CH_SYS_CALL_CONNECT_START extends RpcRequestHandler {
                                     .put("user_data",call_id)
                                     .build());
                     try {
-                        rpcCaller.invoke(sessionContext,req);
+                        rpcCaller.invoke(sessionContext,req,true);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败", Constants.EVENT_SYS_CALL_CONNECT_ON_START,e);
                     }

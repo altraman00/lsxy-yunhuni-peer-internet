@@ -77,7 +77,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK extends RpcRequestHandler{
                                     .put("user_data2",call_id2)
                                     .build());
                     try {
-                        rpcCaller.invoke(sessionContext,req);
+                        rpcCaller.invoke(sessionContext,req,true);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败", Constants.EVENT_EXT_DUO_CALLBACK_SUCCESS,e);
                     }
@@ -94,7 +94,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK extends RpcRequestHandler{
                                     .put("user_data2",call_id2)
                                     .build());
                     try {
-                        rpcCaller.invoke(sessionContext,req);
+                        rpcCaller.invoke(sessionContext,req,true);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_FAIL,e);
                     }
@@ -105,13 +105,13 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK extends RpcRequestHandler{
                     logger.error("调用ext.duo_callback超时call_id={}",call_id1);
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
-                                    .put("method",Constants.EVENT_SYS_CALL_ON_TIMEOUT)
+                                    .put("method",Constants.EVENT_EXT_CALL_ON_TIMEOUT)
                                     .put("user_data",call_id1)
                                     .put("user_data1",call_id1)
                                     .put("user_data2",call_id2)
                                     .build());
                     try {
-                        rpcCaller.invoke(sessionContext,req);
+                        rpcCaller.invoke(sessionContext,req,true);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_TIMEOUT,e);
                     }

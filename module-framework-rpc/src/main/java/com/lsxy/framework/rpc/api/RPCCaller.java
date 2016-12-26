@@ -107,11 +107,23 @@ public class RPCCaller {
 
 
 	/**
-	 * 调用远程服务，无返回值
+	 * 调用远程服务，无返回值,不重试
 	 * @param sessionContext 允许外接session为空,将为空判断放入方法体主要是为了统一处理会话丢失导致的消息丢失,将消息丢入修正队列
 	 * @throws RequestWriteException
 	 */
 	public void invoke(SessionContext sessionContext, RPCRequest request) throws RightSessionNotFoundExcepiton, SessionWriteException {
+		invoke(sessionContext, request,false);
+	}
+
+	/**
+	 * 调用远程服务，无返回值
+	 * @param sessionContext
+	 * @param request
+	 * @param retry 是否重试
+	 * @throws RightSessionNotFoundExcepiton
+	 * @throws SessionWriteException
+     */
+	public void invoke(SessionContext sessionContext, RPCRequest request,boolean retry) throws RightSessionNotFoundExcepiton, SessionWriteException {
 		try{
 			Session session = sessionContext.getRightSession(request);
 			//如果session为空
@@ -121,8 +133,12 @@ public class RPCCaller {
 			}
 			invoke(session,request);
 		} catch (SessionWriteException | RightSessionNotFoundExcepiton e) {
-			logger.error("RPC请求发送失败,请求消息丢入修正队列:"+request,e);
-			fixQueue.fix(request);
+			if(retry){
+				logger.error("RPC请求发送失败,请求消息丢入修正队列:"+request,e);
+				fixQueue.fix(request);
+			}else{
+				logger.error("RPC请求发送失败");
+			}
 			throw e;
 		}
 	}
