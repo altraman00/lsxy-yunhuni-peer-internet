@@ -431,7 +431,7 @@ public class IVRActionService {
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_ANSWER,params);
         try {
-            rpcCaller.invoke(sessionContext, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest,true);
         } catch (Throwable e) {
             logger.error("调用失败",e);
         }
@@ -542,7 +542,7 @@ public class IVRActionService {
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
         try {
-            rpcCaller.invoke(sessionContext, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest,true);
         } catch (Throwable e) {
             logger.error("调用失败",e);
         }
