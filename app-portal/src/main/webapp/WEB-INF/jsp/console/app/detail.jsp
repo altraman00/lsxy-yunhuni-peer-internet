@@ -769,7 +769,7 @@
                         showtoast("删除成功");
                         if(pagePlay){
                             var currentPage;
-                            if(((pagePlay.nowPage - 1) * pagePlay.listRow +1) <= pagePlay.count-1){
+                            if(((pagePlay.nowPage - 1) * pagePlay.listRow +1) <= --pagePlay.count){
                                 currentPage = pagePlay.nowPage;
                             }else {
                                 currentPage = pagePlay.nowPage - 1;
@@ -814,7 +814,7 @@
         },"post");
 
         //每页显示数量
-        var listRow = 20;
+        var listRow = 2;
         //显示多少个分页按钮
         var showPageCount = 5;
         //指定id，创建分页标签
