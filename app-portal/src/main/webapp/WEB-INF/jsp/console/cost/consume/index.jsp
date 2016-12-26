@@ -113,7 +113,7 @@
                                                     <input type="text" class="datepicker lastMonth form-control" value='${endTime}' name="endTime" id="endTime" data-date-end-date="0m" readonly="readonly"/>
                                                     <input type="text" name="appId" id="appId" value="${appId}" hidden>
                                                     <button class="btn btn-primary query" type="button" id="findform" >查询</button>
-                                                    <button class="btn btn-primary query" type="button" onclick="download()" >导出</button>
+                                                    <%--<button class="btn btn-primary query" type="button" onclick="download()" >导出</button>--%>
                                                     <span class="tips-error" ></span>
                                                 </div>
                                             </div>

@@ -89,7 +89,7 @@
                                                 </select>
 
                                                 <button class="btn btn-primary margin-left-20" type="submit"> 查询</button>
-                                                <button class="btn btn-primary" type="button" onclick="download()"> 导出</button>
+                                                <%--<button class="btn btn-primary" type="button" onclick="download()"> 导出</button>--%>
                                             </div>
 
 
