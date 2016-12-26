@@ -767,18 +767,17 @@
                 ajaxsync(ctx + "/console/app/file/play/delete",{'id':id,csrfParameterName:csrfToken},function(response){
                     if(response.success){
                         showtoast("删除成功");
-//                        fileTotalSoze();
-                        $('#play-'+id).remove();
                         if(pagePlay){
-                            pagePlay.count--;
-                            pagePlay.initTotalPage();
-                            if(pagePlay.nowPage>pagePlay.totalPage){
-                                pagePlay.nowPage=pagePlay.totalPage;
+                            var currentPage;
+                            if(((pagePlay.nowPage - 1) * pagePlay.listRow +1) <= pagePlay.count-1){
+                                currentPage = pagePlay.nowPage;
+                            }else {
+                                currentPage = pagePlay.nowPage - 1;
                             }
-                            if(pagePlay.nowPage<=0){
-                                pagePlay.nowPage=1;
+                            if(currentPage<=0){
+                                currentPage=1;
                             }
-                            $('#page'+pagePlay.nowPage+pagePlay.obj).click();
+                            $('#page' + currentPage + pagePlay.obj).click();
                         }
                     }else{
                         showtoast("删除失败");
