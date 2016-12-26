@@ -56,6 +56,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
     ConversationService conversationService;
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterService callCenterService;
+    @Autowired
     private ResourceTelenumService resourceTelenumService;
 
     @Autowired
@@ -156,7 +157,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         if(cdrSplit[11].trim().equals("0")){
             //TODO 相对平台是呼入 处理to
             voiceCdr.setFromNum(cdrSplit[7].trim());
-            String toNum = cdrSplit[8].trim();
+            String toNum = cdrSplit[8].trim().split("@")[0];
             ResourceTelenum num = resourceTelenumService.findByTelNumberOrCallUri(toNum);
             if(num != null){
                 voiceCdr.setToNum(num.getTelNumber());
@@ -165,7 +166,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             }
         }else{
             //TODO 相对平台是呼出 处理from
-            String fromNum = cdrSplit[7].trim();
+            String fromNum = cdrSplit[7].trim().split("@")[0];
             ResourceTelenum num = resourceTelenumService.findByTelNumberOrCallUri(fromNum);
             if(num != null){
                 voiceCdr.setFromNum(num.getTelNumber());
