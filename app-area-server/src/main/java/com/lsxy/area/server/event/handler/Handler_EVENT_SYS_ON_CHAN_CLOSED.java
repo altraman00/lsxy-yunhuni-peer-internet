@@ -21,6 +21,8 @@ import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
+import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
 import com.lsxy.yunhuni.api.session.service.VoiceCdrService;
 import org.apache.commons.lang.StringUtils;
@@ -54,6 +56,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
     ConversationService conversationService;
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterService callCenterService;
+    private ResourceTelenumService resourceTelenumService;
 
     @Autowired
     private MQService mqService;
@@ -150,8 +153,28 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
 
         voiceCdr.setType(productCode.name());
         voiceCdr.setRelevanceId(businessState.getId());
-        voiceCdr.setFromNum(cdrSplit[7].trim());
-        voiceCdr.setToNum(cdrSplit[8].trim());
+        if(cdrSplit[11].trim().equals("0")){
+            //TODO 相对平台是呼入 处理to
+            voiceCdr.setFromNum(cdrSplit[7].trim());
+            String toNum = cdrSplit[8].trim();
+            ResourceTelenum num = resourceTelenumService.findByTelNumberOrCallUri(toNum);
+            if(num != null){
+                voiceCdr.setToNum(num.getTelNumber());
+            }else{
+                voiceCdr.setToNum(toNum);
+            }
+        }else{
+            //TODO 相对平台是呼出 处理from
+            String fromNum = cdrSplit[7].trim();
+            ResourceTelenum num = resourceTelenumService.findByTelNumberOrCallUri(fromNum);
+            if(num != null){
+                voiceCdr.setFromNum(num.getTelNumber());
+            }else{
+                voiceCdr.setFromNum(fromNum);
+            }
+            voiceCdr.setToNum(cdrSplit[8].trim());
+        }
+
         Date callStartDate = getCallDate(cdrSplit[18].trim());
         voiceCdr.setCallStartDt(callStartDate == null?new Date():callStartDate);
         voiceCdr.setCallAckDt(getCallDate(cdrSplit[19].trim()));
@@ -164,7 +187,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         if(data != null){
             switch (productCode){
                 case duo_call:{
-                    String sessionId = data.get(voiceCdr.getToNum());
+                    String sessionId = data.get(voiceCdr.getToNum().split("@")[0]);
                     voiceCdr.setSessionId(sessionId);
                     break;
                 }

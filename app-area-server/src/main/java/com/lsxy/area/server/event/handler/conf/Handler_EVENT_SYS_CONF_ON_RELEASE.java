@@ -210,7 +210,7 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
                     .build();
 
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
-            rpcCaller.invoke(sessionContext, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest,true);
         } catch (Throwable e) {
             logger.error("会议结束自动挂断与会方={}失败",e);
         }

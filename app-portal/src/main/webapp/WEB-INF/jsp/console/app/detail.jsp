@@ -188,20 +188,34 @@
                                                         </div>
                                                     </div>
                                                     <c:if test="${app.serviceType=='call_center'}">
-                                                    <div class="row">
-                                                        <div class="col-md-1 dev">
-                                                            分机接入信息：
+                                                        <div class="row">
+                                                            <div class="col-md-1 dev">
+                                                                分机接入信息：
+                                                            </div>
+                                                            <div class="col-md-9">
+                                                                <p>${sipRegistrar}</p>
+                                                                <%--<c:forEach items="${appExtensionList}" var="appExtension">--%>
+                                                                    <%--<c:if test="${appExtension.telenum==app.id}">--%>
+                                                                        <%--<p>${appExtension.telenum} </p>--%>
+                                                                    <%--</c:if>--%>
+                                                                <%--</c:forEach>--%>
+                                                                <%--<p class="text-danger">（上线后平台会重新分配分机接入信息）</p>--%>
+                                                            </div>
                                                         </div>
-                                                        <div class="col-md-9">
-                                                            <p>${sipRegistrar}</p>
-                                                            <%--<c:forEach items="${appExtensionList}" var="appExtension">--%>
-                                                                <%--<c:if test="${appExtension.telenum==app.id}">--%>
+                                                        <div class="row">
+                                                            <div class="col-md-1 dev">
+                                                                呼叫中心应用编号：
+                                                            </div>
+                                                            <div class="col-md-9">
+                                                                <p>${app.callCenterNum}</p>
+                                                                    <%--<c:forEach items="${appExtensionList}" var="appExtension">--%>
+                                                                    <%--<c:if test="${appExtension.telenum==app.id}">--%>
                                                                     <%--<p>${appExtension.telenum} </p>--%>
-                                                                <%--</c:if>--%>
-                                                            <%--</c:forEach>--%>
-                                                            <%--<p class="text-danger">（上线后平台会重新分配分机接入信息）</p>--%>
+                                                                    <%--</c:if>--%>
+                                                                    <%--</c:forEach>--%>
+                                                                    <%--<p class="text-danger">（上线后平台会重新分配分机接入信息）</p>--%>
+                                                            </div>
                                                         </div>
-                                                    </div>
                                                     </c:if>
                                                 </div>
                                             </div>
@@ -767,18 +781,18 @@
                 ajaxsync(ctx + "/console/app/file/play/delete",{'id':id,csrfParameterName:csrfToken},function(response){
                     if(response.success){
                         showtoast("删除成功");
-//                        fileTotalSoze();
-                        $('#play-'+id).remove();
                         if(pagePlay){
-                            pagePlay.count--;
-                            pagePlay.initTotalPage();
-                            if(pagePlay.nowPage>pagePlay.totalPage){
-                                pagePlay.nowPage=pagePlay.totalPage;
+                            var currentPage;
+                            if(((pagePlay.nowPage - 1) * pagePlay.listRow +1) <= --pagePlay.count){
+                                currentPage = pagePlay.nowPage;
+                            }else {
+                                currentPage = pagePlay.nowPage - 1;
                             }
-                            if(pagePlay.nowPage<=0){
-                                pagePlay.nowPage=1;
+                            if(currentPage> 0){
+                                $('#page' + currentPage + pagePlay.obj).click();
+                            }else{
+                                $('#play-'+id).remove();
                             }
-                            $('#page'+pagePlay.nowPage+pagePlay.obj).click();
                         }
                     }else{
                         showtoast("删除失败");
@@ -800,6 +814,9 @@
      *触发放音文件分页
      */
     var pagePlay ;
+    function voiceRecordTab(){
+        $('#uploadButton').hide();
+    }
     function upplay(){
         $('#uploadButton').show();
         //获取数据总数
@@ -855,7 +872,7 @@
             var html ='';
             //数据列表
             for(var i = 0 ; i<data.length; i++){
-                html +='<tr class="playtr" id="play-'+data[i][5]+'"><td class="voice-format">'+data[i][1]+'</td>';
+                html +='<tr class="playtr" id="play-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
                 if(data[i][2]==-1){
                     html+='<td  title="审核不通过原因：'+data[i][5]+'"><span class="nosuccess">审核不通过</span><i class="fa fa-exclamation-triangle"></i></td>';
                 }else if(data[i][2]==1&&data[i][6]==1){
@@ -878,7 +895,7 @@
     $('#myTab li').click(function(){
         var type = $(this).attr('data-id');
         if(type=='voice'){
-            upvoice();
+            voiceRecordTab();
         }
         if(type=='play'){
             upplay();

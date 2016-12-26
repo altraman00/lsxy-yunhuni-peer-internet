@@ -2,6 +2,8 @@ package com.lsxy.framework.api.tenant.model;
 
 import com.lsxy.framework.api.base.IdEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -108,6 +110,7 @@ public class Account extends IdEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "tenant_id")
+	@NotFound(action = NotFoundAction.IGNORE)
 	public Tenant getTenant() {
 		return tenant;
 	}

@@ -4,6 +4,9 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
+import com.lsxy.area.server.batch.CallCenterBatchInserter;
+import com.lsxy.area.server.batch.CallSessionBatchInserter;
+import com.lsxy.area.server.batch.VoiceIvrBatchInserter;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.handler.ActionHandler;
@@ -137,6 +140,15 @@ public class IVRActionService {
 
     @Autowired
     private CallCenterStatisticsService callCenterStatisticsService;
+
+    @Autowired
+    private CallSessionBatchInserter callSessionBatchInserter;
+
+    @Autowired
+    private CallCenterBatchInserter callCenterBatchInserter;
+
+    @Autowired
+    private VoiceIvrBatchInserter voiceIvrBatchInserter;
 
     private CloseableHttpAsyncClient client = null;
 
@@ -355,8 +367,9 @@ public class IVRActionService {
     }
 
     private void saveIvrSessionCall(String call_id, App app, Tenant tenant, String res_id, String from, String to, String lineId, boolean iscc){
+        CallSession callSession = new CallSession();
+        callSession.setId(UUIDGenerator.uuid());
         try{
-            CallSession callSession = new CallSession();
             callSession.setStatus(CallSession.STATUS_CALLING);
             callSession.setFromNum(to);
             callSession.setToNum(from);
@@ -365,8 +378,7 @@ public class IVRActionService {
             callSession.setRelevanceId(call_id);
             callSession.setResId(res_id);
             callSession.setType(iscc ? CallSession.TYPE_CALL_CENTER:CallSession.TYPE_VOICE_IVR);
-            callSession = callSessionService.save(callSession);
-            businessStateService.updateInnerField(call_id,BusinessState.SESSIONID,callSession.getId());
+            callSessionBatchInserter.put(callSession);
             if(iscc){
                 CallCenter callCenter = new CallCenter();
                 callCenter.setId(call_id);
@@ -377,7 +389,7 @@ public class IVRActionService {
                 callCenter.setStartTime(new Date());
                 callCenter.setType(""+CallCenter.CALL_IN);
                 callCenter.setCost(BigDecimal.ZERO);
-                callCenterService.save(callCenter);
+                callCenterBatchInserter.put(callCenter);
                 try{
                     callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(tenant.getId(),app.getId(),
                             new Date()).setCallIn(1L).build());
@@ -391,7 +403,7 @@ public class IVRActionService {
                 voiceIvr.setToNum(to);
                 voiceIvr.setStartTime(new Date());
                 voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_INCOMING);
-                voiceIvrService.save(voiceIvr);
+                voiceIvrBatchInserter.put(voiceIvr);
             }
         }catch (Throwable t){
             logger.error("保存callsession失败",t);
@@ -417,6 +429,7 @@ public class IVRActionService {
                         .putIfNotEmpty("to",from)
                         .putIfWhere(CallCenterUtil.CALLCENTER_FIELD,iscc,call_id)
                         .putIfWhere(CallCenterUtil.ISCC_FIELD,iscc,CallCenterUtil.ISCC_TRUE)
+                        .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
                 .build();
         businessStateService.save(state);
@@ -431,7 +444,7 @@ public class IVRActionService {
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_ANSWER,params);
         try {
-            rpcCaller.invoke(sessionContext, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest,true);
         } catch (Throwable e) {
             logger.error("调用失败",e);
         }
@@ -542,7 +555,7 @@ public class IVRActionService {
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
         try {
-            rpcCaller.invoke(sessionContext, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest,true);
         } catch (Throwable e) {
             logger.error("调用失败",e);
         }

@@ -226,10 +226,21 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                             .build();
                     RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONNECT_START, map);
                     rpcCaller.invoke(sessionContext, rpcrequest);
+                    businessStateService.updateInnerField(ivr_call_id,"ivr_dial_call_id",call_id);
                 } catch (Throwable e) {
-                    logger.error("调用失败",e);
+                    hungup(state);
+                    Map<String,Object> notify_data = new MapBuilder<String,Object>()
+                            .putIfNotEmpty("event","ivr.connect_end")
+                            .putIfNotEmpty("id",ivr_call_id)
+                            .putIfNotEmpty("begin_time",System.currentTimeMillis())
+                            .putIfNotEmpty("end_time",System.currentTimeMillis())
+                            .putIfNotEmpty("error",error)
+                            .build();
+                    notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
+                    ivrActionService.doAction(ivr_call_id,new MapBuilder<String,Object>()
+                            .putIfNotEmpty("error","dial error")
+                            .build());
                 }
-                businessStateService.updateInnerField(ivr_call_id,"ivr_dial_call_id",call_id);
             }
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
             String conversation_id = businessData.get(CallCenterUtil.CONVERSATION_FIELD);
@@ -406,5 +417,20 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             //TODO
         }
         return res;
+    }
+
+    private void hungup(BusinessState state){
+        Map<String, Object> params = new MapBuilder<String,Object>()
+                .putIfNotEmpty("res_id",state.getResId())
+                .putIfNotEmpty("user_data",state.getId())
+                .put("areaId",state.getAreaId())
+                .build();
+
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
+        try {
+            rpcCaller.invoke(sessionContext, rpcrequest,true);
+        } catch (Throwable e) {
+            logger.error("调用失败",e);
+        }
     }
 }

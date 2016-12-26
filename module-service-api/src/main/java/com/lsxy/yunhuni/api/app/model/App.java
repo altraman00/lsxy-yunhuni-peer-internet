@@ -42,7 +42,7 @@ public class App extends IdEntity {
     private Integer isCallCenter;//是否启用呼叫中心服务 是否呼叫中心0否，1是',
     private String serviceType;//服务类型
     private AreaSip areaSip; //sip接入点信息
-    private Long callCenterNum;
+    private Long callCenterNum; //呼叫中心应用编号
 
     @Column(name = "is_call_center")
     public Integer getIsCallCenter() {

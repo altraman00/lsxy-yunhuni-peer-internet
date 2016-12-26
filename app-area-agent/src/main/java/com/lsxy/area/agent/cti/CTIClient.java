@@ -129,7 +129,7 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
             /*发送区域管理器请求次数计数*/
             if (sc != null) sc.getSendAreaServerRequestCount().incrementAndGet();
 
-            rpcCaller.invoke(sessionContext,areaRPCRequest);
+            rpcCaller.invoke(sessionContext,areaRPCRequest,true);
         } catch (Exception e) {
             logger.error("CTI事件通知区域管理器时发生异常,事件被丢失:{}-{}",rpcRequest.getMethod(), rpcRequest.getParams());
             logger.error("CTI事件通知区域管理器时发生异常",e);
