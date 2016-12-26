@@ -164,7 +164,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         if(data != null){
             switch (productCode){
                 case duo_call:{
-                    String sessionId = data.get(voiceCdr.getToNum());
+                    String sessionId = data.get(voiceCdr.getToNum().split("@")[0]);
                     voiceCdr.setSessionId(sessionId);
                     break;
                 }
