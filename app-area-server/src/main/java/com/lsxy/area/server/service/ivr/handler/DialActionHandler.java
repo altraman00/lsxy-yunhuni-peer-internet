@@ -232,6 +232,18 @@ public class DialActionHandler extends ActionHandler{
             rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Exception e) {
             logger.error("ivr 拨号出错:",e);
+            Map<String,Object> notify_data = new MapBuilder<String,Object>()
+                    .putIfNotEmpty("event","ivr.connect_end")
+                    .putIfNotEmpty("id",ivr_call_id)
+                    .putIfNotEmpty("begin_time",System.currentTimeMillis())
+                    .putIfNotEmpty("end_time",System.currentTimeMillis())
+                    .putIfNotEmpty("error","dial error")
+                    .build();
+            notifyCallbackUtil.postNotify(app.getUrl(),notify_data,null,3);
+            ivrActionService.doAction(ivr_call_id,new MapBuilder<String,Object>()
+                    .putIfNotEmpty("error","dial error")
+                    .build());
+            return false;
         }
 
         //保存业务数据，后续事件要用到

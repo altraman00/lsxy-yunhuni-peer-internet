@@ -77,7 +77,7 @@ public class Handler_MN_CH_EXT_VERIFY_CALL extends RpcRequestHandler{
                                     .put("user_data",call_id)
                                     .build());
                     try {
-                        rpcCaller.invoke(sessionContext,req);
+                        rpcCaller.invoke(sessionContext,req,true);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败", Constants.EVENT_EXT_VERIFY_CALL_SUCCESS,e);
                     }
@@ -92,7 +92,7 @@ public class Handler_MN_CH_EXT_VERIFY_CALL extends RpcRequestHandler{
                                     .put("user_data",call_id)
                                     .build());
                     try {
-                        rpcCaller.invoke(sessionContext,req);
+                        rpcCaller.invoke(sessionContext,req,true);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_FAIL,e);
                     }
@@ -104,7 +104,7 @@ public class Handler_MN_CH_EXT_VERIFY_CALL extends RpcRequestHandler{
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
                                     .put("method",Constants.EVENT_EXT_CALL_ON_TIMEOUT)
-                                    .put("user_data",call_id)
+                                    .put("user_data",call_id,true)
                                     .build());
                     try {
                         rpcCaller.invoke(sessionContext,req);

@@ -3,6 +3,7 @@ package com.lsxy.area.server.service.ivr.handler;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
+import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -38,6 +39,12 @@ public class PlayActionHandler extends ActionHandler{
     @Autowired
     private PlayFileUtil playFileUtil;
 
+    @Autowired
+    private NotifyCallbackUtil notifyCallbackUtil;
+
+    @Autowired
+    private IVRActionService ivrActionService;
+
     @Override
     public String getAction() {
         return "play";
@@ -52,6 +59,7 @@ public class PlayActionHandler extends ActionHandler{
         }
         String res_id = state.getResId();
         if(plays!=null && plays.size()>0){
+            businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT_FIELD,next);
             try {
                 plays = playFileUtil.convertArray(state.getTenantId(),state.getAppId(),plays);
                 Map<String, Object> params = new MapBuilder<String,Object>()
@@ -66,10 +74,21 @@ public class PlayActionHandler extends ActionHandler{
                 rpcCaller.invoke(sessionContext, rpcrequest);
             } catch (Throwable e) {
                 logger.error("调用失败",e);
+                if(StringUtils.isNotBlank(state.getCallBackUrl())){
+                    Map<String, Object> notify_data = new MapBuilder<String, Object>()
+                            .putIfNotEmpty("event", "ivr.play_end")
+                            .putIfNotEmpty("id", callId)
+                            .putIfNotEmpty("begin_time", System.currentTimeMillis())
+                            .putIfNotEmpty("end_time", System.currentTimeMillis())
+                            .putIfNotEmpty("error", "play error")
+                            .build();
+                    notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
+                }
+                ivrActionService.doAction(callId,new MapBuilder<String,Object>()
+                        .putIfNotEmpty("error","play error")
+                        .build());
             }
         }
-
-        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT_FIELD,next);
         return true;
     }
 }
