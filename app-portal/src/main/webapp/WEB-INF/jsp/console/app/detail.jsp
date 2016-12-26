@@ -800,6 +800,9 @@
      *触发放音文件分页
      */
     var pagePlay ;
+    function voiceRecordTab(){
+        $('#uploadButton').hide();
+    }
     function upplay(){
         $('#uploadButton').show();
         //获取数据总数
@@ -878,7 +881,7 @@
     $('#myTab li').click(function(){
         var type = $(this).attr('data-id');
         if(type=='voice'){
-            upvoice();
+            voiceRecordTab();
         }
         if(type=='play'){
             upplay();

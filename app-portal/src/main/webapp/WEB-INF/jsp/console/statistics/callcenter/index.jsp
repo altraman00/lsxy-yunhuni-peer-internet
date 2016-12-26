@@ -393,6 +393,7 @@
             },
             series: [
                 {
+                    name:'呼叫次数',
                     type:'line',
                     data:xd,
                     areaStyle: {normal: {}}
