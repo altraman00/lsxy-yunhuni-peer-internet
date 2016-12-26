@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by tandy on 16/8/5.
@@ -22,13 +23,14 @@ import java.util.Set;
  */
 @Component
 @Profile(value={"test","production", "development","localdev"})
-public class CTIClient implements RpcEventListener{
-
+public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable,UnitCallbacks{
 
     private static final Logger logger = LoggerFactory.getLogger(CTIClient.class);
 
     @Autowired(required = false)
     private StasticsCounter sc;
+
+    private int clientId;
 
     //本地unitid 由于需要通过环境变量设置值,所以不适用"." 而适用_
     @Value("${area_agent_client_cti_unitid:20}")
@@ -48,25 +50,49 @@ public class CTIClient implements RpcEventListener{
 
     @PostConstruct
     public void start() {
+        clientContext.init();
+
         if (logger.isDebugEnabled()) {
             logger.debug("开始启动CTI客户端,初始化UnitID:{}", localUnitID);
         }
 
-        Unit.initiate(localUnitID);
+        Unit.initiate(localUnitID,this);
         try {
-            Set<CTIClientConfigFactory.CTIClientConfig> configs = ctiClientConfigFactory.getConfigs();
-            for (CTIClientConfigFactory.CTIClientConfig config : configs) {
-                Commander commander = Unit.createCommander(config.clientId, config.ctiHost, this);
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug("client id {} create invoke complete, connect to {}", config.clientId, config.ctiHost);
-                }
-                clientContext.add(config.clientId, commander);
+            Set<String> servers = clientContext.getCTIServers();
+            for(String serverIp:servers) {
+                createNewCTICommander(serverIp);
             }
 
         } catch (Exception ex) {
             logger.error("CTI客户端启动失败",ex);
         }
+
+        //启动后台探测线程
+        runDaemonThread();
+    }
+
+    /**
+     * 创建新的CTI Commander连接对象
+     * @param serverIp
+     * @throws InterruptedException
+     */
+    private void createNewCTICommander(String serverIp) throws InterruptedException {
+        Unit.createCommander((byte)clientId, serverIp, this, this);
+        clientId = clientId + 2;
+        if (logger.isDebugEnabled()) {
+            logger.debug("client id {} create invoke complete, connect to {}", clientId, serverIp);
+        }
+    }
+
+    /**
+     * 启动监控线程
+     */
+    private void runDaemonThread() {
+        //启动监听线程
+        Thread deamonThread = new Thread(this);
+        deamonThread.setDaemon(true);
+        deamonThread.setName("CTIClientMonitorThread");
+        deamonThread.start();
     }
 
     @Override
@@ -110,4 +136,109 @@ public class CTIClient implements RpcEventListener{
         }
     }
 
+    /**
+     *  负载数据触发条件：
+     *     有变化时1s一条 无变化时120s一条 有连接建立时，无条件触发
+     * @param busAddress
+     * @param serverInfo
+     */
+    @Override
+    public void onServerLoadChanged(BusAddress busAddress, ServerInfo serverInfo) {
+        if(logger.isDebugEnabled()){
+            logger.debug("收到负载数据："+serverInfo);
+        }
+
+        String unitId = busAddress.getUnitId() + "";
+        String pid = busAddress.getClientId() + "";
+        CTINode node = clientContext.updateNodeLoadData(unitId,pid,serverInfo.getLoads());
+        if(node != null){
+            String param = String.format("node=%s&load=%s&cinNumber=%s&coutNumber=%s&cinCount=%s&coutCount=%s",node.getId(),node.getLoadValue(),node.getCinNumber(),node.getCoutNumber(),node.getCinCount(),node.getCoutCount());
+            try {
+                rpcCaller.invoke(sessionContext,RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_LOAD_DATA,param));
+            } catch (Exception e) {
+                logger.error("出现异常："+busAddress +":"+serverInfo,e);
+            }
+        }
+    }
+
+    @Override
+    public void run() {
+        while(true){
+            try {
+                TimeUnit.SECONDS.sleep(10);
+                if(logger.isDebugEnabled()){
+                    logger.debug("10秒一次尝试从Redis缓存加载CTI配置,当前状态：{}",clientContext );
+                }
+                //重新加载一次redis配置
+                clientContext.loadConfig();
+                Set<String> servers = clientContext.getCTIServers();
+                for (String serverIp : servers) {
+                    if(clientContext.isNewServerFound(serverIp)){
+                        if(logger.isDebugEnabled()){
+                            logger.debug("有新的CTI服务连接被发现：{}"+serverIp);
+                        }
+                        createNewCTICommander(serverIp);
+                    }
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void connectSucceed(Client client) {
+        if(logger.isDebugEnabled()){
+            logger.debug("CTI 服务连接成功：" + client.getIp() +":" + client.getPort());
+        }
+
+        if(client instanceof  Commander){
+            String serverIp = client.getIp();
+            clientContext.registerCommander(serverIp, (Commander) client);
+        }
+
+    }
+
+    @Override
+    public void connectFailed(Client client, int i) {
+        logger.error("CTI 服务连接失败：" + client.getIp() + ":" + client.getPort() +"=>"+i);
+    }
+
+    @Override
+    public void connectLost(Client client) {
+        logger.error("CTI 服务连接丢失："+client.getIp());
+        String ip = client.getIp();
+        byte unitid = client.getUnitId();
+        clientContext.ctiClientConnectionLost(ip,unitid);
+    }
+
+    /**
+     * 全局（整个 CTI BUS 上的连接状态变化事件）
+     *
+     * @param unitId     产生连接状态变化的BUS节点的Unit ID
+     * @param clientId   产生连接状态变化的BUS节点的Client ID。是node中心节点连接时，client id 值为 -1
+     * @param clientType 产生连接状态变化的BUS节点的Client Type<br>
+     *                   类型定义：
+     *                   <ul>
+     *                   <li>0: NULL</li>
+     *                   <li>1: BUS 服务</li>
+     *                   <li>2: IPSC（CTI服务进程）服务</li>
+     *                   <li>3: IPSC 监控服务</li>
+     *                   </ul>
+     * @param status     产生连接状态变化的BUS节点的连接状态 <br>
+     *                   状态值：
+     *                   <ul>
+     *                   <li>0: 断开连接</li>
+     *                   <li>1: 新建连接</li>
+     *                   <li>2: 已有的连接</li>
+     *                   </ul>
+     * @param addInfo    产生连接状态变化的BUS节点的附加信息
+     */
+    @Override
+    public void globalConnectStateChanged(byte unitId, byte clientId, byte clientType, byte status, String addInfo) {
+        //AA只关心类型为2的IPSC服务
+        if(clientType == 2){
+            clientContext.connectStateChanged(unitId,clientId,status);
+        }
+    }
 }

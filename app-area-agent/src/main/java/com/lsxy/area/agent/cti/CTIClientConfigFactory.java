@@ -1,12 +1,8 @@
 package com.lsxy.area.agent.cti;
 
-import com.lsxy.framework.config.SystemConfig;
-import org.springframework.context.annotation.Profile;
+import com.lsxy.framework.cache.manager.RedisCacheService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by tandy on 16/8/5.
@@ -17,9 +13,11 @@ import java.util.Set;
 @Component
 public class CTIClientConfigFactory {
 
-    private Set<CTIClientConfig> configs = new HashSet<>();
 
+    private int clientId= 0;
 
+    @Autowired
+    private RedisCacheService cacheService;
 
     class CTIClientConfig {
         String ctiHost;
@@ -31,18 +29,32 @@ public class CTIClientConfigFactory {
         }
     }
 
-    /**
-     * 初始化配置
-     * 到REDIS获取配置信息,初始化配置对象集合
-     */
-    @PostConstruct
-    public void initConfig(){
-        //TODO 去REDIS获取配置信息来初始化多个客户端配置
-        CTIClientConfig config = new CTIClientConfig((byte)0, SystemConfig.getProperty("area.agent.client.cti.host"));
-        this.configs.add(config);
-    }
+//    /**
+//     * 初始化配置
+//     * 到REDIS获取配置信息,初始化配置对象集合
+//     */
+//    @PostConstruct
+//    public void initConfig(){
+//        Set<String> servers = ctiConfigService.ctiServers();
+//
+//        servers.forEach((serverIp)->{
+//            newConfig(serverIp);
+//        });
+//    }
 
-    public Set<CTIClientConfig> getConfigs() {
-        return configs;
-    }
+//    /**
+//     * 发现新的配置
+//     * @param serverIp
+//     * @return
+//     */
+//    public CTIClientConfig newConfig(String serverIp){
+//        CTIClientConfig config = new CTIClientConfig((byte)((clientId)), serverIp);
+//        //客户端clientId采用偶数ID  基数为CTI Monitor
+//        clientId = clientId + 2;
+//        this.configs.registerCommander(config);
+//        return config;
+//    }
+
+
+
 }

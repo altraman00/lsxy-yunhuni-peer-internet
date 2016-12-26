@@ -1,10 +1,9 @@
 package com.lsxy.area.agent.handler.call;
 
-import com.lsxy.app.area.cti.BusAddress;
-import com.lsxy.app.area.cti.Commander;
 import com.lsxy.app.area.cti.RpcError;
 import com.lsxy.app.area.cti.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
+import com.lsxy.area.agent.cti.CTINode;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -21,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -48,18 +46,18 @@ public class Handler_MN_CH_SYS_CALL_PLAY_START extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        Commander cticlient = cticlientContext.getAvalibleClient();
+
         try {
             Map<String, Object> params = request.getParamMap();
             String call_id = (String)params.get("user_data");
             String res_id = (String)params.get("res_id");
-
+            CTINode cticlient = cticlientContext.getAvalibleNode(res_id);
             String content = (String)params.get("content");
             if(StringUtils.isNotEmpty(content)){
                 params.put("content", JSONUtil2.fromJson(content,(new Object[1][]).getClass()));
             }
 
-            cticlient.operateResource(new BusAddress((byte)0,(byte)0),res_id, "sys.call.play_start", params, new RpcResultListener(){
+            cticlient.operateResource( res_id, "sys.call.play_start", params, new RpcResultListener(){
                 @Override
                 protected void onResult(Object o) {
                     if(logger.isDebugEnabled()){

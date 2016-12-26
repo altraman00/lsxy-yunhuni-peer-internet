@@ -56,4 +56,5 @@ public class ServiceConstants {
 	public static final String MN_CH_RF_DELETED = "MN_CH_RF_DELETED";		//录音文件删除指令
 	public static final String MN_CH_RF_DELETED_OK = "MN_CH_RF_DELETED_OK";		//录音文件删除成功指令
 
+	public static final String CH_MN_CTI_LOAD_DATA = "CH_MN_CTI_LOAD_DATA";
 }
