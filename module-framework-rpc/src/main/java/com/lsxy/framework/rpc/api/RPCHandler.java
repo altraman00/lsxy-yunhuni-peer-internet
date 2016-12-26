@@ -35,7 +35,7 @@ public abstract class RPCHandler {
 	 * @return
 	 */
 	public static ExecutorService rpcHandlerExecutorService(String threadNamePattern) {
-		return new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, 0L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(QUEUE_CAPACITY),
+		return new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, 60L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(QUEUE_CAPACITY),
 				new BasicThreadFactory.Builder().namingPattern(threadNamePattern).build());
 	}
 
