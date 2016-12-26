@@ -55,7 +55,7 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
             types = new String[]{type};
         }
         if(App.PRODUCT_CALL_CENTER.equals(type)){
-            types = CallSession.PRODUCT_CODE;
+            types = CallSession.CALL_CENTER_PRODUCT_CODE;
         }
         String hql = "from VoiceCdrDay obj where "+StatisticsUtils.getSqlIsNull2(tenantId,appId, types)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.day";
         List<VoiceCdrDay>  list = this.list(hql,startTime,endTime);

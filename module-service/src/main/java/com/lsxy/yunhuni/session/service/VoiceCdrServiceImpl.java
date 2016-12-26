@@ -65,7 +65,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
             types = new String[]{type};
         }
         if(App.PRODUCT_CALL_CENTER.equals(type)){
-            types = CallSession.PRODUCT_CODE;
+            types = CallSession.CALL_CENTER_PRODUCT_CODE;
         }
         String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,types)+ " deleted=0 and   call_start_dt BETWEEN ? and ?";
         sql = "select "+StringUtil.sqlName(VoiceCdr.class)+sql+" order by call_start_dt desc ";
@@ -94,7 +94,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
             types = new String[]{type};
         }
         if(App.PRODUCT_CALL_CENTER.equals(type)){
-            types = CallSession.PRODUCT_CODE;
+            types = CallSession.CALL_CENTER_PRODUCT_CODE;
         }
         String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,types)+ " deleted=0 and   call_start_dt BETWEEN ? and ?";
         String sqlCount = "select count(1) "+sql;
@@ -127,12 +127,9 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
             types = new String[]{type};
         }
         if(App.PRODUCT_CALL_CENTER.equals(type)){
-            types = CallSession.PRODUCT_CODE;
+            types = CallSession.CALL_CENTER_PRODUCT_CODE;
         }
         String costType = " SUM(cost) as cost";
-        if(CallSession.TYPE_VOICE_RECORDING.equals(type)){
-            costType = " sum(record_size) as size,sum(cost) as money ";
-        }
         String sql = "select "+costType+" from db_lsxy_bi_yunhuni.tb_bi_voice_cdr  where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,types)+ " deleted=0  and call_start_dt BETWEEN ? and ? ";
         Map result = this.jdbcTemplate.queryForMap(sql,new Object[]{date1,date2});
         return result;

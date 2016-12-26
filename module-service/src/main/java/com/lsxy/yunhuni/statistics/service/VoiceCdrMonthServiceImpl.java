@@ -44,7 +44,7 @@ public class VoiceCdrMonthServiceImpl extends AbstractService<VoiceCdrMonth> imp
             types = new String[]{type};
         }
         if(App.PRODUCT_CALL_CENTER.equals(type)){
-            types = CallSession.PRODUCT_CODE;
+            types = CallSession.CALL_CENTER_PRODUCT_CODE;
         }
         String hql = "from VoiceCdrMonth obj where "+StatisticsUtils.getSqlIsNull2(tenantId,appId, types)+"  obj.dt between ?1 and ?2 ORDER BY obj.month";
         List<VoiceCdrMonth>list = this.list(hql,startTime,endTime);

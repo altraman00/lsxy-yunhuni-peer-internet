@@ -221,7 +221,7 @@ public class BillDetailController extends AbstractPortalController {
             values = new String[]{"callStartDt","fromNum","toNum","cost","costTimeLong"};
             serviceType = App.PRODUCT_VOICE;
         }else if("callcenter".equals(path)){
-            oType = CallSession.TYPE_VOICE_CALLBACK;
+            oType = CallSession.TYPE_CALL_CENTER;
             title = "呼叫中心";
             headers = new String[]{"呼叫时间","呼叫类型","主叫","被叫","消费金额","时长（秒）"};
             values = new String[]{"callStartDt","ivrType:1=呼入;2=呼出","fromNum","toNum","cost","costTimeLong"};
