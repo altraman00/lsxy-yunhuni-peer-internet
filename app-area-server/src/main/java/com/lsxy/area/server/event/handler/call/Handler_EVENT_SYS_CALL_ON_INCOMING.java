@@ -4,6 +4,7 @@ import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
+import com.lsxy.framework.core.exceptions.api.BalanceNotEnoughException;
 import com.lsxy.framework.core.exceptions.api.NumberNotAllowToCallException;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -16,6 +17,9 @@ import com.lsxy.yunhuni.api.app.service.ServiceType;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
+import com.lsxy.yunhuni.api.product.service.CalCostService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
@@ -68,6 +72,9 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
     @Autowired
     private TelnumLocationService telNumLocationService;
 
+    @Autowired
+    private CalCostService calCostService;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CALL_ON_INCOMING;
@@ -81,7 +88,6 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
      */
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        long start = System.currentTimeMillis();
         RPCResponse res = null;
         Map<String,Object> params = request.getParamMap();
         if(MapUtils.isEmpty(params)){
@@ -143,7 +149,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         }
         boolean isCallCenter = false;
         if(app.getServiceType().equals(App.PRODUCT_CALL_CENTER)){
-            if(app.getIsCallCenter() == null || app.getIsCallCenter() != 1){
+            if(!appService.enabledService(tenant.getId(),app.getId(), ServiceType.CallCenter)){
                 logger.info("[{}][{}]没有开通呼叫中心",tenant.getId(),app.getId());
                 return res;
             }
@@ -154,10 +160,16 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 return res;
             }
         }
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(isCallCenter ?
+                ProductCode.call_center.getApiCmd():ProductCode.ivr_call.getApiCmd(), app.getTenant().getId());
+        if(!isAmountEnough){
+            logger.info("[{}][{}]欠费，不能呼入",app.getId(),tenant.getId());
+            return res;
+        }
+
         if(logger.isDebugEnabled()){
             logger.debug("[{}][{}]开始处理ivr",tenant.getId(),app.getId());
         }
-        logger.info("incoming找号码耗时:{}",(System.currentTimeMillis() - start));
         ivrActionService.doActionIfAccept(app,tenant,res_id,from,to.getTelNumber(),calledLine.getId(),isCallCenter);
         return res;
     }
@@ -191,7 +203,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         //TODO 座席呼平台多少位？
         //TODO 如何判断座席
         //TODO 用于座席呼入压力测试,所以把"system"排除掉
-        if(!from.contains("system")){
+        if(!from.contains("10000")){
             if(from.length() >= 7 && from.length() <= 8){
                 //固话不带区号，加上区号
                 from = lineGateway.getAreaCode() + from;

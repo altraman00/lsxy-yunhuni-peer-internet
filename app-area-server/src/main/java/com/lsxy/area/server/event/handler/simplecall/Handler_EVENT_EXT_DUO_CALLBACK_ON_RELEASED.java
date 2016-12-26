@@ -100,8 +100,9 @@ public class Handler_EVENT_EXT_DUO_CALLBACK_ON_RELEASED extends EventHandler {
             String sessionId = entry.getValue();
             CallSession callSession = callSessionService.findById(sessionId);
             if(callSession != null){
-                callSession.setStatus(CallSession.STATUS_OVER);
-                callSessionService.save(callSession);
+                CallSession updateSession = new CallSession();
+                updateSession.setStatus(CallSession.STATUS_OVER);
+                callSessionService.update(callSession.getId(),updateSession);
             }
         }
         String appId = state.getAppId();

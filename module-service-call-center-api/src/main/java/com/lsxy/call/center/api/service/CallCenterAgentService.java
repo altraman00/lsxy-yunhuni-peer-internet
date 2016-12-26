@@ -83,9 +83,9 @@ public interface CallCenterAgentService extends BaseService<CallCenterAgent> {
      * @param state
      * @throws YunhuniApiException
      */
-    void state(String appId, String agentName, String state) throws YunhuniApiException;
+    String state(String appId, String agentName, String state) throws YunhuniApiException;
 
-    void state(String tenantId,String appId,String agentId, String state,boolean force) throws YunhuniApiException;
+    String state(String tenantId,String appId,String agentId, String state,boolean force) throws YunhuniApiException;
 
     String getState(String agentId) throws YunhuniApiException;
 

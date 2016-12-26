@@ -157,24 +157,26 @@ public class DeQueueServiceImpl implements DeQueueService {
             logger.debug("排队超时,tenantId={},appId={},callId={}",tenantId,appId,callId);
         }
         BusinessState state = businessStateService.get(callId);
+
+        if(state != null){
+            updateCallCenterTOMANUALRESULT(state,""+CallCenter.TO_MANUAL_RESULT_TIME_OUT);
+            try{
+                callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
+                        .Builder(state.getTenantId(),state.getAppId(),new Date())
+                        .setQueueNum(1L)
+                        .setQueueDuration((System.currentTimeMillis() - Long.parseLong(state.getBusinessData()
+                                .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD)))/1000)
+                        .build());
+            }catch (Throwable t){
+                logger.error("incrIntoRedis失败",t);
+            }
+            updateQueue(queueId,callId,null,null,null,CallCenterQueue.RESULT_FAIL);
+        }
         if(state == null || (state.getClosed() != null && state.getClosed())){
             logger.info("会话已关闭callid={}",callId);
             return;
         }
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
-
-        updateCallCenterTOMANUALRESULT(state,""+CallCenter.TO_MANUAL_RESULT_TIME_OUT);
-        try{
-            callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
-                    .Builder(state.getTenantId(),state.getAppId(),new Date())
-                    .setQueueNum(1L)
-                    .setQueueDuration((System.currentTimeMillis()
-                            - Long.parseLong(state.getBusinessData()
-                            .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD)))/1000)
-                    .build());
-        }catch (Throwable t){
-            logger.error("incrIntoRedis失败",t);
-        }
 
         callCenterUtil.sendQueueFailEvent(state.getCallBackUrl(),
                 queueId,CallCenterUtil.QUEUE_TYPE_IVR,
@@ -186,8 +188,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
             ivrActionService.doAction(callId,new MapBuilder<String,Object>()
                     .put("error",CallCenterUtil.QUEUE_FAIL_TIMEOUT).build());
-        }
-        updateQueue(queueId,callId,null,null,null,CallCenterQueue.RESULT_FAIL);
+        };
     }
 
     @Override
@@ -196,24 +197,28 @@ public class DeQueueServiceImpl implements DeQueueService {
             logger.debug("排队失败,tenantId={},appId={},callId={}",tenantId,appId,callId);
         }
         BusinessState state = businessStateService.get(callId);
+
+        if(state != null){
+            updateCallCenterTOMANUALRESULT(state,""+CallCenter.TO_MANUAL_RESULT_FAIL);
+            try{
+                callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
+                        .Builder(state.getTenantId(),state.getAppId(),new Date())
+                        .setQueueNum(1L)
+                        .setQueueDuration((System.currentTimeMillis()
+                                - Long.parseLong(state.getBusinessData()
+                                .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD)))/1000)
+                        .build());
+            }catch (Throwable t){
+                logger.error("incrIntoRedis失败",t);
+            }
+            updateQueue(queueId,callId,null,null,null,CallCenterQueue.RESULT_FAIL);
+        }
+
         if(state == null || (state.getClosed() != null && state.getClosed())){ 
             logger.info("会话已关闭callid={}",callId);
             return;
         }
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
-
-        updateCallCenterTOMANUALRESULT(state,""+CallCenter.TO_MANUAL_RESULT_FAIL);
-        try{
-            callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
-                    .Builder(state.getTenantId(),state.getAppId(),new Date())
-                    .setQueueNum(1L)
-                    .setQueueDuration((System.currentTimeMillis()
-                            - Long.parseLong(state.getBusinessData()
-                            .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD)))/1000)
-                    .build());
-        }catch (Throwable t){
-            logger.error("incrIntoRedis失败",t);
-        }
 
         callCenterUtil.sendQueueFailEvent(state.getCallBackUrl(),
                 queueId,CallCenterUtil.QUEUE_TYPE_IVR,
@@ -226,7 +231,6 @@ public class DeQueueServiceImpl implements DeQueueService {
             ivrActionService.doAction(callId,new MapBuilder<String,Object>()
                     .put("error",CallCenterUtil.QUEUE_FAIL_ERROR).build());
         }
-        updateQueue(queueId,callId,null,null,null,CallCenterQueue.RESULT_FAIL);
     }
 
     /**
@@ -249,22 +253,26 @@ public class DeQueueServiceImpl implements DeQueueService {
             if(callCenterQueue == null){
                 return;
             }
+            CallCenterQueue updateCallCenterQueue = new CallCenterQueue();
+
             Date cur = new Date();
-            callCenterQueue.setRelevanceId(callId);
+            updateCallCenterQueue.setRelevanceId(callId);
             if(conversationId != null){
-                callCenterQueue.setConversation(conversationId);
+                updateCallCenterQueue.setConversation(conversationId);
             }
             if(agentName != null){
-                callCenterQueue.setAgent(agentName);
+                updateCallCenterQueue.setAgent(agentName);
             }
             if(agentCallId != null){
-                callCenterQueue.setAgentCallId(agentCallId);
-                callCenterQueue.setInviteTime(cur);
+                updateCallCenterQueue.setAgentCallId(agentCallId);
+                updateCallCenterQueue.setInviteTime(cur);
             }
-            callCenterQueue.setEndTime(cur);
-            callCenterQueue.setToManualTime((callCenterQueue.getEndTime().getTime() - callCenterQueue.getStartTime().getTime()) / 1000);
-            callCenterQueue.setResult(result);
-            callCenterQueueService.save(callCenterQueue);
+            updateCallCenterQueue.setEndTime(cur);
+            if(callCenterQueue.getStartTime()!=null){
+                updateCallCenterQueue.setToManualTime((cur.getTime() - callCenterQueue.getStartTime().getTime()) / 1000);
+            }
+            updateCallCenterQueue.setResult(result);
+            callCenterQueueService.update(id,updateCallCenterQueue);
         }catch (Throwable t){
             logger.error("更新排队记录失败",t);
         }
@@ -279,8 +287,9 @@ public class DeQueueServiceImpl implements DeQueueService {
             }
             if(callCenter != null){
                 if(callCenter.getToManualResult() == null){
-                    callCenter.setToManualResult(result);
-                    callCenterService.save(callCenter);
+                    CallCenter updateCallcenter = new CallCenter();
+                    updateCallcenter.setToManualResult(result);
+                    callCenterService.update(callCenterId,updateCallcenter);
                 }
             }
         }catch (Throwable t){

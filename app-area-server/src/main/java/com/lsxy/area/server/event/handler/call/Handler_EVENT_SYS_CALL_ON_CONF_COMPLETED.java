@@ -113,10 +113,6 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
         if(StringUtils.isBlank(appId)){
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
-        App app = appService.findById(state.getAppId());
-        if(app == null){
-            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
-        }
         conversationService.logicExit(conversation_id,call_id);
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());

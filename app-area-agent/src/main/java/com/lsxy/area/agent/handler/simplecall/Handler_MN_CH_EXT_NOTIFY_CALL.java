@@ -1,10 +1,9 @@
 package com.lsxy.area.agent.handler.simplecall;
 
-import com.lsxy.app.area.cti.BusAddress;
-import com.lsxy.app.area.cti.Commander;
 import com.lsxy.app.area.cti.RpcError;
 import com.lsxy.app.area.cti.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
+import com.lsxy.area.agent.cti.CTINode;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -22,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -50,7 +48,7 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        Commander cticlient = cticlientContext.getAvalibleClient();
+
 
         if(logger.isDebugEnabled()){
             logger.debug("handler process_MN_CH_EXT_NOTIFY_CALL:{}",request);
@@ -59,6 +57,7 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
         Map<String, Object> params = request.getParamMap();
         String call_id = (String)params.get("user_data");
         try {
+            CTINode cticlient = cticlientContext.getAvalibleNode(null);
             String play_content = (String)params.get("play_content");
             if(StringUtils.isNotEmpty(play_content)){
                 params.put("play_content", JSONUtil2.fromJson(play_content,(new Object[1][]).getClass()));
@@ -66,7 +65,7 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
             if(logger.isDebugEnabled()){
                 logger.debug("调用CTI创建语音外呼资源，参数为{}", JSONUtil.objectToJson(params));
             }
-            String res_id = cticlient.createResource(new BusAddress((byte)0,(byte)0), "ext.notify_call", params, new RpcResultListener(){
+            String res_id = cticlient.createResource("ext.notify_call", params, new RpcResultListener(){
 
                 @Override
                 protected void onResult(Object o) {

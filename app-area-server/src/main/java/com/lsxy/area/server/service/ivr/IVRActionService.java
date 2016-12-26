@@ -31,6 +31,7 @@ import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
 import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
 import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -63,9 +64,10 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.*;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 /**
  * Created by liuws on 2016/9/1.
@@ -80,8 +82,6 @@ public class IVRActionService {
     private static final String ACCEPT_TYPE_TEXT_PLAIN = "text/plain;charset=utf-8";
 
     private static final int RETRY_TIMES = 3;
-
-    private CloseableHttpAsyncClient client = null;
 
     public static final int MAX_DURATION_SEC = 60 * 60 * 6;
 
@@ -135,6 +135,11 @@ public class IVRActionService {
 
     @Autowired
     private CallCenterStatisticsService callCenterStatisticsService;
+
+    private CloseableHttpAsyncClient client = null;
+
+    private ExecutorService worker = null;
+
     private Map<String,ActionHandler> handlers = new HashMap<>();
 
     private Schema schema = null;
@@ -144,6 +149,13 @@ public class IVRActionService {
         initClient();
         initHandler();
         initIVRSchema();
+        initWorker();
+    }
+
+    private void initWorker(){
+        //初始化100个线程，最多500个线程，最多积压1024个任务
+        worker = new ThreadPoolExecutor(100, 500, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1024),
+                new BasicThreadFactory.Builder().namingPattern("ivr-action-%s").build());
     }
     private void initIVRSchema() {
         try{
@@ -198,11 +210,11 @@ public class IVRActionService {
      * @return
      */
     public String getFirstIvr(final String call_id,final String url,String from){
-        long start = System.currentTimeMillis();
         String res = null;
         boolean success = false;
         int re_times = 0;
         do{
+            long start = System.currentTimeMillis();
             try{
                 HttpPost post = new HttpPost(url);
                 Map<String,Object> data = new MapBuilder<String,Object>()
@@ -224,14 +236,14 @@ public class IVRActionService {
                     res = receiveResponse(response);
                     success = true;
                 }
+                if(logger.isDebugEnabled()){
+                    logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
+                }
             }catch (Throwable t){
-                logger.error("调用{}失败",url);
+                logger.error("调用{}失败,耗时={}",url,(System.currentTimeMillis() - start));
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
-        if(logger.isDebugEnabled()){
-            logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
-        }
         return res;
     }
 
@@ -266,11 +278,11 @@ public class IVRActionService {
      * @return
      */
     private String getNextRequest(String call_id,String url,String prevAction,Map<String,Object> prevResults){
-        long start = System.currentTimeMillis();
         String res = null;
         boolean success = false;
         int re_times = 0;
         do{
+            long start = System.currentTimeMillis();
             try{
                 String target = inputUrl(url,"call_id",call_id);
                 if(prevAction != null){
@@ -299,14 +311,14 @@ public class IVRActionService {
                     res = receiveResponse(response);
                     success = true;
                 }
+                if(logger.isDebugEnabled()){
+                    logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
+                }
             }catch (Throwable t){
-                logger.error("调用{}失败",url);
+                logger.error("调用{}失败,耗时={}",url,(System.currentTimeMillis() - start));
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
-        if(logger.isDebugEnabled()){
-            logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
-        }
         return res;
     }
 
@@ -362,6 +374,7 @@ public class IVRActionService {
                 callCenter.setToNum(to);
                 callCenter.setStartTime(new Date());
                 callCenter.setType(""+CallCenter.CALL_IN);
+                callCenter.setCost(BigDecimal.ZERO);
                 callCenterService.save(callCenter);
                 try{
                     callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(tenant.getId(),app.getId(),
@@ -420,7 +433,11 @@ public class IVRActionService {
         }
     }
 
-    public boolean doAction(String call_id,Map<String,Object> prevResults){
+    public void doAction(String call_id,Map<String,Object> prevResults){
+        worker.execute(() -> this.doWork(call_id,prevResults));
+    }
+
+    private boolean doWork(String call_id,Map<String,Object> prevResults){
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
             logger.info("callId={}没有找到state",call_id);
