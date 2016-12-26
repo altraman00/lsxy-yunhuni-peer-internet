@@ -152,7 +152,11 @@ public class CTINode{
      */
     public String createResource(String name, Map<String, Object> params, RpcResultListener rpcResultListener) throws IOException, CreateCTIResoucesException {
         if(this.ctiCommander != null){
-            return ctiCommander.createResource(new BusAddress((byte)Integer.parseInt(this.getUnitId()),(byte)Integer.parseInt(this.getPid())),name,params,rpcResultListener);
+            BusAddress ba = new BusAddress((byte)Integer.parseInt(this.getUnitId()),(byte)Integer.parseInt(this.getPid()));
+            if(logger.isDebugEnabled()){
+                logger.debug("CTI节点创建资源:{}->{}",ba,this);
+            }
+            return ctiCommander.createResource(ba,name,params,rpcResultListener);
         }else{
             logger.error("node is not ready , can't create resource for : " + name + "("+params+") and node info is "+ this);
             throw new CreateCTIResoucesException(name,params,this);
@@ -162,7 +166,7 @@ public class CTINode{
 
     @Override
     public String toString() {
-        return String.format("cti node:%s(%s) => cint count : %s , cout count : %s , cin number : %s , cout number : %s",id,ip,cinCount,coutCount,cinNumber,coutNumber);
+        return String.format("cti node:%s(%s) ["+this.ready+"]["+this.status+"]=> cint count : %s , cout count : %s , cin number : %s , cout number : %s , commander : %s",id,ip,cinCount,coutCount,cinNumber,coutNumber,this.ctiCommander);
     }
 
     /**
@@ -175,7 +179,11 @@ public class CTINode{
      */
     public void operateResource(String resId, String method, Map<String, Object> params, RpcResultListener o) throws IOException, OperateCTIResoucesException {
         if(this.ctiCommander != null){
-            ctiCommander.operateResource(new BusAddress((byte)Integer.parseInt(this.getUnitId()),(byte)Integer.parseInt(this.getPid())),resId,method,params,o);
+            BusAddress ba = new BusAddress((byte)Integer.parseInt(this.getUnitId()),(byte)Integer.parseInt(this.getPid()));
+            if(logger.isDebugEnabled()){
+                logger.debug("CTI节点操作资源:{}->{}",ba,this);
+            }
+            ctiCommander.operateResource(ba,resId,method,params,o);
         }else{
             logger.error("node is not ready , can't operate resource for : " + resId +"=>"+ method+"("+params+") and node info is "+ this);
             throw new OperateCTIResoucesException(resId,method,params,this);

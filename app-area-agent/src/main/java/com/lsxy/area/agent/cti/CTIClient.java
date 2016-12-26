@@ -77,12 +77,11 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
      * @throws InterruptedException
      */
     private void createNewCTICommander(String serverIp) throws InterruptedException {
-        Commander commander = Unit.createCommander((byte)clientId, serverIp, this, this);
+        Unit.createCommander((byte)clientId, serverIp, this, this);
+        clientId = clientId + 2;
         if (logger.isDebugEnabled()) {
             logger.debug("client id {} create invoke complete, connect to {}", clientId, serverIp);
         }
-        clientContext.registerCommander(serverIp, commander);
-        clientId = clientId + 2;
     }
 
     /**
@@ -137,6 +136,12 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
         }
     }
 
+    /**
+     *  负载数据触发条件：
+     *     有变化时1s一条 无变化时120s一条 有连接建立时，无条件触发
+     * @param busAddress
+     * @param serverInfo
+     */
     @Override
     public void onServerLoadChanged(BusAddress busAddress, ServerInfo serverInfo) {
         if(logger.isDebugEnabled()){
@@ -145,7 +150,15 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
 
         String unitId = busAddress.getUnitId() + "";
         String pid = busAddress.getClientId() + "";
-        clientContext.updateNodeLoadData(unitId,pid,serverInfo.getLoads());
+        CTINode node = clientContext.updateNodeLoadData(unitId,pid,serverInfo.getLoads());
+        if(node != null){
+            String param = String.format("node=%s&load=%s&cinNumber=%s&coutNumber=%s&cinCount=%s&coutCount=%s",node.getId(),node.getLoadValue(),node.getCinNumber(),node.getCoutNumber(),node.getCinCount(),node.getCoutCount());
+            try {
+                rpcCaller.invoke(sessionContext,RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_LOAD_DATA,param));
+            } catch (Exception e) {
+                logger.error("出现异常："+busAddress +":"+serverInfo,e);
+            }
+        }
     }
 
     @Override
@@ -154,7 +167,7 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
             try {
                 TimeUnit.SECONDS.sleep(10);
                 if(logger.isDebugEnabled()){
-                    logger.debug("10秒一次尝试从Redis缓存加载CTI配置");
+                    logger.debug("10秒一次尝试从Redis缓存加载CTI配置,当前状态：{}",clientContext );
                 }
                 //重新加载一次redis配置
                 clientContext.loadConfig();
@@ -178,6 +191,12 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
         if(logger.isDebugEnabled()){
             logger.debug("CTI 服务连接成功：" + client.getIp() +":" + client.getPort());
         }
+
+        if(client instanceof  Commander){
+            String serverIp = client.getIp();
+            clientContext.registerCommander(serverIp, (Commander) client);
+        }
+
     }
 
     @Override
@@ -218,9 +237,8 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
     @Override
     public void globalConnectStateChanged(byte unitId, byte clientId, byte clientType, byte status, String addInfo) {
         //AA只关心类型为2的IPSC服务
-        if(clientId == 2){
+        if(clientType == 2){
             clientContext.connectStateChanged(unitId,clientId,status);
         }
-
     }
 }

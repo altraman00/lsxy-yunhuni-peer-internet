@@ -45,7 +45,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK_CANCEL extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        CTINode cticlient = cticlientContext.getAvalibleNode(null);
+
 
         if(logger.isDebugEnabled()){
             logger.debug("handler process_MN_CH_EXT_DUO_CALLBACK_CANCEL:{}",request);
@@ -54,6 +54,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK_CANCEL extends RpcRequestHandler{
         Map<String, Object> params = request.getParamMap();
         String call_id = (String)params.get("user_data");
         try {
+            CTINode cticlient = cticlientContext.getAvalibleNode(null);
             if(logger.isDebugEnabled()){
                 logger.debug("调用CTI取消双向回拔，参数为{}", JSONUtil.objectToJson(params));
             }

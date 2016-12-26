@@ -45,6 +45,9 @@ public class CTIClientContext {
         ipscNodes.forEach((snode)->{
             String key = KEY_CTI__NODE_PREFIX + ":" + snode;
             String sServer = (String) cacheService.hget(key,"ip");
+            if(logger.isDebugEnabled()){
+                logger.debug("cti node {} ip is {}",snode,sServer);
+            }
             if(StringUtil.isNotEmpty(sServer)){
                 sServer = sServer.substring(0,sServer.indexOf("-"));
                 if(!servers.contains(sServer)){
@@ -68,10 +71,20 @@ public class CTIClientContext {
      * @param commander
      */
     public void registerCommander(String serverIp, Commander commander) {
+        if(logger.isDebugEnabled()){
+            logger.debug("注册CTICommander{}:{}",serverIp,commander);
+        }
+
         clients.put(serverIp, commander);
         for(String key:nodes.keySet()){
             CTINode node = nodes.get(key);
-            if(node.getUnitId().equals(commander.getUnitId()+"")){
+            if(logger.isDebugEnabled()){
+                logger.debug("注册CTICommand到节点 {} vs {}",node.getUnitId(),commander.getConnectingUnitId());
+            }
+            if(node.getUnitId().equals(commander.getConnectingUnitId()+"")){
+                if(logger.isDebugEnabled()){
+                    logger.debug("注册CTICommander到节点:{}->{}",node.getId(),commander);
+                }
                 node.setCtiCommander(commander);
             }
         }
@@ -85,12 +98,17 @@ public class CTIClientContext {
      *                        eg:1.0.0-sys.call-11000016035539044
      * @return
      */
-    public CTINode getAvalibleNode(String referenceResId) {
+    public CTINode getAvalibleNode(String referenceResId) throws AvalibleCTINodeNotFoundException{
         CTINode node = null;
         if(StringUtil.isNotEmpty(referenceResId)){
             String nodeId = referenceResId.substring(0,referenceResId.indexOf("-"));
             node = nodes.get(nodeId);
-            logger.error("指定的参考资源ID未找到对应的CTI节点："+referenceResId);
+            if(logger.isDebugEnabled()){
+                logger.debug("根据参考资源ID{}找到对应的CTI节点:{}",referenceResId,node);
+            }
+            if(node == null){
+                throw new AvalibleCTINodeNotFoundException(this,referenceResId);
+            }
             return node;
         }
         //如果资源id为空，就查询负载最小的节点
@@ -114,10 +132,10 @@ public class CTIClientContext {
 
         if (node == null) {
             logger.error("没有找到一个有效的CTI客户端");
-
+            throw new AvalibleCTINodeNotFoundException(this,referenceResId);
         }else {
             if (logger.isDebugEnabled()) {
-                logger.debug("找到有效的CTINode:" + node);
+                logger.debug("找到负载最低的CTI节点:{},当前负载状况：{}" , node,nodes);
             }
         }
         return node;
@@ -126,11 +144,12 @@ public class CTIClientContext {
 
     /**
      * 是否是一个新的serverIp
+     * 新的serverIp 是没有创建 commaonder对象的，如果有创建commander对象，需要在clients中注册
      * @param serverIp
      * @return
      */
     public boolean isNewServerFound(String serverIp) {
-        return !this.servers.contains(serverIp);
+        return !this.clients.containsKey(serverIp);
     }
 
     public void remove(String ip) {
@@ -158,7 +177,7 @@ public class CTIClientContext {
      * sip.out.total.num=1000,
      * callout.num=405
      */
-    public void updateNodeLoadData(String unitId, String pid, Map<String, Integer> loadData) {
+    public CTINode updateNodeLoadData(String unitId, String pid, Map<String, Integer> loadData) {
         String nodeKey = "1."+unitId+"."+pid;
         CTINode node = nodes.get(nodeKey);
 
@@ -174,6 +193,7 @@ public class CTIClientContext {
                 logger.debug("CTI节点更新负载数据：{}", node);
             }
         }
+        return node;
     }
 
     /**
@@ -209,9 +229,15 @@ public class CTIClientContext {
     public void connectStateChanged(byte unitId, byte clientId, byte status) {
         String key = "1." + unitId + "." + clientId;
         if(status == 0){ //如果有连接断开
+            if(logger.isDebugEnabled()){
+                logger.debug("CTI节点断开连接:1.{}.{}",unitId,clientId);
+            }
             this.nodes.remove(key);
         }else if(status == 1 || status == 2){  //如果有新建立的连接 或者初始已有连接
             if(!this.nodes.containsKey(key)){
+                if(logger.isDebugEnabled()){
+                    logger.debug("CTI新节点加入:1.{}.{}",unitId,clientId);
+                }
                 String nodeRedisKey = KEY_CTI__NODE_PREFIX + ":" + key;
                 String sServer = (String) cacheService.hget(nodeRedisKey,"ip");
                 sServer = sServer.substring(0,sServer.indexOf("-"));
@@ -219,4 +245,14 @@ public class CTIClientContext {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        return "CTIClientContext{" +
+                ", servers=" + servers +
+                ", nodes=" + nodes +
+                ", clients=" + clients +
+                '}';
+    }
+
 }

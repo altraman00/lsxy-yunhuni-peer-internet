@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
@@ -13,7 +14,7 @@ import javax.annotation.PostConstruct;
  * Created by tandy on 16/7/30.
  * 区域客户端
  */
-//@Component
+@Component
 public class AreaClient {
 
     private static final Logger logger = LoggerFactory.getLogger(AreaClient.class);

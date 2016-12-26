@@ -89,17 +89,13 @@ public class BillDetailController extends AbstractRestController {
         RestResponse restResponse = null;
         if(StringUtil.isNotEmpty(appId)&&StringUtil.isNotEmpty(type)){
             //获取分页数据
-            if(CallSession.TYPE_VOICE_RECORDING.equals(type)){//录音
-
-            }else {
-                Page page = voiceCdrService.pageList(pageNo, pageSize, type, uid, time, appId);
-                re.put("page", page);
-                if (CallSession.TYPE_VOICE_VOICECODE.equals(type)) {//语音验证码
-                    re.put("total", page.getTotalCount());
-                } else {
-                    Map map = voiceCdrService.sumCost(type, uid, time, appId);
-                    re.put("total", map.get("cost"));
-                }
+            Page page = voiceCdrService.pageList(pageNo, pageSize, type, uid, time, appId);
+            re.put("page", page);
+            if (CallSession.TYPE_VOICE_VOICECODE.equals(type)) {//语音验证码
+                re.put("total", page.getTotalCount());
+            } else {
+                Map map = voiceCdrService.sumCost(type, uid, time, appId);
+                re.put("total", map.get("cost"));
             }
             restResponse = RestResponse.success(re);
         }else{
