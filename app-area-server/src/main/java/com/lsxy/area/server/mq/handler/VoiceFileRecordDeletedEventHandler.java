@@ -5,7 +5,7 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.mq.api.MQMessageHandler;
-import com.lsxy.framework.mq.events.portal.VoiceFilePlayDeleteEvent;
+import com.lsxy.framework.mq.events.portal.VoiceFileRecordDeleteEvent;
 import com.lsxy.framework.oss.OSSService;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
  * 用户中心删除对应的放音文件后，通知区域删除对应放音文件
  */
 @Component
-public class VoiceFileRecordDeletedEventHandler implements MQMessageHandler<VoiceFilePlayDeleteEvent> {
+public class VoiceFileRecordDeletedEventHandler implements MQMessageHandler<VoiceFileRecordDeleteEvent> {
     private static final Logger logger = LoggerFactory.getLogger(VoiceFileRecordDeletedEventHandler.class);
     private static Pattern pattern = Pattern.compile("^[0-9]*[1-9][0-9]*$");
     @Autowired
@@ -60,7 +60,7 @@ public class VoiceFileRecordDeletedEventHandler implements MQMessageHandler<Voic
     @Autowired
     private AppService appService;
     @Override
-    public void handleMessage(VoiceFilePlayDeleteEvent event) throws JMSException {
+    public void handleMessage(VoiceFileRecordDeleteEvent event) throws JMSException {
         if(logger.isDebugEnabled()){
             logger.debug("删除录音文件开启");
         }
