@@ -31,6 +31,7 @@ import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
 import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
 import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -63,10 +64,12 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.*;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 /**
  * Created by liuws on 2016/9/1.
@@ -81,8 +84,6 @@ public class IVRActionService {
     private static final String ACCEPT_TYPE_TEXT_PLAIN = "text/plain;charset=utf-8";
 
     private static final int RETRY_TIMES = 3;
-
-    private CloseableHttpAsyncClient client = null;
 
     public static final int MAX_DURATION_SEC = 60 * 60 * 6;
 
@@ -136,6 +137,11 @@ public class IVRActionService {
 
     @Autowired
     private CallCenterStatisticsService callCenterStatisticsService;
+
+    private CloseableHttpAsyncClient client = null;
+
+    private ExecutorService worker = null;
+
     private Map<String,ActionHandler> handlers = new HashMap<>();
 
     private Schema schema = null;
@@ -145,6 +151,13 @@ public class IVRActionService {
         initClient();
         initHandler();
         initIVRSchema();
+        initWorker();
+    }
+
+    private void initWorker(){
+        //初始化100个线程，最多1000个线程，最多积压1024个任务
+        worker = new ThreadPoolExecutor(100, 1000, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1024),
+                new BasicThreadFactory.Builder().namingPattern("ivr-action-%s").build());
     }
     private void initIVRSchema() {
         try{
@@ -167,9 +180,9 @@ public class IVRActionService {
                                 .setSocketTimeout(5000)
                                 .setConnectTimeout(5000).build())
                 //总共最多1000并发
-                .setMaxConnTotal(1000)
-                //每个host最多100并发
-                .setMaxConnPerRoute(100)
+                .setMaxConnTotal(3000)
+                //每个host最多300并发
+                .setMaxConnPerRoute(1000)
                 //禁用cookies
                 .disableCookieManagement()
                 .build();
@@ -199,11 +212,11 @@ public class IVRActionService {
      * @return
      */
     public String getFirstIvr(final String call_id,final String url,String from){
-        long start = System.currentTimeMillis();
         String res = null;
         boolean success = false;
         int re_times = 0;
         do{
+            long start = System.currentTimeMillis();
             try{
                 HttpPost post = new HttpPost(url);
                 Map<String,Object> data = new MapBuilder<String,Object>()
@@ -225,18 +238,18 @@ public class IVRActionService {
                     res = receiveResponse(response);
                     success = true;
                 }
+                if(logger.isDebugEnabled()){
+                    logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
+                }
             }catch (Throwable t){
-                logger.error("调用{}失败",url);
+                logger.error("调用{}失败,耗时={},error={}",url,(System.currentTimeMillis() - start),t);
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
-        if(logger.isDebugEnabled()){
-            logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
-        }
         return res;
     }
 
-    private static String inputUrl(String url,String key,String value){
+    private static String inputUrl(String url,String key,String value) throws UnsupportedEncodingException {
         URI uri = URI.create(url);
         String scheme = uri.getScheme();
         String host = uri.getHost();
@@ -246,9 +259,9 @@ public class IVRActionService {
         String query = uri.getQuery();
         String fragment = uri.getFragment();
         if(StringUtil.isEmpty(query)){
-            query = key + "=" + value;
+            query = key + "=" + URLEncoder.encode(value,"UTF-8");
         }else{
-            query = query + "&" + key + "=" + value;
+            query = query + "&" + key + "=" + URLEncoder.encode(value,"UTF-8");
         }
         if(p != -1){
             port = ":"+p;
@@ -267,11 +280,11 @@ public class IVRActionService {
      * @return
      */
     private String getNextRequest(String call_id,String url,String prevAction,Map<String,Object> prevResults){
-        long start = System.currentTimeMillis();
         String res = null;
         boolean success = false;
         int re_times = 0;
         do{
+            long start = System.currentTimeMillis();
             try{
                 String target = inputUrl(url,"call_id",call_id);
                 if(prevAction != null){
@@ -300,14 +313,14 @@ public class IVRActionService {
                     res = receiveResponse(response);
                     success = true;
                 }
+                if(logger.isDebugEnabled()){
+                    logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
+                }
             }catch (Throwable t){
-                logger.error("调用{}失败",url);
+                logger.error("调用{}失败,耗时={},error={}",url,(System.currentTimeMillis() - start),t);
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
-        if(logger.isDebugEnabled()){
-            logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
-        }
         return res;
     }
 
@@ -395,6 +408,8 @@ public class IVRActionService {
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
+                        //incoming是第一个会话所以是自己引用自己
+                        .put(BusinessState.REF_RES_ID,res_id)
                         //TYPE_IVR_INCOMING 才需要等待应答标记
                         .put(IVR_ANSWER_WAITTING_FIELD,"1")
                         //incoming事件from 和 to是相反的
@@ -422,7 +437,11 @@ public class IVRActionService {
         }
     }
 
-    public boolean doAction(String call_id,Map<String,Object> prevResults){
+    public void doAction(String call_id,Map<String,Object> prevResults){
+        worker.execute(() -> this.doWork(call_id,prevResults));
+    }
+
+    private boolean doWork(String call_id,Map<String,Object> prevResults){
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
             logger.info("callId={}没有找到state",call_id);
