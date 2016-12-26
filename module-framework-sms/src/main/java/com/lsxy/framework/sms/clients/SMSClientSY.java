@@ -101,7 +101,7 @@ public class SMSClientSY implements SMSClient {
 
     public static void main(String[] args) {
         SMSClientSY client = new SMSClientSY();
-        String result = client.sendsms("18826474526","【壹云】您的验证码是0000");
+        String result = client.sendsms("18826474526","【壹耘】您的验证码是0000");
         System.out.println("发送结果 :" + result);
     }
 

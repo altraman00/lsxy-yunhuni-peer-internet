@@ -35,10 +35,10 @@
                                     }
                                 });
                             }
-                            //                        marqueeContent[0]="<span >壹云有新的讯息1</span>";
-                            //                        marqueeContent[1]="<span >壹云有新的讯息2</span>";
-                            //                        marqueeContent[2]="<span >壹云有新的讯息3壹云有新的讯息3</span>";
-                            //                        marqueeContent[3]="<span >壹云有新的讯息4</span>";
+                            //                        marqueeContent[0]="<span >壹耘有新的讯息1</span>";
+                            //                        marqueeContent[1]="<span >壹耘有新的讯息2</span>";
+                            //                        marqueeContent[2]="<span >壹耘有新的讯息3壹耘有新的讯息3</span>";
+                            //                        marqueeContent[3]="<span >壹耘有新的讯息4</span>";
                             var marqueeInterval=new Array();
                             var marqueeId=0;
                             var marqueeDelay=2000;
