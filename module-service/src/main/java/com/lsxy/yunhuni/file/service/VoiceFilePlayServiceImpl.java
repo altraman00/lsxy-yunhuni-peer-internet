@@ -27,6 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 放音文件
@@ -221,5 +222,11 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
     public void renewSyncByAppId(String appId) {
         String sql = "UPDATE db_lsxy_bi_yunhuni.tb_bi_voice_file_play a SET a.sync=? WHERE a.app_id=? and a.deleted=0";
         jdbcTemplate.update(sql, 0, appId);
+    }
+    @Override
+    public List<Map> getOssListByDeleted() {
+        String sql = " SELECT id as id ,oss_url as ossUrl FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_play WHERE deleted=1 and status==1 and oss_url is not null and oss_url<>'' and (oss_deleted is null or oss_deleted<>1)";
+        List<Map> list = jdbcTemplate.queryForList(sql,Map.class);
+        return list;
     }
 }

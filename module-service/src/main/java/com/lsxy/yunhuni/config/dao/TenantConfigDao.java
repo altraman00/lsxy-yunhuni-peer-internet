@@ -10,5 +10,5 @@ import java.io.Serializable;
  * Created by zhangxb on 2016/8/23.
  */
 public interface TenantConfigDao extends BaseDaoInterface<TenantConfig, Serializable> {
-    TenantConfig findByTypeAndNameAndTenantId(String type, String name,String tenantId);
+    TenantConfig findByTypeAndKeyNameAndTenantIdAndAppId(String type, String name,String tenantId,String appId);
 }

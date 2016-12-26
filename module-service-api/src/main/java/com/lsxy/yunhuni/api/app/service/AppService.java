@@ -3,7 +3,6 @@ package com.lsxy.yunhuni.api.app.service;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
-import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 
 import java.util.Date;
 import java.util.List;
@@ -25,7 +24,7 @@ public interface AppService extends BaseService<App> {
      * @param tenantId 租户id
      * @return
      */
-    List<App> findAppByUserNameAndServiceType(String tenantId,String serviceType)  ;
+    List<App> findAppByTenantIdAndServiceType(String tenantId, String serviceType)  ;
     /**
      * 获取分页信息
      * @param tenantId 租户id
@@ -70,11 +69,11 @@ public interface AppService extends BaseService<App> {
      */
     List<App> getAppsByTenantId(String tenantId);
 
-
     /**
-     * 获取分机注册信息
-     * @param appId
-     * @return
+     * 创建应用
+     * @param app
      */
-    String findAppSipRegistrar(String appId);
+    App create(App app);
+
+    boolean enabledService(String tenantId,String appId,ServiceType service);
 }

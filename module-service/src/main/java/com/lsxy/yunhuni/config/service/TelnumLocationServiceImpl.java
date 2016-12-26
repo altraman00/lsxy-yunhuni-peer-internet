@@ -2,6 +2,7 @@ package com.lsxy.yunhuni.config.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.model.TelnumLocation;
 import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
 import com.lsxy.yunhuni.config.dao.TelnumLocationDao;
@@ -112,7 +113,7 @@ public class TelnumLocationServiceImpl extends AbstractService<TelnumLocation> i
             case TYPE_TELEPHONE:{
                 switch (telPhoneRule){
                     //全部加区号
-                    case "0":{
+                    case LineGateway.TELAREARULE_ADD_CODE:{
                         return num;
                     }
                     //被叫归属地与线路归属地一致,去掉区号
@@ -129,11 +130,11 @@ public class TelnumLocationServiceImpl extends AbstractService<TelnumLocation> i
             case TYPE_MOBILE:{
                 switch (mobileRule){
                     //全部加0
-                    case "0":{
+                    case LineGateway.MOBILEAREARULE_ADD_ZERO:{
                         return "0" + num;
                     }
                     //全部不加0
-                    case "1":{
+                    case LineGateway.MOBILEAREARULE_NOT_ADD_ZERO:{
                         return num;
                     }
                     //被叫归属地与线路归属地不一致，加0

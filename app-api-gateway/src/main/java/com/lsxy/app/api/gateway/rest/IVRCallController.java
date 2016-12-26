@@ -4,7 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.api.gateway.dto.IVRCallInputDTO;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.area.api.IVRService;
-import com.lsxy.area.api.exceptions.YunhuniApiException;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.web.utils.WebUtils;
 import org.slf4j.Logger;

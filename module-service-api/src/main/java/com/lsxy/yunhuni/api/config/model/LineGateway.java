@@ -22,6 +22,17 @@ import java.math.BigDecimal;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_line_gateway")
 public class LineGateway extends IdEntity {
+    public final static String STATUS_USABLE = "1";
+    public final static String STATUS_UNUSABLE = "0";
+    public final static String MOBILEAREARULE_ADD_ZERO = "0";
+    public final static String MOBILEAREARULE_NOT_ADD_ZERO = "1";
+    public final static String MOBILEAREARULE_ADD_ZERO_WHEN_EQ = "2";
+    public final static String TELAREARULE_ADD_CODE = "0";
+    public final static String TELAREARULE_ADD_CODE_WHEN_EQ = "2";
+    public final static String ISTHROUGH_TRUE = "1";
+    public final static String ISTHROUGH_FALSE = "0";
+    public final static String ISPUBLICLINE_TRUE = "1";
+    public final static String ISPUBLICLINE_FALSE = "0";
 
     private String lineNumber;  //线路标识
     private String operator;//运营商 中国电信；中国移动；中国联通
@@ -37,14 +48,15 @@ public class LineGateway extends IdEntity {
     private String mobileAreaRule;//手机区号规则 0=全部加0；1=全部不加0；2:=被叫归属地与线路归属地不一致，加0
     private String telAreaRule;//固话区号规则 0=一律加区号；1=一律不加区号；2=非与线路属于同一个归属地加区号
     private BigDecimal linePrice;//线路网关单价
-    private String isThrough;//是否透传
+    private String isThrough;//是否透传 1为可透传，0为不可透传
     private Integer quality;//质量 数字1-10
     private Integer capacity;//容量 数字
     private String remark;
     private String sipAuthIp;//sip接入点的外网IP地址
-    private String status;//状态
+    private String status;//状态 1为可用，0为不可用
     private String isPublicLine;//是否全局线路
 
+    @Transient
     private Integer priority;//优先级，临时数据，数据库不保存
 
     @Column(name="is_through")

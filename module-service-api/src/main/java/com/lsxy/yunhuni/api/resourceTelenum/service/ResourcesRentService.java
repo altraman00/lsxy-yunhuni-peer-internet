@@ -63,16 +63,18 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
     void cleanExpireTelnumResourceRent();
 
     /**
+     * 月租费
+     */
+    void monthlyRentTask();
+    /**
      * 号码租用自动扣费任务
      */
     void resourcesRentTask();
-
     /**
-     * 获取租户租用的号码
-     * @param id
-     * @return
+     * 录音容量月租扣费
      */
-    List<ResourcesRent> findByTenantId(String id);
+    void recordingVoiceFileTask();
+
     /**
      * 释放号码
      */
@@ -93,4 +95,6 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * 创建订单
      */
     TelenumOrder telnumNew(Tenant tenant, String[] numIds);
+    /** 对录音进行扣费*/
+    boolean recordCost(String tenantId,String appId);
 }

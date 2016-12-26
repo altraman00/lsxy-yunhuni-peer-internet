@@ -21,7 +21,6 @@ public class CallCenterConversation extends IdEntity {
     private String relevanceId;//所属呼叫中心
     private Date startTime;//发起时间
     private Date endTime;//结束时间
-    private String recordUrl;//录音文件URL
     @Column(name = "tenant_id")
     public String getTenantId() {
         return tenantId;
@@ -63,11 +62,4 @@ public class CallCenterConversation extends IdEntity {
         this.endTime = endTime;
     }
 
-    public String getRecordUrl() {
-        return recordUrl;
-    }
-
-    public void setRecordUrl(String recordUrl) {
-        this.recordUrl = recordUrl;
-    }
 }

@@ -80,7 +80,7 @@ public class Handler_MN_CH_SYS_CALL_CONF_ENTER extends RpcRequestHandler{
                 @Override
                 protected void onError(RpcError rpcError) {
                     logger.error("调用sys.call.conf_enter失败call_id={},result={}",call_id,rpcError);
-                    /*RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
+                    RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
                                     .put("method",Constants.EVENT_SYS_CALL_CONF_ENTER_FAIL)
                                     .put("user_data",call_id)
@@ -89,22 +89,22 @@ public class Handler_MN_CH_SYS_CALL_CONF_ENTER extends RpcRequestHandler{
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_CONF_ENTER_FAIL);
-                    }*/
+                    }
                 }
 
                 @Override
                 protected void onTimeout() {
                     logger.error("调用sys.call.conf_enter超时call_id={}",call_id);
-                    /*RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
+                    RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
-                                    .put("method",Constants.EVENT_SYS_CALL_CONF_ENTER_TIMEOUT)
+                                    .put("method",Constants.EVENT_SYS_CALL_CONF_ENTER_FAIL)
                                     .put("user_data",call_id)
                                     .build());
                     try {
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
-                        logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_CONF_ENTER_TIMEOUT);
-                    }*/
+                        logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_CONF_ENTER_FAIL);
+                    }
                 }
             });
             response.setMessage(RPCResponse.STATE_OK);

@@ -4,11 +4,10 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.IVRService;
-import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.framework.api.billing.service.CalBillingService;
-import com.lsxy.framework.api.tenant.model.TenantServiceSwitch;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
+import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -16,7 +15,7 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.config.model.LineGateway;
+import com.lsxy.yunhuni.api.app.service.ServiceType;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
@@ -79,23 +78,6 @@ public class IVRServiceImpl implements IVRService {
     @Autowired
     private AreaAndTelNumSelector areaAndTelNumSelector;
 
-    private boolean isEnableIVRService(String tenantId,String appId){
-        try {
-            TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
-            if(serviceSwitch != null && (serviceSwitch.getIsIvrService() == null || serviceSwitch.getIsIvrService() != 1)){
-                return false;
-            }
-            App app = appService.findById(appId);
-            if(app.getIsIvrService() == null || app.getIsIvrService() != 1){
-                return false;
-            }
-        } catch (Throwable e) {
-            logger.error("判断是否开启service失败",e);
-            return false;
-        }
-        return true;
-    }
-
     @Override
     public String ivrCall(String ip, String appId, String from, String to,
                           Integer maxDialDuration, Integer maxCallDuration, String userData) throws YunhuniApiException {
@@ -114,7 +96,7 @@ public class IVRServiceImpl implements IVRService {
             }
         }
 
-        if(!isEnableIVRService(tenantId,appId)){
+        if(!appService.enabledService(tenantId,appId, ServiceType.IvrService)){
             throw new AppServiceInvalidException();
         }
 
@@ -168,13 +150,15 @@ public class IVRServiceImpl implements IVRService {
                                     .setTenantId(tenantId)
                                     .setAppId(appId)
                                     .setId(callId)
-                                    .setType("ivr_call")
+                                    .setType(BusinessState.TYPE_IVR_CALL)
+                                    .setCallBackUrl(app.getUrl())
                                     .setAreaId(areaId)
                                     .setLineGatewayId(lineId)
-                                    .setBusinessData(new MapBuilder<String,Object>()
+                                    .setUserdata(userData)
+                                    .setBusinessData(new MapBuilder<String,String>()
                                             .putIfNotEmpty("from",from)
                                             .putIfNotEmpty("to",to)
-                                            .putIfNotEmpty("sessionid",callSession.getId())
+                                            .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                                             .build())
                                     .build();
         businessStateService.save(callstate);

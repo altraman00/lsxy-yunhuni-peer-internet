@@ -35,7 +35,7 @@ public class Handler_MN_CH_RF_SYNC_OK extends RpcRequestHandler {
     private static final Logger logger = LoggerFactory.getLogger(Handler_MN_CH_RF_SYNC_OK.class);
     @Override
     public String getEventName() {
-        return ServiceConstants.MN_CH_VF_SYNC_OK;
+        return ServiceConstants.MN_CH_RF_SYNC_OK;
     }
     @Autowired
     private VoiceFileRecordService voiceFileRecordService;

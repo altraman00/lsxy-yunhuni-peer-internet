@@ -16,12 +16,36 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_call_center_conversation_member")
 public class CallCenterConversationMember extends IdEntity {
+    public static final String INITIATOR_TRUE = "1";
+    public static final String INITIATOR_FALSE = "0";
+    public static final String AGENT_TRUE = "1";
+    public static final String AGENT_FALSE = "0";
+
+    public static final Integer MODE_I_O=1;//收放音
+    public static final Integer MODE_I = 2;//收音
+    public static final Integer MODE_O = 3;//放音
+    public static final Integer MODE_N = 4;//无
+    public static final Integer MODE_DEFAULT = MODE_I_O;
+
+    private String callId;
     private String relevanceId;//所属呼叫中心交谈
     private Date startTime;//发起时间
     private Date endTime;//结束时间
     private String sessionId;//加入的session
     private String joinNum;//加入的号码
     private String isInitiator;//是否发起方
+    private String isAgent;//是否坐席
+    private Integer mode;//说听模式
+
+    @Column(name = "call_id")
+    public String getCallId() {
+        return callId;
+    }
+
+    public void setCallId(String callId) {
+        this.callId = callId;
+    }
+
     @Column(name = "relevance_id")
     public String getRelevanceId() {
         return relevanceId;
@@ -69,5 +93,23 @@ public class CallCenterConversationMember extends IdEntity {
 
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
+    }
+
+    @Column(name = "is_agent")
+    public String getIsAgent() {
+        return isAgent;
+    }
+
+    public void setIsAgent(String isAgent) {
+        this.isAgent = isAgent;
+    }
+
+    @Column(name = "mode")
+    public Integer getMode() {
+        return mode;
+    }
+
+    public void setMode(Integer mode) {
+        this.mode = mode;
     }
 }

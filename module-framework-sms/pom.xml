@@ -16,7 +16,14 @@
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-kernel</artifactId>
             <version>1.7.3</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>javax.servlet</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.apache.axis2/axis2-xmlbeans -->
         <dependency>
             <groupId>org.apache.axis2</groupId>

@@ -18,6 +18,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -113,6 +114,11 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
             }
         }
         return result;
+    }
+
+    @Override
+    public List<LineGateway> findByIds(Collection<String> ids) {
+        return lineGatewayDao.findByIdIn(ids);
     }
 
 

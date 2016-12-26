@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -66,5 +67,4 @@ public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serial
     @Query("update ResourcesRent rent set rent.rentExpire=:expireTime where rent.id=:id")
     void updateResourceRentExpireTime(@Param("id") String id,@Param("expireTime") Date expireTime);
 
-    List<ResourcesRent> findByTenantIdAndRentStatusIn(String tenantId, List<Integer> status);
 }

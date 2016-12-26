@@ -65,13 +65,13 @@
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />
-        <appender-ref ref="gelf" />
+        <!--<appender-ref ref="gelf" />-->
         <appender-ref ref="ROLLINGFILE"/>
     </root>
 
 
     <logger name="com.lsxy" level="DEBUG" additivity="true" />
-    <logger name="com.lsxy.framework.rpc" level="INFO" additivity="true" />
+    <logger name="com.lsxy.framework.rpc.netty.codec" level="INFO" additivity="true" />
     <logger name="com.lsxy.framework.config" level="INFO" additivity="true" />
     <logger name="com.lsxy.framework.monitor" level="INFO" additivity="true" />
     <logger name="org.springframework" level="ERROR" additivity="true" />

@@ -54,6 +54,7 @@ public class TestController {
     private AsyncRequestContext asyncRequestContext;
 
 
+
     @RequestMapping("/test/clean/sa")
     public RestResponse cleanStasticCount(){
         if(sc != null) sc.reset();
@@ -85,25 +86,26 @@ public class TestController {
     public RestResponse<String> doCallPressureTest(@PathVariable int threads,@PathVariable  int count){
         ExecutorService es = Executors.newFixedThreadPool(threads);
 
-        long starttime = System.currentTimeMillis();
-        long result = 0L;
-        for(int i=0;i<threads;i++){
-            es.submit(new CallTask(count));
-        }
-        es.shutdown();;
-        try {
-            while (!es.awaitTermination(10000, TimeUnit.MILLISECONDS)) {
-                System.out.println("还在跑,线程池没有关闭");
-            }
-
-            result = System.currentTimeMillis() - starttime;
-            if(logger.isDebugEnabled()){
-                logger.debug("整个测试全部完成,共耗时:{}ms",result);
-            }
-        } catch (InterruptedException e) {
-            logger.error("线程池异常",e);
-        }
-        return RestResponse.success("测试完毕,共耗时:"+result+"ms");
+        testService.rpcPresureTest(threads,count);
+//        long starttime = System.currentTimeMillis();
+//        long result = 0L;
+//        for(int i=0;i<threads;i++){
+//            es.submit(new CallTask(count));
+//        }
+//        es.shutdown();;
+//        try {
+//            while (!es.awaitTermination(10000, TimeUnit.MILLISECONDS)) {
+//                System.out.println("还在跑,线程池没有关闭");
+//            }
+//
+//            result = System.currentTimeMillis() - starttime;
+//            if(logger.isDebugEnabled()){
+//                logger.debug("整个测试全部完成,共耗时:{}ms",result);
+//            }
+//        } catch (InterruptedException e) {
+//            logger.error("线程池异常",e);
+//        }
+        return RestResponse.success("调用完毕");
     }
 
 
@@ -129,7 +131,7 @@ public class TestController {
                         logger.debug("[{}]收到返回值:{},共花费:{}ms", c , xx, System.currentTimeMillis() - startdt);
                     }
                 }catch (Exception ex){
-
+                    logger.error("出现异常",ex);
                 }
             }
             if(logger.isDebugEnabled()){

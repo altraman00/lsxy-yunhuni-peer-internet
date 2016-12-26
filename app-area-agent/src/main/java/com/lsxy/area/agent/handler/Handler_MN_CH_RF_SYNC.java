@@ -32,6 +32,7 @@ public class Handler_MN_CH_RF_SYNC extends RpcRequestHandler{
     private static final Logger logger = LoggerFactory.getLogger(Handler_MN_CH_RF_SYNC.class);
     //文件保存地址 area.agent.file.play "/data/prd/p/0"
     private static final String path = SystemConfig.getProperty("area.agent.file.play");
+    private static String repository= SystemConfig.getProperty("global.oss.aliyun.bucket");
     @Autowired
     private OSSService ossService ;
     @Autowired
@@ -41,7 +42,7 @@ public class Handler_MN_CH_RF_SYNC extends RpcRequestHandler{
     private RPCCaller rpcCaller;
     @Override
     public String getEventName() {
-        return ServiceConstants.MN_CH_VF_SYNC;
+        return ServiceConstants.MN_CH_RF_SYNC;
     }
 
     @Override
@@ -78,11 +79,11 @@ public class Handler_MN_CH_RF_SYNC extends RpcRequestHandler{
                 String ymd = DateUtils.formatDate(new Date(), "yyyyMMdd");
                 String ossUri = "tenant_res/" + map.get("tenantId") + "/record_voice/" + map.get("appId") + "/" + ymd + "/" + fileName;
                 String tempUri = "/tmp/" + fileName;
+                logger.info("打包文件地址:["+tempUri+"]");
                 //进行压缩
-                ZipUtil.zip(list, fileName);
+                ZipUtil.zip(list, tempUri);
                 //上传文件
                 File file = new File(tempUri);
-                String repository = "";
                 boolean flag = true;
                 try {
                     //设置为流格式

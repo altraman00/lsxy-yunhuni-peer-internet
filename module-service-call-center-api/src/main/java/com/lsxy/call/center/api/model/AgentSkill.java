@@ -16,16 +16,24 @@ import javax.persistence.Table;
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_call_center_agent_skill")
 public class AgentSkill extends IdEntity {
 
-    public final static Integer ACTIVE_TRUE = 1;
-    public final static Integer ACTIVE_FALSE = 0;
-
     private String tenantId;
     private String appId;
     private String agent;
     private String name;
-    private Integer level;
-    private Integer active;//0 1
+    private Integer score;
+    private Boolean enabled;
 
+    public AgentSkill() {
+    }
+
+    public AgentSkill(String tenantId, String appId, String agent, String name, Integer score, Boolean enabled) {
+        this.tenantId = tenantId;
+        this.appId = appId;
+        this.agent = agent;
+        this.name = name;
+        this.score = score;
+        this.enabled = enabled;
+    }
 
     @Column(name = "tenant_id")
     public String getTenantId() {
@@ -63,22 +71,22 @@ public class AgentSkill extends IdEntity {
         this.name = name;
     }
 
-    @Column(name = "level")
-    public Integer getLevel() {
-        return level;
+    @Column(name = "score")
+    public Integer getScore() {
+        return score;
     }
 
-    public void setLevel(Integer level) {
-        this.level = level;
+    public void setScore(Integer score) {
+        this.score = score;
     }
 
-    @Column(name = "active")
-    public Integer getActive() {
-        return active;
+    @Column(name = "enabled")
+    public Boolean getEnabled() {
+        return enabled;
     }
 
-    public void setActive(Integer active) {
-        this.active = active;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 }
 

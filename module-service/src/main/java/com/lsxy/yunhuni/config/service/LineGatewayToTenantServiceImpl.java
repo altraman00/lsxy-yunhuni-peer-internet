@@ -48,7 +48,7 @@ public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayT
             for(LineGatewayToTenant ltt:list){
                 LineGateway lineGateway = ltt.getLineGateway();
                 //TODO 判断线路是否可用
-                if("1".equals(lineGateway.getStatus())){
+                if(LineGateway.STATUS_USABLE.equals(lineGateway.getStatus())){
                     lineGateway.setPriority(ltt.getPriority());
                     lineGateways.add(lineGateway);
                 }
@@ -72,9 +72,9 @@ public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayT
         return this.countByCustom(hql);
     }
     @Override
-    public int getMaxPriority() {
-        String sql = " SELECT IFNULL(MAX(priority),0) FROM db_lsxy_bi_yunhuni.tb_oc_linegateway_to_tenant WHERE deleted=0";
-        int result = jdbcTemplate.queryForObject(sql,Integer.class);
+    public int getMaxPriority(String tenantId) {
+        String sql = " SELECT IFNULL(MAX(priority),0) FROM db_lsxy_bi_yunhuni.tb_oc_linegateway_to_tenant WHERE deleted=0 and tenant_id=?";
+        int result = jdbcTemplate.queryForObject(sql,Integer.class,tenantId);
         return result;
     }
 
@@ -108,7 +108,8 @@ public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayT
     }
 
     @Override
-    public void removeTenantLine(String id) {
+    public void removeTenantLine(String id,String tenantId) {
+        int o3 = this.getMaxPriority(tenantId);
         LineGatewayToTenant lineGatewayToTenant = this.findById(id);
         //删除线路关系
         try {
@@ -117,7 +118,6 @@ public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayT
             throw new RuntimeException("删除失败");
         }
         //修正优先级
-        int o3 = this.getMaxPriority();
         if(o3!=lineGatewayToTenant.getPriority()){
             int re = this.upPriority(lineGatewayToTenant.getPriority(),o3,null);
             if(re==-1){

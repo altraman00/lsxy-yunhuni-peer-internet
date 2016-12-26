@@ -4,28 +4,36 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.call.center.api.model.AgentSkill;
 import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.call.center.api.model.CallCenterAgent;
-import com.lsxy.call.center.api.model.EnQueue;
-import com.lsxy.call.center.api.service.AgentSkillService;
-import com.lsxy.call.center.api.service.AppExtensionService;
-import com.lsxy.call.center.api.service.CallCenterAgentService;
-import com.lsxy.call.center.api.service.DeQueueService;
-import com.lsxy.call.center.dao.AgentSkillDao;
-import com.lsxy.call.center.dao.AppExtensionDao;
+import com.lsxy.call.center.api.model.Condition;
+import com.lsxy.call.center.api.operations.AgentSkillOperationDTO;
+import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.dao.CallCenterAgentDao;
+import com.lsxy.call.center.states.lock.AgentLock;
+import com.lsxy.call.center.states.lock.ExtensionLock;
+import com.lsxy.call.center.states.state.AgentState;
+import com.lsxy.call.center.states.state.ExtensionState;
+import com.lsxy.call.center.states.statics.ACs;
+import com.lsxy.call.center.states.statics.CAs;
+import com.lsxy.call.center.utils.ExpressionUtils;
+import com.lsxy.call.center.utils.Lua;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
-import com.lsxy.framework.core.utils.BeanUtils;
-import com.lsxy.framework.core.utils.StringUtil;
-import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.core.exceptions.api.*;
+import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.framework.core.utils.Page;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.util.List;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by zhangxb on 2016/10/21.
@@ -38,203 +46,552 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     @Autowired
     private CallCenterAgentDao callCenterAgentDao;
-
     @Autowired
     private AgentSkillService agentSkillService;
-
     @Autowired
     private AppExtensionService appExtensionService;
-
-    @Autowired
-    private AppExtensionDao appExtensionDao;
-
-    @Autowired
-    private AgentSkillDao agentSkillDao;
-
     @Reference(lazy = true,check = false,timeout = 3000)
     private DeQueueService deQueueService;
-
-    @Autowired
-    private RedisCacheService redisCacheService;
-
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
     @Autowired
-    private MQService mqService;
+    private ChannelService channelService;
+    @Autowired
+    private ConditionService conditionService;
+    @Autowired
+    private ExtensionState extensionState;
+    @Autowired
+    private AgentState agentState;
+    @Autowired
+    private RedisCacheService redisCacheService;
+    @Autowired
+    private ACs aCs;
+    @Autowired
+    private CAs cAs;
+    @Autowired
+    private AgentActionLogService agentActionLogService;
+    @Autowired
+    private EnQueueService enQueueService;
+
 
     @Override
     public BaseDaoInterface<CallCenterAgent, Serializable> getDao() {
         return callCenterAgentDao;
     }
 
+
+    /**
+     * 座席和技能是临时数据，所以删除采用物理删除
+     * @param id
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    @Override
+    @CacheEvict(value = "entity", key = "'entity_' + #id", beforeInvocation = true)
+    public void delete(Serializable id) throws IllegalAccessException, InvocationTargetException {
+        CallCenterAgent one = callCenterAgentDao.findOne(id);
+        callCenterAgentDao.delete(one);
+    }
+
+    /**
+     * 座席和技能是临时数据，所以删除采用物理删除
+     * @param entity
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    @CacheEvict(value = "entity", key = "'entity_' + #entity.id", beforeInvocation = true)
+    @Override
+    public void delete(CallCenterAgent entity) throws IllegalAccessException, InvocationTargetException {
+        callCenterAgentDao.delete(entity);
+    }
+
     //登陆
     @Override
-    public String login(String tenantId,String appId,CallCenterAgent callCenterAgent,List<AppExtension> extentions,List<AgentSkill> skills){
-        if(StringUtil.isEmpty(tenantId)){
-            throw new NullPointerException();
+    public String login(CallCenterAgent agent) throws YunhuniApiException {
+        //座席不能为空
+        if(StringUtils.isBlank(agent.getName())){
+            throw new RequestIllegalArgumentException();
         }
-        if(StringUtil.isEmpty(appId)){
-            throw new NullPointerException();
+        //通道不能为空
+        if(StringUtils.isBlank(agent.getChannel())){
+            throw new RequestIllegalArgumentException();
         }
-
-        CallCenterAgent agent = new CallCenterAgent();
-        agent.setTenantId(tenantId);
-        agent.setAppId(appId);
-        agent.setAgentNo(callCenterAgent.getAgentNo());
-        agent.setAgentNum(callCenterAgent.getAgentNum());
-
-        String agentId = this.save(agent).getId();
-        if(extentions!=null && extentions.size()>0){
-            for (AppExtension extension : extentions) {
-                //TODO 设置坐席的分机
+        //初始化座席状态
+        if(StringUtils.isBlank(agent.getState())){
+            agent.setState(CallCenterAgent.STATE_ONLINE);
+        }else if(!agent.getState().equals("busy") && !agent.getState().equals("away") && !agent.getState().equals("idle") && !agent.getState().startsWith("busy/") && !agent.getState().startsWith("away/")){
+            throw new RequestIllegalArgumentException();
+        }
+        //校验通道
+        channelService.findOne(agent.getTenantId(), agent.getAppId(), agent.getChannel());
+        CallCenterAgent oldAgent = callCenterAgentDao.findByAppIdAndName(agent.getAppId(),agent.getName());
+        if(oldAgent != null){
+            Long lastRegTime = agentState.getLastRegTime(oldAgent.getId());
+            //TODO 注册是否过期，过期执行注销过程
+            if(lastRegTime == null || (System.currentTimeMillis() - lastRegTime) > 10 * 60 * 1000){
+                //TODO 注销
+                logout(agent.getTenantId(), agent.getAppId(), agent.getName(), true);
+            }else{
+                //TODO 注册没有过期
+                throw new AgentHasAlreadyLoggedInException();
             }
         }
-        if(skills!=null && skills.size()>0){
-            for (AgentSkill obj : skills) {
-                AgentSkill skill = new AgentSkill();
-                try {
-                    BeanUtils.copyProperties(skill,obj);
-                } catch (Throwable e) {
-                    throw new IllegalArgumentException(e);
+        //分机ID
+        String extensionId = agent.getExtension();
+        if(StringUtils.isBlank(extensionId)){
+           throw new RequestIllegalArgumentException();
+        }
+        AppExtension extension = appExtensionService.findOne(agent.getAppId(),extensionId);
+        if(extension == null){
+            throw new ExtensionNotExistException();
+        }
+        //获取分机锁
+        ExtensionLock extensionLock = new ExtensionLock(redisCacheService,extensionId);
+        boolean lock = extensionLock.lock();
+        //获取锁失败 抛异常
+        if(!lock){
+            throw new ExtensionBindingToAgentException();
+        }
+        try{
+            String extentionAgent = extensionState.getAgent(extensionId);
+            if(StringUtils.isNotBlank(extentionAgent)){
+                throw new ExtensionBindingToAgentException();
+            }
+            String agentId = this.save(agent).getId();
+            //匹配的条件集合
+            List<Condition> suitedConditions = new ArrayList<>();
+            Map<String,Long> conditionScore = new HashMap<>();
+                Map<String,Integer> skillScore = new HashMap<>();
+                if(agent.getSkills()!=null && agent.getSkills().size()>0){
+                for(AgentSkill obj:agent.getSkills()){
+                    //TODO 处理技能，不让技能名称重复
+                    if(StringUtils.isBlank(obj.getName())){
+                        throw new RequestIllegalArgumentException();
+                    }
+                    if(obj.getScore() == null){
+                        obj.setScore(0);
+                    }
+                    if(obj.getEnabled() == null){
+                        obj.setEnabled(false);
+                    }
+                    obj.setTenantId(agent.getTenantId());
+                    obj.setAppId(agent.getAppId());
+                    obj.setAgent(agentId);
+                    agentSkillService.save(obj);
+                    if(obj.getEnabled()){
+                        skillScore.put(obj.getName(),obj.getScore());
+                    }
                 }
-                skill.setTenantId(tenantId);
-                skill.setAppId(appId);
-                skill.setAgent(agentId);
-                agentSkillService.save(skill);
+
+                //查询指定通道下所有条件集合，查出匹配的条件
+                setSuitedConditionsAndConditionScore(agent, suitedConditions, conditionScore, skillScore);
             }
+            //写入登录日志
+            agentActionLogService.agentLogin(agent);
+            //转成lua?
+//            //TODO 设置座席分机
+//            agentState.setExtension(agentId,extensionId);
+//            agentState.setLastRegTime(agentId,System.currentTimeMillis());
+//            agentState.setLastTime(agentId,System.currentTimeMillis());
+//            agentState.setState(agentId,agent.getState());
+//            //TODO 设置分机座席
+//            extensionState.setAgent(extensionId,agentId);
+//            suitedConditions.parallelStream().forEach(condition -> {
+//                //TODO 设置条件座席
+//                cAs.add(condition.getId(),agentId,conditionScore.get(condition.getId()));
+//                //TODO 设置座席条件
+//                aCs.add(agentId,condition.getId(),condition.getPriority());
+//            });
+            //lua 实现
+            int keyCount = 2;
+            List<String> evalStr = new LinkedList<>();
+            //座席状态key
+            evalStr.add(AgentState.getKey(agentId));
+            //分机状态key
+            evalStr.add(ExtensionState.getKey(extensionId));
+            //座席状态各个属性
+            evalStr.add("extension," + extensionId + ",lastRegTime," + System.currentTimeMillis() + ",lastTime," + System.currentTimeMillis());
+            //因为不知道传进来的state会不会包含","号，所以单独分出来
+            evalStr.add(agent.getState());
+            //分机的座席
+            evalStr.add(agentId);
+            if(suitedConditions != null && suitedConditions.size()>0){
+                String aCsKey = ACs.getKey(agentId);
+                StringBuffer bf = new StringBuffer();
+                for(int i = 0;i<suitedConditions.size();i++){
+                    keyCount ++;
+                    Condition condition = suitedConditions.get(i);
+                    //设置座席条件
+                    bf.append(condition.getPriority() + "," + condition.getId() + ",");
+                    //设置条件座席（注意以下两行代码顺序不能变）
+                    evalStr.add(5 + i,conditionScore.get(condition.getId()) + "," + agentId);
+                    evalStr.add(2,CAs.getKey(condition.getId()));
+                }
+                keyCount ++;
+                //设置座席条件进参数列表（注意以下两行代码顺序不能变）
+                evalStr.add(5 + suitedConditions.size(),bf.deleteCharAt(bf.length()-1).toString());
+                evalStr.add(2,aCsKey);
+            }
+            redisCacheService.eval(Lua.AGENTLOGIN,keyCount ,evalStr.toArray(new String[0]));
+
+            try{
+                //TODO 异步
+                //如果座席是空闲，触发座席找排队,此处与以上处理无关，所以不管成不成功，都返回
+                if(agent.getState().contains(CallCenterAgent.STATE_IDLE)){
+                    enQueueService.lookupQueue(agent.getTenantId(), agent.getAppId(),null, agentId);
+                }
+            }catch(Exception e){
+
+            }
+            return agentId;
+        }finally{
+            extensionLock.unlock();
         }
-        return agentId;
+    }
+
+    /**
+     * 查询指定通道下所有条件集合，查出匹配的条件
+     * @param agent 座席
+     * @param suitedConditions 条件集合，请传入一个空的List对象
+     * @param conditionScore 条件的分数，key为条件Id，请传入一个空的Map
+     * @param skillScore 技能分数，key为技能名称，请传入一个空的Map
+     */
+    private void setSuitedConditionsAndConditionScore(CallCenterAgent agent, List<Condition> suitedConditions, Map<String, Long> conditionScore, Map<String, Integer> skillScore) throws YunhuniApiException {
+        List<Condition> conditions = conditionService.getAll(agent.getTenantId(), agent.getAppId(), agent.getChannel());
+        conditions.parallelStream().forEach(condition -> {
+            if(ExpressionUtils.execWhereExpression(condition.getWhereExpression(),skillScore)){
+                long score = ExpressionUtils.execSortExpression(condition.getSortExpression(), skillScore);
+                conditionScore.put(condition.getId(),score);
+                suitedConditions.add(condition);
+            }
+        });
     }
 
     //注销
     @Override
-    public boolean logout(String agentId){
-        agentSkillDao.deleteByAgent(agentId);
-        //TODO 删除坐席的分机列表
-        try {
-            this.delete(agentId);
-        } catch (Throwable e) {
-            throw new IllegalArgumentException(e);
+    public void logout(String tenantId, String appId, String agentName, boolean force) throws YunhuniApiException {
+        if(StringUtils.isBlank(agentName)){
+            throw new RequestIllegalArgumentException();
         }
-        return true;
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
+        if(agent == null){
+            // 座席不存在
+            throw new AgentNotExistException();
+        }
+        AgentLock agentLock = new AgentLock(redisCacheService, agent.getId());
+        boolean lock = agentLock.lock();
+        if(!lock){
+            //获取锁失败
+            throw new AgentIsBusyException();
+        }
+        try{
+            if(logger.isDebugEnabled()){
+                logger.debug("开始注销座席：{}",agentName);
+            }
+            String agentId = agent.getId();
+            String state = agentState.getState(agentId);
+
+            if(StringUtils.isNotBlank(state) && (state.contains(CallCenterAgent.STATE_FETCHING)||state.contains(CallCenterAgent.STATE_TALKING))){
+                if(force){
+                    //TODO
+                    if(logger.isDebugEnabled()){
+                        logger.debug("强行注销座席：{}",agentName);
+                    }
+                }else{
+                    if(logger.isDebugEnabled()){
+                        logger.debug("座席正忙：{}",agentName);
+                    }
+                    // 座席正忙
+                    throw new AgentIsBusyException();
+                }
+            }
+            agentSkillService.deleteByAgent(agentId);
+            try {
+                this.delete(agent);
+                //写入注销日志
+                agentActionLogService.agentLogout(agent);
+            } catch (Exception e) {
+                logger.error("删除座席出错", JSONUtil.objectToJson(agent));
+                logger.error("删除座席出错",e);
+            }
+            String extension = agentState.getExtension(agentId);
+            //TODO LUA?
+            if(StringUtils.isNotBlank(extension)){
+                extensionState.deleteAgent(extension);
+            }
+            agentState.delete(agentId);
+            Set<String> conditionIds = aCs.getAll(agentId);
+            if(conditionIds != null){
+                conditionIds.parallelStream().forEach(conditionId -> {
+                    cAs.remove(conditionId,agentId);
+                });
+            }
+            aCs.delete(agentId);
+        }finally {
+            agentLock.unlock();
+        }
+
     }
 
-    //设置坐席状态
-    public boolean setState(String id,String state){
-        CallCenterAgent agent = this.findById(id);
-        if(agent == null){
-            return true;
+    @Override
+    public void keepAlive(String appId, String agentName) throws YunhuniApiException{
+        if(StringUtils.isBlank(appId)){
+            throw new RequestIllegalArgumentException();
         }
-        //TODO 设置坐席的状态
-        this.save(agent);
-        return true;
-    }
-    //技能迁入迁出
-    @Override
-    public boolean checkInSkill(String agent,String skillName,Integer active){
-        agentSkillDao.updateActiveByAgent(active,agent,skillName);
-        return true;
-    }
-    //技能追加
-    @Override
-    public boolean appendSkill(String tenantId,String appId,String agent,String name,Integer level,Integer active){
-        AgentSkill skill = new AgentSkill();
-        skill.setTenantId(tenantId);
-        skill.setAppId(appId);
-        skill.setAgent(agent);
-        skill.setName(name);
-        skill.setLevel(level);
-        skill.setActive(active);
-        agentSkillService.save(skill);
-        return true;
+        if(StringUtils.isBlank(agentName)){
+            throw new RequestIllegalArgumentException();
+        }
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
+        if(agent == null){
+            // 座席不存在
+            throw new AgentNotExistException();
+        }
+        agentState.setLastRegTime(agent.getId(),System.currentTimeMillis());
     }
 
     @Override
     public List<String> getAgentIdsByChannel(String tenantId,String appId,String channelId){
         String sql = "select id  from db_lsxy_bi_yunhuni.tb_bi_call_center_agent " +
-                "where tenant_id=\""+tenantId+"\" and app_id=\""+appId+"\" and channel_id=\""+channelId+"\" and deleted = 0";
+                "where tenant_id=\""+tenantId+"\" and app_id=\""+appId+"\" and channel=\""+channelId+"\" and deleted = 0";
 
         return jdbcTemplate.queryForList(sql, new Object[]{}, String.class);
     }
-    /**
-     * 排队,通过 dubbo返回结果给  区域管理器
-     * @param tenantId
-     * @param appId
-     * @param callId 参与排队的callId
-     * @param enQueue
-     */
+
     @Override
-    public void enqueue(String tenantId, String appId, String callId, EnQueue enQueue){
-        /*if(StringUtil.isEmpty(tenantId)){
-            return;
+    public CallCenterAgent get(String appId, String agentName) throws YunhuniApiException {
+        if(StringUtils.isBlank(appId)){
+            throw new RequestIllegalArgumentException();
         }
-        if(StringUtil.isEmpty(appId)){
-            return;
+        if(StringUtils.isBlank(agentName)){
+            throw new RequestIllegalArgumentException();
         }
-        if(enQueue == null){
-            return;
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId, agentName);
+        if(agent == null){
+            // 座席不存在
+            throw new AgentNotExistException();
+        }
+        AgentState.Model model = agentState.get(agent.getId());
+        //状态
+        agent.setState(model.getState());
+        //分机
+        agent.setExtension(model.getExtension());
+        List<AgentSkill> skills = agentSkillService.findAllByAgent(agent.getId());
+        //技能
+        agent.setSkills(skills);
+        return agent;
+    }
+
+    @Override
+    public Page getPage(String appId, Integer pageNo, Integer pageSize) throws YunhuniApiException{
+        if(StringUtils.isBlank(appId)){
+            throw new RequestIllegalArgumentException();
+        }
+        List<String> agentIds = new ArrayList<>();
+        String hql = "from CallCenterAgent obj where obj.appId=?1";
+        Page page = this.pageList(hql, pageNo, pageSize, appId);
+        List<CallCenterAgent> result = page.getResult();
+        //将所有座席ID放入集合中
+        result.parallelStream().forEach(agent ->agentIds.add(agent.getId()));
+        //查询这些座席的技能
+        List<AgentSkill> skills = agentSkillService.findAllByAgents(agentIds);
+        //分组这些技能，以座席Id为key放入Map中
+        Map<String, List<AgentSkill>> collect = skills.parallelStream().collect(Collectors.groupingBy(AgentSkill::getAgent, Collectors.toList()));
+        result.parallelStream().forEach(agent -> {
+            AgentState.Model model = agentState.get(agent.getId());
+            agent.setState(model.getState());
+            agent.setExtension(model.getExtension());
+            agent.setSkills(collect.get(agent.getId()));
+        });
+        return page;
+    }
+
+    @Override
+    public void extension(String appId, String agentName,String extensionId) throws YunhuniApiException{
+        if(StringUtils.isBlank(appId)){
+            throw new RequestIllegalArgumentException();
+        }
+        if(StringUtils.isBlank(agentName)){
+            throw new RequestIllegalArgumentException();
+        }
+        if(StringUtils.isBlank(extensionId)){
+            throw new RequestIllegalArgumentException();
+        }
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
+        if(agent == null){
+            // 座席不存在
+            throw new AgentNotExistException();
+        }
+        AppExtension extension = appExtensionService.findOne(agent.getAppId(),extensionId);
+        if(extension == null){
+            throw new ExtensionNotExistException();
+        }
+        //获取分机锁
+        ExtensionLock extensionLock = new ExtensionLock(redisCacheService,extensionId);
+        boolean lock = extensionLock.lock();
+        //获取锁失败 抛异常
+        if(!lock){
+            throw new ExtensionBindingToAgentException();
         }
         try{
-            int timeout = 60;
-            String where = "";
-            String sort = "";
-            if(enQueue.getFilter()!=null && enQueue.getFilter().getCondition()!=null){
-                timeout = enQueue.getFilter().getCondition().getTimeout();
-                where = enQueue.getFilter().getCondition().getWhere();
-                sort = enQueue.getFilter().getCondition().getWhere();
+            String extentionAgent = extensionState.getAgent(extensionId);
+            if(StringUtils.isNotBlank(extentionAgent)){
+                if(extentionAgent.equals(agent.getId())){
+                    return;
+                }else{
+                    throw new ExtensionBindingToAgentException();
+                }
             }
-            String sql = EnqueueSQLUtil.genSQL(tenantId,appId,where,sort);
-            List<EnQueueResult> results = jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper<EnQueueResult>(EnQueueResult.class));
-            EnQueueResult result = null;
-            if(results != null && results.size()>0){
-                for (EnQueueResult res: results) {
-                    boolean locked = "1".equals(redisTemplate.opsForValue().getAndSet("agent_lock_"+res.getAgent(),"1"));
-                    if(!locked){
-                        result = res;
+            String oldExtension = agentState.getExtension(agent.getId());
+            if(StringUtils.isNotBlank(oldExtension)){
+                extensionState.deleteAgent(oldExtension);
+            }
+            extensionState.setAgent(extensionId,agent.getId());
+            agentState.setExtension(agent.getId(),extensionId);
+        }finally {
+            extensionLock.unlock();
+        }
+
+    }
+
+    @Override
+    public void state(String appId, String agentName, String state) throws YunhuniApiException{
+        if(StringUtils.isBlank(appId)){
+            throw new RequestIllegalArgumentException();
+        }
+        if(StringUtils.isBlank(agentName)){
+            throw new RequestIllegalArgumentException();
+        }
+        if(StringUtils.isBlank(state)){
+            throw new RequestIllegalArgumentException();
+        }
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
+        if(agent == null){
+            // 座席不存在
+            throw new AgentNotExistException();
+        }
+        this.state(agent.getTenantId(),agent.getAppId(),agent.getId(),state,false);
+    }
+
+    @Override
+    public void state(String tenantId,String appId,String agentId, String state,boolean force) throws YunhuniApiException{
+        if(logger.isDebugEnabled()){
+            logger.info("[{}][{}]agent={},state={}",tenantId,appId,agentId,state);
+        }
+        AgentLock agentLock = new AgentLock(redisCacheService, agentId);
+        boolean lock = agentLock.lock();
+        if(!lock){
+            //获取锁失败
+            throw new SystemBusyException();
+        }
+        try{
+            if(!force){
+                String curState = agentState.getState(agentId);
+                if(StringUtils.isNotBlank(curState) && (curState.contains(CallCenterAgent.STATE_FETCHING)||curState.contains(CallCenterAgent.STATE_TALKING))){
+                    // 座席正忙
+                    throw new AgentIsBusyException();
+                }
+            }
+            if(state == null){
+                state = CallCenterAgent.STATE_IDLE;
+            }
+            agentState.setState(agentId,state);
+        }finally {
+            agentLock.unlock();
+        }
+        if(state.contains(CallCenterAgent.STATE_IDLE)){
+            enQueueService.lookupQueue(tenantId,appId,null,agentId);
+        }
+    }
+
+    @Override
+    public String getState(String agentId){
+        String state = agentState.getState(agentId);
+        return state;
+    }
+    @Override
+    public void skills(String tenantId, String appId, String agentName, List<AgentSkillOperationDTO> skillOpts) throws YunhuniApiException{
+        if(StringUtils.isBlank(agentName)){
+            throw new RequestIllegalArgumentException();
+        }
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
+        if(agent == null){
+            //座席不存在
+            throw new AgentNotExistException();
+        }
+        String agentId = agent.getId();
+
+        if(skillOpts != null && skillOpts.size() > 0){
+            //匹配的条件集合
+            List<Condition> suitedConditions = new ArrayList<>();
+            Map<String,Long> conditionScore = new HashMap<>();
+
+            //旧的技能
+            List<AgentSkill> skills = agentSkillService.findAllByAgent(agentId);
+            //将技能放到map,key是技能名
+            Map<String,AgentSkill> skillMap = new HashMap<>();
+            skills.parallelStream().forEach(skill -> skillMap.put(skill.getName(),skill));
+            skillOpts.stream().forEach(opt -> {
+                switch (opt.getOpt()){
+                    case 0:{
+                        //删除全部
+                        agentSkillService.deleteByAgent(agentId);
+                        skillMap.clear();
+                        break;
+                    }
+                    case 1:{
+                        //修改
+                        if(StringUtils.isNotBlank(opt.getName())){
+                            AgentSkill agentSkill = skillMap.get(opt.getName());
+                            if(agentSkill != null){
+                                if(opt.getScore() != null){
+                                    agentSkill.setScore(opt.getScore());
+                                }
+                                if(opt.getEnabled() != null){
+                                    agentSkill.setEnabled(opt.getEnabled());
+                                }
+                                agentSkillService.save(agentSkill);
+                            }else{
+                                AgentSkill newSkill = new AgentSkill(tenantId,appId,agentId,opt.getName(),
+                                        opt.getScore() == null?0:opt.getScore(),
+                                        opt.getEnabled()== null?false:opt.getEnabled());
+                                agentSkillService.save(newSkill);
+                                skillMap.put(newSkill.getName(),newSkill);
+                            }
+                        }
+                        break;
+                    }
+                    case 2:{
+                        //删除一个
+                        agentSkillService.deleteByAgentAndName(agentId,opt.getName());
+                        skillMap.remove(opt.getName());
                         break;
                     }
                 }
-            }
-            if(result != null){
-                deQueueService.success(tenantId,appId,callId,result);
-            }else{
-                //将排队放入redis
-                String key = "enqueue_" +tenantId+"_"+appId + UUIDGenerator.uuid();
-                redisTemplate.opsForValue().set(key,"1");
-                //排队队列左进右出
-                redisTemplate.opsForList().leftPush("enqueue_"+tenantId+"_"+appId, JSONUtil.objectToJson(enQueue));
-                mqService.publish(new EnqueueEvent(key,tenantId,appId,callId,timeout));
-            }
-        }catch (Throwable t){
-            logger.error("排队出错",t);
-            deQueueService.fail(tenantId,appId,callId,t.getMessage());
-        }*/
-    }
+            });
+            Collection<AgentSkill> newSkills = skillMap.values();
+            Map<String,Integer> skillScore = new HashMap<>();
+            newSkills.parallelStream().forEach(skill -> {
+                if(skill.getEnabled()){
+                    skillScore.put(skill.getName(),skill.getScore());
+                }
+            });
+            //查询指定通道下所有条件集合，查出匹配的条件
+            setSuitedConditionsAndConditionScore(agent, suitedConditions, conditionScore, skillScore);
 
-    /**
-     * 坐席找排队
-     * @param tenantId
-     * @param appId
-     * @param agentId
-     */
-    public void enqueue(String tenantId, String appId, String agentId){
-        /*CallCenterAgent agent = this.findById(agentId);
-        if(agent == null){
-            return;
+            Set<String> oldConditionIds = aCs.getAll(agentId);
+
+            suitedConditions.parallelStream().forEach(condition -> {
+                oldConditionIds.remove(condition.getId());
+                //TODO 设置条件座席
+                cAs.add(condition.getId(),agentId,conditionScore.get(condition.getId()));
+                //TODO 设置座席条件
+                aCs.add(agentId,condition.getId(),condition.getPriority());
+            });
+            oldConditionIds.parallelStream().forEach(cId -> {
+                cAs.remove(cId,agentId);
+                aCs.remove(agentId,cId);
+            });
         }
-        List<AgentSkill> skills = agentSkillDao.findByTenantIdAndAppIdAndAgentAndActive(tenantId,appId,agentId,1);
-        Map<String,Object> params = new HashMap<>();
-        if(skills!=null && skills.size()>0){
-            for(AgentSkill skill : skills){
-                String varName = "var_" + skill.getName().hashCode();
-                params.put(varName, skill.getLevel() == null ?0 : skill.getLevel());
-            }
-        }
-        String enqueue = redisTemplate.opsForList().rightPop("enqueue_"+tenantId+"_"+appId);
-        if(getWhere(enqueue,params)){
-            getSort(enqueue,params);
-        }*/
     }
 
 }

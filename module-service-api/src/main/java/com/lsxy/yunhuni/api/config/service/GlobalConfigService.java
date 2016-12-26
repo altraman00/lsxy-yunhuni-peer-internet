@@ -15,4 +15,5 @@ public interface GlobalConfigService extends BaseService<GlobalConfig> {
      * @return
      */
     GlobalConfig findByTypeAndName(String type, String name);
+    GlobalConfig findByTypeAndKeyName(String type,String keyName);
 }

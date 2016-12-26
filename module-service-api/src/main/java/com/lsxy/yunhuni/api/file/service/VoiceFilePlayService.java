@@ -5,6 +5,7 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 放音文件
@@ -79,4 +80,6 @@ public interface VoiceFilePlayService extends BaseService<VoiceFilePlay> {
      * @param appId
      */
     void renewSyncByAppId(String appId);
+    /** 获取已删除记录但没有删除oss文件的记录*/
+    List<Map> getOssListByDeleted();
 }

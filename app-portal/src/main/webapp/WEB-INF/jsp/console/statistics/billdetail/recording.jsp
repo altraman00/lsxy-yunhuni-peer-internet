@@ -108,10 +108,9 @@
                                             <div class="col-md-2">
                                                 <select name="type" class="form-control">
                                                     <option value=""></option>
-                                                    <option value="语音回拔" <c:if test="${type=='语音回拔'}">selected="selected"</c:if> >语音回拔</option>
-                                                    <option value="语音会议"<c:if test="${type=='语音会议'}">selected="selected"</c:if> >语音会议</option>
-                                                    <option value="自定义IVR"<c:if test="${type=='自定义IVR'}">selected="selected"</c:if> >自定义IVR</option>
-                                                    <option value="呼叫中心"<c:if test="${type=='呼叫中心'}">selected="selected"</c:if> >呼叫中心</option>
+                                                    <c:forEach items="${types}" var="type1">
+                                                        <option value="${type1}" <c:if test="${type1==type}">selected="selected"</c:if> >${type1}</option>
+                                                    </c:forEach>
                                                 </select>
                                             </div>
                                             <div class="col-md-2">
@@ -185,7 +184,7 @@
             //查询录音是否下载到oss,是下载到本地，否下载到oss显示 正在下载 ,下载oss失败，显示重试
             var params = {'${_csrf.parameterName}':'${_csrf.token}'};
             tag.html('正在下载<span class="download"></span>').attr("data-statu","2");
-            ajaxsync("${ctx}/console/app/file/record/file/download/"+id,params,function(result) {
+            ajaxsubmit("${ctx}/console/app/file/record/file/download/"+id,params,function(result) {
                 if(result.success){
                     window.open(result.data);
                     tag.html('录音下载').attr("data-statu","1");

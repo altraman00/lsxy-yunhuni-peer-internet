@@ -494,17 +494,13 @@
                 this.paylist = []
             },
             sort :function(v){
-                this.orderby = v
+                this.orderby = v;
                 modalPage()
             },
             canne:function(){
                 window.location.href=ctx+"/console/telenum/callnum/index";
             },
             payOrder:function(){
-//                var id = $('#orderid').html();
-//                if(id!=''){
-//                    showtoast("您有未支付的订单，请完成支付后，再进行号码租用");
-//                }
                 $('#call-modal').modal('hide');
                 var ids = "";
                 for(var i = 0;i<this.shop.length;i++){
@@ -569,7 +565,7 @@
                 }else if(this.orderby==4){
                     order = "amount:0";
                 }
-                var params = {'${_csrf.parameterName}':'${_csrf.token}',pageNo:nowPage,pageSize:listRows,telnum:this.serach.name,type:this.serach.phone,areaCode:this.serach.place,order:order};
+                var params = {'${_csrf.parameterName}':'${_csrf.token}','pageNo':nowPage,'pageSize':listRows,'telnum':this.serach.name,'type':this.serach.phone,'areaCode':this.serach.place,'order':order};
                 var self =this;
                 ajaxsync("${ctx}/console/telenum/callnum/telnum/plist",params,function(result) {
                     var re = result.data.result;
@@ -600,7 +596,8 @@
         return false;
     }
 
-
+    var gnowPage = 1;
+    var glistRows = 5;
     //分页
     function modalPage() {
         if(vue.serach.name==-1){
@@ -612,14 +609,14 @@
         if(vue.serach.place==-1){
             vue.serach.place='';
         }
-        var params = {'${_csrf.parameterName}':'${_csrf.token}',pageNo:1,pageSize:1,telnum:vue.serach.name,type:vue.serach.phone,areaCode:vue.serach.place,order:''};
+        var params = {'${_csrf.parameterName}':'${_csrf.token}','pageNo':gnowPage,'pageSize':glistRows,'telnum':vue.serach.name,'type':vue.serach.phone,'areaCode':vue.serach.place,'order':''};
         //获取数据总数
         var count = 0;
         ajaxsync("${ctx}/console/telenum/callnum/telnum/plist",params,function(result) {
             count = result.data.totalCount;
         });
         //每页显示数量
-        var listRow = 5;
+        var listRow = glistRows;
         //显示多少个分页按钮
         var showPageCount = 4;
         //指定id，创建分页标签

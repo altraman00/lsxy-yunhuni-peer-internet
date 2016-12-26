@@ -61,7 +61,6 @@
             <artifactId>module-service-area-api</artifactId>
         </dependency>
 
-
         <!--<dependency>-->
             <!--<groupId>com.lsxy</groupId>-->
             <!--<artifactId>module-framework-api</artifactId>-->
@@ -77,6 +76,10 @@
         <dependency>
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-monitor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-service-call-center-api</artifactId>
         </dependency>
     </dependencies>
 

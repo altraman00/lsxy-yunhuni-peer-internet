@@ -114,6 +114,12 @@ public class Page<T> implements Serializable {
 	}
 
 	/**
+	 * 设置当前页中的记录.
+	 */
+	public void setResult(List data){
+		this.data = data;
+	}
+	/**
 	 * 取该页当前页码,页码从1开始.
 	 */
 	public long getCurrentPageNo() {

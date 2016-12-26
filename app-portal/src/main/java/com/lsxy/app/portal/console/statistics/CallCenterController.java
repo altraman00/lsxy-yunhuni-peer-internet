@@ -10,10 +10,6 @@ import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.session.model.CallSession;
-import com.lsxy.yunhuni.api.statistics.model.ApiCallDay;
-import com.lsxy.yunhuni.api.statistics.model.ApiCallMonth;
-import com.lsxy.yunhuni.api.statistics.model.VoiceCdrDay;
-import com.lsxy.yunhuni.api.statistics.model.VoiceCdrMonth;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +17,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Field;
 import java.util.*;
 
 /**

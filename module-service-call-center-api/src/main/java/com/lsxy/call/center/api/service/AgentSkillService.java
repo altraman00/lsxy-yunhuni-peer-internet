@@ -8,4 +8,12 @@ import java.util.List;
  */
 public interface AgentSkillService extends BaseService<AgentSkill> {
     List<AgentSkill> findByAgent(String tenantId, String appId, String agentId);
+
+    void deleteByAgent(String agentId);
+
+    List<AgentSkill> findAllByAgent(String agentId);
+
+    List<AgentSkill> findAllByAgents(List<String> agentIds);
+
+    void deleteByAgentAndName(String agent, String name);
 }

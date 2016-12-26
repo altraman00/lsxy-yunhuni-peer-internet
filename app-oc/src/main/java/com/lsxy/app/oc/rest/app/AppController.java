@@ -39,7 +39,7 @@ public class AppController extends AbstractRestController {
     ) throws Exception{
         List<App> apps = null;
         if(StringUtils.isNotEmpty(serviceType)){
-            apps = appService.findAppByUserNameAndServiceType(uid,serviceType);
+            apps = appService.findAppByTenantIdAndServiceType(uid,serviceType);
         }else{
             apps = appService.findAppByUserName(uid);
         }

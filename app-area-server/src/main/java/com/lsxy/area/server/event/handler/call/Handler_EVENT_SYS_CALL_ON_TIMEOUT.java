@@ -3,6 +3,8 @@ package com.lsxy.area.server.event.handler.call;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.CallCenterUtil;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -12,7 +14,6 @@ import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
-import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
@@ -48,6 +49,9 @@ public class Handler_EVENT_SYS_CALL_ON_TIMEOUT extends EventHandler{
     @Autowired
     private IVRActionService ivrActionService;
 
+    @Autowired
+    private ConversationService conversationService;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CALL_ON_TIMEOUT;
@@ -74,18 +78,17 @@ public class Handler_EVENT_SYS_CALL_ON_TIMEOUT extends EventHandler{
         }
 
         //更新会话记录状态
-        CallSession callSession = callSessionService.findById((String)state.getBusinessData().get("sessionid"));
+        CallSession callSession = callSessionService.findById(state.getBusinessData().get(BusinessState.SESSIONID));
         if(callSession != null){
             callSession.setStatus(CallSession.STATUS_EXCEPTION);
             callSessionService.save(callSession);
         }
 
-        if("ivr_dial".equals(state.getType())){//ivr拨号失败需要继续ivr
-            Map<String,Object> businessData = state.getBusinessData();
+        if(BusinessState.TYPE_IVR_DIAL.equals(state.getType())){//ivr拨号失败需要继续ivr
+            Map<String,String> businessData = state.getBusinessData();
             if(businessData != null){
-                String ivr_call_id = (String)businessData.get("ivr_call_id");
+                String ivr_call_id = businessData.get("ivr_call_id");
                 if(StringUtil.isNotEmpty(ivr_call_id)){
-                    App app = appService.findById(state.getAppId());
                     Map<String,Object> notify_data = new MapBuilder<String,Object>()
                             .putIfNotEmpty("event","ivr.connect_end")
                             .putIfNotEmpty("id",ivr_call_id)
@@ -93,11 +96,17 @@ public class Handler_EVENT_SYS_CALL_ON_TIMEOUT extends EventHandler{
                             .putIfNotEmpty("end_time",System.currentTimeMillis())
                             .putIfNotEmpty("error","dial error")
                             .build();
-                    if(notifyCallbackUtil.postNotifySync(app.getUrl(),notify_data,null,3)){
-                        ivrActionService.doAction(ivr_call_id);
-                    }
+                    notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
+                    ivrActionService.doAction(ivr_call_id,new MapBuilder<String,Object>()
+                            .putIfNotEmpty("error","dial error")
+                            .build());
                 }
             }
+        }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())||
+                BusinessState.TYPE_CC_OUT_CALL.equals(state.getType())){
+            Map<String,String> businessData = state.getBusinessData();
+            String conversation_id = businessData.get(CallCenterUtil.CONVERSATION_FIELD);
+            conversationService.logicExit(conversation_id,call_id);
         }
         return res;
     }

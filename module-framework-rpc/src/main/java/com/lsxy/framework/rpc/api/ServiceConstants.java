@@ -12,6 +12,7 @@ public class ServiceConstants {
 
 	public static final String MN_CH_SYS_CALL = "MN_CH_SYS_CALL";  //呼叫业务
 	public static final String MN_CH_SYS_CALL_PLAY_START = "MN_CH_SYS_CALL_PLAY_START";  //呼叫放音
+	public static final String MN_CH_SYS_CALL_PLAY_STOP = "MN_CH_SYS_CALL_PLAY_STOP";  //停止呼叫放音
 	public static final String MN_CH_SYS_CALL_RECORD_START = "MN_CH_SYS_CALL_RECORD_START";  //呼叫录音
 	public static final String MN_CH_SYS_CALL_SEND_DTMF_START = "MN_CH_SYS_CALL_SEND_DTMF_START";  //开始发送 DTMF 码
 	public static final String MN_CH_SYS_CALL_RECEIVE_DTMF_START = "MN_CH_SYS_CALL_RECEIVE_DTMF_START";//开始接收DTMF码

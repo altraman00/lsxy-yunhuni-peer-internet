@@ -11,15 +11,16 @@ import org.springframework.stereotype.Service;
 import java.io.Serializable;
 
 /**
- * Created by zhangxb on 2016/11/11.
+ * Created by liuws on 2016/11/18.
  */
 @Service
 @com.alibaba.dubbo.config.annotation.Service
 public class CallCenterConversationServiceImpl extends AbstractService<CallCenterConversation> implements CallCenterConversationService {
+
     @Autowired
     private CallCenterConversationDao callCenterConversationDao;
     @Override
     public BaseDaoInterface<CallCenterConversation, Serializable> getDao() {
-        return this.callCenterConversationDao;
+        return callCenterConversationDao;
     }
 }

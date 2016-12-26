@@ -394,7 +394,7 @@
                 }
             }
 
-            $('#'+id+"_cost1").html(cost[0]+'.<span class="small-font-size" ">'+cost2+'</span>');
+            $('#'+id+"_cost1").html(cost[0]+'.<span class="small-font-size" >'+cost2+'</span>');
             $('#'+id+"_costTime").html(result.data.costTime);
             $('#'+id+"_session").html(result.data.session);
             if(id=='today'){
@@ -614,8 +614,8 @@
                 data:['话务量', '消费额']
             },
             grid: {
-                left: '0%',
-                right: '0%',
+                left: '15px',
+                right: '15px',
                 bottom: '3%',
                 containLabel: true
             },
@@ -702,10 +702,15 @@
                 data:['会话量']
             },
             grid: {
-                left: '0%',
+                left: '15px',
                 right: '3%',
                 bottom: '3%',
                 containLabel: true
+            },
+            dataZoom: {
+                show: false,
+                start: 0,
+                end: 100
             },
             toolbox: {
                 feature: {
@@ -713,12 +718,14 @@
             },
             xAxis: {
                 type: 'category',
-                boundaryGap: false,
+                boundaryGap: [0.2, 0.2],
                 data : Xdata
             },
             yAxis: {
                 type: 'value',
-                name: '  会话量(次)',
+                min: 0,
+                name: '     会话量(次)',
+                boundaryGap: [0.2, 0.2]
             },
             series: [
                 {
@@ -753,7 +760,7 @@
                 data:['api调用次数']
             },
             grid: {
-                left: '0%',
+                left: '15px',
                 right: '3%',
                 bottom: '3%',
                 containLabel: true
@@ -766,10 +773,13 @@
                 type: 'category',
                 boundaryGap: false,
                 data : Xdata,
+                boundaryGap: [0.2, 0.2]
             },
             yAxis: {
                 type: 'value',
-                name: '次数(次)'
+                name: '     次数(次)',
+                min: 0,
+                boundaryGap: [0.2, 0.2]
             },
             series: [
                 {

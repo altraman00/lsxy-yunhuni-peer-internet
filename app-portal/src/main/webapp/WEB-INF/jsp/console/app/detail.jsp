@@ -199,7 +199,7 @@
                                                                     <%--<p>${appExtension.telenum} </p>--%>
                                                                 <%--</c:if>--%>
                                                             <%--</c:forEach>--%>
-                                                            <p class="text-danger">（上线后平台会重新分配分机接入信息）</p>
+                                                            <%--<p class="text-danger">（上线后平台会重新分配分机接入信息）</p>--%>
                                                         </div>
                                                     </div>
                                                     </c:if>
@@ -260,16 +260,17 @@
                                                 配置存储周期
                                             </div>
                                             <div class="col-md-10 font14">
-                                                <input type="radio" name="cycle" value="0" checked/>7天免费存储
-                                                &nbsp;<input type="radio" name="cycle" value="1" />1个月
-                                                &nbsp;<input type="radio" name="cycle" value="2" />2个月
-                                                &nbsp;<input type="radio" name="cycle" value="3" />3个月
+                                                <input type="radio" name="cycle" value="7" <c:if test="${cycle==7}">checked</c:if> />7天免费存储
+                                                &nbsp;<input type="radio" name="cycle" value="30"<c:if test="${cycle==30}">checked</c:if> />1个月
+                                                &nbsp;<input type="radio" name="cycle" value="60"<c:if test="${cycle==60}">checked</c:if> />2个月
+                                                &nbsp;<input type="radio" name="cycle" value="90"<c:if test="${cycle==90}">checked</c:if> />3个月
+                                                &nbsp;<input type="radio" name="cycle" value="180"<c:if test="${cycle==180}">checked</c:if> />6个月
                                             </div>
                                         </div>
                                         <div class="row margin-bottom-20">
                                             <div class="col-md-2 font14 max-width-120"></div>
                                             <div class=" col-md-10">
-                                                <a href="" class="btn btn-primary">保存</a>
+                                                <a href="#" class="btn btn-primary" onclick="saveCycle()">保存</a>
                                             </div>
                                         </div>
                                         <%--<p class="application_info">--%>
@@ -460,6 +461,28 @@
 
 
         <script>
+            function saveCycle(){
+                var cycle = $('input[name=cycle]:checked').val();
+                var cycleName = '';
+                if(cycle==7){
+                    cycleName = "7天";
+                }else if(cycle%30==0&&cycle/30>0){
+                    cycleName = cycle/30 +"个月";
+                }
+                bootbox.setLocale("zh_CN");
+                var h1="配置存储周期是否更改为："+ cycleName;
+                bootbox.confirm(h1, function(result) {
+                    if(result){
+                        ajaxsync(ctx + "/console/app/edit/recording/"+appId,{csrfParameterName:csrfToken,'cycle':cycle},function(response){
+                            if(response.success){
+                                showtoast(response.data);
+                            }else{
+                                showtoast(response.errorMsg);
+                            }
+                        },"post");
+                    }
+                });
+            }
             function showTestNumBind(){
 //                showtoast('当前没有测试号码')
                 bootbox.setLocale("zh_CN");
@@ -657,60 +680,6 @@
         $('#scrolldiv'+id).append(html);
     });
 
-
-    /**
-     * 查询文件
-     */
-    $('.findfile').click(function(){
-        var id = $(this).attr('data-id');
-        $('#scrolldiv'+id).html('');
-        $('.moadltips'+id).html('');
-
-        //获取时间
-        var starttime = $('#datestart'+id).val();
-        var endtime = $('#dateend'+id).val();
-        var tips = compareTime(starttime,endtime);
-        if(tips){
-            $('.moadltips'+id).html(tips); return false;
-        }
-        endtime+=" 23:59:59";
-        var html  = "";
-        //异步查询文件信息
-
-//        ajaxsync(ctx + "/console/app/file/record/sum",{'appId':appId,'startTime':starttime,'endTime':endtime,csrfParameterName:csrfToken},function(response){
-//            if(response.success){
-//                //添加加载文件信息
-//                html  = '  <p>--共计  '+  response.data.total+'  个文件   '+resultFileSize(response.data.size )+'</p>';
-//                html+='<p>--统计完成</p>';
-//                $('#scrolldiv'+id).append(html);
-//            }else{
-//                showtoast(response.errorMsg);
-//            }
-//        },"post");
-
-        //two 表示的是批量下载
-        if(id=='two'){
-            html +='<p>--开始压缩打包</p>';
-            $('#scrolldiv'+id).append(html);
-
-            ajaxsync(ctx + "/console/app/file/record/zip",{'appId':appId,'startTime':starttime,'endTime':endtime,csrfParameterName:csrfToken},function(response){
-                if(response.success){
-                    var fileName = new String(response.data);
-                    var index = fileName.lastIndexOf("/");
-                    var name = fileName.substring(index,fileName.length);
-                    //添加加载文件信息
-                    html  = '<p>--压缩打包完成 '+name+'</p>';
-                    html+='<p>--压缩包生成完成：<a href="#" target="_blank">点击下载</a></p>';
-                    $('#scrolldiv'+id).append(html);
-                }else{
-                    html  = '<p>--压缩打包失败</p>';
-                    html+='<p>--请稍后重试</p>';
-                    $('#scrolldiv'+id).append(html);
-                }
-            },"post");
-
-        }
-    });
     $('.cancelthree').click(function(){
         batchclear($(this).attr('data-id'));
     })
@@ -719,36 +688,6 @@
         $('#datestart'+id).val('');
         $('#dateend'+id).val('');
     }
-
-    /**
-     * 批量删除处理
-     */
-    $('.modalSureThree').click(function(){
-        var id = $(this).attr('data-id');
-        var starttime = $('#datestart'+id).val();
-        var endtime = $('#dateend'+id).val();
-        endtime+=" 23:59:59";
-        bootbox.confirm("确认删除所选文件", function(result) {
-            if(result){
-                ajaxsync(ctx + "/console/app/file/record/batch_delete",{'id':id,'appId':appId,'startTime':starttime,'endTime':endtime,csrfParameterName:csrfToken},function(response){
-                    if(response.success){
-                        showtoast("批量删除成功");
-                    }else{
-                        showtoast("批量删除失败");
-                    }
-                },"post");
-
-                upvoice();
-                $('#voice-'+id).remove();
-                hideModal(id);
-            }else{
-                hideModal(id);
-            }
-            batchclear(id);
-        });
-    });
-
-
     /**
      * 单文件
      */
@@ -817,32 +756,6 @@
     }
 
 
-
-
-    /**
-     * 删除操作
-     */
-    function delvoice(idType){
-        bootbox.setLocale("zh_CN");
-        bootbox.confirm("确认删除文件", function(result) {
-            if(result){
-                var id = new String(idType.id).replace("voice-record-","");
-
-                ajaxsync(ctx + "/console/app/file/record/delete",{'id':id,csrfParameterName:csrfToken},function(response){
-                    if(response.success){
-                        showtoast("删除成功");
-                        recordFileTotalSize();
-                        $('#voice-'+id).remove();
-                    }else{
-                        showtoast("删除失败");
-                    }
-                },"post");
-
-            }
-        });
-    }
-
-
     /**
      * 删除操作
      */
@@ -875,21 +788,7 @@
             }
         });
     }
-    /**
-     * 查询录音文件占存储空间的大小
-     */
-    var recordFileTotalSize = function(){
 
-        ajaxsync(ctx + "/console/app/file/record/sum",{'appId':appId,csrfParameterName:csrfToken},function(response){
-            if(response.success){
-                $('#voiceFileRecord').html("录音文件总计占用："+resultFileSize(response.data.size));
-            }else{
-                showtoast(response.errorMsg);
-            }
-        },"post");
-
-
-    };
 
 
 
@@ -974,54 +873,7 @@
 
     }
 
-    /**
-     *触发录音文件分页
-     */
-    function upvoice(){
-        $('#uploadButton').hide();
-        recordFileTotalSize();
-        //获取数据总数
-        var count = 0;
 
-        ajaxsync(ctx + "/console/app/file/record/list",{ 'appId':appId,'pageNo':1,'pageSize':20,csrfParameterName:csrfToken},function(response){
-            count=response.data.totalCount;
-        },"post");
-
-        //每页显示数量
-        var listRow = 20;
-        //显示多少个分页按钮
-        var showPageCount = 5;
-        //指定id，创建分页标签
-        var pageId = 'voicepage';
-        //searchTable 为方法名
-        var page = new Page(count,listRow,showPageCount,pageId,voiceTable);
-        page.show();
-    }
-    /**
-     * 分页回调方法
-     * @param nowPage 当前页数
-     * @param listRows 每页显示多少条数据
-     * */
-    var voiceTable = function(nowPage,listRows)
-    {
-        ajaxsync(ctx + "/console/app/file/record/list",{'appId':appId,'pageNo':nowPage,'pageSize':listRows,csrfParameterName:csrfToken},function(response){
-            var data =[];
-            for(var j=0;j< response.data.result.length;j++){
-                var tempFile = response.data.result[j];
-                var temp = [tempFile.id,tempFile.name,resultFileSize(tempFile.size),tempFile.duration];
-                data[j]=temp;
-            }
-            var html ='';
-            for(var i = 0 ; i<data.length; i++){
-                html +='<tr class="voicetr" id="voice-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
-                html+='<td>'+data[i][2]+'</td>';
-                html+='<td>'+data[i][3]+'</td>';
-                html+='<td class="operation"><a >下载</a> <span ></span><a onclick="delvoice(this)" id="voice-record-'+data[i][0]+'" >删除</a></td></tr>';
-            }
-            $('#voicetable').find(".voicetr").remove();
-            $('#voicetable').append(html);
-        },"post");
-    }
 
     $('#myTab li').click(function(){
         var type = $(this).attr('data-id');

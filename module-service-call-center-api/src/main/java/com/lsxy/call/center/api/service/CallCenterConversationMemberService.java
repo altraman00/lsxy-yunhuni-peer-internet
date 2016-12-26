@@ -16,4 +16,12 @@ public interface CallCenterConversationMemberService  extends BaseService<CallCe
      * @return
      */
     List<String> getListBySessionId(String sessionId);
+
+    /**
+     * 根据交谈id和callid 获取交谈成员
+     * @param relevanceId
+     * @param callId
+     * @return
+     */
+    public CallCenterConversationMember findOne(String relevanceId,String callId);
 }

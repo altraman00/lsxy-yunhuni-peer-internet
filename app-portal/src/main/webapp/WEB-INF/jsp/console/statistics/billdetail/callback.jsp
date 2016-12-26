@@ -176,7 +176,7 @@
             //查询录音是否下载到oss,是下载到本地，否下载到oss显示 正在下载 ,下载oss失败，显示重试
             var params = {'${_csrf.parameterName}':'${_csrf.token}'};
             tag.html('正在下载<span class="download"></span>').attr("data-statu","2");
-            ajaxsync("${ctx}/console/app/file/record/cdr/download/"+id,params,function(result) {
+            ajaxsubmit("${ctx}/console/app/file/record/cdr/download/"+id,params,function(result) {
                 if(result.success){
                     window.open(result.data);
                     tag.html('录音下载').attr("data-statu","1");

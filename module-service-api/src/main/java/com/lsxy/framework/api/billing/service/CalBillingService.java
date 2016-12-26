@@ -11,19 +11,20 @@ import java.util.Date;
  */
 public interface CalBillingService {
     int AMOUNT_REDIS_MULTIPLE = 10000;//增量型的金额存在redis中的倍数关系（增量型的金额是以long形式存在redis中）
-    String USE_BALANCE_PREFIX = "ubalance";     //当天消费
-    String ADD_BALANCE_PREFIX = "abalance";     //当天充值
-    String USE_CONFERENCE_PREFIX = "uconference";     //会议本日使用量
-    String ADD_CONFERENCE_PREFIX = "aconference";   //会议本日购买增加量
-    String USE_VOICE_PREFIX = "uvoice";             //语音本日使用量
-    String ADD_VOICE_PREFIX = "avoice";              //语音本日购买增加量
-    String USE_SMS_PREFIX = "usms";                 //短信本日使用量
-    String ADD_SMS_PREFIX = "asms";             //短信本日购买增加量
-    String ADD_FSIZE_PREFIX = "afsize";             //容量本日增加量（包括删除文件）
-    String USE_FSIZE_PREFIX = "ufsize";             //容量本日使用量
-    String CALL_CONNECT_PREFIX = "callconnect";             //本日接通量
-    String CALL_SUM_PREFIX = "callsum";             //本日总通话量
-    String CALL_COST_TIME_PREFIX = "callcosttime";             //本日通话时长
+    String BILLING_DAY_PREFIX = "billing_day"; //当天账单key
+    String USE_BALANCE_FIELD = "ubalance";     //当天消费
+    String ADD_BALANCE_FIELD = "abalance";     //当天充值
+    String USE_CONFERENCE_FIELD = "uconference";     //会议本日使用量
+    String ADD_CONFERENCE_FIELD = "aconference";   //会议本日购买增加量
+    String USE_VOICE_FIELD = "uvoice";             //语音本日使用量
+    String ADD_VOICE_FIELD = "avoice";              //语音本日购买增加量
+    String USE_SMS_FIELD = "usms";                 //短信本日使用量
+    String ADD_SMS_FIELD = "asms";             //短信本日购买增加量
+    String ADD_FSIZE_FIELD = "afsize";             //容量本日增加量（包括删除文件）
+    String USE_FSIZE_FIELD = "ufsize";             //容量本日使用量
+    String CALL_CONNECT_FIELD = "callconnect";             //本日接通量
+    String CALL_SUM_FIELD = "callsum";             //本日总通话量
+    String CALL_COST_TIME_FIELD = "callcosttime";             //本日通话时长
 
     /**
      * 获取余额

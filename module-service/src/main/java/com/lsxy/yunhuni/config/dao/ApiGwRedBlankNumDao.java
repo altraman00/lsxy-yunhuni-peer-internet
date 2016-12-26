@@ -12,6 +12,6 @@ import java.io.Serializable;
  */
 public interface ApiGwRedBlankNumDao extends BaseDaoInterface<ApiGwRedBlankNum, Serializable> {
 
-    @Query(value = "SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_config_num_redblacklist num WHERE num.type = :type AND num.status = :status AND :number REGEXP num.number", nativeQuery = true)
+    @Query(value = "SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_config_num_redblacklist num WHERE num.deleted=0 AND num.type = :type AND num.status = :status AND :number REGEXP num.number", nativeQuery = true)
     ApiGwRedBlankNum findFirstByNumberAndTypeAndStatus(@Param("number") String number,@Param("type") int type,@Param("status") int status);
 }

@@ -95,6 +95,11 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
                 }
                 throw new AuthenticationCredentialsNotFoundException("没有找到授权凭证");
             }
+            if (logger.isDebugEnabled()) {
+                logger.debug("CertID:" + certID+";");
+                logger.debug("Timestamp:" + timestamp+";");
+                logger.debug("AppID:" + appid+";");
+            }
 
             // Authorization header is in the form <public_access_key>:<signature>
             String apiuri = request.getRequestURI();
@@ -133,7 +138,7 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
                 RestToken restToken = (RestToken) successfulAuthentication;
                 tenantId = restToken.getTenantId();
             }
-            getSaveApiLogTask().invokeApiSaveDB(appid, payload, contentType, method, signature, apiuri,tenantId,certID);
+            getSaveApiLogTask().invokeApiSaveDB(req,appid, payload, contentType, signature,tenantId,certID);
 
             if(logger.isDebugEnabled()){
                 logger.debug("签名校验完毕,花费{}ms",(System.currentTimeMillis()-start));

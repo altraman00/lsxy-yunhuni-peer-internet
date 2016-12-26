@@ -8,7 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- * 租户产品折扣表
+ * 租户产品计费项折扣表
  * Created by liups on 2016/8/27.
  */
 @Entity
@@ -16,9 +16,18 @@ import javax.persistence.Table;
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_product_tenant_discount")
 public class ProductTenantDiscount  extends IdEntity {
     private String tenantId;
-    private String productId;
+    private String productId;   //产品计费项Id（不是对产品，是对产品计费项）
     private Double discount;    //小数点后两位数字
     private String remark;
+
+    public ProductTenantDiscount() {
+    }
+
+    public ProductTenantDiscount(String tenantId, String productId, Double discount) {
+        this.tenantId = tenantId;
+        this.productId = productId;
+        this.discount = discount;
+    }
 
     @Column(name = "tenant_id")
     public String getTenantId() {
