@@ -207,7 +207,7 @@
                                                                 呼叫中心应用编号：
                                                             </div>
                                                             <div class="col-md-9">
-                                                                <p>${callCenterNum}</p>
+                                                                <p>${app.callCenterNum}</p>
                                                                     <%--<c:forEach items="${appExtensionList}" var="appExtension">--%>
                                                                     <%--<c:if test="${appExtension.telenum==app.id}">--%>
                                                                     <%--<p>${appExtension.telenum} </p>--%>
