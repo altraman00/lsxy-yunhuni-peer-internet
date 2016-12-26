@@ -18,7 +18,7 @@ public abstract class RPCHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(RPCHandler.class);
 	public static final int CORE_POOL_SIZE = 20;
-	public static final int MAXIMUM_POOL_SIZE = 200;
+	public static final int MAXIMUM_POOL_SIZE = 1024;
 	public static final int QUEUE_CAPACITY = 1024;
 
 	/**
