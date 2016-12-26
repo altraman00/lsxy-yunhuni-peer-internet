@@ -188,20 +188,34 @@
                                                         </div>
                                                     </div>
                                                     <c:if test="${app.serviceType=='call_center'}">
-                                                    <div class="row">
-                                                        <div class="col-md-1 dev">
-                                                            分机接入信息：
+                                                        <div class="row">
+                                                            <div class="col-md-1 dev">
+                                                                分机接入信息：
+                                                            </div>
+                                                            <div class="col-md-9">
+                                                                <p>${sipRegistrar}</p>
+                                                                <%--<c:forEach items="${appExtensionList}" var="appExtension">--%>
+                                                                    <%--<c:if test="${appExtension.telenum==app.id}">--%>
+                                                                        <%--<p>${appExtension.telenum} </p>--%>
+                                                                    <%--</c:if>--%>
+                                                                <%--</c:forEach>--%>
+                                                                <%--<p class="text-danger">（上线后平台会重新分配分机接入信息）</p>--%>
+                                                            </div>
                                                         </div>
-                                                        <div class="col-md-9">
-                                                            <p>${sipRegistrar}</p>
-                                                            <%--<c:forEach items="${appExtensionList}" var="appExtension">--%>
-                                                                <%--<c:if test="${appExtension.telenum==app.id}">--%>
+                                                        <div class="row">
+                                                            <div class="col-md-1 dev">
+                                                                呼叫中心应用编号：
+                                                            </div>
+                                                            <div class="col-md-9">
+                                                                <p>${app.callCenterNum}</p>
+                                                                    <%--<c:forEach items="${appExtensionList}" var="appExtension">--%>
+                                                                    <%--<c:if test="${appExtension.telenum==app.id}">--%>
                                                                     <%--<p>${appExtension.telenum} </p>--%>
-                                                                <%--</c:if>--%>
-                                                            <%--</c:forEach>--%>
-                                                            <%--<p class="text-danger">（上线后平台会重新分配分机接入信息）</p>--%>
+                                                                    <%--</c:if>--%>
+                                                                    <%--</c:forEach>--%>
+                                                                    <%--<p class="text-danger">（上线后平台会重新分配分机接入信息）</p>--%>
+                                                            </div>
                                                         </div>
-                                                    </div>
                                                     </c:if>
                                                 </div>
                                             </div>
