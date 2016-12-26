@@ -61,7 +61,7 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
         String yyyyMMdd = DateUtils.formatDate(date, "yyyyMMdd");
         Date statisticsDate = DateUtils.parseDate(yyyyMMdd,"yyyyMMdd");
         Iterable<Tenant> tenants = tenantService.list();
-        ExecutorService executorService = Executors.newFixedThreadPool(50);
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
         List<Future> results = new ArrayList<>();
         for(Tenant tenant:tenants){
 //            this.statisticsTenantAndApp(statisticsDate, tenant);
