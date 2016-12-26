@@ -64,8 +64,10 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -153,8 +155,8 @@ public class IVRActionService {
     }
 
     private void initWorker(){
-        //初始化100个线程，最多500个线程，最多积压1024个任务
-        worker = new ThreadPoolExecutor(100, 500, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1024),
+        //初始化100个线程，最多1000个线程，最多积压1024个任务
+        worker = new ThreadPoolExecutor(100, 1000, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1024),
                 new BasicThreadFactory.Builder().namingPattern("ivr-action-%s").build());
     }
     private void initIVRSchema() {
@@ -178,9 +180,9 @@ public class IVRActionService {
                                 .setSocketTimeout(5000)
                                 .setConnectTimeout(5000).build())
                 //总共最多1000并发
-                .setMaxConnTotal(1000)
-                //每个host最多100并发
-                .setMaxConnPerRoute(100)
+                .setMaxConnTotal(3000)
+                //每个host最多300并发
+                .setMaxConnPerRoute(1000)
                 //禁用cookies
                 .disableCookieManagement()
                 .build();
@@ -240,14 +242,14 @@ public class IVRActionService {
                     logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
                 }
             }catch (Throwable t){
-                logger.error("调用{}失败,耗时={}",url,(System.currentTimeMillis() - start));
+                logger.error("调用{}失败,耗时={},error={}",url,(System.currentTimeMillis() - start),t);
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
         return res;
     }
 
-    private static String inputUrl(String url,String key,String value){
+    private static String inputUrl(String url,String key,String value) throws UnsupportedEncodingException {
         URI uri = URI.create(url);
         String scheme = uri.getScheme();
         String host = uri.getHost();
@@ -257,9 +259,9 @@ public class IVRActionService {
         String query = uri.getQuery();
         String fragment = uri.getFragment();
         if(StringUtil.isEmpty(query)){
-            query = key + "=" + value;
+            query = key + "=" + URLEncoder.encode(value,"UTF-8");
         }else{
-            query = query + "&" + key + "=" + value;
+            query = query + "&" + key + "=" + URLEncoder.encode(value,"UTF-8");
         }
         if(p != -1){
             port = ":"+p;
@@ -315,7 +317,7 @@ public class IVRActionService {
                     logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
                 }
             }catch (Throwable t){
-                logger.error("调用{}失败,耗时={}",url,(System.currentTimeMillis() - start));
+                logger.error("调用{}失败,耗时={},error={}",url,(System.currentTimeMillis() - start),t);
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
@@ -406,6 +408,8 @@ public class IVRActionService {
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
+                        //incoming是第一个会话所以是自己引用自己
+                        .put(BusinessState.REF_RES_ID,res_id)
                         //TYPE_IVR_INCOMING 才需要等待应答标记
                         .put(IVR_ANSWER_WAITTING_FIELD,"1")
                         //incoming事件from 和 to是相反的

@@ -25,6 +25,9 @@ public class BusinessState implements Serializable{
 
     public static final String SESSIONID = "sessionid";
 
+    /**引用的res_id，同一个会议的所有会话资源的ref_res_id要一样，如果没有ref_res_id，那么ref_res_id等于自身的res_id**/
+    public static final String REF_RES_ID = "ref_res_id";
+
     private String tenantId;
     private String appId;
     private String id;
