@@ -269,7 +269,7 @@ public class ConversationService {
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RELEASE, params);
         try {
-            rpcCaller.invoke(sessionContext, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest,true);
         } catch (Exception e) {
             throw new InvokeCallException(e);
         }
@@ -574,7 +574,7 @@ public class ConversationService {
                     .putIfNotEmpty("areaId",call_state.getAreaId())
                     .build();
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_EXIT, params);
-            rpcCaller.invoke(sessionContext, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest,true);
         } catch (Throwable e) {
             logger.error("调用将呼叫退出会议失败",e);
         }
@@ -788,7 +788,7 @@ public class ConversationService {
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
         try {
-            rpcCaller.invoke(sessionContext, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest,true);
         } catch (Throwable e) {
             logger.error("调用失败",e);
         }

@@ -38,6 +38,9 @@ public class ReceivedtmfActionHandler extends ActionHandler{
     @Autowired
     private PlayFileUtil playFileUtil;
 
+    @Autowired
+    private IVRActionService ivrActionService;
+
     @Override
     public String getAction() {
         return "get";
@@ -55,6 +58,7 @@ public class ReceivedtmfActionHandler extends ActionHandler{
         List<String> plays = getPlay(root);
 
         String res_id = state.getResId();
+        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT_FIELD,next);
         try {
             plays = playFileUtil.convertArray(state.getTenantId(),state.getAppId(),plays);
             String play_content = null;
@@ -79,8 +83,10 @@ public class ReceivedtmfActionHandler extends ActionHandler{
             rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Throwable e) {
             logger.error("调用失败",e);
+            ivrActionService.doAction(callId,new MapBuilder<String,Object>()
+                    .putIfNotEmpty("error","receive error")
+                    .build());
         }
-        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT_FIELD,next);
         return true;
     }
 

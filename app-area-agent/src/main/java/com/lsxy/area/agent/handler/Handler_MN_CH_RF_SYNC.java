@@ -112,7 +112,7 @@ public class Handler_MN_CH_RF_SYNC extends RpcRequestHandler{
         RPCRequest request1 = RPCRequest.newRequest(ServiceConstants.MN_CH_RF_SYNC_OK,"");
         request1.setBody(param);
         try {
-            rpcCaller.invoke(sessionContext,request1);
+            rpcCaller.invoke(sessionContext,request1,true);
         } catch (Exception ex) {
             logger.error("录音放音文件指令失败:"+request1,ex);
         }

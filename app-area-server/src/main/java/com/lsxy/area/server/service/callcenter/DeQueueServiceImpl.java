@@ -312,7 +312,7 @@ public class DeQueueServiceImpl implements DeQueueService {
                             .put("areaId",area_id)
                             .build();
                     RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_STOP, params);
-                    rpcCaller.invoke(sessionContext, rpcrequest);
+                    rpcCaller.invoke(sessionContext, rpcrequest,true);
             }
         } catch (Throwable e) {
             logger.error("调用失败",e);
