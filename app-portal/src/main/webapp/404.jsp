@@ -8,7 +8,7 @@
 	</head>
 	<body>
 	<script >
-		window.location.href='<%=SystemConfig.getProperty("global.official.website.url")%>/404';
+		window.location.href='${globalWebsite}/404';
 	</script>
 		<%--<div class="container" style="margin-top:20px;">--%>
 			<%--<div class="jumbotron">--%>

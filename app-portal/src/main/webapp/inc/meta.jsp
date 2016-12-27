@@ -12,6 +12,7 @@
 	request.setAttribute("today", sToday);
 	String userAgent = request.getHeader("User-Agent");
 	String resPrefixUrl = SystemConfig.getProperty("global.resPrefixUrl",request.getContextPath());
+	String globalWebsite = SystemConfig.getProperty("global.official.website.url","https://www.oneyun.com");
 	pageContext.setAttribute("resPrefixUrl",resPrefixUrl);
 
 	String vt = SystemConfig.getVersionStamp();
