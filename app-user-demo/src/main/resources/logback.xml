@@ -6,10 +6,4 @@
     <include resource="logback-yunhuni.xml"/>
     <logger name="com.lsxy" level="DEBUG" additivity="true" />
 
-
-    <root level="INFO">
-        <appender-ref ref="STDOUT" />
-        <appender-ref ref="gelf" />
-        <!--<appender-ref ref="ROLLINGFILE"/>-->
-    </root>
 </configuration>
