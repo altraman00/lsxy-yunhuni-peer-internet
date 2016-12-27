@@ -116,7 +116,6 @@ public class NotifyCallbackUtil {
                     }
                     if(!success){
                         if(retry >0){
-                            logger.info("开始重试");
                             postNotify(url,data,retry-1);
                         }
                     }
@@ -126,7 +125,6 @@ public class NotifyCallbackUtil {
                 public void failed(Exception e) {
                     logger.error("url={}发送事件通知失败",url,e);
                     if(retry >0){
-                        logger.info("开始重试");
                         postNotify(url,data,retry-1);
                     }
 
@@ -136,7 +134,6 @@ public class NotifyCallbackUtil {
                 public void cancelled() {
                     logger.error("url={}发送事件通知被取消",url);
                     if(retry >0){
-                        logger.info("开始重试");
                         postNotify(url,data,retry-1);
                     }
                 }
