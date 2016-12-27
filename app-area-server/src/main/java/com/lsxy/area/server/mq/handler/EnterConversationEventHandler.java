@@ -32,6 +32,7 @@ public class EnterConversationEventHandler implements MQMessageHandler<EnterConv
                     message.getMaxDuration(),message.getPlayFile(),message.getVoiceMode());
         } catch (YunhuniApiException e) {
             logger.info("加入交谈失败{}",message);
+            conversationService.logicExit(message.getConversationId(),message.getCallId());
         }
     }
 }
