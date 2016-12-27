@@ -159,7 +159,7 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
     }
 
     @Override
-    public List<VoiceFileRecord> getListBySessionId(String sessionId) {
+    public List<VoiceFileRecord> getListBySessionId(String... sessionId) {
         String hql = "  FROM VoiceFileRecord obj WHERE obj.sessionId in ( ?1)";
         List list = this.list(hql, sessionId);
         return list;

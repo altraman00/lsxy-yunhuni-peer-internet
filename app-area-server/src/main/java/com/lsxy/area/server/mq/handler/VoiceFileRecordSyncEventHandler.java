@@ -157,15 +157,15 @@ public class VoiceFileRecordSyncEventHandler implements MQMessageHandler<VoiceFi
                     if (temp==null||temp.size() == 0) {
                         return null;
                     }
-                    String te = "";
-                    for (int i = 0; i < temp.size(); i++) {
-                        te += "'" + temp.get(i) + "'";
-                        if (i != temp.size() - 1) {
-                            te += ",";
-                        }
-                    }
+//                    String te = "";
+//                    for (int i = 0; i < temp.size(); i++) {
+//                        te += "'" + temp.get(i) + "'";
+//                        if (i != temp.size() - 1) {
+//                            te += ",";
+//                        }
+//                    }
                     //使用ivr的id
-                    List list = voiceFileRecordService.getListBySessionId( te);
+                    List list = voiceFileRecordService.getListBySessionId( temp.toArray(new String[0]));
                     return list;
                 }
             }
