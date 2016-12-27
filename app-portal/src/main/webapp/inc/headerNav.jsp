@@ -14,10 +14,10 @@
         </li>
     </ul>
     <ul class="nav navbar-nav navbar-right hidden-xs nav-user nav_b">
-        <%--<li class="dropdown hidden-xs "><a href="#" onclick="window.open('<%=SystemConfig.getProperty("global.official.website.url")%>')" class="dropdown-toggle" data-toggle="dropdown">--%>
+        <%--<li class="dropdown hidden-xs "><a href="#" onclick="window.open('${globalWebsite}')" class="dropdown-toggle" data-toggle="dropdown">--%>
             <%--<i class="fa fa-fw fa-book"></i>文档中心--%>
         <%--</a></li>--%>
-        <li class="hidden-xs a-color"> <a href="#" onclick="window.open('<%=SystemConfig.getProperty("global.official.website.url")%>')" class="dropdown-toggle" data-toggle="dropdown" onclick="window.location.href='news.html' ">
+        <li class="hidden-xs a-color"> <a href="#" onclick="window.open('${globalWebsite}')" class="dropdown-toggle" data-toggle="dropdown" onclick="window.location.href='news.html' ">
             <i class="iconfont icon-menu-index"></i>官网首页</a>
 
         </li>
