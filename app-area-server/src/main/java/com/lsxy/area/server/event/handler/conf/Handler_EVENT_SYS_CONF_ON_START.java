@@ -120,6 +120,7 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
                 conversationService.join(conversationId,initiator,null,null,null);
             } catch (YunhuniApiException e) {
                 logger.info("加入交谈失败:{}",e.getCode());
+                conversationService.logicExit(conversationId,initiator);
             }
         }
     }
