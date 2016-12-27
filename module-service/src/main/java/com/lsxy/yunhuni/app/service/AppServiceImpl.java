@@ -182,7 +182,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         if(tenantId == null){
             return false;
         }
-        if(tenantId == null){
+        if(appId == null){
             return false;
         }
         if(service == null){
