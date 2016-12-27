@@ -13,7 +13,7 @@
 
 <div class="register-header">
     <div class="box">
-        <a a href="#" onclick="window.location.href='<%=SystemConfig.getProperty("global.official.website.url")%>'">
+        <a a href="#" onclick="window.location.href='${globalWebsite}'">
         <img class="logo" src="${resPrefixUrl }/images/index/logo_top.png" /></a>
         <div class="text">
             如果有壹耘账号，<a href="${ctx }/login">立即登录</a>

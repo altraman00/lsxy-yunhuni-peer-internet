@@ -88,8 +88,6 @@ public class CalCostServiceImpl implements CalCostService{
             Date dt = cdr.getCallEndDt();
             ProductItem product = productItemService.getProductItemByCode(productCode.name());
             ProductPrice productPrice = productPriceService.getAvailableProductPrice(product.getId());
-            //计量单位
-            String unit = productPrice.getUnit();
             switch (productCode){
     //            case captcha_call:{
     //                //短信
@@ -197,31 +195,32 @@ public class CalCostServiceImpl implements CalCostService{
 
     @Override
     public boolean isCallTimeRemainOrBalanceEnough(String apiCmd, String tenantId) {
+        //TODO 当需要时再加上余量判断（把注释打开）
         ProductCode productCode = ProductCode.changeApiCmdToProductCode(apiCmd);
         switch(productCode){
             case captcha_call:{
-                Long sms = calBillingService.getSms(tenantId);
-                if(sms > 0){
-                    return true;
-                }else{
+//                Long sms = calBillingService.getSms(tenantId);
+//                if(sms > 0){
+//                    return true;
+//                }else{
                     return isBalanceEnough(tenantId);
-                }
+//                }
             }
             case sys_conf:{
-                Long conference = calBillingService.getConference(tenantId);
-                if(conference > 0){
-                    return true;
-                }else{
+//                Long conference = calBillingService.getConference(tenantId);
+//                if(conference > 0){
+//                    return true;
+//                }else{
                     return isBalanceEnough(tenantId);
-                }
+//                }
             }
             default:{
-                Long voice = calBillingService.getVoice(tenantId);
-                if(voice > 0){
-                    return true;
-                }else{
+//                Long voice = calBillingService.getVoice(tenantId);
+//                if(voice > 0){
+//                    return true;
+//                }else{
                     return isBalanceEnough(tenantId);
-                }
+//                }
             }
         }
     }

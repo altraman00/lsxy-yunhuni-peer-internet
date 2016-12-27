@@ -13,7 +13,7 @@
 
 <div class="register-header">
     <div class="box">
-        <a a href="#" onclick="window.location.href='<%=SystemConfig.getProperty("global.official.website.url")%>'">
+        <a a href="#" onclick="window.location.href='${globalWebsite}'">
         <img class="logo" src="${resPrefixUrl }/images/index/logo_top.png" /></a>
         <div class="text">
             如果有壹耘账号，<a href="${ctx }/login">立即登录</a>
@@ -58,7 +58,7 @@
                     </div>
                     <div class="form-group reader">
                         <div class="col-lg-9 col-lg-offset-3">
-                            <input type="checkbox"  id="registerRead"> 点击阅读<a href="${resPrefixUrl}/explain_registe.html" target="_blank">注册协议</a> <span class="tips-error" id="registerReadMsg" hidden>请先阅读注册协议</span>
+                            <input type="checkbox"  id="registerRead"> 点击阅读<a href="${globalWebsite}/develop/book/platform" target="_blank">注册协议</a> <span class="tips-error" id="registerReadMsg" hidden>请先阅读注册协议</span>
                         </div>
                     </div>
                     <div class="form-group ">
