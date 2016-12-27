@@ -191,7 +191,11 @@
                         tag.html('录音下载').attr("data-statu","1");
                     }else{
                         showtoast(result.errorMsg);
-                        tag.html('下载失败,请重试').attr("data-statu","1");
+                        if(result.errorCode == "0401"){
+                            tag.remove();
+                        }else{
+                            tag.html('下载失败,请重试').attr("data-statu","1");
+                        }
                     }
                 });
             }else if(ststus==2){
