@@ -27,7 +27,7 @@ public interface VoiceFileRecordService extends BaseService<VoiceFileRecord> {
     long getSumSize(String tenant,String app);
 
     /**根据sessionid获取录音文件*/
-    List<VoiceFileRecord> getListBySessionId(String sessionId);
+    List<VoiceFileRecord> getListBySessionId(String... sessionId);
     /** 根据创建时间，租户，区域获取AA文件存在的区域*/
     List<String> getAAAreaByCreateTimeAndTenantId(Date createTime,String tenantId);
     /** 根据创建时间，租户，区域获取录音文件AA文件存在*/
