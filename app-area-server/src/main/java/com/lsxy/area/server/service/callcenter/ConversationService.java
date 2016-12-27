@@ -731,11 +731,14 @@ public class ConversationService {
                 }
             }
         }else{
-            //不是ivr 不需要下一步  直接挂断
-            if(logger.isDebugEnabled()) {
-                logger.debug("开始挂断坐席callid={}", callId);
+
+            if(call_state.getClosed() == null || !call_state.getClosed()){
+                //不是ivr 不需要下一步  直接挂断
+                if(logger.isDebugEnabled()) {
+                    logger.debug("开始挂断坐席callid={}", callId);
+                }
+                hangup(call_state.getResId(),callId,call_state.getAreaId());
             }
-            hangup(call_state.getResId(),callId,call_state.getAreaId());
         }
     }
 
