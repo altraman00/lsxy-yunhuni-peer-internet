@@ -37,38 +37,36 @@
         </triggeringPolicy>
     </appender>
 
-    <appender name="gelf" class="biz.paluch.logging.gelf.logback.GelfLogbackAppender">
-        <host>tcp:graylog.yunhuni.com</host>
-        <port>12205</port>
-        <version>1.1</version>
-        <facility>production</facility>
-        <extractStackTrace>true</extractStackTrace>
-        <filterStackTrace>true</filterStackTrace>
-        <mdcProfiling>true</mdcProfiling>
-        <timestampPattern>yyyy-MM-dd HH:mm:ss,SSSS</timestampPattern>
-        <maximumMessageSize>8192</maximumMessageSize>
+    <!--<appender name="gelf" class="biz.paluch.logging.gelf.logback.GelfLogbackAppender">-->
+        <!--<host>tcp:graylog.yunhuni.com</host>-->
+        <!--<port>12205</port>-->
+        <!--<version>1.1</version>-->
+        <!--<facility>production</facility>-->
+        <!--<extractStackTrace>true</extractStackTrace>-->
+        <!--<filterStackTrace>true</filterStackTrace>-->
+        <!--<mdcProfiling>true</mdcProfiling>-->
+        <!--<timestampPattern>yyyy-MM-dd HH:mm:ss,SSSS</timestampPattern>-->
+        <!--<maximumMessageSize>8192</maximumMessageSize>-->
 
-        <!-- This are static fields -->
-        <additionalFields>systemId=${systemId},env=production</additionalFields>
-        <!-- Optional: Specify field types -->
-        <additionalFieldTypes>systemId=String,env=String</additionalFieldTypes>
+        <!--&lt;!&ndash; This are static fields &ndash;&gt;-->
+        <!--<additionalFields>systemId=${systemId},env=production</additionalFields>-->
+        <!--&lt;!&ndash; Optional: Specify field types &ndash;&gt;-->
+        <!--<additionalFieldTypes>systemId=String,env=String</additionalFieldTypes>-->
 
-        <!-- This are fields using MDC -->
-        <mdcFields>mdcField2</mdcFields>
-        <dynamicMdcFields>mdc.*,(mdc|MDC)fields</dynamicMdcFields>
-        <includeFullMdc>true</includeFullMdc>
-        <!--<filter class="ch.qos.logback.classic.filter.ThresholdFilter">-->
-        <!--<level>INFO</level>-->
-        <!--</filter>-->
-    </appender>
+        <!--&lt;!&ndash; This are fields using MDC &ndash;&gt;-->
+        <!--<mdcFields>mdcField2</mdcFields>-->
+        <!--<dynamicMdcFields>mdc.*,(mdc|MDC)fields</dynamicMdcFields>-->
+        <!--<includeFullMdc>true</includeFullMdc>-->
+        <!--&lt;!&ndash;<filter class="ch.qos.logback.classic.filter.ThresholdFilter">&ndash;&gt;-->
+        <!--&lt;!&ndash;<level>INFO</level>&ndash;&gt;-->
+        <!--&lt;!&ndash;</filter>&ndash;&gt;-->
+    <!--</appender>-->
 
 
-    <!--<root level="INFO">-->
-        <!--<appender-ref ref="STDOUT" />-->
-        <!--<appender-ref ref="gelf" />-->
-        <!--<appender-ref ref="ROLLINGFILE"/>-->
-    <!--</root>-->
-
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="ROLLINGFILE"/>
+    </root>
 
     <logger name="com.lsxy" level="DEBUG" additivity="true" />
     <logger name="com.lsxy.framework.rpc" level="INFO" additivity="true" />
