@@ -129,15 +129,15 @@ public class Handler_MN_CH_RF_SYNC_OK extends RpcRequestHandler {
                     if (temp==null||temp.size() == 0) {
                         return null;
                     }
-                    String te = "";
-                    for (int i = 0; i < temp.size(); i++) {
-                        te += "'" + temp.get(i) + "'";
-                        if (i != temp.size() - 1) {
-                            te += ",";
-                        }
-                    }
-                    //使用ivr的id
-                    List list = voiceFileRecordService.getListBySessionId( te);
+//                    String te = "";
+//                    for (int i = 0; i < temp.size(); i++) {
+//                        te += "'" + temp.get(i) + "'";
+//                        if (i != temp.size() - 1) {
+//                            te += ",";
+//                        }
+//                    }
+//                    //使用ivr的id
+                    List list = voiceFileRecordService.getListBySessionId( temp.toArray(new String[0]));
                     return list;
                 }
             }

@@ -4,6 +4,7 @@ import com.lsxy.app.area.cti.RpcError;
 import com.lsxy.app.area.cti.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.area.agent.cti.CTINode;
+import com.lsxy.area.agent.utils.RefResIdUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -50,7 +51,7 @@ public class Handler_MN_CH_SYS_CONF extends RpcRequestHandler{
         String conf_id = (String)params.get("user_data");
 
         try {
-            CTINode cticlient = cticlientContext.getAvalibleNode(null);
+            CTINode cticlient = cticlientContext.getAvalibleNode(RefResIdUtil.get(params));
             cticlient.createResource( "sys.conf", params, new RpcResultListener(){
                 @Override
                 protected void onResult(Object o) {
