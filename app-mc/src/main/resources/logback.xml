@@ -9,9 +9,4 @@
     <logger name="org.thymeleaf" level="ERROR" additivity="true" />
     <logger name="org.springframework.security" level="INFO" additivity="true" />
 
-    <root level="INFO">
-        <appender-ref ref="STDOUT" />
-        <appender-ref ref="gelf" />
-        <!--<appender-ref ref="ROLLINGFILE"/>-->
-    </root>
 </configuration>

@@ -9,9 +9,4 @@
     <logger name="com.lsxy.framework.web.utils.WebUtils" level="INFO" additivity="true" />
     <logger name="com.lsxy.app.api.gateway.security.ip.BlackIpListFilter" level="INFO" additivity="false" />
 
-    <root level="INFO">
-        <appender-ref ref="STDOUT" />
-        <appender-ref ref="gelf" />
-        <appender-ref ref="ROLLINGFILE"/>
-    </root>
 </configuration>

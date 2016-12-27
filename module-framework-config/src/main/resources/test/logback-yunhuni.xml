@@ -18,7 +18,15 @@
             <pattern>${CONSOLE_LOG_PATTERN}</pattern>
         </encoder>
     </appender>
-
+    <!-- 异步输出 -->
+    <appender name ="AROLLINGFILE" class= "ch.qos.logback.classic.AsyncAppender">
+        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+        <discardingThreshold >0</discardingThreshold>
+        <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+        <queueSize>512</queueSize>
+        <!-- 添加附加的appender,最多只能添加一个 -->
+        <appender-ref ref ="ROLLINGFILE"/>
+    </appender>
     <!-- 按照每天生成日志文件 -->
     <appender name="ROLLINGFILE"  class="ch.qos.logback.core.rolling.RollingFileAppender">
         <Prudent>true</Prudent>
@@ -37,31 +45,35 @@
         </triggeringPolicy>
     </appender>
 
-    <appender name="gelf" class="biz.paluch.logging.gelf.logback.GelfLogbackAppender">
-        <host>tcp:10.163.3.165</host>
-        <port>12205</port>
-        <version>1.1</version>
-        <facility>java-test</facility>
-        <extractStackTrace>true</extractStackTrace>
-        <filterStackTrace>true</filterStackTrace>
-        <mdcProfiling>true</mdcProfiling>
-        <timestampPattern>yyyy-MM-dd HH:mm:ss,SSSS</timestampPattern>
-        <maximumMessageSize>8192</maximumMessageSize>
+    <!--<appender name="gelf" class="biz.paluch.logging.gelf.logback.GelfLogbackAppender">-->
+        <!--<host>tcp:10.163.3.165</host>-->
+        <!--<port>12205</port>-->
+        <!--<version>1.1</version>-->
+        <!--<facility>java-test</facility>-->
+        <!--<extractStackTrace>true</extractStackTrace>-->
+        <!--<filterStackTrace>true</filterStackTrace>-->
+        <!--<mdcProfiling>true</mdcProfiling>-->
+        <!--<timestampPattern>yyyy-MM-dd HH:mm:ss,SSSS</timestampPattern>-->
+        <!--<maximumMessageSize>8192</maximumMessageSize>-->
 
-        <!-- This are static fields -->
-        <additionalFields>systemId=${systemId},env=test</additionalFields>
-        <!-- Optional: Specify field types -->
-        <additionalFieldTypes>systemId=String,env=String</additionalFieldTypes>
+        <!--&lt;!&ndash; This are static fields &ndash;&gt;-->
+        <!--<additionalFields>systemId=${systemId},env=test</additionalFields>-->
+        <!--&lt;!&ndash; Optional: Specify field types &ndash;&gt;-->
+        <!--<additionalFieldTypes>systemId=String,env=String</additionalFieldTypes>-->
 
-        <!-- This are fields using MDC -->
-        <mdcFields>mdcField2</mdcFields>
-        <dynamicMdcFields>mdc.*,(mdc|MDC)fields</dynamicMdcFields>
-        <includeFullMdc>true</includeFullMdc>
-        <!--<filter class="ch.qos.logback.classic.filter.ThresholdFilter">-->
-            <!--<level>INFO</level>-->
-        <!--</filter>-->
-    </appender>
-
+        <!--&lt;!&ndash; This are fields using MDC &ndash;&gt;-->
+        <!--<mdcFields>mdcField2</mdcFields>-->
+        <!--<dynamicMdcFields>mdc.*,(mdc|MDC)fields</dynamicMdcFields>-->
+        <!--<includeFullMdc>true</includeFullMdc>-->
+        <!--&lt;!&ndash;<filter class="ch.qos.logback.classic.filter.ThresholdFilter">&ndash;&gt;-->
+            <!--&lt;!&ndash;<level>INFO</level>&ndash;&gt;-->
+        <!--&lt;!&ndash;</filter>&ndash;&gt;-->
+    <!--</appender>-->
+    <!---->
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="AROLLINGFILE"/>
+    </root>
 
     <logger name="com.lsxy" level="DEBUG" additivity="true" />
     <logger name="com.lsxy.framework.rpc.netty.codec" level="INFO" additivity="true" />
@@ -70,6 +82,8 @@
     <logger name="org.springframework" level="ERROR" additivity="true" />
     <logger name="org.hibernate" level="ERROR" additivity="true" />
     <logger name="org.springframework.web.servlet.mvc" level="INFO" additivity="true" />
+
+
 
 
 </included>
