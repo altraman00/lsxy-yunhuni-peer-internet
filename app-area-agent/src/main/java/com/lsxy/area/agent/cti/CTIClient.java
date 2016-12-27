@@ -36,6 +36,10 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
     @Value("${area_agent_client_cti_unitid:20}")
     private byte localUnitID;
 
+    //cti 区域节点标识 通过环境变量配置
+    @Value("${area_agent_client_cti_areaid:1}")
+    private String ctiAreaId;
+
     @Autowired
     private CTIClientContext clientContext;
 
@@ -78,6 +82,8 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
      */
     private void createNewCTICommander(String serverIp) throws InterruptedException {
         Unit.createCommander((byte)clientId, serverIp, this, this);
+
+
         clientId = clientId + 2;
         if (logger.isDebugEnabled()) {
             logger.debug("client id {} create invoke complete, connect to {}", clientId, serverIp);
@@ -150,7 +156,8 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
 
         String unitId = busAddress.getUnitId() + "";
         String pid = busAddress.getClientId() + "";
-        CTINode node = clientContext.updateNodeLoadData(unitId,pid,serverInfo.getLoads());
+        String nodeid = serverInfo.getId();
+        CTINode node = clientContext.updateNodeLoadData(nodeid,serverInfo.getLoads());
         if(node != null){
             String param = String.format("node=%s&load=%s&cinNumber=%s&coutNumber=%s&cinCount=%s&coutCount=%s",node.getId(),node.getLoadValue(),node.getCinNumber(),node.getCoutNumber(),node.getCinCount(),node.getCoutCount());
             try {
@@ -192,6 +199,7 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
             logger.debug("CTI 服务连接成功：" + client.getIp() +":" + client.getPort());
         }
 
+
         if(client instanceof  Commander){
             String serverIp = client.getIp();
             clientContext.registerCommander(serverIp, (Commander) client);
@@ -209,7 +217,7 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
         logger.error("CTI 服务连接丢失："+client.getIp());
         String ip = client.getIp();
         byte unitid = client.getUnitId();
-        clientContext.ctiClientConnectionLost(ip,unitid);
+        clientContext.ctiClientConnectionLost(ctiAreaId,ip,unitid);
     }
 
     /**
@@ -238,7 +246,7 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
     public void globalConnectStateChanged(byte unitId, byte clientId, byte clientType, byte status, String addInfo) {
         //AA只关心类型为2的IPSC服务
         if(clientType == 2){
-            clientContext.connectStateChanged(unitId,clientId,status);
+            clientContext.connectStateChanged(ctiAreaId,unitId,clientId,status);
         }
     }
 }
