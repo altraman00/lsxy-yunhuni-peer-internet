@@ -69,7 +69,7 @@ public class SendtmfActionHandler extends ActionHandler{
                         .putIfNotEmpty("end_time",System.currentTimeMillis())
                         .putIfNotEmpty("error","send error")
                         .build();
-                notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3);
+                notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
             }
             ivrActionService.doAction(callId,new MapBuilder<String,Object>()
                     .putIfNotEmpty("error","send error")

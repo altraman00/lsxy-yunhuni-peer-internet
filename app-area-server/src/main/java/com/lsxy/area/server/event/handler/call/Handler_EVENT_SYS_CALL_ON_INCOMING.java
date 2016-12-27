@@ -128,6 +128,9 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             }
         }else{
             //不是公共测试号，从号码资源池中查出被叫号码的应用
+            if(StringUtils.isBlank(to.getAppId())){
+                logger.error("呼入号码没有绑定应用：{}",params);
+            }
             app = appService.findById(to.getAppId());
             if(app == null){
                 logger.error("号码资源池中找不到被叫号码对应的应用：{}",params);
