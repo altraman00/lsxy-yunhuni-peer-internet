@@ -201,7 +201,10 @@ public class BillDetailController extends AbstractRestController {
                 }
                 List<VoiceFileRecord> list = getFile(id);
                 if(list==null||list.size()==0){
-                    return RestResponse.failed("0000","无对应的录音文件");
+                    //TODO 更新CDR
+                    voiceCdr.setRecording(0);
+                    voiceCdrService.save(voiceCdr);
+                    return RestResponse.failed("0401","无对应的录音文件");
                 }
                 //先判断是否文件已上传，如果是的话，直接生成临时下载链接，否则
                 boolean flag = false;
