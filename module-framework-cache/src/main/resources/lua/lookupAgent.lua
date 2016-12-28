@@ -11,7 +11,7 @@ local fetching = ARGV[4]
 local extension_enable = ARGV[5]
 local result
 
-local cas = redis.call('ZREVRANGE',cAs_key,0,-1)
+local cas = redis.call('ZREVRANGE',cAs_key,0,-1,'WITHSCORES')
 local cas_size = #cas
 redis.log(redis.LOG_WARNING,cAs_key)
 redis.log(redis.LOG_WARNING,extension_state_key_prefix)
@@ -31,7 +31,9 @@ local array_to_map = function(_array)
 	return _map;
 end
 
-for i=1,cas_size do
+local idleAgents = {}
+
+for i=1,cas_size,2 do
 	local agent_id = cas[i]
     local agent = array_to_map(redis.call('HGETALL',agent_state_key_prefix..agent_id))
 	redis.log(redis.LOG_WARNING,agent['state'])
@@ -45,15 +47,40 @@ for i=1,cas_size do
 		redis.log(redis.LOG_WARNING,extension['enable'])
 		if(extension and extension['enable'] and extension['enable'] == extension_enable)
 		then
-			local ok = redis.call('setnx',agent_lock_key_prefix..agent_id, '1')
-			redis.log(redis.LOG_WARNING,ok)
-			if ok == 1 then
-				redis.call('HSET',agent_state_key_prefix..agent_id,'state',fetching)
-				result = agent_id
-				redis.call('DEL', agent_lock_key_prefix..agent_id)
-				return result
+			local idleAgent = {id=agent_id,score=cas[i+1],lastTime=agent["lastTime"] }
+			if idleAgent.score == nil then
+				idleAgent.score = 0
+			else
+				idleAgent.score = tonumber(idleAgent.score)
 			end
+			if idleAgent.lastTime == nil then
+				idleAgent.lastTime = 0
+			else
+				idleAgent.lastTime = tonumber(idleAgent.lastTime)
+			end
+			table.insert(idleAgents,idleAgent)
 		end
+	end
+end
+
+table.sort(idleAgents, function(a,b)
+	if a.score == b.score then
+		return a.lastTime<b.lastTime
+	else
+		return a.score>b.score
+	end
+end )
+
+for i in pairs(idleAgents) do
+	local id = idleAgents[i].id
+	local ok = redis.call('setnx',agent_lock_key_prefix..id, '1')
+	redis.log(redis.LOG_WARNING,ok)
+	if ok == 1 then
+		redis.call('HSET',agent_state_key_prefix..id,'lastTime',cur_time)
+		redis.call('HSET',agent_state_key_prefix..id,'state',fetching)
+		redis.call('DEL', agent_lock_key_prefix..id)
+		result = id
+		return result
 	end
 end
 
