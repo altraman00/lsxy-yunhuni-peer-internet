@@ -116,6 +116,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         //开始呼叫坐席
         String agentCallId = conversationService.inviteAgent(appId,state.getBusinessData().get(BusinessState.REF_RES_ID),state.getId(),conversation,result.getAgent().getId(),
                 result.getAgent().getName(),result.getExtension().getId(),
+                state.getBusinessData().get("from"),state.getBusinessData().get("to"),
                 result.getExtension().getTelnum(),result.getExtension().getType(),
                 result.getExtension().getUser(),conversationTimeout,45);
 
