@@ -14,6 +14,8 @@ import com.lsxy.framework.rpc.FrameworkRPCConfig;
 import com.lsxy.framework.rpc.exceptions.RemoteServerStartException;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
 import com.lsxy.yunhuni.api.YunhuniApiConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration;
@@ -32,8 +34,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableDubboConfiguration
 @EnableAsync
 public class AreaServerMainClass extends AbstractSpringBootStarter {
-
-
+    private static final Logger logger = LoggerFactory.getLogger(AreaServerMainClass.class);
     private static final String systemId = "area.server";
     static {
         System.setProperty("systemId",systemId);
