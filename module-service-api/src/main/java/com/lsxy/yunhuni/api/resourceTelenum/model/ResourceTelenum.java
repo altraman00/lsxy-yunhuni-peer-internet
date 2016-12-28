@@ -33,7 +33,6 @@ public class ResourceTelenum extends IdEntity{
 
     private Integer status;//1:已被租用 0:未被租用
     private String telNumber;//号码
-    private Tenant tenant;//所属租户
     private String level;//号码等级,
     private String callUri;//呼出URI,
     private String source;//来源
@@ -49,11 +48,13 @@ public class ResourceTelenum extends IdEntity{
     private String isCalled;//可被叫
     private String isThrough;//可透传
     private String type;//1采购线路0租户自带
+    private String appId;
+    private String tenantId;
 
     @Transient
-    private String appId;
-    @Transient
     private LineGateway line;
+    @Transient
+    private Tenant tenant;//所属租户
 
     @Column(name = "is_through")
     public String getIsThrough() {
@@ -157,15 +158,6 @@ public class ResourceTelenum extends IdEntity{
         this.areaCode = areaCode;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "tenant_id")
-    public Tenant getTenant() {
-        return tenant;
-    }
-
-    public void setTenant(Tenant tenant) {
-        this.tenant = tenant;
-    }
 
     @Column(name = "status")
     public Integer getStatus() {
@@ -211,7 +203,25 @@ public class ResourceTelenum extends IdEntity{
         this.remark = remark;
     }
 
-    public ResourceTelenum(String telNumber,String callUri,String operator, String areaCode,String lineId, String amount) {
+    @Column(name = "app_id")
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    @Column(name = "tenant_id")
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public ResourceTelenum(String telNumber, String callUri, String operator, String areaCode, String lineId, String amount) {
         this.operator = operator;
         this.areaCode = areaCode;
         this.amount = new BigDecimal(amount);
@@ -241,20 +251,20 @@ public class ResourceTelenum extends IdEntity{
     }
 
     @Transient
-    public String getAppId() {
-        return appId;
-    }
-
-    public void setAppId(String appId) {
-        this.appId = appId;
-    }
-
-    @Transient
     public LineGateway getLine() {
         return line;
     }
 
     public void setLine(LineGateway line) {
         this.line = line;
+    }
+
+    @Transient
+    public Tenant getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(Tenant tenant) {
+        this.tenant = tenant;
     }
 }

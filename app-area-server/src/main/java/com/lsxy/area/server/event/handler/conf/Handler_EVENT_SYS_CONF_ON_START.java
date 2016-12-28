@@ -92,6 +92,9 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         }
         if(res_id!=null){
             businessStateService.updateResId(conf_id,res_id);
+            if(state.getBusinessData().get(BusinessState.REF_RES_ID) == null){
+                businessStateService.updateInnerField(conf_id,BusinessState.REF_RES_ID,res_id);
+            }
         }
         if(logger.isDebugEnabled()){
             logger.info("confi_id={},state={}",conf_id,state);
@@ -110,17 +113,14 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         if(StringUtils.isBlank(appId)){
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
-        App app = appService.findById(state.getAppId());
-        if(app == null){
-            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
-        }
 
         String initiator = conversationService.getInitiator(conversationId);
         if(initiator != null){
             try {
-                conversationService.join(appId,conversationId,initiator,null,null,null);
+                conversationService.join(conversationId,initiator,null,null,null);
             } catch (YunhuniApiException e) {
-                e.printStackTrace();
+                logger.info("加入交谈失败:{}",e.getCode());
+                conversationService.logicExit(conversationId,initiator);
             }
         }
     }

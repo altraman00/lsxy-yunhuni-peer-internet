@@ -38,6 +38,13 @@ public class MapBuilder<K,V> {
         return this;
     }
 
+    public MapBuilder<K,V> putIfWhere(K k,boolean where,V v){
+        if(v != null && where && !v.toString().trim().equals("")){
+            put(k,v);
+        }
+        return this;
+    }
+
     public Map<K,V> build(){
         return map;
     }

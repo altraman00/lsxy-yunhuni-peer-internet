@@ -3,10 +3,7 @@ package com.lsxy.yunhuni.api.config.model;
 import com.lsxy.framework.api.base.IdEntity;
 import org.hibernate.annotations.Where;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.math.BigDecimal;
 
 /**
@@ -56,7 +53,6 @@ public class LineGateway extends IdEntity {
     private String status;//状态 1为可用，0为不可用
     private String isPublicLine;//是否全局线路
 
-    @Transient
     private Integer priority;//优先级，临时数据，数据库不保存
 
     @Column(name="is_through")

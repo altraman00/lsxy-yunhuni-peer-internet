@@ -23,7 +23,8 @@ fi
 #是否需要在最后TAIL LOG
 TAIL_LOG=false
 DEPLOY_PACKAGE="jar"
-JAVA_OPTS=""
+JAVA_OPTS="-Xms512m -Xmx512m"
+
 while getopts "A:P:H:M:O:B:STLD" opt; do
   case $opt in
     A)
@@ -52,7 +53,7 @@ while getopts "A:P:H:M:O:B:STLD" opt; do
       TOMCAT_HOME="$OPTARG";
       ;;
     O)
-      JAVA_OPTS="$OPTARG";
+      JAVA_OPTS="$JAVA_OPTS $OPTARG";
       ;;
     B)
       BUILDNUM="-$OPTARG";
@@ -64,11 +65,14 @@ while getopts "A:P:H:M:O:B:STLD" opt; do
   esac
 done
 
+echo "JAVA参数：$JAVA_OPTS"
+
 if [ $ENV = "test" ]; then
     VERSION="TEST$BUILDNUM-SNAPSHOT"
 elif [ $ENV = "development" ]; then
     VERSION="DEV$BUILDNUM-SNAPSHOT"
 fi
+
 
 echo "下载最新版本组件包"
 echo "curl $NEXUS_PATH/com/lsxy/$APP_NAME/$VERSION/maven-metadata.xml"

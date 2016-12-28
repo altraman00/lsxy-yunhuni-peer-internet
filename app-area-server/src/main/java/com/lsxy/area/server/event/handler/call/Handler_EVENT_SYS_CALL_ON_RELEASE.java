@@ -6,12 +6,14 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationService;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
 import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -25,6 +27,8 @@ import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceIvr;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
+import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
+import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -74,7 +78,13 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
     private ConversationService conversationService;
 
     @Autowired
+    private IVRActionService ivrActionService;
+
+    @Autowired
     private CallCenterUtil callCenterUtil;
+
+    @Autowired
+    private CallCenterStatisticsService callCenterStatisticsService;
 
     @Override
     public String getEventName() {
@@ -97,7 +107,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         String call_id = (String)params.get("user_data");
 
         if(StringUtils.isBlank(call_id)){
-            throw new InvalidParamException("call_id is null");
+            //throw new InvalidParamException("call_id is null");
+            logger.info("call_id is null");
+            return null;
         }
 
         BusinessState state = businessStateService.get(call_id);
@@ -114,8 +126,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         try{
             CallSession callSession = callSessionService.findById(state.getBusinessData().get(BusinessState.SESSIONID));
             if(callSession != null){
-                callSession.setStatus(CallSession.STATUS_OVER);
-                callSessionService.save(callSession);
+                CallSession updateSession = new CallSession();
+                updateSession.setStatus(CallSession.STATUS_OVER);
+                callSessionService.update(callSession.getId(),updateSession);
             }
         }catch (Throwable t){
             logger.error("更新会话记录失败",t);
@@ -139,22 +152,56 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             try{
                 VoiceIvr voiceIvr = voiceIvrService.findById(call_id);
                 if(voiceIvr != null){
-                    voiceIvr.setEndTime(new Date());
-                    voiceIvrService.save(voiceIvr);
+                    VoiceIvr updateVoiceIvr= new VoiceIvr();
+                    updateVoiceIvr.setEndTime(new Date());
+                    voiceIvrService.update(voiceIvr.getId(),updateVoiceIvr);
                 }
             }catch (Throwable t){
                 logger.error("更新voiceIvr失败",t);
             }
         }else{
             try{
-                CallCenter callCenter = callCenterService.findById(call_id);
+                String callCenterId = conversationService.getCallCenter(state);
+                CallCenter callCenter = null;
+                if(callCenterId!=null){
+                    callCenter = callCenterService.findById(callCenterId);
+                }
+                if(logger.isDebugEnabled()){
+                    logger.info("[{}][{}][{}]更新CallCenter,callCenter={}",
+                            state.getTenantId(),state.getAppId(),call_id,callCenter);
+                }
                 if(callCenter != null){
-                    callCenter.setEndTime(new Date());
-                    if(callCenter.getStartTime() != null){
-                        Long callLongTime = (new Date().getTime() - callCenter.getStartTime().getTime()) / 1000;
-                        callCenter.setCallTimeLong(callLongTime.toString());
+                    if(conversationService.isCC(state)){
+                        CallCenter updateCallcenter = new CallCenter();
+                        updateCallcenter.setEndTime(new Date());
+                        Long callLongTime  = null;
+                        if(callCenter.getStartTime() != null){
+                            callLongTime = (new Date().getTime() - callCenter.getStartTime().getTime()) / 1000;
+                            updateCallcenter.setCallTimeLong(callLongTime);
+                        }
+                        if("usr".equals(params.get("dropped_by"))){//由用户挂断挂断
+                            updateCallcenter.setOverReason(CallCenter.OVER_REASON_USER);
+                            if(callCenter.getToManualResult() == null){
+                                updateCallcenter.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_GIVEUP);
+                            }
+                        }else{
+                            if(callCenter.getAgent() != null && callCenter.getToManualResult() !=null &&
+                                    callCenter.getToManualResult().equals(""+CallCenter.TO_MANUAL_RESULT_SUCESS)){
+                                updateCallcenter.setOverReason(CallCenter.OVER_REASON_AGENT_HANGUP);
+                            }
+                        }
+                        callCenterService.update(callCenterId,updateCallcenter);
+                        if(callLongTime != null){
+                            try{
+                                callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
+                                        .Builder(state.getTenantId(),state.getAppId(),new Date())
+                                        .setCallTimeLong(callLongTime)
+                                        .build());
+                            }catch (Throwable t){
+                                logger.error("incrIntoRedis失败",t);
+                            }
+                        }
                     }
-                    callCenterService.save(callCenter);
                 }
             }catch (Throwable t){
                 logger.error("更新CallCenter失败",t);
@@ -198,13 +245,27 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 hugup(ivr_dial_call_id,state.getAreaId());
             }
 
-            if(conversationService.isCC(call_id)){
-                if(logger.isDebugEnabled()){
+            if(logger.isDebugEnabled()){
+                if(conversationService.isCC(call_id)){
                     logger.info("[{}][{}]客户挂机callid={}",state.getTenantId(),state.getAppId(),call_id);
                 }
-                String conversation_id = state.getBusinessData().get(CallCenterUtil.CONVERSATION_FIELD);
-                if(conversation_id != null){
-                    conversationService.logicExit(conversation_id,call_id);
+            }
+        }else if(BusinessState.TYPE_IVR_DIAL.equals(state.getType())){//ivr拨号失败需要继续ivr
+            Map<String,String> businessData = state.getBusinessData();
+            if(businessData != null){
+                String ivr_call_id = businessData.get("ivr_call_id");
+                if(StringUtil.isNotEmpty(ivr_call_id)){
+                    Map<String, Object> notify_data = new MapBuilder<String, Object>()
+                            .putIfNotEmpty("event", "ivr.connect_end")
+                            .putIfNotEmpty("id", ivr_call_id)
+                            .putIfNotEmpty("begin_time", System.currentTimeMillis())
+                            .putIfNotEmpty("end_time", System.currentTimeMillis())
+                            .putIfNotEmpty("error", "dial error")
+                            .build();
+                    notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
+                    ivrActionService.doAction(ivr_call_id,new MapBuilder<String,Object>()
+                            .putIfNotEmpty("error","dial error")
+                            .build());
                 }
             }
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
@@ -221,13 +282,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                     if(logger.isDebugEnabled()){
                         logger.info("[{}][{}]坐席挂机agentId={}",state.getTenantId(),state.getAppId(),agentId);
                     }
-                    callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,reserve_state,true);
+                    curState = callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,reserve_state,true);
                 } catch (Throwable e) {
                     logger.error("坐席挂机事件设置坐席状态失败agent="+agentId,e);
-                }
-                try {
-                    curState = callCenterAgentService.getState(agentId);
-                } catch (YunhuniApiException e) {
                 }
                 if(preState!=null && curState != null){
                     if(!preState.equals(curState)){
@@ -249,7 +306,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
         try {
-            rpcCaller.invoke(sessionContext, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest,true);
         } catch (Throwable e) {
             logger.error("调用失败",e);
         }

@@ -4,6 +4,9 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
+import com.lsxy.area.server.batch.CallCenterBatchInserter;
+import com.lsxy.area.server.batch.CallSessionBatchInserter;
+import com.lsxy.area.server.batch.VoiceIvrBatchInserter;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.handler.ActionHandler;
@@ -28,7 +31,10 @@ import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceIvr;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
+import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
+import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -61,9 +67,12 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.*;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 /**
  * Created by liuws on 2016/9/1.
@@ -78,8 +87,6 @@ public class IVRActionService {
     private static final String ACCEPT_TYPE_TEXT_PLAIN = "text/plain;charset=utf-8";
 
     private static final int RETRY_TIMES = 3;
-
-    private CloseableHttpAsyncClient client = null;
 
     public static final int MAX_DURATION_SEC = 60 * 60 * 6;
 
@@ -131,6 +138,22 @@ public class IVRActionService {
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterService callCenterService;
 
+    @Autowired
+    private CallCenterStatisticsService callCenterStatisticsService;
+
+    @Autowired
+    private CallSessionBatchInserter callSessionBatchInserter;
+
+    @Autowired
+    private CallCenterBatchInserter callCenterBatchInserter;
+
+    @Autowired
+    private VoiceIvrBatchInserter voiceIvrBatchInserter;
+
+    private CloseableHttpAsyncClient client = null;
+
+    private ExecutorService worker = null;
+
     private Map<String,ActionHandler> handlers = new HashMap<>();
 
     private Schema schema = null;
@@ -140,6 +163,13 @@ public class IVRActionService {
         initClient();
         initHandler();
         initIVRSchema();
+        initWorker();
+    }
+
+    private void initWorker(){
+        //初始化100个线程，最多1000个线程，最多积压1024个任务
+        worker = new ThreadPoolExecutor(100, 1000, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1024),
+                new BasicThreadFactory.Builder().namingPattern("ivr-action-%s").build());
     }
     private void initIVRSchema() {
         try{
@@ -162,9 +192,9 @@ public class IVRActionService {
                                 .setSocketTimeout(5000)
                                 .setConnectTimeout(5000).build())
                 //总共最多1000并发
-                .setMaxConnTotal(1000)
-                //每个host最多100并发
-                .setMaxConnPerRoute(100)
+                .setMaxConnTotal(3000)
+                //每个host最多300并发
+                .setMaxConnPerRoute(1000)
                 //禁用cookies
                 .disableCookieManagement()
                 .build();
@@ -194,11 +224,11 @@ public class IVRActionService {
      * @return
      */
     public String getFirstIvr(final String call_id,final String url,String from){
-        long start = System.currentTimeMillis();
         String res = null;
         boolean success = false;
         int re_times = 0;
         do{
+            long start = System.currentTimeMillis();
             try{
                 HttpPost post = new HttpPost(url);
                 Map<String,Object> data = new MapBuilder<String,Object>()
@@ -220,18 +250,18 @@ public class IVRActionService {
                     res = receiveResponse(response);
                     success = true;
                 }
+                if(logger.isDebugEnabled()){
+                    logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
+                }
             }catch (Throwable t){
-                logger.error("调用{}失败",url);
+                logger.error("调用{}失败,耗时={},error={}",url,(System.currentTimeMillis() - start),t);
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
-        if(logger.isDebugEnabled()){
-            logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
-        }
         return res;
     }
 
-    private static String inputUrl(String url,String key,String value){
+    private static String inputUrl(String url,String key,String value) throws UnsupportedEncodingException {
         URI uri = URI.create(url);
         String scheme = uri.getScheme();
         String host = uri.getHost();
@@ -241,9 +271,9 @@ public class IVRActionService {
         String query = uri.getQuery();
         String fragment = uri.getFragment();
         if(StringUtil.isEmpty(query)){
-            query = key + "=" + value;
+            query = key + "=" + URLEncoder.encode(value,"UTF-8");
         }else{
-            query = query + "&" + key + "=" + value;
+            query = query + "&" + key + "=" + URLEncoder.encode(value,"UTF-8");
         }
         if(p != -1){
             port = ":"+p;
@@ -262,11 +292,11 @@ public class IVRActionService {
      * @return
      */
     private String getNextRequest(String call_id,String url,String prevAction,Map<String,Object> prevResults){
-        long start = System.currentTimeMillis();
         String res = null;
         boolean success = false;
         int re_times = 0;
         do{
+            long start = System.currentTimeMillis();
             try{
                 String target = inputUrl(url,"call_id",call_id);
                 if(prevAction != null){
@@ -295,14 +325,14 @@ public class IVRActionService {
                     res = receiveResponse(response);
                     success = true;
                 }
+                if(logger.isDebugEnabled()){
+                    logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
+                }
             }catch (Throwable t){
-                logger.error("调用{}失败",url);
+                logger.error("调用{}失败,耗时={},error={}",url,(System.currentTimeMillis() - start),t);
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
-        if(logger.isDebugEnabled()){
-            logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
-        }
         return res;
     }
 
@@ -337,6 +367,47 @@ public class IVRActionService {
     }
 
     private void saveIvrSessionCall(String call_id, App app, Tenant tenant, String res_id, String from, String to, String lineId, boolean iscc){
+        CallSession callSession = new CallSession();
+        callSession.setId(UUIDGenerator.uuid());
+        try{
+            callSession.setStatus(CallSession.STATUS_CALLING);
+            callSession.setFromNum(to);
+            callSession.setToNum(from);
+            callSession.setApp(app);
+            callSession.setTenant(tenant);
+            callSession.setRelevanceId(call_id);
+            callSession.setResId(res_id);
+            callSession.setType(iscc ? CallSession.TYPE_CALL_CENTER:CallSession.TYPE_VOICE_IVR);
+            callSessionBatchInserter.put(callSession);
+            if(iscc){
+                CallCenter callCenter = new CallCenter();
+                callCenter.setId(call_id);
+                callCenter.setTenantId(tenant.getId());
+                callCenter.setAppId(app.getId());
+                callCenter.setFromNum(from);
+                callCenter.setToNum(to);
+                callCenter.setStartTime(new Date());
+                callCenter.setType(""+CallCenter.CALL_IN);
+                callCenter.setCost(BigDecimal.ZERO);
+                callCenterBatchInserter.put(callCenter);
+                try{
+                    callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(tenant.getId(),app.getId(),
+                            new Date()).setCallIn(1L).build());
+                }catch (Throwable t){
+                    logger.error("incrIntoRedis失败",t);
+                }
+            }else{
+                VoiceIvr voiceIvr = new VoiceIvr();
+                voiceIvr.setId(call_id);
+                voiceIvr.setFromNum(from);
+                voiceIvr.setToNum(to);
+                voiceIvr.setStartTime(new Date());
+                voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_INCOMING);
+                voiceIvrBatchInserter.put(voiceIvr);
+            }
+        }catch (Throwable t){
+            logger.error("保存callsession失败",t);
+        }
         String areaId = areaAndTelNumSelector.getAreaId(app);
         //保存业务数据，后续事件要用到
         BusinessState state = new BusinessState.Builder()
@@ -349,49 +420,19 @@ public class IVRActionService {
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
+                        //incoming是第一个会话所以是自己引用自己
+                        .put(BusinessState.REF_RES_ID,res_id)
                         //TYPE_IVR_INCOMING 才需要等待应答标记
                         .put(IVR_ANSWER_WAITTING_FIELD,"1")
                         //incoming事件from 和 to是相反的
                         .putIfNotEmpty("from",to)
                         .putIfNotEmpty("to",from)
-                        .putIfNotEmpty(CallCenterUtil.ISCC_FIELD,iscc ? CallCenterUtil.ISCC_TRUE:null)
+                        .putIfWhere(CallCenterUtil.CALLCENTER_FIELD,iscc,call_id)
+                        .putIfWhere(CallCenterUtil.ISCC_FIELD,iscc,CallCenterUtil.ISCC_TRUE)
+                        .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
                 .build();
         businessStateService.save(state);
-        try{
-            CallSession callSession = new CallSession();
-            callSession.setStatus(CallSession.STATUS_CALLING);
-            callSession.setFromNum(to);
-            callSession.setToNum(from);
-            callSession.setApp(app);
-            callSession.setTenant(tenant);
-            callSession.setRelevanceId(call_id);
-            callSession.setResId(state.getResId());
-            callSession.setType(iscc ? CallSession.TYPE_CALL_CENTER:CallSession.TYPE_VOICE_IVR);
-            callSession = callSessionService.save(callSession);
-            businessStateService.updateInnerField(call_id,BusinessState.SESSIONID,callSession.getId());
-            if(iscc){
-                CallCenter callCenter = new CallCenter();
-                callCenter.setId(call_id);
-                callCenter.setTenantId(state.getTenantId());
-                callCenter.setAppId(state.getAppId());
-                callCenter.setFromNum(from);
-                callCenter.setToNum(to);
-                callCenter.setStartTime(new Date());
-                callCenter.setType(""+CallCenter.CALL_IN);
-                callCenterService.save(callCenter);
-            }else{
-                VoiceIvr voiceIvr = new VoiceIvr();
-                voiceIvr.setId(call_id);
-                voiceIvr.setFromNum(from);
-                voiceIvr.setToNum(to);
-                voiceIvr.setStartTime(new Date());
-                voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_INCOMING);
-                voiceIvrService.save(voiceIvr);
-            }
-        }catch (Throwable t){
-            logger.error("保存callsession失败",t);
-        }
     }
 
     public void answer(String res_id,String call_id,String areaId){
@@ -403,13 +444,17 @@ public class IVRActionService {
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_ANSWER,params);
         try {
-            rpcCaller.invoke(sessionContext, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest,true);
         } catch (Throwable e) {
             logger.error("调用失败",e);
         }
     }
 
-    public boolean doAction(String call_id,Map<String,Object> prevResults){
+    public void doAction(String call_id,Map<String,Object> prevResults){
+        worker.execute(() -> this.doWork(call_id,prevResults));
+    }
+
+    private boolean doWork(String call_id,Map<String,Object> prevResults){
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
             logger.info("callId={}没有找到state",call_id);
@@ -510,7 +555,7 @@ public class IVRActionService {
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
         try {
-            rpcCaller.invoke(sessionContext, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest,true);
         } catch (Throwable e) {
             logger.error("调用失败",e);
         }

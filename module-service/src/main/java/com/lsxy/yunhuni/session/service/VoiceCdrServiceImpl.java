@@ -1,13 +1,12 @@
 package com.lsxy.yunhuni.session.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.core.utils.BeanUtils;
-import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.core.utils.Page;
-import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.framework.core.utils.*;
 import com.lsxy.utils.StatisticsUtils;
 import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
@@ -23,9 +22,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -49,6 +50,12 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
     @Autowired
     private VoiceCdrDayService voiceCdrDayService;
 
+    @Autowired
+    private CalCostService calCostService;
+
+    @Autowired
+    private CalBillingService calBillingService;
+
     @Override
     public List<VoiceCdr> listCdr(String type, String tenantId, String time, String appId) {
         Date date1 = DateUtils.parseDate(time,"yyyy-MM-dd");
@@ -60,7 +67,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         if(App.PRODUCT_CALL_CENTER.equals(type)){
             types = CallSession.PRODUCT_CODE;
         }
-        String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,types)+ " deleted=0 and   last_time BETWEEN ? and ?";
+        String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,types)+ " deleted=0 and   call_end_dt BETWEEN ? and ?";
         sql = "select "+StringUtil.sqlName(VoiceCdr.class)+sql+" order by call_end_dt desc ";
         List rows = jdbcTemplate.queryForList(sql,new Object[]{date1,date2});
         List<VoiceCdr> list = new ArrayList();
@@ -214,4 +221,26 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
     }
 
 
+    @Override
+    @Transactional
+    public VoiceCdr save(VoiceCdr voiceCdr){
+        //扣费
+        if(voiceCdr.getCallAckDt() != null){
+            calCostService.callConsume(voiceCdr);
+        }else{
+            voiceCdr.setCostTimeLong(0L);
+            voiceCdr.setCost(BigDecimal.ZERO);
+            voiceCdr.setDeduct(0L);
+            voiceCdr.setCostType(VoiceCdr.COST_TYPE_COST);
+        }
+        if(logger.isDebugEnabled()){
+            logger.debug("插入cdr数据：{}", JSONUtil.objectToJson(voiceCdr));
+        }
+        calBillingService.incCallSum(voiceCdr.getTenantId(),voiceCdr.getCallEndDt());
+        if(voiceCdr.getCallAckDt() != null){
+            calBillingService.incCallConnect(voiceCdr.getTenantId(),voiceCdr.getCallEndDt());
+        }
+        calBillingService.incCallCostTime(voiceCdr.getTenantId(),voiceCdr.getCallEndDt(),voiceCdr.getCostTimeLong());
+        return getDao().save(voiceCdr);
+    }
 }

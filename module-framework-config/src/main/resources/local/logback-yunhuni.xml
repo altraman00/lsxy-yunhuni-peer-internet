@@ -62,12 +62,6 @@
     </appender>
 
 
-    <root level="INFO">
-        <appender-ref ref="STDOUT" />
-        <appender-ref ref="gelf" />
-        <appender-ref ref="ROLLINGFILE"/>
-    </root>
-
     <logger name="com.lsxy" level="DEBUG" additivity="true" />
     <logger name="com.lsxy.framework.rpc" level="DEBUG" additivity="true" />
     <logger name="com.lsxy.framework.config" level="INFO" additivity="true" />

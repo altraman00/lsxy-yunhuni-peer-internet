@@ -1,5 +1,7 @@
 package com.lsxy.area.api;
 
+import java.util.List;
+
 public interface BusinessStateService {
 
     public void save(BusinessState state);
@@ -19,6 +21,10 @@ public interface BusinessStateService {
     public void updateClosed(String id,Boolean closed);
 
     public void updateInnerField(String id,String field,String value);
+
+    public void updateInnerField(String id,String... params);
+
+    public void updateInnerField(String id,List<String> params);
 
     public void deleteInnerField(String id,String field);
 

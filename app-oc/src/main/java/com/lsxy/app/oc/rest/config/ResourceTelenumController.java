@@ -9,6 +9,7 @@ import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
@@ -130,20 +131,20 @@ public class ResourceTelenumController extends AbstractRestController {
             isEditNum = true;
         }
         if(StringUtils.isNotEmpty(telnumTVo.getCallUri())&&!resourceTelenum.getCallUri().equals(telnumTVo.getCallUri())) {
-            String temp2 = resourceTelenumService.findNumByCallUri(telnumTVo.getCallUri());
-            if (StringUtils.isNotEmpty(temp2)) {
+            ResourceTelenum temp2 = resourceTelenumService.findNumByCallUri(telnumTVo.getCallUri());
+            if (temp2 != null) {
                 return RestResponse.failed("0000", "该呼出URI已存在号码池中");
             }
         }
         Tenant tenant = null;
         int tenantType = 0;
-        if(StringUtils.isNotEmpty(telnumTVo.getTenantId())&&(resourceTelenum.getTenant()==null)){
+        if(StringUtils.isNotEmpty(telnumTVo.getTenantId())&&(resourceTelenum.getTenantId()==null)){
             tenant = tenantService.findById(telnumTVo.getTenantId());
             if(tenant==null || StringUtils.isEmpty(tenant.getId())){
                 return RestResponse.failed("0000","所选租户不存在");
             }
             tenantType = 1;//原来没有租户，新加租户
-        }else if(StringUtils.isNotEmpty(telnumTVo.getTenantId())&&!resourceTelenum.getTenant().getId().equals(telnumTVo.getTenantId())){
+        }else if(StringUtils.isNotEmpty(telnumTVo.getTenantId())&&!resourceTelenum.getTenantId().equals(telnumTVo.getTenantId())){
             tenant = tenantService.findById(telnumTVo.getTenantId());
             if(tenant==null || StringUtils.isEmpty(tenant.getId())){
                 return RestResponse.failed("0000","所选租户不存在");
@@ -202,8 +203,8 @@ public class ResourceTelenumController extends AbstractRestController {
         if(temp!=null){
             return RestResponse.failed("0000", "该号码已存在号码池中");
         }
-        String temp2 = resourceTelenumService.findNumByCallUri(telnumTVo.getCallUri());
-        if(StringUtils.isNotEmpty(temp2)){
+        ResourceTelenum temp2 = resourceTelenumService.findNumByCallUri(telnumTVo.getCallUri());
+        if(temp2 != null){
             return RestResponse.failed("0000", "该呼出URI已存在号码池中");
         }
         //如果有选择线路，则检验线路是否存在
@@ -267,7 +268,14 @@ public class ResourceTelenumController extends AbstractRestController {
         if(resourceTelenum==null||StringUtils.isEmpty(resourceTelenum.getId())){
             return RestResponse.failed("0000","号码不存在");
         }
-        resourceTelenum.setLine(lineGatewayService.findById(resourceTelenum.getLineId()));
+        if(StringUtil.isNotBlank(resourceTelenum.getTenantId())){
+            Tenant tenant = tenantService.findById(resourceTelenum.getTenantId());
+            resourceTelenum.setTenant(tenant);
+        }
+        if(StringUtil.isNotBlank(resourceTelenum.getLineId())){
+            LineGateway line = lineGatewayService.findById(resourceTelenum.getLineId());
+            resourceTelenum.setLine(line);
+        }
         return RestResponse.success(resourceTelenum);
     }
     @ApiOperation(value = "删除号码")

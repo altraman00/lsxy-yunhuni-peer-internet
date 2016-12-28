@@ -11,4 +11,6 @@ import java.util.List;
  */
 public interface LineGatewayToTenantDao extends BaseDaoInterface<LineGatewayToTenant, Serializable> {
     List<LineGatewayToTenant> findByTenantIdAndLineGateway_AreaId(String tenantId, String areaId);
+
+    List<LineGatewayToTenant> findByTenantId(String tenantId);
 }

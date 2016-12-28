@@ -49,13 +49,7 @@ public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        RPCResponse response = RPCResponse.buildResponse(request);
-
         Commander cticlient = cticlientContext.getAvalibleClient();
-        if(cticlient == null) {
-            response.setMessage(RPCResponse.STATE_EXCEPTION);
-            return response;
-        }
 
         Map<String, Object> params = request.getParamMap();
         String call_id = (String)params.get("user_data");
@@ -83,7 +77,7 @@ public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
                                     .put("user_data",call_id)
                                     .build());
                     try {
-                        rpcCaller.invoke(sessionContext,req);
+                        rpcCaller.invoke(sessionContext,req,true);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败", Constants.EVENT_EXT_CAPTCHA_CALL_SUCCESS,e);
                     }
@@ -98,7 +92,7 @@ public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
                                     .put("user_data",call_id)
                                     .build());
                     try {
-                        rpcCaller.invoke(sessionContext,req);
+                        rpcCaller.invoke(sessionContext,req,true);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_FAIL,e);
                     }
@@ -113,17 +107,15 @@ public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
                                     .put("user_data",call_id)
                                     .build());
                     try {
-                        rpcCaller.invoke(sessionContext,req);
+                        rpcCaller.invoke(sessionContext,req,true);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_TIMEOUT,e);
                     }
                 }
             });
-            response.setMessage(RPCResponse.STATE_OK);
-        } catch (IOException e) {
+        } catch (Throwable e) {
             logger.error("调用创建语音认证码资源失败",e);
-            response.setMessage(RPCResponse.STATE_EXCEPTION);
         }
-        return response;
+        return null;
     }
 }

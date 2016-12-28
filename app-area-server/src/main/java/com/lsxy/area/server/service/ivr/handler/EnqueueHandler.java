@@ -4,8 +4,10 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.PlayFileUtil;
+import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.call.center.api.service.DeQueueService;
@@ -22,6 +24,7 @@ import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -34,7 +37,7 @@ public class EnqueueHandler extends ActionHandler{
     @Autowired
     private BusinessStateService businessStateService;
 
-    @Reference(lazy = true,check = false,timeout = 3000)
+    @Reference(lazy = true,check = false,timeout = 30000)
     private EnQueueService enQueueService;
 
     @Reference(lazy = true,check = false,timeout = 3000)
@@ -51,6 +54,9 @@ public class EnqueueHandler extends ActionHandler{
 
     @Autowired
     private PlayFileUtil playFileUtil;
+
+    @Autowired
+    private ConversationService conversationService;
 
     @Override
     public String getAction() {
@@ -88,9 +94,23 @@ public class EnqueueHandler extends ActionHandler{
                 }
             }
         }
-        businessStateService.updateInnerField(callId,CallCenterUtil.CHANNEL_ID_FIELD,enQueue.getChannel());
-        businessStateService.updateInnerField(callId,CallCenterUtil.CONDITION_ID_FIELD,enQueue.getRoute().getCondition().getId());
-        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT_FIELD,next);
+
+        businessStateService.updateInnerField(callId,
+                CallCenterUtil.ENQUEUE_START_TIME_FIELD,""+new Date().getTime(),
+                CallCenterUtil.CHANNEL_ID_FIELD,enQueue.getChannel(),
+                CallCenterUtil.CONDITION_ID_FIELD,enQueue.getRoute().getCondition().getId(),
+                IVRActionService.IVR_NEXT_FIELD,next);
+
+        String callCenterId = conversationService.getCallCenter(state);
+        if(callCenterId != null){
+            CallCenter callCenter = callCenterService.findById(callCenterId);
+            if(callCenter!=null && callCenter.getToManualTime() == null){//更新转人工时间
+                CallCenter updateCallcenter = new CallCenter();
+                updateCallcenter.setToManualTime(new Date());
+                callCenterService.update(callCenterId,updateCallcenter);
+            }
+        }
+
         try {
             enQueueService.lookupAgent(state.getTenantId(), state.getAppId(), businessData.get("to"), callId, enQueue);
         }catch (Throwable t){

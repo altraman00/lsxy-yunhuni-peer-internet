@@ -50,13 +50,7 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        RPCResponse response = RPCResponse.buildResponse(request);
-
         Commander cticlient = cticlientContext.getAvalibleClient();
-        if(cticlient == null) {
-            response.setMessage(RPCResponse.STATE_EXCEPTION);
-            return response;
-        }
 
         if(logger.isDebugEnabled()){
             logger.debug("handler process_MN_CH_EXT_NOTIFY_CALL:{}",request);
@@ -88,7 +82,7 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
                                     .put("user_data",call_id)
                                     .build());
                     try {
-                        rpcCaller.invoke(sessionContext,req);
+                        rpcCaller.invoke(sessionContext,req,true);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败", Constants.EVENT_EXT_NOTIFY_CALL_SUCCESS,e);
                     }
@@ -103,7 +97,7 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
                                     .put("user_data",call_id)
                                     .build());
                     try {
-                        rpcCaller.invoke(sessionContext,req);
+                        rpcCaller.invoke(sessionContext,req,true);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_FAIL,e);
                     }
@@ -118,18 +112,16 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
                                     .put("user_data",call_id)
                                     .build());
                     try {
-                        rpcCaller.invoke(sessionContext,req);
+                        rpcCaller.invoke(sessionContext,req,true);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_TIMEOUT,e);
                     }
                 }
             });
-            response.setMessage(RPCResponse.STATE_OK);
-            response.setBody(res_id);
-        } catch (IOException e) {
+        } catch (Throwable e) {
             logger.error("操作CTI资源异常{}",request,e);
         }
 
-        return response;
+        return null;
     }
 }

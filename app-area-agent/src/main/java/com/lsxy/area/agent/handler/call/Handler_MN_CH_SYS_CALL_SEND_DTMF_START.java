@@ -46,13 +46,7 @@ public class Handler_MN_CH_SYS_CALL_SEND_DTMF_START extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        RPCResponse response = RPCResponse.buildResponse(request);
-
         Commander cticlient = cticlientContext.getAvalibleClient();
-        if(cticlient == null) {
-            response.setMessage(RPCResponse.STATE_EXCEPTION);
-            return response;
-        }
         try {
             Map<String, Object> params = request.getParamMap();
             String call_id = (String)params.get("user_data");
@@ -75,7 +69,7 @@ public class Handler_MN_CH_SYS_CALL_SEND_DTMF_START extends RpcRequestHandler{
                                     .put("user_data",call_id)
                                     .build());
                     try {
-                        rpcCaller.invoke(sessionContext,req);
+                        rpcCaller.invoke(sessionContext,req,true);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_SEND_DTMF_ON_FAIL,e);
                     }
@@ -90,17 +84,15 @@ public class Handler_MN_CH_SYS_CALL_SEND_DTMF_START extends RpcRequestHandler{
                                     .put("user_data",call_id)
                                     .build());
                     try {
-                        rpcCaller.invoke(sessionContext,req);
+                        rpcCaller.invoke(sessionContext,req,true);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_SEND_DTMF_ON_FAIL,e);
                     }
                 }
             });
-            response.setMessage(RPCResponse.STATE_OK);
-        } catch (IOException e) {
+        } catch (Throwable e) {
             logger.error("调用资源操作失败",e);
-            response.setMessage(RPCResponse.STATE_EXCEPTION);
         }
-        return response;
+        return null;
     }
 }

@@ -44,9 +44,9 @@ public class NotifyCallbackUtil {
                                 .setSocketTimeout(5000)
                                 .setConnectTimeout(5000).build())
                 //总共最多1000并发
-                .setMaxConnTotal(1000)
-                //每个host最多100并发
-                .setMaxConnPerRoute(100)
+                .setMaxConnTotal(3000)
+                //每个host最多300并发
+                .setMaxConnPerRoute(1000)
                 //禁用cookies
                 .disableCookieManagement()
                 .build();
@@ -116,7 +116,6 @@ public class NotifyCallbackUtil {
                     }
                     if(!success){
                         if(retry >0){
-                            logger.info("开始重试");
                             postNotify(url,data,retry-1);
                         }
                     }
@@ -126,7 +125,6 @@ public class NotifyCallbackUtil {
                 public void failed(Exception e) {
                     logger.error("url={}发送事件通知失败",url,e);
                     if(retry >0){
-                        logger.info("开始重试");
                         postNotify(url,data,retry-1);
                     }
 
@@ -136,7 +134,6 @@ public class NotifyCallbackUtil {
                 public void cancelled() {
                     logger.error("url={}发送事件通知被取消",url);
                     if(retry >0){
-                        logger.info("开始重试");
                         postNotify(url,data,retry-1);
                     }
                 }

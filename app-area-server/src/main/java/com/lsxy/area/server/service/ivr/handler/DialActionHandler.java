@@ -12,7 +12,7 @@ import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.api.tenant.service.TenantService;
-import com.lsxy.framework.core.exceptions.api.AppOffLineException;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -30,6 +30,7 @@ import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
 
@@ -160,7 +161,7 @@ public class DialActionHandler extends ActionHandler{
         AreaAndTelNumSelector.Selector selector;
         try {
             selector = areaAndTelNumSelector.getTelnumberAndAreaId(app,from,to);
-        } catch (AppOffLineException e) {
+        } catch (YunhuniApiException e) {
             return false;
         }
         String areaId = selector.getAreaId();
@@ -180,6 +181,7 @@ public class DialActionHandler extends ActionHandler{
             callCenter.setToNum(to);
             callCenter.setStartTime(new Date());
             callCenter.setType(""+CallCenter.CALL_DIAL);
+            callCenter.setCost(BigDecimal.ZERO);
             callId = callCenterService.save(callCenter).getId();
 
             callSession = new CallSession();
@@ -221,7 +223,8 @@ public class DialActionHandler extends ActionHandler{
                 .put("max_answer_seconds",maxCallDuration, IVRActionService.MAX_DURATION_SEC)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
-                .put("areaId ",areaId)
+                .put("areaId",areaId)
+                .putIfNotEmpty(BusinessState.REF_RES_ID,parent_call_res_id)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
@@ -229,6 +232,18 @@ public class DialActionHandler extends ActionHandler{
             rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Exception e) {
             logger.error("ivr 拨号出错:",e);
+            Map<String,Object> notify_data = new MapBuilder<String,Object>()
+                    .putIfNotEmpty("event","ivr.connect_end")
+                    .putIfNotEmpty("id",ivr_call_id)
+                    .putIfNotEmpty("begin_time",System.currentTimeMillis())
+                    .putIfNotEmpty("end_time",System.currentTimeMillis())
+                    .putIfNotEmpty("error","dial error")
+                    .build();
+            notifyCallbackUtil.postNotify(app.getUrl(),notify_data,null,3);
+            ivrActionService.doAction(ivr_call_id,new MapBuilder<String,Object>()
+                    .putIfNotEmpty("error","dial error")
+                    .build());
+            return false;
         }
 
         //保存业务数据，后续事件要用到
@@ -241,6 +256,7 @@ public class DialActionHandler extends ActionHandler{
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
+                        .putIfNotEmpty(BusinessState.REF_RES_ID,parent_call_res_id)
                         .putIfNotEmpty(CallCenterUtil.ISCC_FIELD,isCC?CallCenterUtil.ISCC_TRUE:null)
                         .putIfNotEmpty("ivr_call_id",ivr_call_id)
                         .putIfNotEmpty("from",from)

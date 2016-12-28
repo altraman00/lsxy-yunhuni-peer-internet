@@ -47,13 +47,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK_CANCEL extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        RPCResponse response = RPCResponse.buildResponse(request);
-
         Commander cticlient = cticlientContext.getAvalibleClient();
-        if(cticlient == null) {
-            response.setMessage(RPCResponse.STATE_EXCEPTION);
-            return response;
-        }
 
         if(logger.isDebugEnabled()){
             logger.debug("handler process_MN_CH_EXT_DUO_CALLBACK_CANCEL:{}",request);
@@ -83,7 +77,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK_CANCEL extends RpcRequestHandler{
                                     .put("user_data",call_id)
                                     .build());
                     try {
-                        rpcCaller.invoke(sessionContext,req);
+                        rpcCaller.invoke(sessionContext,req,true);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_FAIL,e);
                     }
@@ -94,21 +88,20 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK_CANCEL extends RpcRequestHandler{
                     logger.error("调用ext.duo_callback超时call_id={}",call_id);
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
-                                    .put("method",Constants.EVENT_SYS_CALL_ON_TIMEOUT)
+                                    .put("method",Constants.EVENT_EXT_CALL_ON_TIMEOUT)
                                     .put("user_data",call_id)
                                     .build());
                     try {
-                        rpcCaller.invoke(sessionContext,req);
+                        rpcCaller.invoke(sessionContext,req,true);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_TIMEOUT,e);
                     }
                 }
             });
-            response.setMessage(RPCResponse.STATE_OK);
-        } catch (IOException e) {
+        } catch (Throwable e) {
             logger.error("操作CTI资源异常{}",request,e);
         }
 
-        return response;
+        return null;
     }
 }

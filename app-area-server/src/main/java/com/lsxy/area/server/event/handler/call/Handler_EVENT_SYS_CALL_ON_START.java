@@ -73,7 +73,11 @@ public class Handler_EVENT_SYS_CALL_ON_START extends EventHandler{
         }
         if(res_id!=null){
             businessStateService.updateResId(call_id,res_id);
+            if(state.getBusinessData().get(BusinessState.REF_RES_ID) == null){
+                businessStateService.updateInnerField(call_id,BusinessState.REF_RES_ID,res_id);
+            }
         }
+
         if(logger.isDebugEnabled()){
             logger.info("call_id={},state={}",call_id,state);
         }
@@ -81,9 +85,10 @@ public class Handler_EVENT_SYS_CALL_ON_START extends EventHandler{
         //更新会话记录状态
         CallSession callSession = callSessionService.findById(state.getBusinessData().get(BusinessState.SESSIONID));
         if(callSession != null){
-            callSession.setResId(res_id);
-            callSession.setStatus(CallSession.STATUS_CALLING);
-            callSessionService.save(callSession);
+            CallSession updateSession = new CallSession();
+            updateSession.setResId(res_id);
+            updateSession.setStatus(CallSession.STATUS_CALLING);
+            callSessionService.update(callSession.getId(),updateSession);
         }
         return res;
     }

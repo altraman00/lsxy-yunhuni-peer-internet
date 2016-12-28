@@ -10,11 +10,13 @@ import com.lsxy.call.center.states.state.ExtensionState;
 import com.lsxy.call.center.states.statics.ACs;
 import com.lsxy.call.center.states.statics.CAs;
 import com.lsxy.call.center.states.statics.CQs;
-import com.lsxy.call.center.utils.Lua;
+import com.lsxy.call.center.utils.CQSBatchInserter;
+import com.lsxy.framework.cache.utils.Lua;
+import com.lsxy.call.center.utils.QueueBatchInserter;
 import com.lsxy.framework.cache.manager.RedisCacheService;
-import com.lsxy.framework.core.utils.BeanUtils;
-import com.lsxy.framework.core.utils.JSONUtil;
-import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.framework.core.exceptions.api.ChannelNotExistException;
+import com.lsxy.framework.core.exceptions.api.ConditionNotExistException;
+import com.lsxy.framework.core.utils.*;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.callcenter.EnqueueTimeoutEvent;
 import org.slf4j.Logger;
@@ -52,23 +54,58 @@ public class EnQueueServiceImpl implements EnQueueService{
     @Autowired
     private RedisCacheService redisCacheService;
 
-    @Reference(lazy = true,check = false,timeout = 3000)
+    @Reference(lazy = true,check = false,timeout = 30000)
     private DeQueueService deQueueService;
 
     @Autowired
     private AgentState agentState;
 
     @Autowired
-    private CAs cAs;
-
-    @Autowired
-    private ACs aCs;
-
-    @Autowired
     private CQs cQs;
 
     @Autowired
+    private CQSBatchInserter cqsBatchInserter;
+
+    @Autowired
     private MQService mqService;
+
+    @Autowired
+    private QueueBatchInserter queueBatchInserter;
+
+    private CallCenterQueue save(String num,Condition condition,String callId,BaseEnQueue baseEnQueue){
+        CallCenterQueue queue = new CallCenterQueue();
+        queue.setId(UUIDGenerator.uuid());
+        queue.setTenantId(condition.getTenantId());
+        queue.setAppId(condition.getAppId());
+        queue.setRelevanceId("");
+        queue.setCondition(condition.getId());
+        queue.setStartTime(new Date());
+        queue.setNum(num);
+        queue.setOriginCallId(callId);
+        queue.setEnqueue(JSONUtil.objectToJson(baseEnQueue));
+        queueBatchInserter.put(queue);
+        return queue;
+    }
+
+    private void addCQS(String conditionId,String queueId){
+        cqsBatchInserter.put(conditionId, queueId);
+    }
+
+    private void publishTimeoutEvent(Condition condition,String queueId,String callId){
+        long start = 0;
+        if(logger.isDebugEnabled()){
+            start = System.currentTimeMillis();
+        }
+        mqService.publish(new EnqueueTimeoutEvent(condition.getId(),
+                queueId,
+                condition.getTenantId(),
+                condition.getAppId(),
+                callId,
+                (condition.getQueueTimeout() == null ? 0 : condition.getQueueTimeout()) * 1000));
+        if(logger.isDebugEnabled()){
+            logger.debug("发布排队超时事件，耗时={}",(System.currentTimeMillis() - start));
+        }
+    }
 
     /**
      * 排队,通过 dubbo返回结果给  区域管理器
@@ -79,7 +116,7 @@ public class EnQueueServiceImpl implements EnQueueService{
      */
     @Override
     public void lookupAgent(String tenantId, String appId,String num, String callId, EnQueue enQueue){
-        CallCenterQueue queue = null;
+        String queueId = null;
         try{
             if(tenantId == null){
                 throw new IllegalArgumentException("tenantId 不能为null");
@@ -93,31 +130,38 @@ public class EnQueueServiceImpl implements EnQueueService{
             if(enQueue == null){
                 throw new IllegalArgumentException("enQueue 不能为null");
             }
-            Channel channel = channelService.findOne(tenantId,appId,enQueue.getChannel());
+            Channel channel = channelService.findById(enQueue.getChannel());
             if(channel == null){
-                throw new IllegalArgumentException("通道不存在");
+                throw new ChannelNotExistException();
             }
+            if(!tenantId.equals(channel.getTenantId())){
+                throw new ChannelNotExistException();
+            }
+            if(!appId.equals(channel.getAppId())){
+                throw new ChannelNotExistException();
+            }
+
             String conditionId = enQueue.getRoute().getCondition().getId();
-            Condition condition = conditionService.findOne(tenantId,appId,conditionId);
+            Condition condition = conditionService.findById(conditionId);
             if(condition == null){
-                throw new IllegalArgumentException("条件不存在");
+                throw new ConditionNotExistException();
+            }
+            if(!tenantId.equals(condition.getTenantId())){
+                throw new ConditionNotExistException();
+            }
+            if(!appId.equals(condition.getAppId())){
+                throw new ConditionNotExistException();
             }
             if(!condition.getChannelId().equals(channel.getId())){
-                throw new IllegalArgumentException("条件-通道不匹配");
+                throw new ConditionNotExistException();
             }
             //创建排队记录
-            queue = new CallCenterQueue();
-            queue.setTenantId(tenantId);
-            queue.setAppId(appId);
-            queue.setRelevanceId("");
-            queue.setCondition(conditionId);
-            queue.setStartTime(new Date());
-            queue.setNum(num);
-            queue.setOriginCallId(callId);
             BaseEnQueue baseEnQueue = new BaseEnQueue();
-            BeanUtils.copyProperties(baseEnQueue,enQueue);
-            queue.setEnqueue(JSONUtil.objectToJson(baseEnQueue));
-            queue = callCenterQueueService.save(queue);
+            try {
+                BeanUtils.copyProperties(baseEnQueue,enQueue);
+            } catch (Throwable e) {}
+            queueId = save(num,condition,callId,baseEnQueue).getId();
+
             //lua脚本找坐席
             String agent = (String)redisCacheService.eval(Lua.LOOKUPAGENT,4,
                     CAs.getKey(condition.getId()),AgentState.getPrefixed(),
@@ -125,16 +169,15 @@ public class EnQueueServiceImpl implements EnQueueService{
                     ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
                     CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,ExtensionState.Model.ENABLE_TRUE);
             if(logger.isDebugEnabled()){
-                logger.debug("[{}][{}]callid={}排队结果:agent={}",tenantId,appId,callId,agent);
+                logger.debug("[{}][{}]排队结果:agent={},queueid={}",tenantId,appId,agent,queueId);
             }
             if(StringUtil.isEmpty(agent)){
                 //没有找到可用坐席
                 if(logger.isDebugEnabled()){
                     logger.debug("[{}][{}]callid={}发布排队超时事件",tenantId,appId,callId);
                 }
-                cQs.add(conditionId,queue.getId());
-                mqService.publish(new EnqueueTimeoutEvent(conditionId,queue.getId(),
-                        tenantId,appId,callId,condition.getQueueTimeout() * 1000));
+                addCQS(conditionId,queueId);
+                publishTimeoutEvent(condition,queueId,callId);
                 String agent_idle = (String)redisCacheService.eval(Lua.LOOKUPAGENTFORIDLE,3,
                         CAs.getKey(condition.getId()),AgentState.getPrefixed(),
                         ExtensionState.getPrefixed(),
@@ -149,7 +192,8 @@ public class EnQueueServiceImpl implements EnQueueService{
                     EnQueueResult result = new EnQueueResult();
                     result.setExtension(appExtensionService.findById(agentState.getExtension(agent)));
                     result.setAgent(callCenterAgentService.findById(agent));
-                    deQueueService.success(tenantId,appId,callId,queue.getId(),result);
+                    result.setBaseEnQueue(baseEnQueue);
+                    deQueueService.success(tenantId,appId,callId,queueId,result);
                 }catch (Throwable t1){
                     try{
                         agentState.setState(agent,CallCenterAgent.STATE_IDLE);
@@ -161,7 +205,7 @@ public class EnQueueServiceImpl implements EnQueueService{
             }
         }catch (Throwable e){
             logger.info("[{}][{}]callid={}排队找坐席出错:{}",tenantId,appId,callId,e.getMessage());
-            deQueueService.fail(tenantId,appId,callId,e.getMessage(),queue != null?queue.getId():null);
+            deQueueService.fail(tenantId,appId,callId,e.getMessage(),queueId);
         }
     }
 
@@ -185,29 +229,29 @@ public class EnQueueServiceImpl implements EnQueueService{
                 CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,
             conditionId==null?"":conditionId,ExtensionState.Model.ENABLE_TRUE);
         if(logger.isDebugEnabled()){
-            logger.info("[{}][{}]坐席找排队结果agent={},queueId={}",tenantId,appId,queueId);
+            logger.debug("[{}][{}]排队结果:agent={}",tenantId,appId,agent);
         }
         if(queueId != null){
             //找到排队，修改排队状态
-            CallCenterQueue queue = callCenterQueueService.findById(queueId);
-            if(logger.isDebugEnabled()){
-                logger.info("[{}][{}]坐席找排队结果agent={},queue={}",tenantId,appId,queue);
-            }
-            if(queue != null){
+            try{
+                CallCenterQueue queue = callCenterQueueService.findById(queueId);
+                if(logger.isDebugEnabled()){
+                    logger.debug("[{}][{}]排队结果:agent={},queueid={}",tenantId,appId,agent,queue.getId());
+                }
+                EnQueueResult result = new EnQueueResult();
+                result.setExtension(appExtensionService.findById(agentState.getExtension(agent)));
+                result.setAgent(callCenterAgentService.findById(agent));
+                if(StringUtil.isNotEmpty(queue.getEnqueue())){
+                    result.setBaseEnQueue(JSONUtil2.fromJson(queue.getEnqueue(),BaseEnQueue.class));
+                }
+                deQueueService.success(tenantId,appId,queue.getOriginCallId(),queueId,result);
+            }catch (Throwable t1){
                 try{
-                    EnQueueResult result = new EnQueueResult();
-                    result.setExtension(appExtensionService.findById(agentState.getExtension(agent)));
-                    result.setAgent(callCenterAgentService.findById(agent));
-                    deQueueService.success(tenantId,appId,queue.getOriginCallId(),queueId,result);
-                }catch (Throwable t1){
-                    try{
-                        agentState.setState(agent,CallCenterAgent.STATE_IDLE);
-                    }catch (Throwable t2){
-                        logger.info("",t2);
-                    }
+                    agentState.setState(agent,CallCenterAgent.STATE_IDLE);
+                }catch (Throwable t2){
+                    logger.info("",t2);
                 }
             }
         }
     }
-
 }

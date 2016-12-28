@@ -1,12 +1,6 @@
 package com.lsxy.framework.rpc.api;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.io.UnsupportedEncodingException;
+import com.lsxy.framework.core.utils.StringUtil;
 
 /**
  * 相应对象
@@ -54,5 +48,52 @@ public class RPCResponse extends RPCMessage{
 		String sBody = this.getBodyAsString();
 		return "P["+this.getSessionid()+"]["+this.getTimestamp()+"]["+this.tryTimes+"]["+this.lastTryTimestamp+"]>>RP:" +this.message + ">>BODY:"+sBody;
 	}
-	
+
+	/**
+	 * 序列化
+	 * RP:SESSIONID TIMESTAMP MESSAGE
+	 * @return
+	 */
+	@Override
+	public String serialize() {
+		StringBuffer sb = new StringBuffer("RP:");
+		sb.append(this.getSessionid());
+		sb.append(" ");
+		sb.append(this.getTimestamp());
+		sb.append(" ");
+		sb.append(this.getMessage());
+		return sb.toString();
+	}
+
+
+	public static RPCResponse unserialize(String str){
+		RPCResponse response = null;
+		if(StringUtil.isNotEmpty(str) && str.matches("RP:\\w{32}\\s\\d{13}+\\s\\w+")){
+			response = new RPCResponse();
+			String[] parts = str.split(" ");
+			response.setSessionid(parts[0].substring(3));
+			response.setTimestamp(Long.valueOf(parts[1]));
+			response.setMessage(parts[2]);
+		}
+		return response;
+	}
+
+
+
+//	public static void main(String[] args) {
+//		String value = "RP:12341234123412341234123412341234 1481705348021 OK";
+////		Pattern pt = Pattern.compile("RQ:\\w[32]\\s\\w+\\s.*");
+//		System.out.println(value.matches("RP:\\w{32}\\s\\d{13}+\\s\\w+"));
+//		String[] parts = value.split(" ");
+//		String sessionid = parts[0].substring(3);
+//		String timestamp = parts[1];
+//		String message = parts[2];
+//		System.out.println(message);
+//		System.out.println(timestamp);
+//
+//		System.out.println(sessionid);
+//
+//		RPCResponse response = RPCResponse.unserialize(value);
+//		System.out.println(response.getMessage());
+//	}
 }

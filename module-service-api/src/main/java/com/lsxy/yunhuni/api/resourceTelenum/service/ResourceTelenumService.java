@@ -7,10 +7,7 @@ import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 全局号码资源service
@@ -38,13 +35,13 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
     /**
      *  获取空闲号码
      */
-    Page getPageByFreeNumber(Integer pageNo,  Integer pageSize, String telnum,String type,String areaCode,String order);
+    Page getFreeNumberPage(String tenantId,Integer pageNo, Integer pageSize, String telnum, String type, String areaCode, String order);
     /**
      * 根据呼叫URI查找号码
      * @param uri
      * @return
      */
-    String findNumByCallUri(String uri);
+    ResourceTelenum findNumByCallUri(String uri);
 
     /**
      * 获取分页信息
@@ -101,4 +98,6 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * @return
      */
     List<ResourceTelenum> findByIds(Collection<String> ids);
+
+    List<ResourceTelenum> findByTelNumbers(Collection<String> telNumbers);
 }

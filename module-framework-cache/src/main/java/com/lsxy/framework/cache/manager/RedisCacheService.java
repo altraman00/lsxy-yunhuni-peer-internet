@@ -1,8 +1,9 @@
 package com.lsxy.framework.cache.manager;
 
 import com.lsxy.framework.cache.exceptions.TransactionExecFailedException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.lsxy.framework.cache.utils.Lua;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.DependsOn;
@@ -18,6 +19,7 @@ import javax.annotation.PostConstruct;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.*;
 
 /**
  * Redis操作方法
@@ -35,7 +37,9 @@ public class RedisCacheService {
     //默认超时时间（毫秒）
 //    public static final long DEFAULT_TIME_OUT = 3000;
 
-	private final static Log logger = LogFactory.getLog(RedisCacheService.class);
+	private static final Logger logger = LoggerFactory.getLogger(RedisCacheService.class);
+
+	private static final ConcurrentHashMap<String,Future<String>> lua_script_cache = new ConcurrentHashMap<>();
 
 	@Autowired
 	@Qualifier("businessRedisTemplate")
@@ -45,10 +49,52 @@ public class RedisCacheService {
 
 	@PostConstruct
 	public void init(){
+
+	}
+
+	private String getSha1Promise(Jedis jedis,String script){
+		String sha1Id = null;
+		Future<String> f = lua_script_cache.get(script);
+		if(f == null){
+			FutureTask<String> task = new FutureTask<>(new Callable<String>(){
+				@Override
+				public String call() throws Exception {
+					logger.info("load redis script:\n{}",script);
+					return jedis.scriptLoad(script);
+				}
+			});
+			Future<String> f1 = lua_script_cache.putIfAbsent(script, task);
+			if(f1 == null){
+				task.run();
+				f = task;
+			}else{
+				f = f1;
+			}
+		}
+		try {
+			sha1Id = f.get();
+		} catch (Throwable e) {
+			logger.info("获取redis script sha1失败",e);
+		}
+		return sha1Id;
 	}
 
 	private Object eval(final Jedis jedis, final String script,final int keyCount,final String... params){
-		return jedis.eval(script,keyCount,params);
+		long start = 0;
+		if(logger.isDebugEnabled()){
+			start = System.currentTimeMillis();
+		}
+		Object obj = null;
+		String sha1Id = getSha1Promise(jedis, script);
+		if(sha1Id != null){
+			obj = jedis.evalsha(sha1Id,keyCount,params);
+		}else{
+			obj = jedis.eval(script,keyCount,params);
+		}
+		if(logger.isDebugEnabled()){
+			logger.info("执行redis script耗时={}",(System.currentTimeMillis() - start));
+		}
+		return obj;
 	}
 
 	public Object eval(final String script,final int keyCount,final String... params){
@@ -101,12 +147,7 @@ public class RedisCacheService {
 						if(logger.isDebugEnabled()){
 							logger.debug("ready to set nx:"+key+">>>>"+ value);
 						}
-						String script = "local ok = redis.call('setnx', KEYS[1], ARGV[1])\n" +
-								"if ok == 1 then\n" +
-								"  redis.call('expire', KEYS[1], ARGV[2])\n" +
-								"end\n" +
-								"return ok";
-						Long ret = (Long)eval((Jedis)connection.getNativeConnection(),script,1,key,value,""+expire);
+						Long ret = (Long)eval((Jedis)connection.getNativeConnection(), Lua.LOCK,1,key,value,""+expire);
 						if(logger.isDebugEnabled()){
 							logger.debug("set nx result:"+ret);
 						}
