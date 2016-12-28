@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
+import com.lsxy.area.server.batch.CallSessionBatchInserter;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
@@ -102,6 +103,9 @@ public class ConversationService {
 
     @Value(value = "${app.cc.opensips.ip}")
     private String sip_address;
+
+    @Autowired
+    private CallSessionBatchInserter callSessionBatchInserter;
 
     public BaseEnQueue getEnqueue(String queueId){
         BaseEnQueue enqueue = null;
@@ -278,16 +282,26 @@ public class ConversationService {
 
 
     /**
-     * 邀请坐席加入交谈
+     *
      * @param appId
-     * @param conversationId
+     * @param ref_res_id  参考id
+     * @param initiator   发起者的callid
+     * @param conversationId 交谈id
+     * @param agentId    坐席id(平台)
+     * @param agentName  坐席id(用户)
+     * @param extension  坐席分机id
+     * @param systemNum  平台号码 可为null，
+     * @param diaplyNum  呼叫坐席的显示号码，为空
+     * @param agentPhone 坐席的话机号码（如果坐席的分级类型为TYPE_TELPHONE）
+     * @param type       坐席分机类型
+     * @param user       SIP注册用户名  （如果坐席的分级类型为TYPE_THIRD_SIP，TYPE_SIP）
      * @param maxDuration
      * @param maxDialDuration
      * @return
      * @throws YunhuniApiException
      */
     public String inviteAgent(String appId,String ref_res_id,String initiator, String conversationId,String agentId,String agentName,String extension,
-                         String telnum,String type,String user,
+                         String systemNum,String diaplyNum,String agentPhone,String type,String user,
                           Integer maxDuration, Integer maxDialDuration) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
         App app = appService.findById(appId);
@@ -295,19 +309,22 @@ public class ConversationService {
         String to = null;
         String areaId = null;
         String lineId = null;
+
         if(AppExtension.TYPE_TELPHONE.equals(type)){
             AreaAndTelNumSelector.Selector selector =
-                    areaAndTelNumSelector.getTelnumberAndAreaId(app,null,telnum);
-            from = selector.getOneTelnumber();
-            to = selector.getToUri();
+                    areaAndTelNumSelector.getTelnumberAndAreaId(app,systemNum,agentPhone);
             areaId = selector.getAreaId();
             lineId = selector.getLineId();
+            from = selector.getOneTelnumber();
+            to = selector.getToUri();
         }else{
             areaId = areaAndTelNumSelector.getAreaId(app);
-            from = "10000@"+areaId+".area.oneyun.com";
+            from = (StringUtil.isEmpty(diaplyNum)
+                    ? systemNum : diaplyNum) + "@"+areaId+".area.oneyun.com";
             to = user + "@" + sip_address;
         }
         CallSession callSession = new CallSession();
+        callSession.setId(UUIDGenerator.uuid());
         callSession.setStatus(CallSession.STATUS_PREPARING);
         callSession.setFromNum(from);
         callSession.setToNum(to);
@@ -316,7 +333,7 @@ public class ConversationService {
         callSession.setRelevanceId(callId);
         callSession.setType(CallSession.TYPE_CALL_CENTER);
         callSession.setResId(null);
-        callSession = callSessionService.save(callSession);
+        callSessionBatchInserter.put(callSession);
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("to_uri",to)
                 .putIfNotEmpty("from_uri",from)
