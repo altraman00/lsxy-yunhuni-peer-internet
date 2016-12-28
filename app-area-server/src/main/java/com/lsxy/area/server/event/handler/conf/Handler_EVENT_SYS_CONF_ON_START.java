@@ -179,7 +179,9 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
                 .build();
         try {
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD, params);
-            rpcCaller.invoke(sessionContext, rpcrequest);
+            if(!businessStateService.closed(conf_id)) {
+                rpcCaller.invoke(sessionContext, rpcrequest);
+            }
         } catch (Exception e) {
             logger.error("会议创建自动录音：",e);
         }

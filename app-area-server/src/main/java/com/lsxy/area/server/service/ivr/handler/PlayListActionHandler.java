@@ -75,7 +75,9 @@ public class PlayListActionHandler extends ActionHandler{
                         .build();
 
                 RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_START, params);
-                rpcCaller.invoke(sessionContext, rpcrequest);
+                if(!businessStateService.closed(callId)) {
+                    rpcCaller.invoke(sessionContext, rpcrequest);
+                }
             } catch (Throwable e) {
                 logger.error("调用失败",e);
                 if(StringUtils.isNotBlank(state.getCallBackUrl())){

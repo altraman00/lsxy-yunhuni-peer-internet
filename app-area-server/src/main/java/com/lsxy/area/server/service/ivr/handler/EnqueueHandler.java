@@ -87,7 +87,9 @@ public class EnqueueHandler extends ActionHandler{
                             .put("areaId",state.getAreaId())
                             .build();
                     RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_START, params);
-                    rpcCaller.invoke(sessionContext, rpcrequest);
+                    if(!businessStateService.closed(callId)){
+                        rpcCaller.invoke(sessionContext, rpcrequest);
+                    }
                     businessStateService.updateInnerField(callId, CallCenterUtil.IS_PLAYWAIT_FIELD,CallCenterUtil.IS_PLAYWAIT_TRUE);
                 } catch (Throwable e) {
                     logger.error("调用失败",e);
