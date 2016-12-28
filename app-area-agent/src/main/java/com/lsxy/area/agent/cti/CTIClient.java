@@ -81,6 +81,9 @@ public class CTIClient implements RpcEventListener,MonitorEventListener,Runnable
      * @throws InterruptedException
      */
     private void createNewCTICommander(String serverIp) throws InterruptedException {
+        if(logger.isDebugEnabled()){
+            logger.debug("create new commander : {} , {} , {}",ctiAreaId,clientId,serverIp);
+        }
         Unit.createCommander((byte)clientId, serverIp, this, this);
 
 
