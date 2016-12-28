@@ -229,7 +229,9 @@ public class DialActionHandler extends ActionHandler{
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
         try {
-            rpcCaller.invoke(sessionContext, rpcrequest);
+            if(!businessStateService.closed(callId)){
+                rpcCaller.invoke(sessionContext, rpcrequest);
+            }
         } catch (Exception e) {
             logger.error("ivr 拨号出错:",e);
             Map<String,Object> notify_data = new MapBuilder<String,Object>()

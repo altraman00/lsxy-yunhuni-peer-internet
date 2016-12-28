@@ -202,13 +202,16 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
             logger.info("会议结束自动挂断与会方={}失败,res_id=null",callId);
             return;
         }
+        if(state.getClosed() !=null && state.getClosed()){
+            logger.info("会议结束自动挂断与会方={}失败,与会方已经挂断了",callId);
+            return;
+        }
         try {
             Map<String, Object> params = new MapBuilder<String,Object>()
                     .putIfNotEmpty("res_id",res_id)
                     .putIfNotEmpty("user_data",callId)
                     .put("areaId",state.getAreaId())
                     .build();
-
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
             rpcCaller.invoke(sessionContext, rpcrequest,true);
         } catch (Throwable e) {
