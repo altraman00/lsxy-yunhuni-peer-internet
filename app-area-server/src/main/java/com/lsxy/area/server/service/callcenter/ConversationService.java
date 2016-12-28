@@ -452,7 +452,6 @@ public class ConversationService {
                     call_id,conversation_id,maxDuration,playFile,voiceMode);
         }
         BusinessState call_state = businessStateService.get(call_id);
-        BusinessState conversation_state = businessStateService.get(conversation_id);
 
         if(call_state ==null || call_state.getResId() == null){
             throw new SystemBusyException();
@@ -461,6 +460,8 @@ public class ConversationService {
         if(call_state.getClosed()!= null && call_state.getClosed()){
             throw new SystemBusyException();
         }
+
+        BusinessState conversation_state = businessStateService.get(conversation_id);
 
         if(conversation_state != null &&
                 conversation_state.getResId() == null &&
@@ -477,11 +478,6 @@ public class ConversationService {
 
         if(conversation_state.getClosed()!= null && conversation_state.getClosed()){
             throw new SystemBusyException();
-        }
-
-        if(!call_state.getAppId().equals(conversation_state.getAppId())){
-            //不合法的参数
-            throw new IllegalArgumentException();
         }
 
         Map<String,String> call_business=call_state.getBusinessData();
@@ -547,7 +543,6 @@ public class ConversationService {
             logger.info("调用退出会议命令conversationId={},callId={}",conversationId,callId);
         }
         BusinessState call_state = businessStateService.get(callId);
-        BusinessState conversation_state = businessStateService.get(conversationId);
         if(call_state == null || call_state.getResId() == null){
             logger.info("(call_state == null || call_state.getResId() == null)conversationId={},callId={}",conversationId,callId);
             return;
@@ -555,6 +550,7 @@ public class ConversationService {
         if(call_state.getClosed() != null && call_state.getClosed()){
             return;
         }
+        BusinessState conversation_state = businessStateService.get(conversationId);
         if(conversation_state == null || conversation_state.getResId() == null){
             logger.info("(conversation_state == null || conversation_state.getResId() == null)conversationId={},callId={}",conversationId,callId);
             return;
@@ -562,10 +558,7 @@ public class ConversationService {
         if(conversation_state.getClosed() != null && conversation_state.getClosed()){
             return;
         }
-        if(!call_state.getAppId().equals(conversation_state.getAppId())){
-            logger.info("(!call_state.getAppId().equals(conversation_state.getAppId()))conversationId={},callId={}",conversationId,callId);
-            return;
-        }
+
         try {
             Map<String,Object> params = new MapBuilder<String,Object>()
                     .putIfNotEmpty("res_id",call_state.getResId())
@@ -610,7 +603,6 @@ public class ConversationService {
 
     public void setVoiceMode(String areaId,String conversationId, String callId, Integer voiceMode) throws YunhuniApiException {
         BusinessState call_state = businessStateService.get(callId);
-        BusinessState conversation_state = businessStateService.get(conversationId);
 
         if(call_state ==null || call_state.getResId() == null){
             throw new SystemBusyException();
@@ -620,6 +612,8 @@ public class ConversationService {
             throw new SystemBusyException();
         }
 
+        BusinessState conversation_state = businessStateService.get(conversationId);
+
         if(conversation_state == null || conversation_state.getResId() == null){
             throw new SystemBusyException();
         }
@@ -628,9 +622,6 @@ public class ConversationService {
             throw new SystemBusyException();
         }
 
-        if(!call_state.getAppId().equals(conversation_state.getAppId())){
-            throw new IllegalArgumentException();
-        }
         if(voiceMode ==null){
             throw new IllegalArgumentException();
         }
@@ -664,17 +655,13 @@ public class ConversationService {
      */
     public void logicExit(String conversationId,String callId){
         BusinessState call_state = businessStateService.get(callId);
-        BusinessState conversation_state = businessStateService.get(conversationId);
         if(call_state == null || call_state.getResId() == null){
             logger.info("(call_state == null || call_state.getResId() == null)conversationId={},callId={}",conversationId,callId);
             return;
         }
+        BusinessState conversation_state = businessStateService.get(conversationId);
         if(conversation_state == null || conversation_state.getResId() == null){
             logger.info("(conversation_state == null || conversation_state.getResId() == null)conversationId={},callId={}",conversationId,callId);
-            return;
-        }
-        if(!call_state.getAppId().equals(conversation_state.getAppId())){
-            logger.info("(!call_state.getAppId().equals(conversation_state.getAppId()))conversationId={},callId={}",conversationId,callId);
             return;
         }
         try{
@@ -731,7 +718,6 @@ public class ConversationService {
                 }
             }
         }else{
-
             if(call_state.getClosed() == null || !call_state.getClosed()){
                 //不是ivr 不需要下一步  直接挂断
                 if(logger.isDebugEnabled()) {
@@ -747,11 +733,11 @@ public class ConversationService {
      * **/
     public void join(String conversation_id,String call_id){
         BusinessState state = businessStateService.get(call_id);
-        if(state == null){
+        if(state == null || (state.getClosed() != null && state.getClosed())){
             return;
         }
-        CallCenterConversation conversation = callCenterConversationService.findById(conversation_id);
-        if(conversation==null){
+        BusinessState conversationState = businessStateService.get(conversation_id);
+        if(conversationState == null || (conversationState.getClosed() != null && conversationState.getClosed())){
             return;
         }
         Map<String,String> businessData = state.getBusinessData();
@@ -783,6 +769,7 @@ public class ConversationService {
         }
         callCenterUtil.conversationPartsChangedEvent(state.getCallBackUrl(),conversation_id);
     }
+
     private void hangup(String res_id,String call_id,String area_id){
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",res_id)
