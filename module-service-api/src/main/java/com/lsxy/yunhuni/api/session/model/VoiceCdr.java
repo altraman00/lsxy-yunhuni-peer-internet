@@ -29,8 +29,7 @@ public class VoiceCdr extends IdEntity {
     private String lineId;//所属线路
     private String type;//'查看产品表code字段或枚举类ProductCode
     private String relevanceId;//根据会话类型关联对应类型的表的记录
-    private String recordUrl;//录音文件URL
-    private Long recordSize;//录音文件大小
+    private Integer recording; //是否有录音文件:0无，1有，null无法判断
     private String fromNum;//主叫
     private String toNum;//被叫
     private Date callStartDt;//呼叫开始时间
@@ -124,22 +123,16 @@ public class VoiceCdr extends IdEntity {
     public void setRelevanceId(String relevanceId) {
         this.relevanceId = relevanceId;
     }
-    @Column( name = "record_url")
-    public String getRecordUrl() {
-        return recordUrl;
+
+    @Column( name = "recording")
+    public Integer getRecording() {
+        return recording;
     }
 
-    public void setRecordUrl(String recordUrl) {
-        this.recordUrl = recordUrl;
-    }
-    @Column( name = "record_size")
-    public Long getRecordSize() {
-        return recordSize;
+    public void setRecording(Integer recording) {
+        this.recording = recording;
     }
 
-    public void setRecordSize(Long recordSize) {
-        this.recordSize = recordSize;
-    }
     @Column( name = "from_num")
     public String getFromNum() {
         return fromNum;

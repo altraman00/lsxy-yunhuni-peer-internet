@@ -21,7 +21,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Created by tandy on 16/8/1.
@@ -33,7 +33,7 @@ import java.util.concurrent.*;
 public class NettyServerHandler extends AbstractServerRPCHandler {
 
     // 业务逻辑线程池(业务逻辑最好跟netty io线程分开处理，线程切换虽会带来一定的性能损耗，但可以防止业务逻辑阻塞io线程)
-    private final static ExecutorService workerThreadService = newBlockingExecutorsUseCallerRun(500);
+    private final static ExecutorService workerThreadService = rpcHandlerExecutorService("NettyRPCServerHandler-%s");
 
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
@@ -46,25 +46,6 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
     private ServerSessionContext sessionContext;
 
 
-    /**
-     * 阻塞的ExecutorService
-     *
-     * @param size
-     * @return
-     */
-    public static ExecutorService newBlockingExecutorsUseCallerRun(int size) {
-        return new ThreadPoolExecutor(size, size, 0L, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(),
-                new RejectedExecutionHandler() {
-                    @Override
-                    public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-                        try {
-                            executor.getQueue().put(r);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                });
-    }
     @Override
     public Session getSessionInTheContextObject(Object ctxObject) {
         ChannelHandlerContext ctx = (ChannelHandlerContext) ctxObject;
@@ -77,21 +58,15 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
     class IOHandle extends SimpleChannelInboundHandler<String>{
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
-//            if(logger.isDebugEnabled()){
-//                logger.debug("收到消息：{}",msg);
-//            }
             final RPCMessage rpcMessage = RPCMessage.unserialize(msg);
             if(logger.isDebugEnabled()){
                 logger.debug("收到消息耗时:{} ms  [{}]",(System.currentTimeMillis() - rpcMessage.getTimestamp()),rpcMessage.getSessionid());
             }
-            workerThreadService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        process(ctx, rpcMessage);
-                    } catch (SessionWriteException e) {
-                        logger.error("处理RPC消息异常:"+rpcMessage,e);
-                    }
+            workerThreadService.execute(() -> {
+                try {
+                    process(ctx, rpcMessage);
+                } catch (Exception e) {
+                    logger.error("处理RPC消息异常:"+rpcMessage,e);
                 }
             });
         }
@@ -189,4 +164,6 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
     public SimpleChannelInboundHandler<String> getIoHandler() {
         return ioHandler;
     }
+
+
 }

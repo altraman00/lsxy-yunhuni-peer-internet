@@ -78,7 +78,7 @@
                                             </div>
                                             <span class="span-required">*</span>
                                         </div>
-                                        <p class="tips">20字符内，符合<a href="${resPrefixUrl}/explain_auth.html" target="_blank">应用审核规范要求</a></p>
+                                        <p class="tips">20字符内，符合<a href="${globalWebsite}/develop/book/platform" target="_blank">应用审核规范要求</a></p>
 
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用描述：</lable>
@@ -128,9 +128,9 @@
                                             <span class="span-required">*</span>
                                         </div>
                                         <%--<p class="tips"><a href="">回调说明文档</a></p>--%>
-                                        <p class="tips">
-                                            <input type="checkbox" name="isAuth" value="1" <c:if test="${app.isAuth=='1'}">checked='checked'</c:if>> 鉴权 (网络直拨,回拨,互联网语音,视频通话会涉及鉴权流程，勾选但未实现会呼叫失败)
-                                        </p>
+                                        <%--<p class="tips">--%>
+                                            <%--<input type="checkbox" name="isAuth" value="1" <c:if test="${app.isAuth=='1'}">checked='checked'</c:if>> 鉴权 (网络直拨,回拨,互联网语音,视频通话会涉及鉴权流程，勾选但未实现会呼叫失败)--%>
+                                        <%--</p>--%>
 
                                         <div class="form-group height-10">
                                             <span class="hr"></span>

@@ -83,12 +83,13 @@
 
                                                 <span class="search-bigger-title inline-block text-center ">呼叫类型</span>
                                                 <select name="type" class="form-control inline-block search-input">
-                                                    <option <c:if test="${type == '1'}"> selected</c:if> value="1">呼出</option>
-                                                    <option <c:if test="${type == '2'}"> selected</c:if> value="2">呼入</option>
+                                                    <option  value="">全部</option>
+                                                    <option <c:if test="${type == '1'}"> selected</c:if> value="1">呼入</option>
+                                                    <option <c:if test="${type == '2'}"> selected</c:if> value="2">呼出</option>
                                                 </select>
 
                                                 <button class="btn btn-primary margin-left-20" type="submit"> 查询</button>
-                                                <button class="btn btn-primary" type="button" onclick="download()"> 导出</button>
+                                                <%--<button class="btn btn-primary" type="button" onclick="download()"> 导出</button>--%>
                                             </div>
 
 
@@ -138,6 +139,7 @@
                                                         <c:if test="${result.toManualResult==2}">呼叫坐席失败</c:if>
                                                         <c:if test="${result.toManualResult==3}">主动放弃</c:if>
                                                         <c:if test="${result.toManualResult==4}">超时</c:if>
+                                                        <c:if test="${result.toManualResult==5}">转接失败</c:if>
                                                     </td>
                                                     <td>${result.overReason}</td>
                                                     <td><fmt:formatDate value="${result.toManualTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate></td>

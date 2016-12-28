@@ -33,10 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.WebAsyncTask;
 
 import java.net.URL;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 /**
@@ -89,17 +86,13 @@ public class BillDetailController extends AbstractRestController {
         RestResponse restResponse = null;
         if(StringUtil.isNotEmpty(appId)&&StringUtil.isNotEmpty(type)){
             //获取分页数据
-            if(CallSession.TYPE_VOICE_RECORDING.equals(type)){//录音
-
-            }else {
-                Page page = voiceCdrService.pageList(pageNo, pageSize, type, uid, time, appId);
-                re.put("page", page);
-                if (CallSession.TYPE_VOICE_VOICECODE.equals(type)) {//语音验证码
-                    re.put("total", page.getTotalCount());
-                } else {
-                    Map map = voiceCdrService.sumCost(type, uid, time, appId);
-                    re.put("total", map.get("cost"));
-                }
+            Page page = voiceCdrService.pageList(pageNo, pageSize, type, uid, time, appId);
+            re.put("page", page);
+            if (CallSession.TYPE_VOICE_VOICECODE.equals(type)) {//语音验证码
+                re.put("total", page.getTotalCount());
+            } else {
+                Map map = voiceCdrService.sumCost(type, uid, time, appId);
+                re.put("total", map.get("cost"));
             }
             restResponse = RestResponse.success(re);
         }else{
@@ -208,7 +201,10 @@ public class BillDetailController extends AbstractRestController {
                 }
                 List<VoiceFileRecord> list = getFile(id);
                 if(list==null||list.size()==0){
-                    return RestResponse.failed("0000","无对应的录音文件");
+                    //TODO 更新CDR
+                    voiceCdr.setRecording(0);
+                    voiceCdrService.save(voiceCdr);
+                    return RestResponse.failed("0401","无对应的录音文件");
                 }
                 //先判断是否文件已上传，如果是的话，直接生成临时下载链接，否则
                 boolean flag = false;
@@ -251,40 +247,43 @@ public class BillDetailController extends AbstractRestController {
         VoiceCdr voiceCdr = voiceCdrService.findById(id);
         List list = null;
         if(voiceCdr!=null&& StringUtils.isNotEmpty(voiceCdr.getId())) {
-            ProductCode p1 = ProductCode.changeApiCmdToProductCode(voiceCdr.getType());
-            //语音会议
-            if (ProductCode.sys_conf.getRemark().equals(p1.getRemark())) {
-                //获取会议操作者
-                MeetingMember meetingMember = meetingMemberService.findById(voiceCdr.getSessionId());
-                if (meetingMember!=null) {
-                    //使用会议id
-                    list = voiceFileRecordService.getListBySessionId(meetingMember.getMeeting().getId());
-                }
-            }
-            //自定义IVR
-            else if (ProductCode.ivr_call.getRemark().equals(p1.getRemark())) {
-                //使用ivr的id
-                list = voiceFileRecordService.getListBySessionId(voiceCdr.getSessionId());
-            }
-            //语音回拔
-            else if (ProductCode.duo_call.getRemark().equals(p1.getRemark())) {
-                //使用双向回拨的id
-                list = voiceFileRecordService.getListBySessionId(voiceCdr.getSessionId());
-            }
-            //呼叫中心
-            else if (ProductCode.call_center.getRemark().equals(p1.getRemark())) {
-                //根据sessionid获取呼叫中心交互成员，在获取呼叫中心交谈，在获取文件
-                List<String> temp = callCenterConversationMemberService.getListBySessionId(voiceCdr.getSessionId());
-                if (temp!=null&&temp.size() == 0) {
-                    String te = "";
-                    for (int i = 0; i < temp.size(); i++) {
-                        te += "'" + temp.get(i) + "'";
-                        if (i != temp.size() - 1) {
-                            te += ",";
-                        }
+            ProductCode p1 = ProductCode.valueOf(voiceCdr.getType());
+            switch(p1){
+                case sys_conf:{
+                    //获取会议操作者
+                    MeetingMember meetingMember = meetingMemberService.findById(voiceCdr.getSessionId());
+                    if (meetingMember!=null) {
+                        //使用会议id
+                        list = voiceFileRecordService.getListBySessionId(meetingMember.getMeeting().getId());
                     }
+                    break;
+                }
+                case ivr_call:{
                     //使用ivr的id
-                    list = voiceFileRecordService.getListBySessionId( te);
+                    list = voiceFileRecordService.getListBySessionId(voiceCdr.getSessionId());
+                    break;
+                }
+                case duo_call:{
+                    //使用双向回拨的id
+                    list = voiceFileRecordService.getListBySessionId(voiceCdr.getSessionId());
+                    break;
+                }
+                case call_center:{
+                    //根据sessionid获取呼叫中心交互成员，在获取呼叫中心交谈，在获取文件
+                    List<String> temp = callCenterConversationMemberService.getListBySessionId(voiceCdr.getSessionId());
+                    if (temp!=null&&temp.size() > 0) {
+//
+//                        String te = "";
+//                        for (int i = 0; i < temp.size(); i++) {
+//                            te += "'" + temp.get(i) + "'";
+//                            if (i != temp.size() - 1) {
+//                                te += ",";
+//                            }
+//                        }
+                        //使用ivr的id
+                        list = voiceFileRecordService.getListBySessionId(temp.toArray(new String[0]));
+                    }
+                    break;
                 }
             }
         }
@@ -303,4 +302,6 @@ public class BillDetailController extends AbstractRestController {
         String result = OssTempUriUtils.getOssTempUri( accessId, accessKey, host, "GET",resource ,60);
         return result;
     }
+
+
 }

@@ -1,10 +1,9 @@
 package com.lsxy.area.agent.handler.call;
 
-import com.lsxy.app.area.cti.BusAddress;
-import com.lsxy.app.area.cti.Commander;
 import com.lsxy.app.area.cti.RpcError;
 import com.lsxy.app.area.cti.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
+import com.lsxy.area.agent.cti.CTINode;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -17,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -44,13 +42,13 @@ public class Handler_MN_CH_SYS_CALL_ANSWER extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        Commander cticlient = cticlientContext.getAvalibleClient();
+
         try {
             Map<String, Object> params = request.getParamMap();
             String call_id = (String)params.get("user_data");
             String res_id = (String)params.get("res_id");
-
-            cticlient.operateResource(new BusAddress((byte)0,(byte)0),res_id, "sys.call.answer", params, new RpcResultListener(){
+            CTINode cticlient = cticlientContext.getAvalibleNode(res_id);
+            cticlient.operateResource( res_id, "sys.call.answer", params, new RpcResultListener(){
                 @Override
                 protected void onResult(Object o) {
                     if(logger.isDebugEnabled()){

@@ -104,7 +104,7 @@
                                             </div>
                                             <div class="col-md-2">
                                                 <button class="btn btn-primary" type="submit"> 查询</button>
-                                                <button class="btn btn-primary" type="button" onclick="download()"> 导出</button>
+                                                <%--<button class="btn btn-primary" type="button" onclick="download()"> 导出</button>--%>
                                             </div>
                                         </div>
                                     </form:form>
@@ -149,7 +149,11 @@
                                                         ￥<fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber>
                                                         </span></span>
                                                     </td>
-                                                    <td><a id="downVoid${result.id}" onclick="downVoid('${result.id}')" data-statu="1">录音下载</a></td>
+                                                    <td>
+                                                        <c:if test="${result.costTimeLong != 0 && result.recording != 0}">
+                                                            <a id="downVoid${result.id}" onclick="downVoid('${result.id}')" data-statu="1">录音下载</a>
+                                                        </c:if>
+                                                    </td>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>

@@ -16,6 +16,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.async.WebAsyncTask;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,6 +26,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * 详单查询
@@ -92,7 +95,7 @@ public class BillDetailController extends AbstractPortalController {
         String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/sum?appId={1}&type={2}&startTime={3}&endTime={4}";
         mav.addObject("sum",RestRequest.buildSecurityRequest(token).get(uri, Map.class,appId,type,map.get("time"),map.get("time")).getData());
         String uri1 = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/plist/time?pageNo={1}&pageSize={2}&appId={3}&type={4}&startTime={5}&endTime={6}";
-        mav.addObject("pageObj",RestRequest.buildSecurityRequest(token).getPage(uri1,Map.class,pageNo,pageSize,appId,type,map.get("time"),map.get("time")).getData());
+        mav.addObject("pageObj",RestRequest.buildSecurityRequest(token).getPage(uri1,Map.class,pageNo,pageSize,map.get("appId"),type,map.get("time"),map.get("time")).getData());
         mav.setViewName("/console/statistics/billdetail/recording");
         return mav;
     }
@@ -176,70 +179,77 @@ public class BillDetailController extends AbstractPortalController {
      * @return
      */
     @RequestMapping("{path}/download")
-    public void download(HttpServletRequest request, HttpServletResponse response, @PathVariable String path, String time, String appId){
-        String oType = "";
-        String title = "";
-        String one = "";
-        String[] headers = null;
-        String[] values = null;
-        String serviceType = "";
-        if("notify".equals(path)){//语音通知
-            oType = CallSession.TYPE_VOICE_NOTIFY;
-            title = "语音通知";
-            headers = new String[]{"呼叫时间","主叫","被叫","消费金额","时长（秒）"};
-            values = new String[]{"callStartDt","fromNum","toNum","cost","costTimeLong"};
-            serviceType = App.PRODUCT_VOICE;
-        }else if("code".equals(path)){//语音验证码
-            oType = CallSession.TYPE_VOICE_VOICECODE;
-            title = "语音验证码";
-            headers = new String[]{"发送时间","主叫","被叫","挂机时间","消费金额","时长（秒）"};
-            values = new String[]{"callStartDt","fromNum","toNum","callEndDt","cost","costTimeLong"};
-            serviceType = App.PRODUCT_VOICE;
-        }
+    @ResponseBody
+    public WebAsyncTask download(HttpServletRequest request, HttpServletResponse response, @PathVariable String path, String time, String appId){
+        Callable<String> callable = new Callable<String>() {
+            public String call() throws Exception {
+                String oType = "";
+                String title = "";
+                String one = "";
+                String[] headers = null;
+                String[] values = null;
+                String serviceType = "";
+                if("notify".equals(path)){//语音通知
+                    oType = CallSession.TYPE_VOICE_NOTIFY;
+                    title = "语音通知";
+                    headers = new String[]{"呼叫时间","主叫","被叫","消费金额","时长（秒）"};
+                    values = new String[]{"callStartDt","fromNum","toNum","cost","costTimeLong"};
+                    serviceType = App.PRODUCT_VOICE;
+                }else if("code".equals(path)){//语音验证码
+                    oType = CallSession.TYPE_VOICE_VOICECODE;
+                    title = "语音验证码";
+                    headers = new String[]{"发送时间","主叫","被叫","挂机时间","消费金额","时长（秒）"};
+                    values = new String[]{"callStartDt","fromNum","toNum","callEndDt","cost","costTimeLong"};
+                    serviceType = App.PRODUCT_VOICE;
+                }
         /*else if("recording".equals(type)){//录音
             oType = CallSession.TYPE_VOICE_RECORDING;
             title = "录音";
             headers = new String[]{};
             values = new String[]{};
         }*/
-        else if("ivr".equals(path)) {// 自定义IVR
-            oType = CallSession.TYPE_VOICE_IVR;
-            title = " 自定义IVR";
-            headers = new String[]{"呼叫时间","呼叫类型","主叫","被叫","消费金额","时长（秒）"};
-            values = new String[]{"callStartDt","ivrType:1=呼入;2=呼出","fromNum","toNum","cost","costTimeLong"};
-            serviceType = App.PRODUCT_VOICE;
-        }else if("metting".equals(path)){// 语音会议
-            oType = CallSession.TYPE_VOICE_MEETING;
-            title = " 语音会议";
-            headers = new String[]{"会议标识ID","呼叫时间","参与者","参与类型","消费金额","时长（秒）"};
-            values = new String[]{"sessionId","callStartDt","joinType:0-fromNum;1-toNum;2-fromNum","joinType:0=创建;1=邀请加入;2=呼入加入","cost","costTimeLong"};
-            serviceType = App.PRODUCT_VOICE;
-        }else if("callback".equals(path)){//语音回拨
-            oType = CallSession.TYPE_VOICE_CALLBACK;
-            title = "语音回拨";
-            headers = new String[]{"呼叫时间","主叫","被叫","消费金额","时长（秒）"};
-            values = new String[]{"callStartDt","fromNum","toNum","cost","costTimeLong"};
-            serviceType = App.PRODUCT_VOICE;
-        }else if("callcenter".equals(path)){
-            oType = CallSession.TYPE_VOICE_CALLBACK;
-            title = "呼叫中心";
-            headers = new String[]{"呼叫时间","呼叫类型","主叫","被叫","消费金额","时长（秒）"};
-            values = new String[]{"callStartDt","ivrType:1=呼入;2=呼出","fromNum","toNum","cost","costTimeLong"};
-            serviceType = App.PRODUCT_CALL_CENTER;
-        }
-        List list = null;
-        if(StringUtils.isNotEmpty(oType)){
-            Map<String,String> map = init(request,time,appId,serviceType);
-            list = (List)getList(request,oType,map.get("time"),map.get("appId")).getData();
-        }
-        String appName = "";
-        if(StringUtils.isNotEmpty(appId)){
-            appName = ((App)getAppById(request,appId).getData()).getName();
-        }else{
-            appName = "全部";
-        }
-        one = title+" 时间："+time+" 应用："+appName;
-        downloadExcel(title,one,headers,values,list,null,"cost",response);
+                else if("ivr".equals(path)) {// 自定义IVR
+                    oType = CallSession.TYPE_VOICE_IVR;
+                    title = " 自定义IVR";
+                    headers = new String[]{"呼叫时间","呼叫类型","主叫","被叫","消费金额","时长（秒）"};
+                    values = new String[]{"callStartDt","ivrType:1=呼入;2=呼出","fromNum","toNum","cost","costTimeLong"};
+                    serviceType = App.PRODUCT_VOICE;
+                }else if("metting".equals(path)){// 语音会议
+                    oType = CallSession.TYPE_VOICE_MEETING;
+                    title = " 语音会议";
+                    headers = new String[]{"会议标识ID","呼叫时间","参与者","参与类型","消费金额","时长（秒）"};
+                    values = new String[]{"sessionId","callStartDt","joinType:0-fromNum;1-toNum;2-fromNum","joinType:0=创建;1=邀请加入;2=呼入加入","cost","costTimeLong"};
+                    serviceType = App.PRODUCT_VOICE;
+                }else if("callback".equals(path)){//语音回拨
+                    oType = CallSession.TYPE_VOICE_CALLBACK;
+                    title = "语音回拨";
+                    headers = new String[]{"呼叫时间","主叫","被叫","消费金额","时长（秒）"};
+                    values = new String[]{"callStartDt","fromNum","toNum","cost","costTimeLong"};
+                    serviceType = App.PRODUCT_VOICE;
+                }else if("callcenter".equals(path)){
+                    oType = CallSession.TYPE_CALL_CENTER;
+                    title = "呼叫中心";
+                    headers = new String[]{"呼叫时间","呼叫类型","主叫","被叫","消费金额","时长（秒）"};
+                    values = new String[]{"callStartDt","ivrType:1=呼入;2=呼出","fromNum","toNum","cost","costTimeLong"};
+                    serviceType = App.PRODUCT_CALL_CENTER;
+                }
+                List list = null;
+                if(StringUtils.isNotEmpty(oType)){
+                    Map<String,String> map = init(request,time,appId,serviceType);
+                    list = (List)getList(request,oType,map.get("time"),map.get("appId")).getData();
+                }
+                String appName = "";
+                if(StringUtils.isNotEmpty(appId)){
+                    appName = ((App)getAppById(request,appId).getData()).getName();
+                }else{
+                    appName = "全部";
+                }
+                one = title+" 时间："+time+" 应用："+appName;
+                downloadExcel(title,one,headers,values,list,null,"cost",response);
+                return "";
+            }
+        };
+        return new WebAsyncTask(600000,callable);
     }
     /**
      * 统计

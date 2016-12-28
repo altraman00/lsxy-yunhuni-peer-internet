@@ -166,7 +166,12 @@
 
                 <!--没有可选号码-->
                 <div id="selectOwnIvr" style="display: none" >
-                    <div class="input text-center">
+                    <div class="input text-center"  style="width: 89%;
+                        color: #619B5A;
+                        margin: 0 auto;
+                        font-size: 14px;
+                        background-color: #dff0d8;
+                    ">
                         我的号码列表没有可选号码，如需租用号码，请前往“号码管理”中的“我的号码”
                     </div>
                     <div class="input text-center" >
@@ -178,11 +183,12 @@
                 <div id="selectNewIvr" style="display: none">
                     <div class="input text-center">
                         <div  style="width: 89%;
-    color: #619B5A;
-    margin: 0 auto;
-    font-size: 14px;
-    background-color: #dff0d8;
-">若您选择开通自定义IVR或者云呼叫中心功能，则需要从我的号码列表中选择一个可呼入的号码与该应用绑定</div>
+                            color: #619B5A;
+                            margin: 0 auto;
+                            font-size: 14px;
+                            background-color: #dff0d8;
+                        ">
+                            若您选择开通自定义IVR或者呼叫中心功能，则需要从我的号码列表中选择一个可呼入的号码与该应用绑定</div>
                     </div>
                     <div class="phone-table">
                         <table class="table table-striped">

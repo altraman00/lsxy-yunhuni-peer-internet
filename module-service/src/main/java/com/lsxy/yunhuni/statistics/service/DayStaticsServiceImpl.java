@@ -56,7 +56,7 @@ public class DayStaticsServiceImpl extends AbstractService<DayStatics> implement
         String yyyyMMdd = DateUtils.formatDate(date, "yyyyMMdd");
         Date staticsDate = DateUtils.parseDate(yyyyMMdd,"yyyyMMdd");
         Iterable<Tenant> tenants = tenantService.list();
-        ExecutorService executorService = Executors.newFixedThreadPool(50);
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
         List<Future> results = new ArrayList<>();
         for(Tenant tenant:tenants){
             results.add(executorService.submit(() -> this.staticTenantAndApp(staticsDate, tenant)));

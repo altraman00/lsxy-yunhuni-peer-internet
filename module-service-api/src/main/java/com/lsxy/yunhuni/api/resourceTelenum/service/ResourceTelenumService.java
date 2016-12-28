@@ -100,4 +100,11 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
     List<ResourceTelenum> findByIds(Collection<String> ids);
 
     List<ResourceTelenum> findByTelNumbers(Collection<String> telNumbers);
+
+    /**
+     * 根据呼叫号码或callUrl来查找号码
+     * @param num
+     * @return
+     */
+    ResourceTelenum findByTelNumberOrCallUri(String num);
 }

@@ -18,7 +18,7 @@ import java.util.Date;
 public class VoiceCdrHour extends IdEntity {
     private String tenantId;//所属租户
     private String appId;//所属应用
-    private Integer type;//会话类型1.语音通知2.双向回拨3.会议4.IVR定制服务5.语音验证码6.录音
+    private String type;//会话类型1.语音通知2.双向回拨3.会议4.IVR定制服务5.语音验证码6.录音
     private String operatorId;//操作类型
     private String areaId;//区域
     private Date dt;//统计时间
@@ -70,11 +70,11 @@ public class VoiceCdrHour extends IdEntity {
         this.appId = appId;
     }
     @Column(name = "type")
-    public Integer getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(Integer type) {
+    public void setType(String type) {
         this.type = type;
     }
     @Column(name = "operator_id")

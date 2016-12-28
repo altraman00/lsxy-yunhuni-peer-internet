@@ -493,4 +493,9 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     public List<ResourceTelenum> findByTelNumbers(Collection<String> telNumbers) {
         return resourceTelenumDao.findByTelNumberIn(telNumbers);
     }
+
+    @Override
+    public ResourceTelenum findByTelNumberOrCallUri(String num) {
+        return resourceTelenumDao.findFirstByTelNumberOrCallUri(num,num);
+    }
 }

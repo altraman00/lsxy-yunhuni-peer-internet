@@ -210,8 +210,8 @@ public class CallServiceImpl implements CallService {
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, params);
         try {
             Map<String,String> data = new MapBuilder<String,String>()
-                    .put(to1_uri,callSession.getId())
-                    .put(to2_uri,callSession2.getId())
+                    .put(to1_uri.split("@")[0],callSession.getId())
+                    .put(to2_uri.split("@")[0],callSession2.getId())
                     .build();
             //将数据存到redis
             BusinessState cache = new BusinessState.Builder()
