@@ -78,10 +78,12 @@
                                                             应用名称：
                                                         </div>
                                                         <div class="col-md-6">
-                                                            ${app.name}
-                                                            <c:if test="${app.status==1}"><span style="color:#9dc940;">已上线</span></c:if>
-                                                            <c:if test="${app.status==2}"><span class="text-danger">未上线</span></c:if>
-                                                            <%--<input type="hidden" id="appStatus" value="${app.status}">--%>
+                                                            <p>
+                                                                ${app.name}
+                                                                <c:if test="${app.status==1}"><span style="color:#9dc940;">已上线</span></c:if>
+                                                                <c:if test="${app.status==2}"><span class="text-danger">未上线</span></c:if>
+                                                                <%--<input type="hidden" id="appStatus" value="${app.status}">--%>
+                                                            </p>
                                                         </div>
                                                     </div>
                                                     <div class="row ">
@@ -161,30 +163,33 @@
                                                         <div class="col-md-1 dev">
                                                             绑定测试号：
                                                         </div>
-                                                        <div class="col-md-8"> <span id="testNumBind"
-                                                                <c:if test="${testNumBindList==null || fn:length(testNumBindList)==0 || tempTestNum==0}">
-                                                                    hidden
-                                                                </c:if>>
-                                                            <c:set var="tempTestNum" value="0"></c:set>
-                                                            <c:forEach items="${testNumBindList}" var="testNumBind">
-                                                                <c:if test="${testNumBind.app.id==app.id}">
-                                                                    <c:set var="tempTestNum" value="${tempTestNum+1}"></c:set>
-                                                                </c:if>
-                                                            </c:forEach>
+                                                        <div class="col-md-8">
+                                                            <p>
+                                                                <span id="testNumBind"
+                                                                    <c:if test="${testNumBindList==null || fn:length(testNumBindList)==0 || tempTestNum==0}">
+                                                                        hidden
+                                                                    </c:if>>
+                                                                <c:set var="tempTestNum" value="0"></c:set>
                                                                 <c:forEach items="${testNumBindList}" var="testNumBind">
                                                                     <c:if test="${testNumBind.app.id==app.id}">
-                                                                        <span name="testNum">${testNumBind.number} </span>
+                                                                        <c:set var="tempTestNum" value="${tempTestNum+1}"></c:set>
                                                                     </c:if>
                                                                 </c:forEach>
-                                                            </span>
-                                                                <a
-                                                                        <c:if test="${testNumBindList!=null && fn:length(testNumBindList)> 0}">
-                                                                            class="modalShow" data-id="one"
+                                                                    <c:forEach items="${testNumBindList}" var="testNumBind">
+                                                                        <c:if test="${testNumBind.app.id==app.id}">
+                                                                            <span name="testNum">${testNumBind.number} </span>
                                                                         </c:if>
-                                                                        <c:if test="${testNumBindList==null || fn:length(testNumBindList)== 0}">
-                                                                            onclick="showTestNumBind()"
-                                                                        </c:if>
-                                                                >绑定交互测试号</a>
+                                                                    </c:forEach>
+                                                                </span>
+                                                                    <a
+                                                                            <c:if test="${testNumBindList!=null && fn:length(testNumBindList)> 0}">
+                                                                                class="modalShow" data-id="one"
+                                                                            </c:if>
+                                                                            <c:if test="${testNumBindList==null || fn:length(testNumBindList)== 0}">
+                                                                                onclick="showTestNumBind()"
+                                                                            </c:if>
+                                                                    >绑定交互测试号</a>
+                                                            </p>
                                                         </div>
                                                     </div>
                                                     <c:if test="${app.serviceType=='call_center'}">

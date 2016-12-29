@@ -168,7 +168,7 @@
                                         <div class="form-group app-createbox none app-tap-child" data-child="call_center" >
                                             <lable class="col-md-3 text-right"></lable>
                                             <div class="col-md-9" >
-                                                <p><input type="checkbox" name="isCallCenter" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isCallCenter=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">云呼叫中心</font>(专业的销售和客服中心，具备IVR导航、坐席管理、呼叫转移等全方位功能)</p>
+                                                <p><input type="checkbox" name="isCallCenter" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isCallCenter=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">呼叫中心</font>(专业的销售和客服中心，具备IVR导航、坐席管理、呼叫转移等全方位功能)</p>
                                             </div>
                                         </div>
                                         <div class="form-group">
