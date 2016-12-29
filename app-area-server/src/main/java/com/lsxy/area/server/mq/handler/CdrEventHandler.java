@@ -44,7 +44,7 @@ public class CdrEventHandler implements MQMessageHandler<CdrEvent> {
         if(voiceCdr == null){
             return;
         }
-        voiceCdrService.save(voiceCdr);
+        voiceCdrService.insertCdr(voiceCdr);
         if(message.getCallCenterId()!=null){
             if(voiceCdr.getCost() != null && voiceCdr.getCost().compareTo(BigDecimal.ZERO) == 1){
                 mqService.publish(new CallCenterIncrCostEvent(message.getCallCenterId(),voiceCdr.getCost()));
