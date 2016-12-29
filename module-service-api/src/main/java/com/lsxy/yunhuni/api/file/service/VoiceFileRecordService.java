@@ -38,4 +38,6 @@ public interface VoiceFileRecordService extends BaseService<VoiceFileRecord> {
     List<VoiceFileRecord> getListByTenantAndAppAndCreateTime(String tenant,String app,Date createTime);
     /** 获取已删除记录但没有删除oss文件的记录*/
     List<Map> getOssListByDeleted();
+
+    void insertRecord(VoiceFileRecord record);
 }
