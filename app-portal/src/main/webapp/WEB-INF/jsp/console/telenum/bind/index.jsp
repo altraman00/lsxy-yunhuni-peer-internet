@@ -65,7 +65,8 @@
                                     <div class="row">
                                         <form role="form" action="./index.html" method="post" class="register-form" id="application_create">
                                             <p class="number_info ">
-                                                测试号码用于在应用上线前用于外呼、会议或其他业务调试，在应用未上线阶段，所有语音、会议业务仅限于已经绑定的测试号码测试号码允许绑定5个
+                                                1.测试号码用于在应用未上线阶段，租户进行外呼、会议或其他业务调试时使用，租户绑定号码后，才能接听系统应用的呼出。<br/>
+                                                2.测试号码只允许绑定5个。
                                             </p>
 
                                             <c:forEach items="${testNumBindList}"  var="testNumBind" varStatus="s" >

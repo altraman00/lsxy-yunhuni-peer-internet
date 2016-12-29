@@ -2,6 +2,7 @@ package com.lsxy.area.server.mq.handler;
 
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.mq.events.agentserver.RecordCompletedEvent;
+import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
 import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
@@ -12,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
-import java.math.BigDecimal;
 
 /**
  * 处理录音完成事件
@@ -84,8 +84,9 @@ public class RecordCompletedEventHandler implements MQMessageHandler<RecordCompl
         record.setUrl(message.getUrl());
         record.setCallTimeLong(getTimelong(message.getStarTime(),message.getEndTime()));
         // 录音扣费金额,录音扣费时长
-        calCostService.recordConsume(record);
+        calCostService.recordConsumeCal(record);
         record.setSize(getRecordSize(message.getStarTime(),message.getEndTime()));
-        voiceFileRecordService.save(record);
+        voiceFileRecordService.insertRecord(record);
+
     }
 }

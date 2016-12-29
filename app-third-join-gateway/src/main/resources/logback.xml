@@ -5,10 +5,4 @@
     <property name="systemId" value="third.join.gateway" />
     <include resource="logback-yunhuni.xml"/>
 
-
-    <root level="INFO">
-        <appender-ref ref="STDOUT" />
-        <appender-ref ref="gelf" />
-        <!--<appender-ref ref="ROLLINGFILE"/>-->
-    </root>
 </configuration>

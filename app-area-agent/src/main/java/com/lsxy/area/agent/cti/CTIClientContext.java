@@ -162,24 +162,23 @@ public class CTIClientContext {
 
     /**
      * 更新负载数据
+     * @param nodeid
      * @param unitId
      * @param pid
      * @param loadData
-     * callin.count=116347,
-     * callout.count=116797,
-     * sip.in.total.num=1000,
-     * ch.total.num=2000,
-     * dsp.used.num=107,
-     * sip.callout.num=405,
-     * sip.callin.num=405,
-     * loadlevel=0,
-     * callin.num=405,
-     * sip.out.total.num=1000,
-     * callout.num=405
+* callin.count=116347,
+* callout.count=116797,
+* sip.in.total.num=1000,
+* ch.total.num=2000,
+* dsp.used.num=107,
+* sip.callout.num=405,
+* sip.callin.num=405,
+* loadlevel=0,
+* callin.num=405,
+* sip.out.total.num=1000,
      */
-    public CTINode updateNodeLoadData(String unitId, String pid, Map<String, Integer> loadData) {
-        String nodeKey = "1."+unitId+"."+pid;
-        CTINode node = nodes.get(nodeKey);
+    public CTINode updateNodeLoadData(String nodeid, Map<String, Integer> loadData) {
+        CTINode node = nodes.get(nodeid);
 
         if(node != null) {
             node.setCinCount(loadData.get("callin.count"));
@@ -201,14 +200,14 @@ public class CTIClientContext {
      * @param ip
      * @param unitid
      */
-    public void ctiClientConnectionLost(String ip, byte unitid) {
+    public void ctiClientConnectionLost(String areaId,String ip, byte unitid) {
         if(logger.isDebugEnabled()){
             logger.debug("CTI服务连接丢失：{}",ip);
         }
         servers.remove(ip);
         clients.remove(ip);
         for (String key:nodes.keySet()) {
-            if(key.startsWith("1."+unitid)){
+            if(key.startsWith(areaId+"."+unitid)){
                 if(logger.isDebugEnabled()){
                     logger.debug("CTI服务连接丢失-清理节点: {}",key);
                 }
@@ -219,24 +218,24 @@ public class CTIClientContext {
 
     /**
      * 连接状态变化事件
+     * @param ctiAreaId
      * @param unitId
      * @param clientId
      * @param status
-     *                   <li>0: 断开连接</li>
-     *                   <li>1: 新建连接</li>
-     *                   <li>2: 已有的连接</li>
+*                   <li>0: 断开连接</li>
+*                   <li>1: 新建连接</li>
      */
-    public void connectStateChanged(byte unitId, byte clientId, byte status) {
-        String key = "1." + unitId + "." + clientId;
+    public void connectStateChanged(String ctiAreaId, byte unitId, byte clientId, byte status) {
+        String key = ctiAreaId + "." + unitId + "." + clientId;
         if(status == 0){ //如果有连接断开
             if(logger.isDebugEnabled()){
-                logger.debug("CTI节点断开连接:1.{}.{}",unitId,clientId);
+                logger.debug("CTI节点断开连接:{}.{}.{}",ctiAreaId,unitId,clientId);
             }
             this.nodes.remove(key);
         }else if(status == 1 || status == 2){  //如果有新建立的连接 或者初始已有连接
             if(!this.nodes.containsKey(key)){
                 if(logger.isDebugEnabled()){
-                    logger.debug("CTI新节点加入:1.{}.{}",unitId,clientId);
+                    logger.debug("CTI新节点加入:{}.{}.{}",ctiAreaId,unitId,clientId);
                 }
                 String nodeRedisKey = KEY_CTI__NODE_PREFIX + ":" + key;
                 String sServer = (String) cacheService.hget(nodeRedisKey,"ip");
