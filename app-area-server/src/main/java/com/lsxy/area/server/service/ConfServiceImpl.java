@@ -128,6 +128,8 @@ public class ConfServiceImpl implements ConfService {
         String areaId = areaAndTelNumSelector.getAreaId(app);
 
         Meeting meeting = new Meeting();
+        meeting.setAppId(app.getId());
+        meeting.setTenantId(app.getTenant().getId());
         meeting.setResId(null);
         meeting.setStartTime(null);
         meeting = meetingService.save(meeting);

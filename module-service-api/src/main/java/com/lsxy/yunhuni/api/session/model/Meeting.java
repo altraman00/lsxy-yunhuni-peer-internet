@@ -16,10 +16,29 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_meeting")
 public class Meeting  extends IdEntity {
+    private String tenantId;//所属租户
+    private String  appId;//所属应用
     private String fromNum;//发起人
     private Date startTime;//发起时间
     private Date endTime;
     private String resId;
+
+    @Column( name = "tenant_id")
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+    @Column( name = "app_id")
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
 
     @Column(name = "from_num")
     public String getFromNum() {

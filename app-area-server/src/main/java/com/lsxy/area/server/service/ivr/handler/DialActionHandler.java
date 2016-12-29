@@ -196,6 +196,8 @@ public class DialActionHandler extends ActionHandler{
             callSession = callSessionService.save(callSession);
         }else{
             VoiceIvr voiceIvr = new VoiceIvr();
+            voiceIvr.setAppId(app.getId());
+            voiceIvr.setTenantId(app.getTenant().getId());
             voiceIvr.setFromNum(oneTelnumber);
             voiceIvr.setToNum(to);
             voiceIvr.setStartTime(new Date());

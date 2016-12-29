@@ -112,6 +112,8 @@ public class IVRServiceImpl implements IVRService {
         String lineId = selector.getLineId();
 
         VoiceIvr voiceIvr = new VoiceIvr();
+        voiceIvr.setAppId(app.getId());
+        voiceIvr.setTenantId(app.getTenant().getId());
         voiceIvr.setFromNum(oneTelnumber);
         voiceIvr.setToNum(to);
         voiceIvr.setStartTime(new Date());

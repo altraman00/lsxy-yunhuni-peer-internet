@@ -83,6 +83,8 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_SUCCESS extends EventHandler {
 
         CaptchaCall captchaCall = new CaptchaCall();
         captchaCall.setId(call_id);
+        captchaCall.setAppId(state.getAppId());
+        captchaCall.setTenantId(state.getTenantId());
         captchaCall.setStartTime(new Date());
         captchaCall.setEndTime(null);
         captchaCall.setFromNum(busniessData.get("from"));

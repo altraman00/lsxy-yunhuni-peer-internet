@@ -399,6 +399,8 @@ public class IVRActionService {
             }else{
                 VoiceIvr voiceIvr = new VoiceIvr();
                 voiceIvr.setId(call_id);
+                voiceIvr.setAppId(app.getId());
+                voiceIvr.setTenantId(app.getTenant().getId());
                 voiceIvr.setFromNum(from);
                 voiceIvr.setToNum(to);
                 voiceIvr.setStartTime(new Date());
