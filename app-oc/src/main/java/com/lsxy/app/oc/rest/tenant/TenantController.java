@@ -1074,7 +1074,7 @@ public class TenantController {
         map.put("formTime",incStatics.getQueueNum()==0?0:Math.round((double)incStatics.getQueueDuration()/incStatics.getQueueNum()));//排队时间
         long callSuccess = incStatics.getCallInSuccess() + incStatics.getCallOutSuccess();
         map.put("callTime",callSuccess == 0?0:Math.round((double)incStatics.getCallTimeLong()/callSuccess));//平均通话时长
-        map.put("callFail",incStatics.getCallIn()==0?0:Math.round((double)(incStatics.getCallInSuccess()*100)/incStatics.getCallIn()));//呼入流失率
+        map.put("callFail",incStatics.getCallIn()==0?0:Math.round((double)((incStatics.getQueueNum() - incStatics.getToManualSuccess())*100)/incStatics.getQueueNum()));//呼入流失率
         return RestResponse.success(map);
     }
     @ApiOperation(value = "用户中心的应用的呼叫中心统计数据")
