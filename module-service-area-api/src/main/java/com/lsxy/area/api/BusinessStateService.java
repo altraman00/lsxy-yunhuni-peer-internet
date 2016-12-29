@@ -8,6 +8,8 @@ public interface BusinessStateService {
 
     public BusinessState get(String id);
 
+    public boolean closed(String id);
+
     public void updateUserdata(String id,String userdata);
 
     public void updateResId(String id,String resId);

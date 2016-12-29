@@ -64,7 +64,9 @@ public class RecordActionHandler extends ActionHandler{
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_RECORD_START, params);
         try {
-            rpcCaller.invoke(sessionContext, rpcrequest);
+            if(!businessStateService.closed(callId)) {
+                rpcCaller.invoke(sessionContext, rpcrequest);
+            }
         } catch (Throwable e) {
             logger.error("调用失败",e);
             if(StringUtils.isNotBlank(state.getCallBackUrl())){

@@ -144,6 +144,14 @@ public class BusinessStateServiceImpl implements BusinessStateService {
         return state;
     }
 
+    public boolean closed(String id){
+        boolean result = Boolean.parseBoolean((String)redisCacheService.hget(getKey(id),"closed"));
+        if(logger.isDebugEnabled()){
+            logger.debug("businessStateid={},closed={}",id,result);
+        }
+        return result;
+    }
+
     private void updateField(String id,String field,String value){
         String key = getKey(id);
         try{
