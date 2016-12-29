@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -212,10 +213,12 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
     @Override
     public void insertRecord(VoiceFileRecord record) {
         this.save(record);
-        //插入消费
-        Consume consume = new Consume(record.getCreateTime(),ProductCode.recording.name(),record.getCost(),ProductCode.recording.getRemark(),
-                record.getAppId(),record.getTenantId(),record.getId());
-        consumeService.consume(consume);
+        if(record.getCost().compareTo(BigDecimal.ZERO) == 1){
+            //插入消费
+            Consume consume = new Consume(record.getCreateTime(),ProductCode.recording.name(),record.getCost(),ProductCode.recording.getRemark(),
+                    record.getAppId(),record.getTenantId(),record.getId());
+            consumeService.consume(consume);
+        }
     }
 
 
