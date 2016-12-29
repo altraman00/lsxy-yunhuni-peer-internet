@@ -188,8 +188,8 @@ public class DialActionHandler extends ActionHandler{
             callSession.setStatus(CallSession.STATUS_CALLING);
             callSession.setFromNum(to);
             callSession.setToNum(from);
-            callSession.setApp(app);
-            callSession.setTenant(app.getTenant());
+            callSession.setAppId(app.getId());
+            callSession.setTenantId(app.getTenant().getId());
             callSession.setRelevanceId(callId);
             callSession.setResId(null);
             callSession.setType(CallSession.TYPE_CALL_CENTER);
@@ -207,8 +207,8 @@ public class DialActionHandler extends ActionHandler{
             callSession.setStatus(CallSession.STATUS_PREPARING);
             callSession.setFromNum(oneTelnumber);
             callSession.setToNum(selector.getToUri());
-            callSession.setApp(app);
-            callSession.setTenant(app.getTenant());
+            callSession.setAppId(app.getId());
+            callSession.setTenantId(app.getTenant().getId());
             callSession.setRelevanceId(callId);
             callSession.setType(CallSession.TYPE_VOICE_IVR);
             callSession.setResId(null);

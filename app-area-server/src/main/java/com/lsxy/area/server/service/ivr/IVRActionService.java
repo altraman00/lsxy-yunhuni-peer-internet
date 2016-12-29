@@ -373,8 +373,8 @@ public class IVRActionService {
             callSession.setStatus(CallSession.STATUS_CALLING);
             callSession.setFromNum(to);
             callSession.setToNum(from);
-            callSession.setApp(app);
-            callSession.setTenant(tenant);
+            callSession.setAppId(app.getId());
+            callSession.setTenantId(app.getTenant().getId());
             callSession.setRelevanceId(call_id);
             callSession.setResId(res_id);
             callSession.setType(iscc ? CallSession.TYPE_CALL_CENTER:CallSession.TYPE_VOICE_IVR);
