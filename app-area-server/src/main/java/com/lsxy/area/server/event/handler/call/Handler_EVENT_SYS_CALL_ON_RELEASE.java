@@ -288,7 +288,8 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 }
                 if(preState!=null && curState != null){
                     if(!preState.equals(curState)){
-                        callCenterUtil.agentStateChangedEvent(state.getCallBackUrl(),agentId,preState, curState);
+                        callCenterUtil.agentStateChangedEvent(state.getCallBackUrl(),agentId,
+                                state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),preState, curState);
                     }
                 }
             }

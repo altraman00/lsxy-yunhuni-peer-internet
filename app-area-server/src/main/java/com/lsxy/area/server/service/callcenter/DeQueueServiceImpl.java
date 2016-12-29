@@ -149,7 +149,9 @@ public class DeQueueServiceImpl implements DeQueueService {
                 state.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
                 callId,agentCallId,state.getUserdata());
 
-        callCenterUtil.agentStateChangedEvent(state.getCallBackUrl(),result.getAgent().getId(), CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
+        callCenterUtil.agentStateChangedEvent(state.getCallBackUrl(),result.getAgent().getId(),
+                result.getAgent().getName(),
+                CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
     }
 
     @Override

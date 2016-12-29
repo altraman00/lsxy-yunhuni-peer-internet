@@ -18,12 +18,31 @@ public class VoiceIvr extends IdEntity {
     public static final Integer IVR_TYPE_INCOMING = 1;
     public static final Integer IVR_TYPE_CALL = 2;
 
+    private String tenantId;//所属租户
+    private String  appId;//所属应用
     private Date startTime;
     private Date endTime;
     private String fromNum;
     private String toNum;
     private Integer ivrType;
     private String hangupSide;
+
+    @Column( name = "tenant_id")
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+    @Column( name = "app_id")
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
 
     @Column(name = "start_time")
     public Date getStartTime() {
