@@ -609,7 +609,7 @@ public class TenantController {
         if(tenant == null){
             throw new IllegalArgumentException("租户不存在");
         }
-        Consume consume = new Consume(new Date(), ConsumeCode.flat_balance.name(),input.getAmount(),ConsumeCode.flat_balance.getName(),"0",tenant);
+        Consume consume = new Consume(new Date(), ConsumeCode.flat_balance.name(),input.getAmount(),ConsumeCode.flat_balance.getName(),"0",tenant.getId(),null);
         consumeService.consume(consume);
         return RestResponse.success(true);
     }

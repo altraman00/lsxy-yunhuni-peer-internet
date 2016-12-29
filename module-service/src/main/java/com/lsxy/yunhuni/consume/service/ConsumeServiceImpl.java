@@ -63,7 +63,7 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
             tmepAppId += " and  obj.appId ='"+appId+"'";
         }
         Tenant tenant = tenantService.findTenantByUserName(userName);
-        String hql = "from Consume obj where obj.tenant.id=?1 and obj.dt BETWEEN  ?2 and ?3 "+tmepAppId+" ORDER BY obj.dt desc";
+        String hql = "from Consume obj where obj.tenantId=?1 and obj.dt BETWEEN  ?2 and ?3 "+tmepAppId+" ORDER BY obj.dt desc";
         List<Consume> list = this.list(hql,tenant.getId(),startDate,endDate);
         return list;
     }
@@ -83,14 +83,14 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
             tmepAppId += " and  obj.appId ='"+appId+"'";
         }
         Tenant tenant = tenantService.findTenantByUserName(userName);
-        String hql = "from Consume obj where obj.tenant.id=?1 and obj.dt BETWEEN  ?2 and ?3 "+tmepAppId+" ORDER BY obj.dt desc";
+        String hql = "from Consume obj where obj.tenantId=?1 and obj.dt BETWEEN  ?2 and ?3 "+tmepAppId+" ORDER BY obj.dt desc";
         Page<Consume> page = this.pageList(hql,pageNo,pageSize,tenant.getId(),startDate,endDate);
         return page;
     }
 
     @Override
     public Page<Consume> pageList(String tenantId, Integer pageNo, Integer pageSize, Date startTime, Date endTime) {
-        String hql = "from Consume obj where obj.tenant.id=?1 and obj.dt<=?2 and obj.dt>=?3   ORDER BY obj.dt";
+        String hql = "from Consume obj where obj.tenantId=?1 and obj.dt<=?2 and obj.dt>=?3   ORDER BY obj.dt";
         Page<Consume> page = this.pageList(hql,pageNo,pageSize,tenantId,endTime,startTime);
         return page;
     }
@@ -98,7 +98,7 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
     @Override
     public Page<Consume> pageListByTenantAndDate(String tenantId, Integer year, Integer month, Integer pageNo, Integer pageSize) {
 
-        String hql = "from Consume obj where obj.tenant.id=?1 AND  obj.dt BETWEEN ?2 AND ?3  ORDER BY obj.dt desc";
+        String hql = "from Consume obj where obj.tenantId=?1 AND  obj.dt BETWEEN ?2 AND ?3  ORDER BY obj.dt desc";
         Date date1 = DateUtils.parseDate(year+"-"+month+"-01 00:00:00", "yyyy-MM-dd HH:mm:ss");
         Date date2 = DateUtils.getLastTimeOfMonth(DateUtils.parseDate(year+"-"+month,"yyyy-MM"));
         Page<Consume>  page = this.pageList(hql,pageNo,pageSize,tenantId,date1,date2);
@@ -130,7 +130,7 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
         }
         this.save(consume);
         //Redis中消费增加
-        calBillingService.incConsume(consume.getTenant().getId(),consume.getDt(),consume.getAmount());
+        calBillingService.incConsume(consume.getTenantId(),consume.getDt(),consume.getAmount());
     }
 
     @Override
