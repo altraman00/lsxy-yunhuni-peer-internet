@@ -223,10 +223,13 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         return map;
     }
 
+    @Override
+    public VoiceCdr save(VoiceCdr voiceCdr){
+        return this.getDao().save(voiceCdr);
+    }
 
     @Override
-    @Transactional
-    public VoiceCdr save(VoiceCdr voiceCdr){
+    public void insertCdr(VoiceCdr voiceCdr){
         //扣费
         if(voiceCdr.getCallAckDt() != null){
             calCostService.callConsumeCal(voiceCdr);
@@ -252,6 +255,5 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
             Consume consume = new Consume(voiceCdr.getCallEndDt(),productCode.name(),voiceCdr.getCost(),productCode.getRemark(),voiceCdr.getAppId(),voiceCdr.getTenantId(),voiceCdr.getId());
             consumeService.consume(consume);
         }
-        return voiceCdr;
     }
 }
