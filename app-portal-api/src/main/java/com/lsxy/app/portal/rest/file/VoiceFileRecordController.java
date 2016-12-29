@@ -160,7 +160,7 @@ public class VoiceFileRecordController extends AbstractRestController {
                 boolean flag = false;
                 for(int i=0;i<list.size();i++){
                     VoiceFileRecord voiceFileRecord = list.get(i);
-                    if(1!=voiceFileRecord.getStatus()){
+                    if(voiceFileRecord.getStatus()==null || 1!=voiceFileRecord.getStatus()){
                         flag=true;
                         break;
                     }
@@ -209,28 +209,21 @@ public class VoiceFileRecordController extends AbstractRestController {
                 }
                 case ivr_call:{
                     //使用ivr的id
-                    list = voiceFileRecordService.getListBySessionId(voiceCdr.getSessionId());
+                    list = voiceFileRecordService.getListBySessionId(voiceCdr.getRelevanceId());
                     break;
                 }
                 case duo_call:{
                     //使用双向回拨的id
-                    list = voiceFileRecordService.getListBySessionId(voiceCdr.getSessionId());
+                    list = voiceFileRecordService.getListBySessionId(voiceCdr.getRelevanceId());
                     break;
                 }
                 case call_center:{
                     //根据sessionid获取呼叫中心交互成员，在获取呼叫中心交谈，在获取文件
                     List<String> temp = callCenterConversationMemberService.getListBySessionId(voiceCdr.getSessionId());
-                    if (temp!=null&&temp.size() > 0) {
-//                        String te = "";
-//                        for (int i = 0; i < temp.size(); i++) {
-//                            te += "'" + temp.get(i) + "'";
-//                            if (i != temp.size() - 1) {
-//                                te += ",";
-//                            }
-//                        }
-                        //使用ivr的id
-                        list = voiceFileRecordService.getListBySessionId( temp.toArray(new String[0]));
+                    if (temp!=null&&temp.size() == 0) {
+                        return null;
                     }
+                    list = voiceFileRecordService.getListBySessionId( temp.toArray(new String[0]));
                     break;
                 }
             }

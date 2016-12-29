@@ -33,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -400,11 +401,13 @@ public class LineGatewayController extends AbstractRestController {
                     //判断号码线路关系中是否是归属线路，是的话，删除归属线路关系
                     if(resourceTelenum1!=null&&StringUtils.isNotEmpty(resourceTelenum1.getId())){
                         //本身有归属线路
-                        if(resourceTelenum1.getLineId()!=null&&!lineGateway.getId().equals(resourceTelenum1.getLineId())){
+                        if(resourceTelenum1.getLineId() != null && !lineGateway.getId().equals(resourceTelenum1.getLineId()) ){
                             TelnumToLineGateway telnumToLineGateway12 = telnumToLineGatewayService.findByTelNumberAndLineId(resourceTelenum1.getTelNumber(),resourceTelenum1.getLineId());
-                            telnumToLineGateway12.setIsCalled(TelnumToLineGateway.ISCALLED_FALSE);
-                            telnumToLineGateway12.setIsDialing(TelnumToLineGateway.ISDIALING_FALSE);
-                            telnumToLineGatewayService.save(telnumToLineGateway12);
+                            if(telnumToLineGateway12 != null) {
+                                telnumToLineGateway12.setIsCalled(TelnumToLineGateway.ISCALLED_FALSE);
+                                telnumToLineGateway12.setIsDialing(TelnumToLineGateway.ISDIALING_FALSE);
+                                telnumToLineGatewayService.save(telnumToLineGateway12);
+                            }
                         }
                         //修正归属线路关系
                         resourceTelenum1.setLineId(lineGateway.getId());
@@ -412,14 +415,15 @@ public class LineGatewayController extends AbstractRestController {
                         resourceTelenum1.setIsDialing(telnumToLineGateway.getIsDialing());
                         resourceTelenumService.save(resourceTelenum1);
                     }
-                }else if(TelnumToLineGateway.ISDIALING_FALSE.equals(telnumToLineGateway.getIsDialing())||TelnumToLineGateway.ISCALLED_FALSE.equals(telnumToLineGateway.getIsCalled())){
+                }else{
+                    //TelnumToLineGateway.ISDIALING_FALSE.equals(telnumToLineGateway.getIsDialing())&&TelnumToLineGateway.ISCALLED_FALSE.equals(telnumToLineGateway.getIsCalled())
                     ResourceTelenum resourceTelenum1 = resourceTelenumService.findByTelNumber(telnumToLineGateway.getTelNumber());
-                    //判断号码线路关系中是否是归属线路，是的话，删除归属线路关系
+                    //线路号码关系中不可用主叫也不可被叫是，判断号码线路关系中是否是归属线路，是的话，删除归属线路关系
                     if(resourceTelenum1!=null&&StringUtils.isNotEmpty(resourceTelenum1.getId())){
                         //当前号码的归属线路是当前线路，删除归属线路关系
                         if(resourceTelenum1.getLineId()!=null&&lineGateway.getId().equals(resourceTelenum1.getLineId())){
                             //删除归属线路关系
-                            resourceTelenum1.setLineId(lineGateway.getId());
+                            resourceTelenum1.setLineId(null);
                             //设置号码不可主叫不可被叫
                             resourceTelenum1.setIsCalled(ResourceTelenum.ISCALLED_FALSE);
                             resourceTelenum1.setIsDialing(ResourceTelenum.ISDIALING_FALSE);
@@ -463,6 +467,11 @@ public class LineGatewayController extends AbstractRestController {
             @ApiParam( name="id",value = "线路id")@PathVariable String id,
             @ApiParam(name = "telnumVo",value = "新增号码集合")@RequestBody TelnumVo telnumVo) {
         telnumVo.setTelNumber(telnumVo.getTelNumber().trim());//对号码去空
+        try{
+            BigDecimal bigDecimal = new BigDecimal(telnumVo.getAmount());
+        }catch (Exception e){
+            return RestResponse.failed("0000","金额格式错误");
+        }
         if(StringUtils.isEmpty(telnumVo.getTelNumber())){
             return RestResponse.failed("0000","号码不能为空");
         }
