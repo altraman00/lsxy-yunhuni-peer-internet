@@ -246,10 +246,12 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
             logger.debug("插入cdr数据：{}", JSONUtil.objectToJson(voiceCdr));
         }
         getDao().save(voiceCdr);
-        //插入消费
-        ProductCode productCode = ProductCode.valueOf(voiceCdr.getType());
-        Consume consume = new Consume(voiceCdr.getCallEndDt(),productCode.name(),voiceCdr.getCost(),productCode.getRemark(),voiceCdr.getAppId(),voiceCdr.getTenantId(),voiceCdr.getId());
-        consumeService.consume(consume);
+        if(voiceCdr.getCost().compareTo(BigDecimal.ZERO) == 1){
+            //插入消费
+            ProductCode productCode = ProductCode.valueOf(voiceCdr.getType());
+            Consume consume = new Consume(voiceCdr.getCallEndDt(),productCode.name(),voiceCdr.getCost(),productCode.getRemark(),voiceCdr.getAppId(),voiceCdr.getTenantId(),voiceCdr.getId());
+            consumeService.consume(consume);
+        }
         return voiceCdr;
     }
 }
