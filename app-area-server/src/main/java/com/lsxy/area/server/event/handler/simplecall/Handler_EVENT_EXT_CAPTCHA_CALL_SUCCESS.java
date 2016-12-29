@@ -74,8 +74,8 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_SUCCESS extends EventHandler {
         callSession.setFromNum(busniessData.get("from"));
         callSession.setToNum(busniessData.get("to"));
         callSession.setStatus(CallSession.STATUS_CALLING);
-        callSession.setApp(appService.findById(state.getAppId()));
-        callSession.setTenant(tenantService.findById(state.getTenantId()));
+        callSession.setAppId(state.getAppId());
+        callSession.setTenantId(state.getTenantId());
         callSession.setRelevanceId(call_id);
         callSession.setType(CallSession.TYPE_VOICE_VOICECODE);
         callSession.setResId(res_id);
@@ -83,6 +83,8 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_SUCCESS extends EventHandler {
 
         CaptchaCall captchaCall = new CaptchaCall();
         captchaCall.setId(call_id);
+        captchaCall.setAppId(state.getAppId());
+        captchaCall.setTenantId(state.getTenantId());
         captchaCall.setStartTime(new Date());
         captchaCall.setEndTime(null);
         captchaCall.setFromNum(busniessData.get("from"));
