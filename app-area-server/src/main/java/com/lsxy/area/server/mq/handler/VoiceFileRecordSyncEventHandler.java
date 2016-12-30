@@ -136,9 +136,9 @@ public class VoiceFileRecordSyncEventHandler implements MQMessageHandler<VoiceFi
             switch(p1){
                 case sys_conf:{
                     //获取会议操作者
-                    MeetingMember meetingMember = meetingMemberService.findById(voiceCdr.getSessionId());
+                    MeetingMember meetingMember = meetingMemberService.findBySessionId(voiceCdr.getSessionId());
                     //使用会议id
-                    List list = voiceFileRecordService.getListBySessionId(meetingMember.getMeeting().getId());
+                    List list = voiceFileRecordService.getListBySessionId(meetingMember.getMeetingId());
                     return list;
                 }
                 case ivr_call:{
