@@ -211,7 +211,9 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     @Override
     public void logout(String user) {
         AppExtension appExtension = appExtensionDao.findByUser(user);
-        extensionState.setEnable(appExtension.getId(),ExtensionState.Model.ENABLE_FALSE);
+        if(appExtension != null){
+            extensionState.setEnable(appExtension.getId(),ExtensionState.Model.ENABLE_FALSE);
+        }
     }
 
 
