@@ -306,7 +306,8 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         String curState = CallCenterAgent.STATE_TALKING;
                         if(CallCenterAgent.STATE_FETCHING.equals(preState)){
                             callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,curState,true);
-                            callCenterUtil.agentStateChangedEvent(state.getCallBackUrl(),agentId,preState,curState);
+                            callCenterUtil.agentStateChangedEvent(state.getCallBackUrl(),agentId,
+                                    businessData.get(CallCenterUtil.AGENT_NAME_FIELD),preState,curState);
                         }
                     } catch (YunhuniApiException e) {
                         logger.info("[{}][{}]agentID={}设置坐席状态失败 ",state.getTenantId(),state.getAppId(),agentId);
@@ -428,7 +429,9 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
         try {
-            rpcCaller.invoke(sessionContext, rpcrequest,true);
+            if(!businessStateService.closed(state.getId())) {
+                rpcCaller.invoke(sessionContext, rpcrequest, true);
+            }
         } catch (Throwable e) {
             logger.error("调用失败",e);
         }

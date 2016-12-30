@@ -89,7 +89,7 @@ public class DeQueueServiceImpl implements DeQueueService {
     public void success(String tenantId, String appId, String callId,
                         String queueId, EnQueueResult result) throws Exception{
         if(logger.isDebugEnabled()){
-            logger.debug("排队成功，tenantId={},appId={},callId={},queueId={},result=",
+            logger.debug("排队成功，tenantId={},appId={},callId={},queueId={},result={}",
                     tenantId,appId,callId,queueId,result);
         }
         BusinessState state = businessStateService.get(callId);
@@ -149,7 +149,9 @@ public class DeQueueServiceImpl implements DeQueueService {
                 state.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
                 callId,agentCallId,state.getUserdata());
 
-        callCenterUtil.agentStateChangedEvent(state.getCallBackUrl(),result.getAgent().getId(), CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
+        callCenterUtil.agentStateChangedEvent(state.getCallBackUrl(),result.getAgent().getId(),
+                result.getAgent().getName(),
+                CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
     }
 
     @Override
@@ -313,7 +315,9 @@ public class DeQueueServiceImpl implements DeQueueService {
                             .put("areaId",area_id)
                             .build();
                     RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_STOP, params);
-                    rpcCaller.invoke(sessionContext, rpcrequest,true);
+                if(!businessStateService.closed(call_id)) {
+                    rpcCaller.invoke(sessionContext, rpcrequest, true);
+                }
             }
         } catch (Throwable e) {
             logger.error("调用失败",e);

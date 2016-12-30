@@ -188,14 +188,16 @@ public class DialActionHandler extends ActionHandler{
             callSession.setStatus(CallSession.STATUS_CALLING);
             callSession.setFromNum(to);
             callSession.setToNum(from);
-            callSession.setApp(app);
-            callSession.setTenant(app.getTenant());
+            callSession.setAppId(app.getId());
+            callSession.setTenantId(app.getTenant().getId());
             callSession.setRelevanceId(callId);
             callSession.setResId(null);
             callSession.setType(CallSession.TYPE_CALL_CENTER);
             callSession = callSessionService.save(callSession);
         }else{
             VoiceIvr voiceIvr = new VoiceIvr();
+            voiceIvr.setAppId(app.getId());
+            voiceIvr.setTenantId(app.getTenant().getId());
             voiceIvr.setFromNum(oneTelnumber);
             voiceIvr.setToNum(to);
             voiceIvr.setStartTime(new Date());
@@ -207,8 +209,8 @@ public class DialActionHandler extends ActionHandler{
             callSession.setStatus(CallSession.STATUS_PREPARING);
             callSession.setFromNum(oneTelnumber);
             callSession.setToNum(selector.getToUri());
-            callSession.setApp(app);
-            callSession.setTenant(app.getTenant());
+            callSession.setAppId(app.getId());
+            callSession.setTenantId(app.getTenant().getId());
             callSession.setRelevanceId(callId);
             callSession.setType(CallSession.TYPE_VOICE_IVR);
             callSession.setResId(null);
@@ -229,7 +231,9 @@ public class DialActionHandler extends ActionHandler{
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
         try {
-            rpcCaller.invoke(sessionContext, rpcrequest);
+            if(!businessStateService.closed(callId)){
+                rpcCaller.invoke(sessionContext, rpcrequest);
+            }
         } catch (Exception e) {
             logger.error("ivr 拨号出错:",e);
             Map<String,Object> notify_data = new MapBuilder<String,Object>()

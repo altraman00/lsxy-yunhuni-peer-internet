@@ -80,7 +80,9 @@ public class ReceivedtmfActionHandler extends ActionHandler{
                     .build();
 
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_RECEIVE_DTMF_START, params);
-            rpcCaller.invoke(sessionContext, rpcrequest);
+            if(!businessStateService.closed(callId)) {
+                rpcCaller.invoke(sessionContext, rpcrequest);
+            }
         } catch (Throwable e) {
             logger.error("调用失败",e);
             ivrActionService.doAction(callId,new MapBuilder<String,Object>()

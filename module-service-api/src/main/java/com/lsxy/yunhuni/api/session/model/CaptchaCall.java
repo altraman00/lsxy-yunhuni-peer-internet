@@ -17,6 +17,8 @@ import java.util.Date;
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_captcha_call")
 public class CaptchaCall extends IdEntity {
 
+    private String tenantId;//所属租户
+    private String  appId;//所属应用
     private Date startTime;//发起时间
     private Date endTime;//结束时间
     private Date answerTime;//应答时间
@@ -24,6 +26,23 @@ public class CaptchaCall extends IdEntity {
     private String toNum;//接收方
     private String hangupSide;//挂断方
     private String resId;
+
+    @Column( name = "tenant_id")
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+    @Column( name = "app_id")
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
 
     @Column( name = "start_time")
     public Date getStartTime() {

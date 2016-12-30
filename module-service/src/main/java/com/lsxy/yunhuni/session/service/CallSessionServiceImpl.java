@@ -27,10 +27,7 @@ public class CallSessionServiceImpl extends AbstractService<CallSession> impleme
 
     @Override
     public Long currentCallSessionCount(String appId) {
-        App app = new App();
-        app.setId(appId);
-
-        return callSessionDao.countByStatusAndApp(CallSession.STATUS_CALLING,app);
+        return callSessionDao.countByStatusAndAppId(CallSession.STATUS_CALLING,appId);
     }
 
     @Override
