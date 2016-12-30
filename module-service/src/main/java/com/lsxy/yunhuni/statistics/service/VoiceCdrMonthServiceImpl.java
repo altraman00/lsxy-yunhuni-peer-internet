@@ -10,6 +10,7 @@ import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.yunhuni.statistics.dao.VoiceCdrMonthDao;
 import com.lsxy.utils.StatisticsUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -40,7 +41,7 @@ public class VoiceCdrMonthServiceImpl extends AbstractService<VoiceCdrMonth> imp
     @Override
     public List<VoiceCdrMonth> list(String tenantId, String appId,String type,Date startTime, Date endTime) {
         String[] types = null;
-        if(type!=null){
+        if(StringUtils.isNotBlank(type)){
             types = new String[]{type};
         }
         if(App.PRODUCT_CALL_CENTER.equals(type)){
