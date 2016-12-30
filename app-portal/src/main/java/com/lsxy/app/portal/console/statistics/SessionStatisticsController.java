@@ -55,10 +55,10 @@ public class SessionStatisticsController extends AbstractPortalController {
      */
     @RequestMapping("/list")
     @ResponseBody
-    public RestResponse list(HttpServletRequest request,String type,String startTime,String appId){
+    public RestResponse list(HttpServletRequest request,String type,String startTime,String appId,String callType){
         List list = new ArrayList();
         List tempConsumeList = getConsumeList(request,type,appId,startTime);
-        List tempVoiceCdrList = getVoiceCdrList(request,type,appId,startTime,"");
+        List tempVoiceCdrList = getVoiceCdrList(request,type,appId,startTime,callType);
         Object date = 12;
         if(ConsumeStatisticsVo.TYPE_DAY.equals(type)){
             date = DateUtils.parseDate(startTime,"yyyy-MM");
@@ -94,9 +94,9 @@ public class SessionStatisticsController extends AbstractPortalController {
     }
     @RequestMapping("/list/session")
     @ResponseBody
-    public RestResponse listSession(HttpServletRequest request,String type,String startTime,String appId){
+    public RestResponse listSession(HttpServletRequest request,String type,String startTime,String appId,String callType){
         List list = new ArrayList();
-        List tempVoiceCdrList = getVoiceCdrList(request,type,appId,startTime,"");
+        List tempVoiceCdrList = getVoiceCdrList(request,type,appId,startTime,callType);
         Object date = 12;
         if(ConsumeStatisticsVo.TYPE_DAY.equals(type)){
             date = DateUtils.parseDate(startTime,"yyyy-MM");
