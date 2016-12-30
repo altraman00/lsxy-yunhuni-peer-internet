@@ -89,7 +89,7 @@ public class DeQueueServiceImpl implements DeQueueService {
     public void success(String tenantId, String appId, String callId,
                         String queueId, EnQueueResult result) throws Exception{
         if(logger.isDebugEnabled()){
-            logger.debug("排队成功，tenantId={},appId={},callId={},queueId={},result=",
+            logger.debug("排队成功，tenantId={},appId={},callId={},queueId={},result={}",
                     tenantId,appId,callId,queueId,result);
         }
         BusinessState state = businessStateService.get(callId);
