@@ -73,7 +73,7 @@ public class BillDetailController extends AbstractRestController {
     public RestResponse call(
             @ApiParam(name = "uid",value = "用户id")
             @PathVariable String uid,
-            @ApiParam(name = "type",value = "voice_call.语音通知,duo_call.双向回拨,conf_call.会议服务,ivr_call.IVR定制服务,captcha_call.语音验证码,voice_recording.录音服务call_center呼叫中心类型")
+            @ApiParam(name = "type",value = "voice_call.语音通知,duo_call.双向回拨,sys_conf.会议服务,ivr_call.IVR定制服务,captcha_call.语音验证码,voice_recording.录音服务call_center呼叫中心类型")
             @RequestParam String type,
             @ApiParam(name = "time",value = "yyyy-MM-dd")
             @RequestParam(required=false) String time,
@@ -251,10 +251,10 @@ public class BillDetailController extends AbstractRestController {
             switch(p1){
                 case sys_conf:{
                     //获取会议操作者
-                    MeetingMember meetingMember = meetingMemberService.findById(voiceCdr.getSessionId());
+                    MeetingMember meetingMember = meetingMemberService.findBySessionId(voiceCdr.getSessionId());
                     if (meetingMember!=null) {
                         //使用会议id
-                        list = voiceFileRecordService.getListBySessionId(meetingMember.getMeeting().getId());
+                        list = voiceFileRecordService.getListBySessionId(meetingMember.getMeetingId());
                     }
                     break;
                 }

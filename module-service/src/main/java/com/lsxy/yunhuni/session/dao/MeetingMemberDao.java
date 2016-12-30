@@ -9,4 +9,5 @@ import java.io.Serializable;
  * Created by liuws on 2016/9/6.
  */
 public interface MeetingMemberDao extends BaseDaoInterface<MeetingMember, Serializable> {
+    MeetingMember findFirstBySessionId(String sessionId);
 }
