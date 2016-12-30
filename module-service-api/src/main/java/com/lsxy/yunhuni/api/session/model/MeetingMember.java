@@ -22,8 +22,8 @@ public class MeetingMember extends IdEntity {
     private String number;//参与者号码
     private Date joinTime;//加入时间
     private Integer joinType;//加入类型1.邀请加入2.呼入加入
-    private Meeting meeting;//所属会议
-    private CallSession session;//关联会话
+    private String meetingId;//所属会议
+    private String sessionId;//关联会话
     private String resId;
 
     @Column( name = "tenant_id")
@@ -67,23 +67,23 @@ public class MeetingMember extends IdEntity {
     public void setJoinType(Integer joinType) {
         this.joinType = joinType;
     }
-    @ManyToOne
-    @JoinColumn( name = "meeting_id" )
-    public Meeting getMeeting() {
-        return meeting;
+
+    @Column( name = "meeting_id" )
+    public String getMeetingId() {
+        return meetingId;
     }
 
-    public void setMeeting(Meeting meeting) {
-        this.meeting = meeting;
-    }
-    @OneToOne
-    @JoinColumn( name = "session_id" )
-    public CallSession getSession() {
-        return session;
+    public void setMeetingId(String meetingId) {
+        this.meetingId = meetingId;
     }
 
-    public void setSession(CallSession session) {
-        this.session = session;
+    @Column( name = "session_id" )
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 
 
