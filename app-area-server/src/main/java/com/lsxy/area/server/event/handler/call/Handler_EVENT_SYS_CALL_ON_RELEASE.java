@@ -288,7 +288,8 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 }
                 if(preState!=null && curState != null){
                     if(!preState.equals(curState)){
-                        callCenterUtil.agentStateChangedEvent(state.getCallBackUrl(),agentId,preState, curState);
+                        callCenterUtil.agentStateChangedEvent(state.getCallBackUrl(),agentId,
+                                state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),preState, curState);
                     }
                 }
             }
@@ -306,7 +307,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
         try {
-            rpcCaller.invoke(sessionContext, rpcrequest,true);
+            if(!businessStateService.closed(ivr_dial_call_id)){
+                rpcCaller.invoke(sessionContext, rpcrequest,true);
+            }
         } catch (Throwable e) {
             logger.error("调用失败",e);
         }

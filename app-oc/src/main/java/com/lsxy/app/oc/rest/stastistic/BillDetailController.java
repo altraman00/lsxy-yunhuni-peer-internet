@@ -73,7 +73,7 @@ public class BillDetailController extends AbstractRestController {
     public RestResponse call(
             @ApiParam(name = "uid",value = "用户id")
             @PathVariable String uid,
-            @ApiParam(name = "type",value = "voice_call.语音通知,duo_call.双向回拨,conf_call.会议服务,ivr_call.IVR定制服务,captcha_call.语音验证码,voice_recording.录音服务call_center呼叫中心类型")
+            @ApiParam(name = "type",value = "voice_call.语音通知,duo_call.双向回拨,sys_conf.会议服务,ivr_call.IVR定制服务,captcha_call.语音验证码,voice_recording.录音服务call_center呼叫中心类型")
             @RequestParam String type,
             @ApiParam(name = "time",value = "yyyy-MM-dd")
             @RequestParam(required=false) String time,
@@ -260,27 +260,18 @@ public class BillDetailController extends AbstractRestController {
                 }
                 case ivr_call:{
                     //使用ivr的id
-                    list = voiceFileRecordService.getListBySessionId(voiceCdr.getSessionId());
+                    list = voiceFileRecordService.getListBySessionId(voiceCdr.getRelevanceId());
                     break;
                 }
                 case duo_call:{
                     //使用双向回拨的id
-                    list = voiceFileRecordService.getListBySessionId(voiceCdr.getSessionId());
+                    list = voiceFileRecordService.getListBySessionId(voiceCdr.getRelevanceId());
                     break;
                 }
                 case call_center:{
                     //根据sessionid获取呼叫中心交互成员，在获取呼叫中心交谈，在获取文件
                     List<String> temp = callCenterConversationMemberService.getListBySessionId(voiceCdr.getSessionId());
                     if (temp!=null&&temp.size() > 0) {
-//
-//                        String te = "";
-//                        for (int i = 0; i < temp.size(); i++) {
-//                            te += "'" + temp.get(i) + "'";
-//                            if (i != temp.size() - 1) {
-//                                te += ",";
-//                            }
-//                        }
-                        //使用ivr的id
                         list = voiceFileRecordService.getListBySessionId(temp.toArray(new String[0]));
                     }
                     break;

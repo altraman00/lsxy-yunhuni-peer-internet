@@ -4,6 +4,8 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.yunhuni.api.consume.model.Consume;
+import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
 import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
@@ -14,6 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,6 +37,8 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
     }
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    ConsumeService consumeService;
 
     @Override
     public long getSumSize(String tenant, String app) {
@@ -204,4 +209,17 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
         List<Map> list = jdbcTemplate.queryForList(sql,Map.class);
         return list;
     }
+
+    @Override
+    public void insertRecord(VoiceFileRecord record) {
+        this.save(record);
+        if(record.getCost().compareTo(BigDecimal.ZERO) == 1){
+            //插入消费
+            Consume consume = new Consume(record.getCreateTime(),ProductCode.recording.name(),record.getCost(),ProductCode.recording.getRemark(),
+                    record.getAppId(),record.getTenantId(),record.getId());
+            consumeService.consume(consume);
+        }
+    }
+
+
 }

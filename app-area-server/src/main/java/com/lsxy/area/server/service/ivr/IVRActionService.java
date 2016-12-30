@@ -373,8 +373,8 @@ public class IVRActionService {
             callSession.setStatus(CallSession.STATUS_CALLING);
             callSession.setFromNum(to);
             callSession.setToNum(from);
-            callSession.setApp(app);
-            callSession.setTenant(tenant);
+            callSession.setAppId(app.getId());
+            callSession.setTenantId(app.getTenant().getId());
             callSession.setRelevanceId(call_id);
             callSession.setResId(res_id);
             callSession.setType(iscc ? CallSession.TYPE_CALL_CENTER:CallSession.TYPE_VOICE_IVR);
@@ -399,6 +399,8 @@ public class IVRActionService {
             }else{
                 VoiceIvr voiceIvr = new VoiceIvr();
                 voiceIvr.setId(call_id);
+                voiceIvr.setAppId(app.getId());
+                voiceIvr.setTenantId(app.getTenant().getId());
                 voiceIvr.setFromNum(from);
                 voiceIvr.setToNum(to);
                 voiceIvr.setStartTime(new Date());
@@ -555,7 +557,9 @@ public class IVRActionService {
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
         try {
-            rpcCaller.invoke(sessionContext, rpcrequest,true);
+            if(!businessStateService.closed(call_id)) {
+                rpcCaller.invoke(sessionContext, rpcrequest, true);
+            }
         } catch (Throwable e) {
             logger.error("调用失败",e);
         }

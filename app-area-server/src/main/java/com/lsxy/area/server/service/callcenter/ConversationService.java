@@ -328,8 +328,8 @@ public class ConversationService {
         callSession.setStatus(CallSession.STATUS_PREPARING);
         callSession.setFromNum(from);
         callSession.setToNum(to);
-        callSession.setApp(app);
-        callSession.setTenant(app.getTenant());
+        callSession.setAppId(app.getId());
+        callSession.setTenantId(app.getTenant().getId());
         callSession.setRelevanceId(callId);
         callSession.setType(CallSession.TYPE_CALL_CENTER);
         callSession.setResId(null);
@@ -403,8 +403,8 @@ public class ConversationService {
         callSession.setStatus(CallSession.STATUS_PREPARING);
         callSession.setFromNum(oneTelnumber);
         callSession.setToNum(selector.getToUri());
-        callSession.setApp(app);
-        callSession.setTenant(app.getTenant());
+        callSession.setAppId(app.getId());
+        callSession.setTenantId(app.getTenant().getId());
         callSession.setRelevanceId(callId);
         callSession.setType(CallSession.TYPE_CALL_CENTER);
         callSession.setResId(null);
@@ -706,7 +706,9 @@ public class ConversationService {
 
         if(call_state.getType().equals(BusinessState.TYPE_CC_AGENT_CALL)){
             callCenterUtil.agentExitConversationEvent(call_state.getCallBackUrl(),
-                    call_state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD),conversationId);
+                    call_state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD),
+                    call_state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),
+                    conversationId);
         }
 
         if(callConversationService.size(callId) > 0){
@@ -782,7 +784,9 @@ public class ConversationService {
         }
         if(state.getType().equals(BusinessState.TYPE_CC_AGENT_CALL)){
             callCenterUtil.agentEnterConversationEvent(state.getCallBackUrl(),
-                    businessData.get(CallCenterUtil.AGENT_ID_FIELD),conversation_id);
+                    businessData.get(CallCenterUtil.AGENT_ID_FIELD),
+                    businessData.get(CallCenterUtil.AGENT_NAME_FIELD),
+                    conversation_id);
         }
         callCenterUtil.conversationPartsChangedEvent(state.getCallBackUrl(),conversation_id);
     }
@@ -795,7 +799,9 @@ public class ConversationService {
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
         try {
-            rpcCaller.invoke(sessionContext, rpcrequest,true);
+            if(!businessStateService.closed(call_id)) {
+                rpcCaller.invoke(sessionContext, rpcrequest, true);
+            }
         } catch (Throwable e) {
             logger.error("调用失败",e);
         }

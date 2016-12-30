@@ -53,7 +53,7 @@ public class VoiceFileRecordDeletedTask {
     /**
      * 录音文件定时删除
      */
-    @Scheduled(cron="0 0/30 * * * ?")
+    @Scheduled(cron="0 30 3 * * ?")
     public void startSync() {
         if(logger.isDebugEnabled()){
             logger.debug("启动录音文件定时删除方案--开始");
@@ -105,7 +105,7 @@ public class VoiceFileRecordDeletedTask {
                 //获取租户对应的录音文件
                 List<VoiceFileRecord> list2 = voiceFileRecordService.getListByTenantAndAppAndCreateTime(tenant1.getId(),apps.get(ai).getId(),createTime);
                 for(int j=0;j<list2.size();j++){
-                    VoiceFileRecord temp = list2.get(i);
+                    VoiceFileRecord temp = list2.get(j);
                     //已同步oss 并且存在oss文件，并且未删除
                     if((temp.getStatus()!=null&&temp.getStatus()==1)&&StringUtils.isNotEmpty(temp.getOssUrl())&&(temp.getOssDeleted()==null||temp.getOssDeleted()!=1)){//需要删除oss文件
                         try {
@@ -115,12 +115,13 @@ public class VoiceFileRecordDeletedTask {
                             logger.error("删除OSS文件：{1}失败，异常{2}",temp.getOssUrl(),e);
                             temp.setOssDeleted(VoiceFilePlay.DELETED_FAIL);
                         }
+                        temp = voiceFileRecordService.save(temp);
                     }
-                    temp = voiceFileRecordService.save(temp);
                     try {
                         voiceFileRecordService.delete(temp);
+                        logger.info("删除录音文件记录：{1}成功",temp.getId());
                     } catch (Exception e) {
-                        logger.error("删除录音文件记录：{1}失败，异常{2}",temp.getId(),e);
+                        logger.error("删除录音文件记录：["+temp.getId()+"]失败，异常",e);
                     }
                 }
             }
@@ -130,25 +131,23 @@ public class VoiceFileRecordDeletedTask {
     private Date getCreateDate(int globalTime, String tenantId, String appId) {
         //获取租户过期的时间
         TenantConfig tenantConfig = tenantConfigService.findByTypeAndKeyNameAndTenantIdAndAppId(GlobalConfig.TYPE_RECORDING,GlobalConfig.KEY_RECORDING,tenantId,appId);
+        int tenantTime = 0;
         if(tenantConfig!=null) {
-            int tenantTime = 0;
             Matcher matcher1 = pattern.matcher(tenantConfig.getValue());
             if (matcher1.matches()) {
                 tenantTime = Integer.valueOf(tenantConfig.getValue());
             }
-            //得到租户下的租户下的录音文件有效时间
-            int timeLong = (tenantTime > globalTime ? tenantTime : globalTime) - 1;
-            //获取日期对象
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DAY_OF_MONTH, -timeLong);
-            cal.set(Calendar.HOUR_OF_DAY, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-            //获取删除时间
-            return cal.getTime();
-        }else{
-            return null;
         }
+        //得到租户下的租户下的录音文件有效时间
+        int timeLong = (tenantTime > globalTime ? tenantTime : globalTime) - 1;
+        //获取日期对象
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_MONTH, -timeLong);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        //获取删除时间
+        return cal.getTime();
     }
 }

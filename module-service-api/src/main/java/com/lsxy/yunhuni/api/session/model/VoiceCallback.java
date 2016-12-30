@@ -16,6 +16,8 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_voice_callback")
 public class VoiceCallback extends IdEntity {
+    private String tenantId;//所属租户
+    private String  appId;//所属应用
     private Date startTime;//发起时间
     private Date answerTime;//第一方应答时间
     private Date connectTime;//第二方应答时间
@@ -35,6 +37,23 @@ public class VoiceCallback extends IdEntity {
         this.from2Num = from2Num;
         this.toNum = toNum;
         this.to2Num = to2Num;
+    }
+
+    @Column( name = "tenant_id")
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+    @Column( name = "app_id")
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 
     @Column( name = "start_time")

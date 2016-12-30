@@ -59,4 +59,5 @@ public interface VoiceCdrService extends BaseService<VoiceCdr> {
      */
     Map getStaticCdr(String tenantId, String appId, Date startTime, Date endTime);
 
+    void insertCdr(VoiceCdr voiceCdr);
 }

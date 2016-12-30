@@ -6,6 +6,9 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.*;
 import com.lsxy.utils.StatisticsUtils;
 import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.consume.model.Consume;
+import com.lsxy.yunhuni.api.consume.service.ConsumeService;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
@@ -55,6 +58,9 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
 
     @Autowired
     private CalBillingService calBillingService;
+
+    @Autowired
+    ConsumeService consumeService;
 
     @Override
     public List<VoiceCdr> listCdr(String type, String tenantId, String time, String appId) {
@@ -217,27 +223,37 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         return map;
     }
 
+    @Override
+    public VoiceCdr save(VoiceCdr voiceCdr){
+        return this.getDao().save(voiceCdr);
+    }
 
     @Override
-    @Transactional
-    public VoiceCdr save(VoiceCdr voiceCdr){
+    public void insertCdr(VoiceCdr voiceCdr){
         //扣费
         if(voiceCdr.getCallAckDt() != null){
-            calCostService.callConsume(voiceCdr);
+            calCostService.callConsumeCal(voiceCdr);
         }else{
             voiceCdr.setCostTimeLong(0L);
             voiceCdr.setCost(BigDecimal.ZERO);
             voiceCdr.setDeduct(0L);
             voiceCdr.setCostType(VoiceCdr.COST_TYPE_COST);
         }
-        if(logger.isDebugEnabled()){
-            logger.debug("插入cdr数据：{}", JSONUtil.objectToJson(voiceCdr));
-        }
         calBillingService.incCallSum(voiceCdr.getTenantId(),voiceCdr.getCallEndDt());
         if(voiceCdr.getCallAckDt() != null){
             calBillingService.incCallConnect(voiceCdr.getTenantId(),voiceCdr.getCallEndDt());
         }
         calBillingService.incCallCostTime(voiceCdr.getTenantId(),voiceCdr.getCallEndDt(),voiceCdr.getCostTimeLong());
-        return getDao().save(voiceCdr);
+        //保存CDR
+        if(logger.isDebugEnabled()){
+            logger.debug("插入cdr数据：{}", JSONUtil.objectToJson(voiceCdr));
+        }
+        getDao().save(voiceCdr);
+        if(voiceCdr.getCost().compareTo(BigDecimal.ZERO) == 1){
+            //插入消费
+            ProductCode productCode = ProductCode.valueOf(voiceCdr.getType());
+            Consume consume = new Consume(voiceCdr.getCallEndDt(),productCode.name(),voiceCdr.getCost(),productCode.getRemark(),voiceCdr.getAppId(),voiceCdr.getTenantId(),voiceCdr.getId());
+            consumeService.consume(consume);
+        }
     }
 }

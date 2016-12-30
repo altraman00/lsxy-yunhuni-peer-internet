@@ -55,10 +55,10 @@ public class SessionStatisticsController extends AbstractPortalController {
      */
     @RequestMapping("/list")
     @ResponseBody
-    public RestResponse list(HttpServletRequest request,String type,String startTime,String appId){
+    public RestResponse list(HttpServletRequest request,String type,String startTime,String appId,String callType){
         List list = new ArrayList();
         List tempConsumeList = getConsumeList(request,type,appId,startTime);
-        List tempVoiceCdrList = getVoiceCdrList(request,type,appId,startTime);
+        List tempVoiceCdrList = getVoiceCdrList(request,type,appId,startTime,callType);
         Object date = 12;
         if(ConsumeStatisticsVo.TYPE_DAY.equals(type)){
             date = DateUtils.parseDate(startTime,"yyyy-MM");
@@ -72,7 +72,7 @@ public class SessionStatisticsController extends AbstractPortalController {
     @ResponseBody
     public RestResponse listCallTime(HttpServletRequest request,String type,String startTime,String appId){
         List list = new ArrayList();
-        List tempVoiceCdrList = getVoiceCdrList(request,type,appId,startTime);
+        List tempVoiceCdrList = getVoiceCdrList(request,type,appId,startTime,App.PRODUCT_CALL_CENTER);
         Object date = 12;
         if(ConsumeStatisticsVo.TYPE_DAY.equals(type)){
             date = DateUtils.parseDate(startTime,"yyyy-MM");
@@ -94,9 +94,9 @@ public class SessionStatisticsController extends AbstractPortalController {
     }
     @RequestMapping("/list/session")
     @ResponseBody
-    public RestResponse listSession(HttpServletRequest request,String type,String startTime,String appId){
+    public RestResponse listSession(HttpServletRequest request,String type,String startTime,String appId,String callType){
         List list = new ArrayList();
-        List tempVoiceCdrList = getVoiceCdrList(request,type,appId,startTime);
+        List tempVoiceCdrList = getVoiceCdrList(request,type,appId,startTime,callType);
         Object date = 12;
         if(ConsumeStatisticsVo.TYPE_DAY.equals(type)){
             date = DateUtils.parseDate(startTime,"yyyy-MM");
@@ -131,16 +131,16 @@ public class SessionStatisticsController extends AbstractPortalController {
      * @param type 统计类型
      * @return
      */
-    private List getVoiceCdrList(HttpServletRequest request,String type,String appId,String startTime){
+    private List getVoiceCdrList(HttpServletRequest request,String type,String appId,String startTime,String callType){
         String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/voice_cdr_"+type+"/list?tenantId={1}&appId={2}&startTime={3}";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/voice_cdr_"+type+"/list?tenantId={1}&appId={2}&startTime={3}&type={4}";
         Class clazz = VoiceCdrDay.class;
         if(ConsumeStatisticsVo.TYPE_MONTH.equals(type)){
             clazz = VoiceCdrMonth.class;
         }
         appId = "-1".equals(appId)?null:appId;
         String tenantId = getCurrentAccount(request).getTenant().getId();
-        return (List)RestRequest.buildSecurityRequest(token).getList(uri, clazz,tenantId,appId,startTime).getData();
+        return (List)RestRequest.buildSecurityRequest(token).getList(uri, clazz,tenantId,appId,startTime,callType).getData();
     }
     /**
      * 获取消费List

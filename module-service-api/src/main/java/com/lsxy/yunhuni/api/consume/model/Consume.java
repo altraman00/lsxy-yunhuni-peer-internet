@@ -22,18 +22,21 @@ public class Consume extends IdEntity {
     private BigDecimal amount;//消费金额
     private String remark;//备注
     private String appId;//所属应用编号（不能为空，仅用查询，勿关联应用，当一个消费不属于任何应用时，设为0）
-    private Tenant tenant;//所属租户
+    private String tenantId;//所属租户
+    private String relevanceId; //消费的相关ID
+
 
     public Consume() {
     }
 
-    public Consume(Date dt, String type, BigDecimal amount, String remark, String appId, Tenant tenant) {
+    public Consume(Date dt, String type, BigDecimal amount, String remark, String appId, String tenantId,String relevanceId) {
         this.dt = dt;
         this.type = type;
         this.amount = amount;
         this.remark = remark;
         this.appId = appId;
-        this.tenant = tenant;
+        this.tenantId = tenantId;
+        this.relevanceId = relevanceId;
     }
 
     @Column(name = "remark")
@@ -77,13 +80,22 @@ public class Consume extends IdEntity {
     public void setAppId(String appId) {
         this.appId = appId;
     }
-    @ManyToOne
-    @JoinColumn(name = "tenant_id")
-    public Tenant getTenant() {
-        return tenant;
+
+    @Column(name = "tenant_id")
+    public String getTenantId() {
+        return tenantId;
     }
 
-    public void setTenant(Tenant tenant) {
-        this.tenant = tenant;
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    @Column(name = "relevance_id")
+    public String getRelevanceId() {
+        return relevanceId;
+    }
+
+    public void setRelevanceId(String relevanceId) {
+        this.relevanceId = relevanceId;
     }
 }
