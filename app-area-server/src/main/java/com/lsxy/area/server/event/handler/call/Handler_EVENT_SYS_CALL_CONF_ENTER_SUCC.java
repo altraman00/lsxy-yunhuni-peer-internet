@@ -149,6 +149,8 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
             String callSessionId = businessData.get(BusinessState.SESSIONID);
             MeetingMember meetingMember = new MeetingMember();
             meetingMember.setId(call_id);
+            meetingMember.setAppId(state.getAppId());
+            meetingMember.setTenantId(state.getTenantId());
             meetingMember.setNumber(businessData.get("to"));
             meetingMember.setJoinTime(new Date());
             if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
