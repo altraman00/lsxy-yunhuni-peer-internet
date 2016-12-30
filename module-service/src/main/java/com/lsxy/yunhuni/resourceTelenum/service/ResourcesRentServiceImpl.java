@@ -170,8 +170,8 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
             List<App> apps = appService.getAppsByTenantId(tenants.get(i).getId());
             for(int j=0;j<apps.size();j++){
                 long sum =  sumAgentNum(tenants.get(i).getId(),apps.get(j).getId(),startTime,endTime);
-                BigDecimal cost = calCostService.calCost(ProductCode.call_center_month.getApiCmd(),tenants.get(i).getId());
-                Consume consume = new Consume(new Date(), ConsumeCode.call_center_month.name(),cost.multiply(new BigDecimal(sum)),"应用id["+apps.get(j).getId()+"]总共有"+sum+"个坐席",apps.get(j).getId(),tenants.get(i));
+                BigDecimal cost = calCostService.calCost(ProductCode.call_center_month.name(),tenants.get(i).getId());
+                Consume consume = new Consume(new Date(), ConsumeCode.call_center_month.name(),cost.multiply(new BigDecimal(sum)),"应用id["+apps.get(j).getId()+"]总共有"+sum+"个坐席",apps.get(j).getId(),tenants.get(i).getId(),null);
                 consumeService.consume(consume);
             }
         }
@@ -199,7 +199,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
             if(StringUtils.isNotBlank(tenantId)){
                 BigDecimal balance = calBillingService.getBalance(tenantId);
                 //获取每月号码扣费金额
-                BigDecimal cost = calCostService.calCost(ProductCode.rent_number_month.getApiCmd(),tenantId);
+                BigDecimal cost = calCostService.calCost(ProductCode.rent_number_month.name(),tenantId);
                 if(balance.compareTo(cost) == 1 || balance.compareTo(cost) == 0){
                     Date expireDate = DateUtils.getLastTimeOfMonth(curTime);
                     if(logger.isDebugEnabled()){
@@ -208,7 +208,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                     resourcesRentDao.updateResourceRentExpireTime(resourcesRent.getId(),expireDate);
                     //TODO 支付
                     //插入消费记录
-                    Consume consume = new Consume(curTime, ConsumeCode.rent_number_month.name(),cost,ConsumeCode.rent_number_month.getName(),appId,tenant);
+                    Consume consume = new Consume(curTime, ConsumeCode.rent_number_month.name(),cost,ConsumeCode.rent_number_month.getName(),appId,tenant.getId(),null);
                     consumeService.consume(consume);
                 }
             }
@@ -249,7 +249,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
         boolean flag = true;
         Tenant tenant = tenantService.findById(tenantId);
         App app = appService.findById(appId);
-        BigDecimal cost = calCostService.calCost(ProductCode.recording_memory.getApiCmd(),tenant.getId());
+        BigDecimal cost = calCostService.calCost(ProductCode.recording_memory.name(),tenant.getId());
         if(tenant!=null&&app!=null){
             //获取租户应用下的录音文件 isDeleted
             long size = voiceFileRecordService.getSumSize(tenant.getId(),app.getId());
@@ -261,7 +261,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                 if(billing.getBalance().compareTo(temp)==-1) {
                     flag = false;
                 }
-                Consume consume = new Consume(new Date(), ConsumeCode.recording_memory.name(),temp,ConsumeCode.recording_memory.getName(),app.getId(),tenant);
+                Consume consume = new Consume(new Date(), ConsumeCode.recording_memory.name(),temp,ConsumeCode.recording_memory.getName(),app.getId(),tenant.getId(),null);
                 consumeService.consume(consume);
             }
         }
@@ -304,12 +304,12 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
             this.save(resourcesRent);
         }
         //扣费
-        Consume consume = new Consume(new Date(), ConsumeCode.rent_number.name(), temp.getAmount(), ConsumeCode.rent_number.getName(), "0", tenant);
+        Consume consume = new Consume(new Date(), ConsumeCode.rent_number.name(), temp.getAmount(), ConsumeCode.rent_number.getName(), "0", tenant.getId(),null);
         consumeService.consume(consume);
         //号码月租费
-        BigDecimal cost = calCostService.calCost(ProductCode.rent_number_month.getApiCmd(),tenant.getId());
+        BigDecimal cost = calCostService.calCost(ProductCode.rent_number_month.name(),tenant.getId());
         BigDecimal bigDecimal = cost.multiply(new BigDecimal(list.size()));
-        Consume consume1 = new Consume(new Date(), ConsumeCode.rent_number_month.name(), bigDecimal, ConsumeCode.rent_number_month.getName(), "0", tenant);
+        Consume consume1 = new Consume(new Date(), ConsumeCode.rent_number_month.name(), bigDecimal, ConsumeCode.rent_number_month.getName(), "0", tenant.getId(),null);
         consumeService.consume(consume1);
     }
 
