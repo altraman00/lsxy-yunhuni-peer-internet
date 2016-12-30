@@ -17,10 +17,10 @@ public interface CallSessionDao extends BaseDaoInterface<CallSession, Serializab
     /**
      * 根据状态获取应用的会话条数
      * @param status 会话状态
-     * @param app 应用
+     * @param appId 应用ID
      * @return 条数
      */
-    Long countByStatusAndApp(int status,App app);
+    Long countByStatusAndAppId(int status,String appId);
 
     @Modifying
     @Query("update CallSession call set call.status=:status where relevanceId=:relevanceId")

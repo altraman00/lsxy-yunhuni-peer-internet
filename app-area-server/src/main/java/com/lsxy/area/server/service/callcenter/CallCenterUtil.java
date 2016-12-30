@@ -198,15 +198,14 @@ public class CallCenterUtil {
     /**
      * 坐席状态改变事件
      */
-    public void agentStateChangedEvent(String url,String agent_id,String previous_state,String latest_state){
+    public void agentStateChangedEvent(String url,String agent_id,String agentName,String previous_state,String latest_state){
         try{
-            CallCenterAgent agent = callCenterAgentService.findById(agent_id);
             if(latest_state == null){
                 latest_state = callCenterAgentService.getState(agent_id);
             }
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","callcenter.agent.state_changed")
-                    .putIfNotEmpty("name",agent.getName())
+                    .putIfNotEmpty("name",agentName)
                     .putIfNotEmpty("previous_state",previous_state)
                     .putIfNotEmpty("latest_state",latest_state)
                     .putIfNotEmpty("current_time",System.currentTimeMillis())
@@ -220,15 +219,20 @@ public class CallCenterUtil {
     /**
      * 坐席进入交谈事件
      */
-    public void agentEnterConversationEvent(String url,String agent_id,String conversation){
+    public void agentEnterConversationEvent(String url,String agent_id,String agentName,String conversation){
         try{
-            CallCenterAgent agent = callCenterAgentService.findById(agent_id);
+            String latest_state = null;
+            try{
+                latest_state = callCenterAgentService.getState(agent_id);
+            }catch (Throwable t){
+                logger.info("获取坐席状态失败",t);
+            }
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","callcenter.agent.conversation_changed")
-                    .putIfNotEmpty("name",agent.getName())
+                    .putIfNotEmpty("name",agentName)
                     .putIfNotEmpty("type","enter")
                     .putIfNotEmpty("conversation_id",conversation)
-                    .putIfNotEmpty("latest_state",agent.getState())
+                    .putIfNotEmpty("latest_state",latest_state)
                     .putIfNotEmpty("current_time",System.currentTimeMillis())
                     .build();
             notifyCallbackUtil.postNotify(url,notify_data,null,3);
@@ -240,15 +244,20 @@ public class CallCenterUtil {
     /**
      * 坐席退出交谈事件
      */
-    public void agentExitConversationEvent(String url,String agent_id,String conversation){
+    public void agentExitConversationEvent(String url,String agent_id,String agentName,String conversation){
         try{
-            CallCenterAgent agent = callCenterAgentService.findById(agent_id);
+            String latest_state = null;
+            try{
+                latest_state = callCenterAgentService.getState(agent_id);
+            }catch (Throwable t){
+                logger.info("获取坐席状态失败",t);
+            }
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","callcenter.agent.conversation_changed")
-                    .putIfNotEmpty("name",agent.getName())
+                    .putIfNotEmpty("name",agentName)
                     .putIfNotEmpty("type","exit")
                     .putIfNotEmpty("conversation_id",conversation)
-                    .putIfNotEmpty("latest_state",agent.getState())
+                    .putIfNotEmpty("latest_state",latest_state)
                     .putIfNotEmpty("current_time",System.currentTimeMillis())
                     .build();
             notifyCallbackUtil.postNotify(url,notify_data,null,3);
