@@ -133,8 +133,8 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
 
         String callCenterId = null;
         if(productCode == ProductCode.call_center){
+            callCenterId = conversationService.getCallCenter(businessState);
             if(voiceCdr.getIvrType() == null){
-                callCenterId = conversationService.getCallCenter(businessState);
                 if(logger.isDebugEnabled()){
                     logger.info("[{}][{}][{}]设置cdr的呼入呼出类型,callCenterId={},state={}",
                             businessState.getTenantId(),businessState.getAppId(),call_id,callCenterId,businessState);
