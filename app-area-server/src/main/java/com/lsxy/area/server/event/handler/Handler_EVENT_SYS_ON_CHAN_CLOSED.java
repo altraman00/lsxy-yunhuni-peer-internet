@@ -115,12 +115,14 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         if(BusinessState.TYPE_IVR_INCOMING.equals(businessState.getType())){
             if(conversationService.isCC(businessState)){
                 productCode = ProductCode.call_center;
-            }else{
-                voiceCdr.setIvrType(1);
             }
-        }else if(BusinessState.TYPE_IVR_CALL.equals(businessState.getType())){
-            voiceCdr.setIvrType(2);
+            voiceCdr.setIvrType(1);
         }else if(BusinessState.TYPE_IVR_DIAL.equals(businessState.getType())){
+            if(conversationService.isCC(businessState)){
+                productCode = ProductCode.call_center;
+            }
+            voiceCdr.setIvrType(2);
+        }else if(BusinessState.TYPE_IVR_CALL.equals(businessState.getType())){
             voiceCdr.setIvrType(2);
         }
 
@@ -132,22 +134,24 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         String callCenterId = null;
         if(productCode == ProductCode.call_center){
             callCenterId = conversationService.getCallCenter(businessState);
-            if(logger.isDebugEnabled()){
-                logger.info("[{}][{}][{}]设置cdr的呼入呼出类型,callCenterId={},state={}",
-                        businessState.getTenantId(),businessState.getAppId(),call_id,callCenterId,businessState);
-            }
-            if(callCenterId != null){
-                try{
-                    CallCenter callCenter = callCenterService.findById(callCenterId);
-                    if(logger.isDebugEnabled()){
-                        logger.info("[{}][{}][{}]设置cdr的呼入呼出类型,callCenter={},state={}",
-                                businessState.getTenantId(),businessState.getAppId(),call_id,callCenter,businessState);
+            if(voiceCdr.getIvrType() == null){
+                if(logger.isDebugEnabled()){
+                    logger.info("[{}][{}][{}]设置cdr的呼入呼出类型,callCenterId={},state={}",
+                            businessState.getTenantId(),businessState.getAppId(),call_id,callCenterId,businessState);
+                }
+                if(callCenterId != null){
+                    try{
+                        CallCenter callCenter = callCenterService.findById(callCenterId);
+                        if(logger.isDebugEnabled()){
+                            logger.info("[{}][{}][{}]设置cdr的呼入呼出类型,callCenter={},state={}",
+                                    businessState.getTenantId(),businessState.getAppId(),call_id,callCenter,businessState);
+                        }
+                        if(callCenter != null && callCenter.getType()!= null){
+                            voiceCdr.setIvrType(Integer.parseInt(callCenter.getType()));
+                        }
+                    }catch (Throwable t){
+                        logger.error("设置cdr的呼入呼出类型失败",t);
                     }
-                    if(callCenter != null && callCenter.getType()!= null){
-                        voiceCdr.setIvrType(Integer.parseInt(callCenter.getType()));
-                    }
-                }catch (Throwable t){
-                    logger.error("设置cdr的呼入呼出类型失败",t);
                 }
             }
         }

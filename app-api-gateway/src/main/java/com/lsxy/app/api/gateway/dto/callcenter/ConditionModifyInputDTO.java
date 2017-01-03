@@ -5,6 +5,7 @@ import com.lsxy.app.api.gateway.dto.CommonDTO;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
@@ -12,6 +13,7 @@ import javax.validation.constraints.Size;
  */
 public class ConditionModifyInputDTO extends CommonDTO {
 
+    @NotNull
     @Size(max = 512)
     @JsonProperty("where")
     private String whereExpression;
@@ -24,6 +26,7 @@ public class ConditionModifyInputDTO extends CommonDTO {
     @JsonProperty("priority")
     private Integer priority;
 
+    @NotNull
     @Min(value = 1)
     @Max(value = 1000)
     @JsonProperty("queue_timeout")
