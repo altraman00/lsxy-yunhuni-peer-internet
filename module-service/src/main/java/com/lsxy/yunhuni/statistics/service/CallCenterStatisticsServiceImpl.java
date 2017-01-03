@@ -9,6 +9,11 @@ import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
+import com.lsxy.yunhuni.api.consume.model.Consume;
+import com.lsxy.yunhuni.api.consume.service.ConsumeService;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
+import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
 import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import com.lsxy.yunhuni.statistics.dao.CallCenterStatisticsDao;
@@ -21,10 +26,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -50,6 +53,10 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
     RedisCacheService redisCacheService;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    CalCostService calCostService;
+    @Autowired
+    ConsumeService consumeService;
 
     @Override
     public BaseDaoInterface<CallCenterStatistics, Serializable> getDao() {
@@ -430,5 +437,34 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
         return result;
     }
 
+    @Override
+    public void agentMonthTask(){
+        Date curTime = new Date();
+        Calendar cal = Calendar.getInstance();
+//        cal.add(Calendar.DAY_OF_MONTH,-timeLong);
+        cal.set(Calendar.HOUR_OF_DAY, 0);//时
+        cal.set(Calendar.MINUTE, 0);//分
+        cal.set(Calendar.SECOND, 0);//秒
+        cal.set(Calendar.MILLISECOND,0);//毫秒
+        //获取删除时间
+        Date endTime =  cal.getTime();
+        cal.add(Calendar.MONTH, -1);// 月份减1
+        Date startTime = cal.getTime();
+        List<Tenant> tenants = tenantService.getListByPage();
+        for(int i=0;i<tenants.size();i++){
+            List<App> apps = appService.getAppsByTenantId(tenants.get(i).getId());
+            for(int j=0;j<apps.size();j++){
+                long sum =  sumAgentNum(tenants.get(i).getId(),apps.get(j).getId(),startTime,endTime);
+                BigDecimal cost = calCostService.calCost(ProductCode.call_center_month.name(),tenants.get(i).getId());
+                Consume consume = new Consume(new Date(), ConsumeCode.call_center_month.name(),cost.multiply(new BigDecimal(sum)),"应用id["+apps.get(j).getId()+"]总共有"+sum+"个坐席",apps.get(j).getId(),tenants.get(i).getId(),null);
+                consumeService.consume(consume);
+            }
+        }
+
+    }
+    public long sumAgentNum(String tenantId, String appId, Date startTime, Date endTime) {
+        String sql = " select count(1) from (select DISTINCT channel,name  from db_lsxy_bi_yunhuni.tb_bi_call_center_agent_action_log where tenant_id=? and app_id=? and  action=1 and create_time BETWEEN ? and ? ) a" ;
+        return jdbcTemplate.queryForObject(sql,Long.class,tenantId,appId,startTime,endTime);
+    }
 
 }

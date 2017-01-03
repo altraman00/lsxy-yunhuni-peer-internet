@@ -158,9 +158,9 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
             }else{
                 meetingMember.setJoinType(MeetingMember.JOINTYPE_INVITE);
             }
-            meetingMember.setMeeting(meeting);
+            meetingMember.setMeetingId(meeting.getId());
             if(callSessionId!=null){
-                meetingMember.setSession(callSessionService.findById(callSessionId));
+                meetingMember.setSessionId(callSessionId);
             }
             meetingMember.setResId(state.getResId());
             meetingMemberService.save(meetingMember);

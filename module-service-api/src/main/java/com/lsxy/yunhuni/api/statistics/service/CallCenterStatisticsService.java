@@ -74,4 +74,9 @@ public interface CallCenterStatisticsService extends BaseService<CallCenterStati
      * @return
      */
     CallCenterStatistics getIncStaticsOfCurrentMonthByAppId(String AppId);
+
+    /**
+     * 座席每月扣费
+     */
+    void agentMonthTask();
 }
