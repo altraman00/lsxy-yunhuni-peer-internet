@@ -40,4 +40,12 @@ public interface VoiceFileRecordService extends BaseService<VoiceFileRecord> {
     List<Map> getOssListByDeleted();
 
     void insertRecord(VoiceFileRecord record);
+
+    /**
+     * 录音容量月租扣费
+     */
+    void recordingVoiceFileTask();
+
+    /** 对录音进行扣费*/
+    boolean recordCost(String tenantId,String appId);
 }

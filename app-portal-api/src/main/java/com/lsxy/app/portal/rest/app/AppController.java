@@ -1,30 +1,26 @@
 package com.lsxy.app.portal.rest.app;
 
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.framework.mq.events.portal.VoiceFilePlayDeleteEvent;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.portal.VoiceFilePlayDeleteEvent;
 import com.lsxy.framework.oss.OSSService;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.config.model.Area;
-import com.lsxy.yunhuni.api.config.model.AreaSip;
 import com.lsxy.yunhuni.api.config.model.GlobalConfig;
 import com.lsxy.yunhuni.api.config.model.TenantConfig;
 import com.lsxy.yunhuni.api.config.service.AreaSipService;
 import com.lsxy.yunhuni.api.config.service.GlobalConfigService;
 import com.lsxy.yunhuni.api.config.service.TenantConfigService;
-import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
-import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
-import com.lsxy.yunhuni.api.product.enums.ProductCode;
+import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -35,9 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.InvocationTargetException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -70,6 +64,8 @@ public class AppController extends AbstractRestController {
     private GlobalConfigService globalConfigService;
     @Autowired
     private ResourcesRentService resourcesRentService;
+    @Autowired
+    VoiceFileRecordService voiceFileRecordService;
     @RequestMapping("/get/{id}/recording/time")
     public RestResponse getRecordingTimeByTenantIdAndAppId(@PathVariable String id){
         int re = tenantConfigService.getRecordingTimeByTenantIdAndAppId(getCurrentAccount().getTenant().getId(),id);
@@ -95,7 +91,7 @@ public class AppController extends AbstractRestController {
                 tenantRecording = Integer.valueOf(tenantConfig.getValue());
             }
             if(tenantRecording<=globalRecording&&time>globalRecording){//收费
-                boolean flag = resourcesRentService.recordCost(getCurrentAccount().getTenant().getId(),id);
+                boolean flag = voiceFileRecordService.recordCost(getCurrentAccount().getTenant().getId(),id);
                 if(!flag){
                     return RestResponse.failed("-1","余额不足");
                 }
@@ -104,7 +100,7 @@ public class AppController extends AbstractRestController {
             tenantConfigService.save(tenantConfig);
         }else{
             if(time>globalRecording){//收费
-                boolean flag = resourcesRentService.recordCost(getCurrentAccount().getTenant().getId(),id);
+                boolean flag = voiceFileRecordService.recordCost(getCurrentAccount().getTenant().getId(),id);
                 if(!flag){
                     return RestResponse.failed("-1","余额不足");
                 }
