@@ -159,7 +159,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             }catch (Throwable t){
                 logger.error("更新voiceIvr失败",t);
             }
-        }else{
+        }else if(!BusinessState.TYPE_IVR_DIAL.equals(state.getType())){
             try{
                 String callCenterId = conversationService.getCallCenter(state);
                 CallCenter callCenter = null;
