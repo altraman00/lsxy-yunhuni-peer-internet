@@ -251,10 +251,10 @@ public class BillDetailController extends AbstractRestController {
             switch(p1){
                 case sys_conf:{
                     //获取会议操作者
-                    MeetingMember meetingMember = meetingMemberService.findById(voiceCdr.getSessionId());
+                    MeetingMember meetingMember = meetingMemberService.findBySessionId(voiceCdr.getSessionId());
                     if (meetingMember!=null) {
                         //使用会议id
-                        list = voiceFileRecordService.getListBySessionId(meetingMember.getMeeting().getId());
+                        list = voiceFileRecordService.getListBySessionId(meetingMember.getMeetingId());
                     }
                     break;
                 }

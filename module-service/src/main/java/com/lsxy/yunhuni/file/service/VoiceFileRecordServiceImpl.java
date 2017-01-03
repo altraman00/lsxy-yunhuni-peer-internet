@@ -1,14 +1,26 @@
 package com.lsxy.yunhuni.file.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.billing.model.Billing;
+import com.lsxy.framework.api.billing.service.CalBillingService;
+import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.config.model.GlobalConfig;
+import com.lsxy.yunhuni.api.config.model.TenantConfig;
+import com.lsxy.yunhuni.api.config.service.GlobalConfigService;
+import com.lsxy.yunhuni.api.config.service.TenantConfigService;
+import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
 import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
+import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.file.dao.VoiceFileRecordDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +34,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 录音文件
@@ -39,6 +53,18 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
     private JdbcTemplate jdbcTemplate;
     @Autowired
     ConsumeService consumeService;
+    @Autowired
+    GlobalConfigService globalConfigService;
+    @Autowired
+    TenantConfigService tenantConfigService;
+    @Autowired
+    public TenantService tenantService;
+    @Autowired
+    AppService appService;
+    @Autowired
+    CalCostService calCostService;
+    @Autowired
+    CalBillingService calBillingService;
 
     @Override
     public long getSumSize(String tenant, String app) {
@@ -221,5 +247,58 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
         }
     }
 
+    @Override
+    public void recordingVoiceFileTask() {
+        int globalRecording = 7;
+        Pattern pattern = Pattern.compile("^[0-9]*[1-9][0-9]*$");
+        GlobalConfig globalConfig = globalConfigService.findByTypeAndName(GlobalConfig.TYPE_RECORDING,GlobalConfig.KEY_RECORDING);
+        if(globalConfig!=null&&StringUtils.isNotEmpty(globalConfig.getValue())) {
+            //全局录音文件存储时长时间
+            Matcher matcher = pattern.matcher(globalConfig.getValue());
+            if (matcher.matches()) {
+                globalRecording = Integer.valueOf(globalConfig.getValue());
+            }
+        }
+        List<TenantConfig> list = tenantConfigService.getPageByTypeAndKeyName(GlobalConfig.TYPE_RECORDING,GlobalConfig.KEY_RECORDING);
+        for(int i=0;i<list.size();i++){
+            TenantConfig tenantConfig = list.get(i);
+            if(StringUtils.isNotEmpty(tenantConfig.getValue())&&StringUtils.isNotEmpty(tenantConfig.getTenantId())&&StringUtils.isNotEmpty(tenantConfig.getAppId())){
+                int tenantRecording = 0;
+                Matcher matcher1 = pattern.matcher(tenantConfig.getValue());
+                if(matcher1.matches()){
+                    tenantRecording = Integer.valueOf(tenantConfig.getValue());
+                }
+                //全局配置的录音文件存储时间不收费，租户的应用下的配置如果大于全局配置的话需要收费
+                if(tenantRecording>globalRecording){
+                    recordCost(tenantConfig.getTenantId(),tenantConfig.getAppId());
+                }
+            }
+        }
+
+    }
+
+    @Override
+    public boolean recordCost(String tenantId,String appId){
+        boolean flag = true;
+        Tenant tenant = tenantService.findById(tenantId);
+        App app = appService.findById(appId);
+        BigDecimal cost = calCostService.calCost(ProductCode.recording_memory.name(),tenant.getId());
+        if(tenant!=null&&app!=null){
+            //获取租户应用下的录音文件 isDeleted
+            long size = this.getSumSize(tenant.getId(),app.getId());
+            long g = 1024*1024*1024;
+            if(size>0) {
+                long s1 = (size / g) + (size % g > 0 ? 1 : 0);
+                BigDecimal temp = cost.multiply(new BigDecimal(s1));
+                Billing billing = calBillingService.getCalBilling(tenant.getId());
+                if(billing.getBalance().compareTo(temp)==-1) {
+                    flag = false;
+                }
+                Consume consume = new Consume(new Date(), ConsumeCode.recording_memory.name(),temp,ConsumeCode.recording_memory.getName(),app.getId(),tenant.getId(),null);
+                consumeService.consume(consume);
+            }
+        }
+        return flag;
+    }
 
 }
