@@ -25,6 +25,8 @@ public final class ExpressionUtils {
     private static final String VAR_PREFIX = "VAR_";
     private static final int VAR_DEFAULT_VALUE = 0;//没有该技能时，技能分为0
     private static final int VAR_MIN_VALUE = 1;
+    /**默认的排序表达式**/
+    private static final String DEFAULT_SORT_EXPRESSION = "1;";
     private ExpressionUtils(){}
 
     private static String getVarName(String varName){
@@ -84,7 +86,7 @@ public final class ExpressionUtils {
 
     public static long execSortExpression(String str, Map<String,Integer> vars){
         if(StringUtil.isBlank(str)){
-            return Integer.MAX_VALUE;
+            str = DEFAULT_SORT_EXPRESSION;
         }
         Valuable value = null;
         DataType type = null;
@@ -123,7 +125,7 @@ public final class ExpressionUtils {
 
     public static boolean validSortExpression(String str){
         if(StringUtil.isBlank(str)){
-            return false;
+            str = DEFAULT_SORT_EXPRESSION;
         }
         Valuable value = null;
         DataType type = null;
