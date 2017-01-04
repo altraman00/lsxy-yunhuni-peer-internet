@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -52,12 +51,12 @@ public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serial
 
     /**
      * 获取过期但没被释放的号码资源
-     * @param rentStatusRelease
-     * @param restypeTelenum
      * @param date
      * @return
      */
-    List<ResourcesRent> findByRentStatusNotAndResTypeAndRentExpireLessThan(int rentStatusRelease, String restypeTelenum, Date date);
+    @Query(value = "SELECT rent.id,rent.tenant_id ,rent.app_id FROM db_lsxy_bi_yunhuni.tb_bi_resources_rent rent " +
+            "WHERE ( rent.deleted=0) AND rent.rent_status in (1,2) AND rent.res_type=1 AND rent.rent_expire<:expireTime",nativeQuery = true)
+    List<Object[]> findInfoExpireRent(@Param("expireTime") Date date);
 
     /**
      * 号码续费过期时间延长
