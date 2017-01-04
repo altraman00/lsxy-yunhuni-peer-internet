@@ -174,7 +174,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                     resourcesRentDao.updateResourceRentExpireTime(resourcesRent.getId(),expireDate);
                     //TODO 支付
                     //插入消费记录
-                    Consume consume = new Consume(curTime, ConsumeCode.rent_number_month.name(),cost,ConsumeCode.rent_number_month.getName(),appId,tenant.getId(),null);
+                    Consume consume = new Consume(curTime, ConsumeCode.rent_number_month.name(),cost,ConsumeCode.rent_number_month.getName(),appId,tenant.getId(),resourcesRent.getId());
                     consumeService.consume(consume);
                 }
             }
