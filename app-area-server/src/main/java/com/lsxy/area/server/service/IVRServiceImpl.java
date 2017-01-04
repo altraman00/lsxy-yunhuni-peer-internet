@@ -117,10 +117,6 @@ public class IVRServiceImpl implements IVRService {
             }
         }
 
-        if(!appService.enabledService(tenantId,appId, ServiceType.IvrService)){
-            throw new AppServiceInvalidException();
-        }
-
         boolean isCallCenter = false;
 
         if(app.getServiceType().equals(App.PRODUCT_CALL_CENTER)){
