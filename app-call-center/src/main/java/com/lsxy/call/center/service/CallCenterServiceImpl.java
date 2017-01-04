@@ -55,10 +55,10 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             hql += " AND  obj.type='"+type+"' ";
         }
         if(StringUtil.isNotEmpty(callnum)){
-            hql += " AND ( obj.fromNum='"+callnum+"' OR obj.toNum='"+callnum+"'  ) ";
+            hql += " AND ( obj.fromNum like '%"+callnum+"%' OR obj.toNum like '%"+callnum+"%'  ) ";
         }
         if(StringUtil.isNotEmpty(agent)){
-            hql += " AND  obj.agent = '"+agent+"'";
+            hql += " AND  obj.agent like '%"+agent+"%'";
         }
         hql += " order by obj.startTime desc";
         Page<CallCenter> page = this.pageList(hql,pageNo,pageSize);
@@ -84,10 +84,10 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             hql += " AND  obj.type='"+type+"' ";
         }
         if(StringUtil.isNotEmpty(callnum)){
-            hql += " AND ( obj.fromNum='"+callnum+"' OR obj.toNum='"+callnum+"'  ) ";
+            hql += " AND ( obj.fromNum like '%"+callnum+"%' OR obj.toNum like '%"+callnum+"%'  ) ";
         }
         if(StringUtil.isNotEmpty(agent)){
-            hql += " AND  obj.agent = '"+agent+"'";
+            hql += " AND  obj.agent like '%"+agent+"%'";
         }
         hql += " order by obj.startTime desc";
         List<CallCenter> list = this.list(hql);
@@ -113,10 +113,10 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             sql += " AND  type='"+type+"' ";
         }
         if(StringUtil.isNotEmpty(callnum)){
-            sql += " AND ( from_num='"+callnum+"' OR to_num='"+callnum+"'  ) ";
+            sql += " AND ( from_num like '%"+callnum+"%' OR to_num like '%"+callnum+"%'  ) ";
         }
         if(StringUtil.isNotEmpty(agent)){
-            sql += " AND  agent = '"+agent+"'";
+            sql += " AND  agent like '%"+agent+"%'";
         }
         Map result = this.jdbcTemplate.queryForMap(sql);
         return result;
