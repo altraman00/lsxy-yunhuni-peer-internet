@@ -4,6 +4,8 @@ import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,14 +22,26 @@ import java.util.concurrent.Callable;
 @Controller
 @RequestMapping("/console/app/file/record")
 public class VoiceFileRecordContrller extends AbstractPortalController {
+    private static final Logger logger = LoggerFactory.getLogger(VoiceFileRecordContrller.class);
     @RequestMapping("/cdr/download/{id}")
     @ResponseBody
     public WebAsyncTask cdrDownload(HttpServletRequest request, @PathVariable String id){
         Callable<RestResponse> callable = new Callable<RestResponse>() {
             public RestResponse call() throws Exception {
-                String token = getSecurityToken(request);
-                String uri = PortalConstants.REST_PREFIX_URL + "/rest/voice_file_record/cdr/download?id={1}";
-                return RestRequest.buildSecurityRequest(token).get(uri, String.class, id);
+//                String token = getSecurityToken(request);
+//                String uri = PortalConstants.REST_PREFIX_URL + "/rest/voice_file_record/cdr/download?id={1}";
+//                return RestRequest.buildSecurityRequest(token).get(uri, String.class, id);
+
+                if(logger.isDebugEnabled()){
+                    logger.debug("开始等。。。。。。");
+                }
+
+                Thread.sleep(2*60*1000);
+                if(logger.isDebugEnabled()){
+                    logger.debug("等待结束");
+                }
+
+                return RestResponse.success();
             }
         };
         return new WebAsyncTask(60000,callable);
