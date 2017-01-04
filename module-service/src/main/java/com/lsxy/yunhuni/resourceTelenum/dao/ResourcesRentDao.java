@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -45,7 +46,7 @@ public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serial
      * 清除过期时间
      * @param expireTime
      */
-    @Modifying(clearAutomatically = true)
+    @Modifying
     @Query("update ResourcesRent rent set rent.rentStatus=3 where rent.rentExpire<:expireTime and rent.resType=1 and rent.rentStatus in (1,2)")
     void cleanExpireTelnumResourceRent(@Param("expireTime") Date expireTime);
 
@@ -62,7 +63,7 @@ public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serial
      * 号码续费过期时间延长
      * @param expireTime
      */
-    @Modifying(clearAutomatically = true)
+    @Modifying
     @Query("update ResourcesRent rent set rent.rentExpire=:expireTime where rent.id=:id")
     void updateResourceRentExpireTime(@Param("id") String id,@Param("expireTime") Date expireTime);
 
