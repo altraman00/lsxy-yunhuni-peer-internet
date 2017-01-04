@@ -72,29 +72,28 @@ public class Handler_EVENT_SYS_CALL_PLAY_ON_FAIL extends EventHandler{
         if(state == null){
             throw new InvalidParamException("businessstate is null");
         }
-        if(canDoivr(state,call_id)){
+        if(canDoivr(state)){
             ivr(state,params,call_id);
         }
         return res;
     }
 
-    private boolean canDoivr(BusinessState state,String call_id){
-        if(BusinessState.TYPE_IVR_CALL.equals(state.getType())){//是ivr呼出
+    private boolean canDoivr(BusinessState state){
+        if(!BusinessState.TYPE_IVR_CALL.equals(state.getType())
+                && !BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
+            return false;
+        }
+        boolean iscc = conversationService.isCC(state);
+        if(!iscc){//不是ivr呼叫中心
             return true;
         }
-        if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){//是ivr呼入
-            boolean iscc = conversationService.isCC(call_id);
-            if(!iscc){//不是ivr呼叫中心呼入
-                return true;
-            }
-            boolean isPlaywait = conversationService.isPlayWait(call_id);
-            if(isPlaywait){
-                //等待音播放完成需要移除等待音标记
-                businessStateService.deleteInnerField(call_id, CallCenterUtil.IS_PLAYWAIT_FIELD);
-            }
-            if(!isPlaywait){//不是ivr呼叫中心排队
-                return true;
-            }
+        boolean isPlaywait = conversationService.isPlayWait(state.getId());
+        if(isPlaywait){
+            //等待音播放完成需要移除等待音标记
+            businessStateService.deleteInnerField(state.getId(), CallCenterUtil.IS_PLAYWAIT_FIELD);
+        }
+        if(!isPlaywait){//不是ivr呼叫中心排队放音
+            return true;
         }
         return false;
     }
