@@ -14,6 +14,7 @@ import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
@@ -102,7 +103,7 @@ public class DialActionHandler extends ActionHandler{
     public boolean handle(String callId,BusinessState state, Element root,String next) {
         //更新下一步
         businessStateService.updateInnerField(callId,IVRActionService.IVR_NEXT_FIELD,next);
-        dial(callId,state.getResId(),state.getAppId(),state.getTenantId(),root);
+        dial(callId,state.getResId(),state.getAppId(),state.getTenantId(),state.getBusinessData().get(CallCenterUtil.CALLCENTER_FIELD),root);
         return true;
     }
 
@@ -120,7 +121,7 @@ public class DialActionHandler extends ActionHandler{
         return Long.parseLong(s);
     }
 
-    public boolean dial(String ivr_call_id, String parent_call_res_id, String appId, String tenantId, Element root){
+    public boolean dial(String ivr_call_id, String parent_call_res_id, String appId, String tenantId,String callCenterId, Element root){
         App app = appService.findById(appId);
         //解析xml
         String ring_play_file = root.elementTextTrim("play");
@@ -174,15 +175,7 @@ public class DialActionHandler extends ActionHandler{
 
         boolean isCC = conversationService.isCC(ivr_call_id);
         if(isCC){
-            CallCenter callCenter = new CallCenter();
-            callCenter.setTenantId(tenantId);
-            callCenter.setAppId(appId);
-            callCenter.setFromNum(from);
-            callCenter.setToNum(to);
-            callCenter.setStartTime(new Date());
-            callCenter.setType(""+CallCenter.CALL_DIAL);
-            callCenter.setCost(BigDecimal.ZERO);
-            callId = callCenterService.save(callCenter).getId();
+            callId = UUIDGenerator.uuid();
 
             callSession = new CallSession();
             callSession.setStatus(CallSession.STATUS_CALLING);
@@ -262,6 +255,7 @@ public class DialActionHandler extends ActionHandler{
                 .setBusinessData(new MapBuilder<String,String>()
                         .putIfNotEmpty(BusinessState.REF_RES_ID,parent_call_res_id)
                         .putIfNotEmpty(CallCenterUtil.ISCC_FIELD,isCC?CallCenterUtil.ISCC_TRUE:null)
+                        .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,callCenterId)
                         .putIfNotEmpty("ivr_call_id",ivr_call_id)
                         .putIfNotEmpty("from",from)
                         .putIfNotEmpty("to",to)

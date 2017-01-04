@@ -2,7 +2,6 @@ package com.lsxy.yunhuni.resourceTelenum.service;
 
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.framework.api.billing.model.Billing;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
@@ -11,10 +10,7 @@ import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.config.model.GlobalConfig;
-import com.lsxy.yunhuni.api.config.model.TenantConfig;
 import com.lsxy.yunhuni.api.config.service.GlobalConfigService;
 import com.lsxy.yunhuni.api.config.service.TenantConfigService;
 import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
@@ -22,7 +18,6 @@ import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
-import com.lsxy.yunhuni.api.product.model.ProductItem;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
@@ -43,9 +38,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 租户号码租用service
@@ -150,17 +146,13 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     @Override
     public void resourcesRentTask(){
         Date curTime = new Date();
-        List<ResourcesRent> resourcesRents = resourcesRentDao.findByRentStatusNotAndResTypeAndRentExpireLessThan(ResourcesRent.RENT_STATUS_RELEASE,ResourcesRent.RESTYPE_TELENUM,curTime);
-        for(ResourcesRent resourcesRent:resourcesRents){
-            String tenantId = null;
-            Tenant tenant = resourcesRent.getTenant();
-            if(tenant != null){
-                tenantId = tenant.getId();
-            }
+        List<Object[]> resourcesRents = resourcesRentDao.findInfoExpireRent(curTime);
+        for(Object[] rent:resourcesRents){
+            String rentId = (String) rent[0];
+            String tenantId = (String) rent[1];
             String appId = "0";
-            App app = resourcesRent.getApp();
-            if(app != null){
-                appId = app.getId();
+            if(rent[2] != null){
+                appId = (String) rent[2];
             }
             if(StringUtils.isNotBlank(tenantId)){
                 BigDecimal balance = calBillingService.getBalance(tenantId);
@@ -171,10 +163,10 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                     if(logger.isDebugEnabled()){
                         logger.debug("号码租用过期时间：{}",DateUtils.formatDate(expireDate,"yyyy-MM-dd HH:mm:ss"));
                     }
-                    resourcesRentDao.updateResourceRentExpireTime(resourcesRent.getId(),expireDate);
+                    resourcesRentDao.updateResourceRentExpireTime(rentId,expireDate);
                     //TODO 支付
                     //插入消费记录
-                    Consume consume = new Consume(curTime, ConsumeCode.rent_number_month.name(),cost,ConsumeCode.rent_number_month.getName(),appId,tenant.getId(),null);
+                    Consume consume = new Consume(curTime, ConsumeCode.rent_number_month.name(),cost,ConsumeCode.rent_number_month.getName(),appId,tenantId,rentId);
                     consumeService.consume(consume);
                 }
             }

@@ -147,7 +147,9 @@
                                                     <td>${result.type}</td>
                                                     <td>${result.costTimeLong}</td>
                                                     <td>${result.size}</td>
-                                                    <td><span style="float:left;width: 80px" ><span style="float:right;" ><fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber></span></span></td>
+                                                    <td><span style="float:left;width: 80px" ><span style="float:right;" >
+                                                        ￥<fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber>
+                                                    </span></span></td>
                                                     <td><a id="downVoid${result.id}" onclick="downVoid('${result.id}')" data-statu="1">录音下载</a></td>
                                                 </tr>
                                             </c:forEach>
