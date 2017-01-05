@@ -513,7 +513,7 @@ public class IVRActionService {
             }
             //呼叫中心排队
             if(h instanceof EnqueueHandler){
-                if(!conversationService.isCC(call_id)){
+                if(!conversationService.isCC(state)){
                     logger.info("[{}][{}]callId={}没有开通呼叫中心服务",state.getTenantId(),state.getAppId(),call_id);
                     return false;
                 }
@@ -522,7 +522,7 @@ public class IVRActionService {
             if(! (h instanceof HangupActionHandler) && state.getBusinessData().get(IVR_ANSWER_WAITTING_FIELD) !=null){
                 businessStateService.updateInnerField(call_id,IVR_ANSWER_AFTER_XML_FIELD,resXML);
                 if(logger.isDebugEnabled()){
-                    logger.info("调用应答isCallcenter={}，callid={}",conversationService.isCC(call_id),call_id);
+                    logger.info("调用应答isCallcenter={}，callid={}",conversationService.isCC(state),call_id);
                 }
                 answer(state.getResId(),call_id,state.getAreaId());
                 return true;

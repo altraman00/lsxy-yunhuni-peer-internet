@@ -142,14 +142,6 @@ public class ConversationService {
         return CallCenterConversationMember.INITIATOR_TRUE.equals(isInitiator(conversation, callId));
     }
 
-    public boolean isCC(String callId){
-        if(StringUtils.isEmpty(callId)){
-            return false;
-        }
-        BusinessState state = businessStateService.get(callId);
-        return isCC(state);
-    }
-
     public boolean isCC(BusinessState state){
         if(state != null && state.getBusinessData()!= null){
             String iscc = state.getBusinessData().get(CallCenterUtil.ISCC_FIELD);
@@ -718,7 +710,8 @@ public class ConversationService {
             }
             return;
         }
-        if(BusinessState.TYPE_IVR_INCOMING.equals(call_state.getType())){
+        if(BusinessState.TYPE_IVR_INCOMING.equals(call_state.getType()) ||
+                BusinessState.TYPE_IVR_CALL.equals(call_state.getType())){
             if(call_state.getClosed() == null || !call_state.getClosed()){
                 if(logger.isDebugEnabled()){
                     logger.debug("开始重新进入ivr，callid={}",callId);

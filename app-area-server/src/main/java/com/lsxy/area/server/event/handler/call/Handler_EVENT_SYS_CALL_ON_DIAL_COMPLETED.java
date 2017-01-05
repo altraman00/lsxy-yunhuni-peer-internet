@@ -177,6 +177,14 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
             }
             if(StringUtils.isBlank(error)){
+                if(conversationService.isCC(state)){
+                    try{
+                        callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(state.getTenantId(),state.getAppId(),
+                                new Date()).setCallOutSuccess(1L).build());
+                    }catch (Throwable t){
+                        logger.error("incrIntoRedis失败",t);
+                    }
+                }
                 ivrActionService.doAction(call_id,null);
             }
         }else if(BusinessState.TYPE_IVR_DIAL.equals(state.getType())){//通过ivr拨号动作发起的呼叫
