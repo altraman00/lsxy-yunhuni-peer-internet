@@ -233,8 +233,9 @@ public class EnQueueServiceImpl implements EnQueueService{
         }
         if(queueId != null){
             //找到排队，修改排队状态
+            CallCenterQueue queue = null;
             try{
-                CallCenterQueue queue = callCenterQueueService.findById(queueId);
+                queue = callCenterQueueService.findById(queueId);
                 if(logger.isDebugEnabled()){
                     logger.debug("[{}][{}]排队结果:agent={},queueid={}",tenantId,appId,agent,queue.getId());
                 }
@@ -251,6 +252,9 @@ public class EnQueueServiceImpl implements EnQueueService{
                     agentState.setState(agent,CallCenterAgent.STATE_IDLE);
                 }catch (Throwable t2){
                     logger.info("设置坐席状态失败agent={}",agent,t2);
+                }
+                if(queue != null){
+                    deQueueService.fail(tenantId,appId,queue.getOriginCallId(),t1.getMessage(),queueId);
                 }
             }
         }
