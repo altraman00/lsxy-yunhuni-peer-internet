@@ -170,8 +170,13 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             }else{
                 voiceCdr.setToNum(toNum);
             }
-            //host根据from来获取
-            host = cdrSplit[7].trim().split("@")[1];
+            //TODO host根据from来获取
+            String[] fromSplit = cdrSplit[7].trim().split("@");
+            if(fromSplit.length > 1){
+                host = fromSplit[1];
+            }else{
+                host = cdrSplit[10].trim().split("@")[1];
+            }
         }else{
             //相对平台是呼出 处理from
             String fromNum = cdrSplit[7].trim().split("@")[0];
