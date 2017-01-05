@@ -11,7 +11,7 @@ import com.lsxy.call.center.states.statics.ACs;
 import com.lsxy.call.center.states.statics.CAs;
 import com.lsxy.call.center.states.statics.CQs;
 import com.lsxy.call.center.utils.CQSBatchInserter;
-import com.lsxy.framework.cache.utils.Lua;
+import com.lsxy.call.center.utils.Lua;
 import com.lsxy.call.center.utils.QueueBatchInserter;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.ChannelNotExistException;
