@@ -100,10 +100,10 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
             sql+=" AND create_time BETWEEN ? AND ? ";
         }
 
-        sql += " ORDER BY create_time)a GROUP BY a.session_id )b WHERE b.deleted=0 ";
+        sql += " )a GROUP BY a.session_id )b WHERE b.deleted=0 ";
 
         String count = " SELECT COUNT(1) "+sql;
-        String sql2 =  " SELECT b.id as id ,b.time as time ,b.type as type ,b.size as size ,b.costTimeLong as costTimeLong,b.cost as cost  "+sql+ " LIMIT ?,?";
+        String sql2 =  " SELECT b.id as id ,b.time as time ,b.type as type ,b.size as size ,b.costTimeLong as costTimeLong,b.cost as cost  "+sql+ " ORDER BY time desc LIMIT ?,?";
         long totalCount = 0;
         if(start!=null&&end!=null){
             totalCount = jdbcTemplate.queryForObject(count,Long.class,start,end);
