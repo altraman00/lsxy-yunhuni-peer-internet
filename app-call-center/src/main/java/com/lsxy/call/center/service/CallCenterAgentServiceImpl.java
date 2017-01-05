@@ -119,7 +119,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         //初始化座席状态
         if(StringUtils.isBlank(agent.getState())){
             agent.setState(CallCenterAgent.STATE_ONLINE);
-        }else if(!agent.getState().equals("busy") && !agent.getState().equals("away") && !agent.getState().equals("idle") && !agent.getState().startsWith("busy/") && !agent.getState().startsWith("away/")){
+        }else if(!agent.getState().equals("busy") && !agent.getState().equals("away") && !agent.getState().equals("idle")
+                && !agent.getState().startsWith("busy/") && !agent.getState().startsWith("away/") && !agent.getState().equals("online")){
             throw new RequestIllegalArgumentException();
         }
         //校验通道
