@@ -77,7 +77,7 @@ public class EnqueueHandler extends ActionHandler{
                 try {
                     playWait = playFileUtil.convert(state.getTenantId(),state.getAppId(),playWait);
                     if(logger.isDebugEnabled()){
-                        logger.debug("[][]callid={}开始播放排队等待音={}",state.getTenantId(),state.getAppId(),callId, playWait);
+                        logger.debug("[{}][{}]callid={}开始播放排队等待音={}",state.getTenantId(),state.getAppId(),callId, playWait);
                     }
                     Map<String, Object> params = new MapBuilder<String,Object>()
                             .putIfNotEmpty("res_id",state.getResId())
