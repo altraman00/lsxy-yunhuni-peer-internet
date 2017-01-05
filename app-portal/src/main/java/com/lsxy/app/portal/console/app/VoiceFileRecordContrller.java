@@ -32,7 +32,8 @@ public class VoiceFileRecordContrller extends AbstractPortalController {
                 String token = getSecurityToken(request);
                 String uri = PortalConstants.REST_PREFIX_URL + "/rest/voice_file_record/cdr/download?id={1}";
                 RestResponse restResponse1 =  RestRequest.buildSecurityRequest(token).get(uri, String.class, id);
-                if(restResponse1.isSuccess()){
+                String temp1 = (String)restResponse1.getData();
+                if(restResponse1.isSuccess() && temp1.indexOf("http")!=-1 ){
                     return restResponse1;
                 }else if("0401".equals(restResponse1.getErrorCode())){
                     return restResponse1;
@@ -43,7 +44,8 @@ public class VoiceFileRecordContrller extends AbstractPortalController {
                         Thread.sleep( 6 * 1000);
 //                        logger.info("正在执行第["+j+"]次查询已耗费时间："+ (new Date().getTime()-init) );
                         RestResponse restResponse2 = getPolling(request, pId);
-                        if (restResponse2.isSuccess()) {
+                        String temp2 = (String)restResponse2.getData();
+                        if (restResponse2.isSuccess() && temp2.indexOf("http")!=-1) {
                             return restResponse2;
                         } else {
                             if ("0001".equals(restResponse2.getErrorCode())) {
@@ -65,14 +67,16 @@ public class VoiceFileRecordContrller extends AbstractPortalController {
                 String token = getSecurityToken(request);
                 String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/file/download?id={1}";
                 RestResponse restResponse1 =   RestRequest.buildSecurityRequest(token).get(uri, String.class,id);
-                if(restResponse1.isSuccess()){
+                String temp1 = (String)restResponse1.getData();
+                if(restResponse1.isSuccess() && temp1.indexOf("http")!=-1 ){
                     return restResponse1;
                 }else{
                     String pId = restResponse1.getErrorMsg();
                     for (int j = 1; j <= 10; j++) {
                         Thread.sleep( 6 * 1000);
                         RestResponse restResponse2 = getPolling(request, pId);
-                        if (restResponse2.isSuccess()) {
+                        String temp2 = (String)restResponse2.getData();
+                        if (restResponse2.isSuccess() && temp2.indexOf("http")!=-1) {
                             return restResponse2;
                         } else {
                             if ("0001".equals(restResponse2.getErrorCode())) {
