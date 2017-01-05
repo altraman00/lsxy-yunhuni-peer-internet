@@ -13,7 +13,6 @@ import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mq.api.MQService;
-import com.lsxy.framework.mq.events.callcenter.CallCenterIncrCostEvent;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
@@ -32,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -210,7 +208,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             //计算线路成本价
             voiceCdr.setLineId(lineGateway.getId());
             if(voiceCdr.getCallAckDt() != null){
-                Integer unit = lineGateway.getLinePriceUnit() == null?0:lineGateway.getLinePriceUnit();
+                Integer unit = lineGateway.getLinePriceUnit() == null ? 60:lineGateway.getLinePriceUnit();
                 BigDecimal price =  lineGateway.getLinePrice() == null ? BigDecimal.ZERO : lineGateway.getLinePrice();
                 BigDecimal lineCost = calCostService.calCost(voiceCdr.getCallTimeLong(), unit, price , 1.0);
                 voiceCdr.setLineCost(lineCost);
