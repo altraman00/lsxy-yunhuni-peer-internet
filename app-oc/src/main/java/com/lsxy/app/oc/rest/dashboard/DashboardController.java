@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
- * Created by Administrator on 2016/8/9.
+ * Created by liuws on 2016/8/9.
  */
 @Api(value = "dashboard", description = "dashboard 相关的接口" )
 @RestController
