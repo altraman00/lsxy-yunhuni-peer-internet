@@ -27,7 +27,7 @@ public class CallSession extends IdEntity {
     public static final String TYPE_VOICE_IVR = ProductCode.ivr_call.name();
     public static final String TYPE_VOICE_VOICECODE = ProductCode.captcha_call.name();
     public static final String TYPE_CALL_CENTER = ProductCode.call_center.name();
-    public static final String[] CALL_CENTER_PRODUCT_CODE = {"call_center"};//呼叫中心产品计费项目
+    public static final String[] CALL_CENTER_PRODUCT_CODE = {ProductCode.call_center.name(),ProductCode.call_center_sip.name()};//呼叫中心产品计费项目
     private Integer status;         //状态
     private String appId;            //所属APP
     private String tenantId;      //所属tenant
