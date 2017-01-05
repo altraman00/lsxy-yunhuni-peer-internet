@@ -83,7 +83,8 @@ public class EnqueueHandler extends ActionHandler{
                             .putIfNotEmpty("res_id",state.getResId())
                             .putIfNotEmpty("content", JSONUtil2.objectToJson(new Object[][]{new Object[]{playWait,0,""}}))
                             .putIfNotEmpty("user_data",callId)
-                            .put("finish_keys","")
+                            .put("finish_keys","")//不允许按键打断
+                            .put("repeat",99)
                             .put("areaId",state.getAreaId())
                             .build();
                     RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_START, params);
