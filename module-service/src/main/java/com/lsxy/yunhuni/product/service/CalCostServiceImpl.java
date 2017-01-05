@@ -50,23 +50,26 @@ public class CalCostServiceImpl implements CalCostService{
         BigDecimal cost;
         ProductPrice productPrice = productPriceService.getAvailableProductPrice(productItem.getId());
         Double discount = productTenantDiscountService.getDiscountByProductIdAndTenantId(productItem.getId(), tenantId);
-        if(productItem.getCalType() == Product.CAL_TYPE_NUM){
+        if(productItem.getCalType() == ProductItem.CAL_TYPE_TIME){
+            //如果是计时，则只需 时长单位数量*单价*折扣
+            cost = calCost(time, productPrice.getTimeUnit(),productPrice.getPrice(), discount);
+        }else{
             //如果是计量，则只需单价*折扣
             cost = productPrice.getPrice().multiply(new BigDecimal(Double.toString(discount)));
-        }else{
-            //如果是计时，则只需 时长单位数量*单价*折扣
-            Long calNum = this.calUnitNum(time, productPrice.getTimeUnit());
-            cost = new BigDecimal(calNum).multiply(productPrice.getPrice()).multiply(new BigDecimal(Double.toString(discount))).setScale(4,BigDecimal.ROUND_HALF_UP);
         }
         return cost;
     }
 
     @Override
+    public BigDecimal calCost(Long time, Integer timeUnit, BigDecimal price, Double discount) {
+        Long calNum = this.calUnitNum(time, timeUnit);
+        return new BigDecimal(calNum).multiply(price).multiply(new BigDecimal(Double.toString(discount))).setScale(4,BigDecimal.ROUND_HALF_UP);
+    }
+
+    @Override
     public BigDecimal calCost(String code, String tenantId) {
         ProductItem productItem = productItemService.getProductItemByCode(code);
-        ProductPrice productPrice = productPriceService.getAvailableProductPrice(productItem.getId());
-        BigDecimal discount = new BigDecimal(productTenantDiscountService.getDiscountByProductIdAndTenantId(productItem.getId(), tenantId));
-        return productPrice.getPrice().multiply(discount);
+        return this.calCost(productItem,tenantId,null);
     }
 
     @Override
