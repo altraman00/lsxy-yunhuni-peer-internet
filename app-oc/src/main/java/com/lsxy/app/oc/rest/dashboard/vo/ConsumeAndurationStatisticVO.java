@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Created by Administrator on 2016/8/9.
+ * Created by liuws on 2016/8/9.
  */
 public class ConsumeAndurationStatisticVO implements Serializable {
 

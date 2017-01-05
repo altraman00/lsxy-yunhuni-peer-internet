@@ -61,7 +61,7 @@ import java.util.stream.Collectors;
 
 
 /**
- * Created by Administrator on 2016/8/10.
+ * Created by liuws on 2016/8/10.
  */
 @Api(value = "租户中心", description = "租户中心相关的接口" )
 @RestController

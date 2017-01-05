@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
 /**
- * Created by Administrator on 2017/1/5.
+ * Created by liuws on 2017/1/5.
  */
 public class LuaUtils {
 
