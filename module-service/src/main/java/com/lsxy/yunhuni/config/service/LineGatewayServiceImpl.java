@@ -9,7 +9,10 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.config.dao.LineGatewayDao;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,8 @@ import java.util.List;
  */
 @Service
 public class LineGatewayServiceImpl extends AbstractService<LineGateway> implements LineGatewayService {
+    private static final Logger logger = LoggerFactory.getLogger(LineGatewayServiceImpl.class);
+
     @Autowired
     LineGatewayDao lineGatewayDao;
     @Autowired
@@ -36,14 +41,11 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
     public BaseDaoInterface<LineGateway, Serializable> getDao() {
         return this.lineGatewayDao;
     }
+    @Value(value = "${app.cc.opensips.ip}")
+    private String sipIp;
+    @Value(value = "${app.cc.opensips.domain}")
+    private String sipDomain;
 
-    @Override
-    public LineGateway getBestLineGatewayByNumber(String number){
-        //TODO 获取最优的线路
-        List<TelnumToLineGateway> dialingLineIdsByNumber = telnumToLineGatewayService.getDialingLinesByNumber(number);
-        String lineId = dialingLineIdsByNumber.get(0).getLineId();
-        return this.findById(lineId);
-    }
 
     @Override
     public Page<LineGateway> getPage(Integer pageNo,Integer pageSize,String operator, String isThrough, String status, String isPublicLine,String order) {
@@ -121,5 +123,35 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
         return lineGatewayDao.findByIdIn(ids);
     }
 
+    @Override
+    public LineGateway findByHost(String host) {
+        if(StringUtils.isBlank(host)){
+            logger.error("host为空");
+            return null;
+        }
+        if(logger.isDebugEnabled()){
+            logger.debug("处理host:{}",host);
+        }
+        host = resolveHost(host);
+        String sipIp = resolveHost(this.sipIp);
+        String sipDomain = resolveHost(this.sipDomain);
+        if(host.equals(sipIp) || host.equals(sipDomain)){
+            //当是用opensip线路时，返回个id为0的线路
+            LineGateway lineGateway = new LineGateway();
+            lineGateway.setId("0");
+            return lineGateway;
+        }
+        String host1 = host.replace(":5060","");
+        String[] hosts = new String[]{host,host1};
+        return lineGatewayDao.findFirstBySipProviderIpInOrSipProviderDomainIn(hosts,hosts);
+    }
+
+    private String resolveHost(String host) {
+        if(!host.contains(":")){
+            return host.trim() + ":5060";
+        }else{
+            return host.trim();
+        }
+    }
 
 }
