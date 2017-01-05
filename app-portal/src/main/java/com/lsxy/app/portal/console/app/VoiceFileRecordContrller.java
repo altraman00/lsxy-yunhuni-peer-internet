@@ -4,6 +4,8 @@ import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.async.WebAsyncTask;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.concurrent.Callable;
 
 /**
@@ -20,6 +23,7 @@ import java.util.concurrent.Callable;
 @Controller
 @RequestMapping("/console/app/file/record")
 public class VoiceFileRecordContrller extends AbstractPortalController {
+    private static final Logger logger = LoggerFactory.getLogger(VoiceFileRecordContrller.class);
     @RequestMapping("/cdr/download/{id}")
     @ResponseBody
     public WebAsyncTask cdrDownload(HttpServletRequest request, @PathVariable String id){
@@ -30,10 +34,14 @@ public class VoiceFileRecordContrller extends AbstractPortalController {
                 RestResponse restResponse1 =  RestRequest.buildSecurityRequest(token).get(uri, String.class, id);
                 if(restResponse1.isSuccess()){
                     return restResponse1;
-                }else {
+                }else if("0401".equals(restResponse1.getErrorCode())){
+                    return restResponse1;
+                }else{
                     String pId = restResponse1.getErrorMsg();
-                    for (int j = 1; j <= 30; j++) {
-                        Thread.sleep(j * 1000);
+//                    long init = new Date().getTime();
+                    for (int j = 1; j <= 10; j++) {
+                        Thread.sleep( 6 * 1000);
+//                        logger.info("正在执行第["+j+"]次查询已耗费时间："+ (new Date().getTime()-init) );
                         RestResponse restResponse2 = getPolling(request, pId);
                         if (restResponse2.isSuccess()) {
                             return restResponse2;
@@ -59,15 +67,15 @@ public class VoiceFileRecordContrller extends AbstractPortalController {
                 RestResponse restResponse1 =   RestRequest.buildSecurityRequest(token).get(uri, String.class,id);
                 if(restResponse1.isSuccess()){
                     return restResponse1;
-                }else {
+                }else{
                     String pId = restResponse1.getErrorMsg();
-                    for (int j = 1; j <= 30; j++) {
-                        Thread.sleep(j * 1000);
+                    for (int j = 1; j <= 10; j++) {
+                        Thread.sleep( 6 * 1000);
                         RestResponse restResponse2 = getPolling(request, pId);
                         if (restResponse2.isSuccess()) {
                             return restResponse2;
                         } else {
-                            if ("0001".equals(restResponse2.getErrorCode()) || "0401".equals(restResponse2.getErrorCode())) {
+                            if ("0001".equals(restResponse2.getErrorCode())) {
                                 return restResponse2;
                             }
                         }

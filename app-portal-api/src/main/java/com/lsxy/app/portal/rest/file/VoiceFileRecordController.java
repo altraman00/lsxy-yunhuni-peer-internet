@@ -128,7 +128,7 @@ public class VoiceFileRecordController extends AbstractRestController {
     @RequestMapping("/polling/{id}")
     public RestResponse fileDownloadPolling(@PathVariable String id){
         VoiceFileRecord v1 = voiceFileRecordService.findById(id);
-        if(v1 == null) {
+        if(v1 != null) {
             if (v1.getStatus() != null) {
                 if (v1.getStatus() == 1) {
                     String ossUri = getOssTempUri(v1.getOssUrl());
