@@ -7,10 +7,13 @@ import com.lsxy.yunhuni.api.product.model.ProductItem;
 import com.lsxy.yunhuni.api.product.service.ProductItemService;
 import com.lsxy.yunhuni.product.dao.ProductItemDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Created by zhangxb on 2016/11/21.
@@ -31,5 +34,17 @@ public class ProductItemServiceImpl extends AbstractService<ProductItem> impleme
             throw new RuntimeException("产品不存在");
         }
         return product;
+    }
+
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "entity", key = "'entity_' + #entity.id", beforeInvocation = true),
+                    @CacheEvict(value = "product", key = "'product_item_' + #entity.code", beforeInvocation = true)
+            }
+    )
+    public ProductItem save(ProductItem entity) {
+        //更新最后修改时间
+        entity.setLastTime(new Date());
+        return getDao().save(entity);
     }
 }

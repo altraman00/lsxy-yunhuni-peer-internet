@@ -23,7 +23,6 @@ public class ConditionCreateInputDTO extends CommonDTO {
     @JsonProperty("where")
     private String whereExpression;
 
-    @NotNull
     @Size(max = 512)
     @JsonProperty("sort")
     private String sortExpression;

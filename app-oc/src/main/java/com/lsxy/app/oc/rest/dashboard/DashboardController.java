@@ -1,5 +1,6 @@
 package com.lsxy.app.oc.rest.dashboard;
 
+import com.lsxy.app.oc.base.AbstractRestController;
 import com.lsxy.app.oc.rest.dashboard.vo.*;
 import com.lsxy.yunhuni.api.statistics.service.ConsumeDayService;
 import com.lsxy.yunhuni.api.statistics.service.ConsumeMonthService;
@@ -30,7 +31,7 @@ import java.util.concurrent.Future;
 @Api(value = "dashboard", description = "dashboard 相关的接口" )
 @RestController
 @RequestMapping("/dashboard")
-public class DashboardController {
+public class DashboardController extends AbstractRestController {
 
     @Autowired
     private TenantService tenantService;

@@ -94,34 +94,21 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
                 throw new SystemBusyException();
             }
             try{
-                boolean modify_where = false;
-                boolean modify_sort = false;
-                boolean modify_priority = false;
+                boolean modify_where  = !oldCondition.getWhereExpression().equals(condition.getWhereExpression());
+                oldCondition.setWhereExpression(condition.getWhereExpression());
 
-                if(condition.getWhereExpression() != null){
-                    modify_where = !(oldCondition.getWhereExpression() == null?"":oldCondition.getWhereExpression())
-                            .equals(condition.getWhereExpression());
-                    oldCondition.setWhereExpression(condition.getWhereExpression());
-                }
-                if(condition.getSortExpression() != null){
-                    modify_sort = !(oldCondition.getSortExpression() == null?"":oldCondition.getSortExpression())
-                            .equals(condition.getSortExpression());
-                    oldCondition.setSortExpression(condition.getSortExpression());
-                }
-                if(condition.getPriority() != null){
-                    modify_priority = Integer.compare(oldCondition.getPriority() == null ? 0 : oldCondition.getPriority()
-                            ,condition.getPriority()) != 0;
-                    oldCondition.setPriority(condition.getPriority());
-                }
-                if(condition.getQueueTimeout() != null){
-                    oldCondition.setQueueTimeout(condition.getQueueTimeout());
-                }
-                if(condition.getFetchTimeout() != null){
-                    oldCondition.setFetchTimeout(condition.getFetchTimeout());
-                }
-                if(condition.getRemark() != null){
-                    oldCondition.setRemark(condition.getRemark());
-                }
+                boolean modify_sort = !(oldCondition.getSortExpression() == null?"":oldCondition.getSortExpression())
+                        .equals(condition.getSortExpression() == null?"":condition.getSortExpression());
+                oldCondition.setSortExpression(condition.getSortExpression());
+
+                boolean modify_priority = Integer.compare(
+                        oldCondition.getPriority() == null ? 0 : oldCondition.getPriority(),
+                        condition.getPriority() == null ? 0 : condition.getPriority()) != 0;
+                oldCondition.setPriority(condition.getPriority());
+
+                oldCondition.setQueueTimeout(condition.getQueueTimeout());
+                oldCondition.setFetchTimeout(condition.getFetchTimeout());
+                oldCondition.setRemark(condition.getRemark());
                 condition = oldCondition;
                 condition = super.save(condition);
                 //修改条件事件
