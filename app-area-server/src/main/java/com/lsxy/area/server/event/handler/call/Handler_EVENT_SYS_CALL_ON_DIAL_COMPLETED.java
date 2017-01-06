@@ -300,6 +300,12 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 if(initorid != null){
                     init_state = businessStateService.get(initorid);
                     if(init_state != null){
+                        if(init_state.getClosed() == null || !init_state.getClosed()){
+                            if(StringUtils.isBlank(error)){
+                                //停止播放排队等待音
+                                conversationService.stopPlayWait(init_state.getAreaId(),initorid,init_state.getResId());
+                            }
+                        }
                         queueId = init_state.getBusinessData().get(CallCenterUtil.QUEUE_ID_FIELD);
                         if(queueId != null){
                             CallCenterQueue callCenterQueue = callCenterQueueService.findById(queueId);
