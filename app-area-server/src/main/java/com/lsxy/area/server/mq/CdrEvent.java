@@ -4,7 +4,7 @@ import com.lsxy.framework.mq.api.AbstractMQEvent;
 import com.lsxy.framework.mq.topic.MQTopicConstants;
 
 /**
- * Created by Administrator on 2016/12/20.
+ * Created by liuws on 2016/12/20.
  */
 public class CdrEvent extends AbstractMQEvent {
 

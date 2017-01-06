@@ -65,13 +65,13 @@ public class CreateConditionEventHandler implements MQMessageHandler<CreateCondi
         long start = System.currentTimeMillis();
         List<String> agentIds = callCenterAgentService
                                         .getAgentIdsByChannel(condition.getTenantId(),condition.getAppId(),condition.getChannelId());
-        if(agentIds == null || agentIds.size() == 0){
-            logger.info("处理CallCenter.CreateConditionEvent，没有坐席！");
-            return;
+
+        if(agentIds != null && agentIds.size() > 0){
+            for (String agentId : agentIds) {
+                init(agentId,condition);
+            }
         }
-        for (String agentId : agentIds) {
-            init(agentId,condition);
-        }
+
         ModifyConditionLock lock = new ModifyConditionLock(redisCacheService,condition.getId());
         lock.unlock();
         logger.info("处理CallCenter.CreateConditionEvent耗时={}",(System.currentTimeMillis() - start));

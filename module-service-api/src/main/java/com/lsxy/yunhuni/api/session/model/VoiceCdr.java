@@ -27,6 +27,7 @@ public class VoiceCdr extends IdEntity {
     private String tenantId;//所属租户
     private String  appId;//所属应用
     private String lineId;//所属线路
+    private BigDecimal lineCost;//线路成本
     private String type;//'查看产品表code字段或枚举类ProductCode
     private String relevanceId;//根据会话类型关联对应类型的表的记录
     private Integer recording; //是否有录音文件:0无，1有，null无法判断
@@ -107,6 +108,15 @@ public class VoiceCdr extends IdEntity {
     public void setLineId(String lineId) {
         this.lineId = lineId;
     }
+    @Column( name = "line_cost")
+    public BigDecimal getLineCost() {
+        return lineCost;
+    }
+
+    public void setLineCost(BigDecimal lineCost) {
+        this.lineCost = lineCost;
+    }
+
     @Column( name = "type")
     public String getType() {
         return type;

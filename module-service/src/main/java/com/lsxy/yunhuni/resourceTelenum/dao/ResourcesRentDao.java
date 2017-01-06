@@ -46,24 +46,24 @@ public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serial
      * 清除过期时间
      * @param expireTime
      */
-    @Modifying(clearAutomatically = true)
+    @Modifying
     @Query("update ResourcesRent rent set rent.rentStatus=3 where rent.rentExpire<:expireTime and rent.resType=1 and rent.rentStatus in (1,2)")
     void cleanExpireTelnumResourceRent(@Param("expireTime") Date expireTime);
 
     /**
      * 获取过期但没被释放的号码资源
-     * @param rentStatusRelease
-     * @param restypeTelenum
      * @param date
      * @return
      */
-    List<ResourcesRent> findByRentStatusNotAndResTypeAndRentExpireLessThan(int rentStatusRelease, String restypeTelenum, Date date);
+    @Query(value = "SELECT rent.id,rent.tenant_id ,rent.app_id FROM db_lsxy_bi_yunhuni.tb_bi_resources_rent rent " +
+            "WHERE ( rent.deleted=0) AND rent.rent_status in (1,2) AND rent.res_type=1 AND rent.rent_expire<:expireTime",nativeQuery = true)
+    List<Object[]> findInfoExpireRent(@Param("expireTime") Date date);
 
     /**
      * 号码续费过期时间延长
      * @param expireTime
      */
-    @Modifying(clearAutomatically = true)
+    @Modifying
     @Query("update ResourcesRent rent set rent.rentExpire=:expireTime where rent.id=:id")
     void updateResourceRentExpireTime(@Param("id") String id,@Param("expireTime") Date expireTime);
 

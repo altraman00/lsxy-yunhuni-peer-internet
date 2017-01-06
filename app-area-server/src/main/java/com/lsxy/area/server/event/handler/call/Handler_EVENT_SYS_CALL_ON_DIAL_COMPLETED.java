@@ -177,6 +177,14 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
             }
             if(StringUtils.isBlank(error)){
+                if(conversationService.isCC(state)){
+                    try{
+                        callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(state.getTenantId(),state.getAppId(),
+                                new Date()).setCallOutSuccess(1L).build());
+                    }catch (Throwable t){
+                        logger.error("incrIntoRedis失败",t);
+                    }
+                }
                 ivrActionService.doAction(call_id,null);
             }
         }else if(BusinessState.TYPE_IVR_DIAL.equals(state.getType())){//通过ivr拨号动作发起的呼叫
@@ -269,37 +277,6 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 }
                 conversationService.exit(conversation_id,call_id);
             }else{
-                String agent_num = businessData.get(CallCenterUtil.AGENT_NUM_FIELD);
-                String prevoice = businessData.get(CallCenterUtil.AGENT_PRENUMVOICE_FIELD);
-                String postvoice = businessData.get(CallCenterUtil.AGENT_POSTNUMVOICE_FIELD);
-                List<Object[]> plays = new ArrayList<>();
-                try {
-                    if(StringUtil.isNotEmpty(prevoice)){
-                        plays.add(new Object[]{playFileUtil.convert(state.getTenantId(),state.getAppId(),prevoice),0,""});
-                    }
-                    if(StringUtil.isNotEmpty(agent_num)){
-                        plays.add(new Object[]{agent_num,1,""});
-                    }
-                    if(StringUtil.isNotEmpty(postvoice)){
-                        plays.add(new Object[]{playFileUtil.convert(state.getTenantId(),state.getAppId(),postvoice),0,""});
-                    }
-                    if(plays!=null && plays.size()>0){
-                        Map<String, Object> _params = new MapBuilder<String,Object>()
-                                .putIfNotEmpty("res_id",state.getResId())
-                                .putIfNotEmpty("content", JSONUtil2.objectToJson(plays))
-                                .put("finish_keys","")
-                                .putIfNotEmpty("user_data",conversation_id)
-                                .put("areaId",state.getAreaId())
-                                .build();
-                        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, _params);
-                        rpcCaller.invoke(sessionContext, rpcrequest);
-                    }
-                }catch(PlayFileNotExistsException e){
-                    logger.info("[{}][{}]放音文件不存在{},{},{},{}",state.getTenantId(),state.getAppId(),
-                            agent_num,prevoice,postvoice,e);
-                }catch(Throwable e) {
-                    logger.error("调用失败 ",e);
-                }
                 if(agentId != null){
                     try {
                         String preState = callCenterAgentService.getState(agentId);
@@ -347,6 +324,37 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                     businessStateService.updateInnerField(conversation_id,
                             CallCenterUtil.CONVERSATION_STARTED_FIELD,CallCenterUtil.CONVERSATION_STARTED_TRUE);
                     if((conversationState.getClosed()== null || !conversationState.getClosed())){
+                        String agent_num = businessData.get(CallCenterUtil.AGENT_NUM_FIELD);
+                        String prevoice = businessData.get(CallCenterUtil.AGENT_PRENUMVOICE_FIELD);
+                        String postvoice = businessData.get(CallCenterUtil.AGENT_POSTNUMVOICE_FIELD);
+                        List<Object[]> plays = new ArrayList<>();
+                        try {
+                            if(StringUtil.isNotEmpty(prevoice)){
+                                plays.add(new Object[]{playFileUtil.convert(state.getTenantId(),state.getAppId(),prevoice),0,""});
+                            }
+                            if(StringUtil.isNotEmpty(agent_num)){
+                                plays.add(new Object[]{agent_num,1,""});
+                            }
+                            if(StringUtil.isNotEmpty(postvoice)){
+                                plays.add(new Object[]{playFileUtil.convert(state.getTenantId(),state.getAppId(),postvoice),0,""});
+                            }
+                            if(plays!=null && plays.size()>0){
+                                Map<String, Object> _params = new MapBuilder<String,Object>()
+                                        .putIfNotEmpty("res_id",conversationState.getResId())
+                                        .putIfNotEmpty("content", JSONUtil2.objectToJson(plays))
+                                        .put("finish_keys","")
+                                        .putIfNotEmpty("user_data",conversation_id)
+                                        .put("areaId",state.getAreaId())
+                                        .build();
+                                RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, _params);
+                                rpcCaller.invoke(sessionContext, rpcrequest);
+                            }
+                        }catch(PlayFileNotExistsException e){
+                            logger.info("[{}][{}]放音文件不存在{},{},{},{}",state.getTenantId(),state.getAppId(),
+                                    agent_num,prevoice,postvoice,e);
+                        }catch(Throwable e) {
+                            logger.error("调用失败 ",e);
+                        }
                         //开始录音
                         conversationService.startRecord(conversationState);
                     }

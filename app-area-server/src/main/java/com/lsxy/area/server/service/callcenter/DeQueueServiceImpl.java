@@ -188,10 +188,11 @@ public class DeQueueServiceImpl implements DeQueueService {
                 CallCenterUtil.QUEUE_FAIL_TIMEOUT,
                 callId,null,state.getUserdata());
 
-        if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
+        if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType()) ||
+                BusinessState.TYPE_IVR_CALL.equals(state.getType())){
             ivrActionService.doAction(callId,new MapBuilder<String,Object>()
                     .put("error",CallCenterUtil.QUEUE_FAIL_TIMEOUT).build());
-        };
+        }
     }
 
     @Override
@@ -230,7 +231,8 @@ public class DeQueueServiceImpl implements DeQueueService {
                 CallCenterUtil.QUEUE_FAIL_ERROR,
                 callId,null,state.getUserdata());
 
-        if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
+        if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType()) ||
+                BusinessState.TYPE_IVR_CALL.equals(state.getType())){
             ivrActionService.doAction(callId,new MapBuilder<String,Object>()
                     .put("error",CallCenterUtil.QUEUE_FAIL_ERROR).build());
         }

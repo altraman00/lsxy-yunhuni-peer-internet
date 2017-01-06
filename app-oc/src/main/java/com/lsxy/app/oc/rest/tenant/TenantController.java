@@ -1,6 +1,7 @@
 package com.lsxy.app.oc.rest.tenant;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.lsxy.app.oc.base.AbstractRestController;
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
 import com.lsxy.app.oc.rest.tenant.vo.*;
 import com.lsxy.call.center.api.model.AppExtension;
@@ -61,12 +62,12 @@ import java.util.stream.Collectors;
 
 
 /**
- * Created by Administrator on 2016/8/10.
+ * Created by liuws on 2016/8/10.
  */
 @Api(value = "租户中心", description = "租户中心相关的接口" )
 @RestController
 @RequestMapping("/tenant")
-public class TenantController {
+public class TenantController extends AbstractRestController {
     public static final Logger logger = LoggerFactory.getLogger(TenantController.class);
     @Autowired
     private TenantService tenantService;
@@ -115,7 +116,7 @@ public class TenantController {
 
     @Autowired
     private ApiCallMonthService apiCallMonthService;
-    @Reference(timeout = 3000,check = false,lazy = true)
+    @Reference(timeout = 10000,check = false,lazy = true)
     CallCenterService callCenterService;
     @Reference(timeout = 3000,check = false,lazy = true)
     AppExtensionService appExtensionService;
