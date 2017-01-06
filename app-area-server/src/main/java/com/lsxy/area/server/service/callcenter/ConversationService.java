@@ -822,7 +822,7 @@ public class ConversationService {
         try {
             boolean isPlayWait = this.isPlayWait(call_id);
             if(logger.isDebugEnabled()){
-                logger.info("停止播放排队录音isPlayWait={}",call_id);
+                logger.info("停止播放排队录音isPlayWait={} ",call_id);
             }
             if(isPlayWait){
                 Map<String, Object> params = new MapBuilder<String,Object>()
