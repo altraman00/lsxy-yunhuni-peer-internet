@@ -100,9 +100,6 @@ public class DeQueueServiceImpl implements DeQueueService {
         }
         String conversation = UUIDGenerator.uuid();
 
-        //停止播放排队等待音
-        stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
-
         //更新排队的call的所属交谈id和排队id
         businessStateService.updateInnerField(callId,
                 CallCenterUtil.CONVERSATION_FIELD,conversation,CallCenterUtil.QUEUE_ID_FIELD,queueId);
@@ -179,7 +176,7 @@ public class DeQueueServiceImpl implements DeQueueService {
             logger.info("会话已关闭callid={}",callId);
             return;
         }
-        stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
+        conversationService.stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
 
         callCenterUtil.sendQueueFailEvent(state.getCallBackUrl(),
                 queueId,CallCenterUtil.QUEUE_TYPE_IVR,
@@ -222,7 +219,7 @@ public class DeQueueServiceImpl implements DeQueueService {
             logger.info("会话已关闭callid={}",callId);
             return;
         }
-        stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
+        conversationService.stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
 
         callCenterUtil.sendQueueFailEvent(state.getCallBackUrl(),
                 queueId,CallCenterUtil.QUEUE_TYPE_IVR,
@@ -299,30 +296,6 @@ public class DeQueueServiceImpl implements DeQueueService {
             }
         }catch (Throwable t){
             logger.error("更新CallCenter失败",t);
-        }
-    }
-
-    /**
-     * 停止播放排队等待音
-     * @param area_id
-     * @param call_id
-     * @param res_id
-     */
-    private void stopPlayWait(String area_id,String call_id,String res_id){
-        try {
-            if(conversationService.isPlayWait(call_id)){
-                    Map<String, Object> params = new MapBuilder<String,Object>()
-                            .putIfNotEmpty("res_id",res_id)
-                            .putIfNotEmpty("user_data",call_id)
-                            .put("areaId",area_id)
-                            .build();
-                    RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_STOP, params);
-                if(!businessStateService.closed(call_id)) {
-                    rpcCaller.invoke(sessionContext, rpcrequest, true);
-                }
-            }
-        } catch (Throwable e) {
-            logger.error("调用失败",e);
         }
     }
 

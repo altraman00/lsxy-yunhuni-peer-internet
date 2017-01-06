@@ -164,6 +164,10 @@ public class ConversationService {
 
     public String getInitiator(String conversation){
         BusinessState state = businessStateService.get(conversation);
+        return getInitiator(state);
+    }
+
+    public String getInitiator(BusinessState state){
         if(state != null && state.getBusinessData()!= null){
             return state.getBusinessData().get(CallCenterUtil.INITIATOR_FIELD);
         }
@@ -664,12 +668,12 @@ public class ConversationService {
      */
     public void logicExit(String conversationId,String callId){
         BusinessState call_state = businessStateService.get(callId);
-        if(call_state == null || call_state.getResId() == null){
+        if(call_state == null){
             logger.info("(call_state == null || call_state.getResId() == null)conversationId={},callId={}",conversationId,callId);
             return;
         }
         BusinessState conversation_state = businessStateService.get(conversationId);
-        if(conversation_state == null || conversation_state.getResId() == null){
+        if(conversation_state == null){
             logger.info("(conversation_state == null || conversation_state.getResId() == null)conversationId={},callId={}",conversationId,callId);
             return;
         }
@@ -710,24 +714,30 @@ public class ConversationService {
             }
             return;
         }
+
+        if(this.size(conversationId) <= 1){
+            if(conversation_state.getClosed() == null || !conversation_state.getClosed()){
+                if(logger.isDebugEnabled()){
+                    logger.debug("开始成员{}退出导致成员不足，解散交谈，conversationId={}",callId,conversationId);
+                }
+                if(conversation_state.getResId()!=null){
+                    try {
+                        this.dismiss(conversation_state.getAppId(),conversationId);
+                    } catch (Throwable e) {
+                        logger.error("解散交谈",e);
+                    }
+                }
+            }
+        }
+
         if(BusinessState.TYPE_IVR_INCOMING.equals(call_state.getType()) ||
                 BusinessState.TYPE_IVR_CALL.equals(call_state.getType())){
             if(call_state.getClosed() == null || !call_state.getClosed()){
+                this.stopPlayWait(call_state.getAreaId(),call_state.getId(),call_state.getResId());
                 if(logger.isDebugEnabled()){
                     logger.debug("开始重新进入ivr，callid={}",callId);
                 }
                 ivrActionService.doAction(callId,null);
-            }else if(this.size(conversationId) <= 1){
-                if(conversation_state.getClosed() == null || !conversation_state.getClosed()){
-                    if(logger.isDebugEnabled()){
-                        logger.debug("开始呼入ivr挂断后，解散会议，callid={}",callId);
-                    }
-                    try {
-                        this.dismiss(call_state.getAppId(),conversationId);
-                    } catch (Throwable e) {
-                        logger.error("呼入ivr挂断后，解散会议",e);
-                    }
-                }
             }
         }else{
             if(call_state.getClosed() == null || !call_state.getClosed()){
@@ -735,7 +745,9 @@ public class ConversationService {
                 if(logger.isDebugEnabled()) {
                     logger.debug("开始挂断坐席callid={}", callId);
                 }
-                hangup(call_state.getResId(),callId,call_state.getAreaId());
+                if(call_state.getResId()!=null){
+                    hangup(call_state.getResId(),callId,call_state.getAreaId());
+                }
             }
         }
     }
@@ -794,6 +806,34 @@ public class ConversationService {
         try {
             if(!businessStateService.closed(call_id)) {
                 rpcCaller.invoke(sessionContext, rpcrequest, true);
+            }
+        } catch (Throwable e) {
+            logger.error("调用失败",e);
+        }
+    }
+
+    /**
+     * 停止播放排队等待音
+     * @param area_id
+     * @param call_id
+     * @param res_id
+     */
+    public void stopPlayWait(String area_id,String call_id,String res_id){
+        try {
+            boolean isPlayWait = this.isPlayWait(call_id);
+            if(logger.isDebugEnabled()){
+                logger.info("停止播放排队录音isPlayWait={}",call_id);
+            }
+            if(isPlayWait){
+                Map<String, Object> params = new MapBuilder<String,Object>()
+                        .putIfNotEmpty("res_id",res_id)
+                        .putIfNotEmpty("user_data",call_id)
+                        .put("areaId",area_id)
+                        .build();
+                RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_STOP, params);
+                if(!businessStateService.closed(call_id)) {
+                    rpcCaller.invoke(sessionContext, rpcrequest, true);
+                }
             }
         } catch (Throwable e) {
             logger.error("调用失败",e);
