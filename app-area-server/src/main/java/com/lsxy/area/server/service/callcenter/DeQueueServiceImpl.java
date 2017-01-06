@@ -327,6 +327,8 @@ public class DeQueueServiceImpl implements DeQueueService {
                 innerFields.add(postNumVoice);
             }
         }
-        businessStateService.updateInnerField(agentCallId,innerFields);
+        if(innerFields.size()>0){
+            businessStateService.updateInnerField(agentCallId,innerFields);
+        }
     }
 }

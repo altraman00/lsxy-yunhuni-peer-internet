@@ -848,7 +848,7 @@ public class ConversationService {
                 .putIfNotEmpty("areaId",area_id)
                 .build();
 
-        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD_STOP, params);
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY_STOP, params);
         try {
             rpcCaller.invoke(sessionContext, rpcrequest, true);
         } catch (Throwable e) {
