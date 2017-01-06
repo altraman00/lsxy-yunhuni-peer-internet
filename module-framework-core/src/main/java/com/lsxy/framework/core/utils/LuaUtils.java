@@ -1,4 +1,4 @@
-package com.lsxy.framework.cache.utils;
+package com.lsxy.framework.core.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,33 +10,24 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
 /**
- * Created by liuws on 2016/11/15.
+ * Created by liuws on 2017/1/5.
  */
-public class Lua {
+public class LuaUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(Lua.class);
+    private static final Logger logger = LoggerFactory.getLogger(LuaUtils.class);
 
-    public static final String LOCK = loadLua("/lua/lock.lua");
-
-    public static final String LOOKUPAGENT = loadLua("/lua/lookupAgent.lua");
-
-    public static final String LOOKUPAGENTFORIDLE = loadLua("/lua/lookupAgentForIdle.lua");
-
-    public static final String LOKUPQUEUE = loadLua("/lua/lookupQueue.lua");
-
-    public static final String AGENTLOGIN = loadLua("/lua/agentLogin.lua");
     /**
      * 加载lua脚本
      * @param path
      * @return
      */
-    private static String loadLua(String path){
+    public static String load(String path){
         StringBuffer lua = new StringBuffer();
         BufferedReader reader = null;
         try{
-            InputStream input = Lua.class.getResourceAsStream(path);
+            InputStream input = LuaUtils.class.getResourceAsStream(path);
             if(input == null){
-                input = Lua.class.getClassLoader().getResourceAsStream(path);
+                input = LuaUtils.class.getClassLoader().getResourceAsStream(path);
             }
             String read;
             reader = new BufferedReader(new InputStreamReader(input, Charset.forName("UTF-8")));
@@ -56,8 +47,8 @@ public class Lua {
                 lua.append(read).append("\n");
             }
         }catch (Throwable t){
-            logger.error("lua脚本读取失败",t);
-            throw new RuntimeException("lua脚本读取失败");
+            logger.error("lua脚本读取失败:"+path,t);
+            throw new RuntimeException("lua脚本读取失败"+path);
         }finally {
             if(reader!=null){
                 try {
@@ -67,6 +58,11 @@ public class Lua {
                 }
             }
         }
+        if(logger.isDebugEnabled()){
+            logger.debug("path={},lua=\n=============================LUA SCRIPT START========================\n" +
+                    "{}=============================LUA SCRIPT END========================",path,lua.toString());
+        }
         return lua.toString();
     }
+
 }

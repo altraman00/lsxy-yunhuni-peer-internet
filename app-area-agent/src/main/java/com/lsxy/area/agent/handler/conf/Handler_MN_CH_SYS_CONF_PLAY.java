@@ -4,11 +4,13 @@ import com.lsxy.app.area.cti.RpcError;
 import com.lsxy.app.area.cti.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.area.agent.cti.CTINode;
+import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.handler.RpcRequestHandler;
 import com.lsxy.framework.rpc.api.session.Session;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +43,10 @@ public class Handler_MN_CH_SYS_CONF_PLAY extends RpcRequestHandler{
         String res_id = (String)params.get("res_id");
 
         try {
+            String content = (String)params.get("content");
+            if(StringUtils.isNotEmpty(content)){
+                params.put("content", JSONUtil2.fromJson(content,(new Object[1][]).getClass()));
+            }
             CTINode cticlient = cticlientContext.getAvalibleNode(res_id);
             cticlient.operateResource( res_id,"sys.conf.play_start", params, new RpcResultListener(){
 

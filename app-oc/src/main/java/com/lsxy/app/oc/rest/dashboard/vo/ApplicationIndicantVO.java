@@ -3,7 +3,7 @@ package com.lsxy.app.oc.rest.dashboard.vo;
 import java.io.Serializable;
 
 /**
- * Created by Administrator on 2016/8/9.
+ * Created by liuws on 2016/8/9.
  */
 public class ApplicationIndicantVO implements Serializable {
 

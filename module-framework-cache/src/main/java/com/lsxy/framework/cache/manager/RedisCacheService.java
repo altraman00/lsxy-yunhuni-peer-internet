@@ -1,7 +1,7 @@
 package com.lsxy.framework.cache.manager;
 
 import com.lsxy.framework.cache.exceptions.TransactionExecFailedException;
-import com.lsxy.framework.cache.utils.Lua;
+import com.lsxy.framework.core.utils.LuaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,10 @@ import javax.annotation.PostConstruct;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 /**
  * Redis操作方法
@@ -38,6 +41,8 @@ public class RedisCacheService {
 //    public static final long DEFAULT_TIME_OUT = 3000;
 
 	private static final Logger logger = LoggerFactory.getLogger(RedisCacheService.class);
+
+	public static final String LOCK = LuaUtils.load("/lua/lock.lua");
 
 	private static final ConcurrentHashMap<String,Future<String>> lua_script_cache = new ConcurrentHashMap<>();
 
@@ -147,7 +152,7 @@ public class RedisCacheService {
 						if(logger.isDebugEnabled()){
 							logger.debug("ready to set nx:"+key+">>>>"+ value);
 						}
-						Long ret = (Long)eval((Jedis)connection.getNativeConnection(), Lua.LOCK,1,key,value,""+expire);
+						Long ret = (Long)eval((Jedis)connection.getNativeConnection(), LOCK,1,key,value,""+expire);
 						if(logger.isDebugEnabled()){
 							logger.debug("set nx result:"+ret);
 						}

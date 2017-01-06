@@ -136,15 +136,17 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         boolean isIVR = false;
 
         if(BusinessState.TYPE_IVR_CALL.equals(state.getType())){
-            isIVR = true;
+            if(!conversationService.isCC(state)){
+                isIVR = true;
+            }
         }
         if(BusinessState.TYPE_IVR_DIAL.equals(state.getType())){
-            if(!conversationService.isCC(call_id)){
+            if(!conversationService.isCC(state)){
                 isIVR = true;
             }
         }
         if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
-            if(!conversationService.isCC(call_id)){
+            if(!conversationService.isCC(state)){
                 isIVR = true;
             }
         }
@@ -159,7 +161,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             }catch (Throwable t){
                 logger.error("更新voiceIvr失败",t);
             }
-        }else{
+        }else if(!BusinessState.TYPE_IVR_DIAL.equals(state.getType())){
             try{
                 String callCenterId = conversationService.getCallCenter(state);
                 CallCenter callCenter = null;
@@ -246,7 +248,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             }
 
             if(logger.isDebugEnabled()){
-                if(conversationService.isCC(call_id)){
+                if(conversationService.isCC(state)){
                     logger.info("[{}][{}]客户挂机callid={}",state.getTenantId(),state.getAppId(),call_id);
                 }
             }
