@@ -324,6 +324,8 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                     businessStateService.updateInnerField(conversation_id,
                             CallCenterUtil.CONVERSATION_STARTED_FIELD,CallCenterUtil.CONVERSATION_STARTED_TRUE);
                     if((conversationState.getClosed()== null || !conversationState.getClosed())){
+                        //开始录音
+                        conversationService.startRecord(conversationState);
                         String agent_num = businessData.get(CallCenterUtil.AGENT_NUM_FIELD);
                         String prevoice = businessData.get(CallCenterUtil.AGENT_PRENUMVOICE_FIELD);
                         String postvoice = businessData.get(CallCenterUtil.AGENT_POSTNUMVOICE_FIELD);
@@ -342,7 +344,6 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                 Map<String, Object> _params = new MapBuilder<String,Object>()
                                         .putIfNotEmpty("res_id",conversationState.getResId())
                                         .putIfNotEmpty("content", JSONUtil2.objectToJson(plays))
-                                        .put("finish_keys","")
                                         .putIfNotEmpty("user_data",conversation_id)
                                         .put("areaId",state.getAreaId())
                                         .build();
@@ -355,8 +356,6 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         }catch(Throwable e) {
                             logger.error("调用失败 ",e);
                         }
-                        //开始录音
-                        conversationService.startRecord(conversationState);
                     }
                     try{
                         CallCenter callCenter = null;

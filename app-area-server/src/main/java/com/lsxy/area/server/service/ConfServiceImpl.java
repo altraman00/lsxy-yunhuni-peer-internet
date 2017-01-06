@@ -10,6 +10,7 @@ import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
+import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
@@ -475,12 +476,12 @@ public class ConfServiceImpl implements ConfService {
         }
 
         playFiles = playFileUtil.convertArray(app.getTenant().getId(),appId,playFiles);
-        String areaId = areaAndTelNumSelector.getAreaId(app);
-        Map<String,Object> params = new MapBuilder<String,Object>()
+
+        Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
-                .putIfNotEmpty("file",StringUtils.join(playFiles,"|"))
+                .putIfNotEmpty("content", JSONUtil2.objectToJson(new Object[][]{new Object[]{StringUtils.join(playFiles,"|"),7,""}}))
                 .putIfNotEmpty("user_data",confId)
-                .putIfNotEmpty("areaId",areaId)
+                .put("areaId",conf_state.getAreaId())
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, params);
