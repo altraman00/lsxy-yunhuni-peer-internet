@@ -28,13 +28,18 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.async.WebAsyncTask;
 
 import java.net.URL;
-import java.util.*;
-import java.util.concurrent.Callable;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.lsxy.yunhuni.api.product.enums.ProductCode.call_center;
 
 /**
  * 详单查询
@@ -44,6 +49,7 @@ import java.util.concurrent.Callable;
 @Api(value = "会话详单", description = "租户中心相关的接口" )
 @RestController
 public class BillDetailController extends AbstractRestController {
+    private static final Logger logger = LoggerFactory.getLogger(BillDetailController.class);
     @Autowired
     VoiceCdrService voiceCdrService;
     @Autowired
@@ -139,115 +145,111 @@ public class BillDetailController extends AbstractRestController {
     @RequestMapping(value = "/{uid}/file/download/{id}" ,method = RequestMethod.GET)
     @ResponseBody
     @ApiOperation(value = "会话详单之录音文件下载")
-    public WebAsyncTask fileDownload( @ApiParam(name = "uid",value = "用户id")@PathVariable String uid, @ApiParam(name = "id",value = "记录id") @PathVariable String id){
-        Callable<RestResponse> callable = new Callable<RestResponse>() {
-            public RestResponse call() throws Exception {
-                Tenant tenant = tenantService.findById(uid);
-                VoiceFileRecord voiceFileRecord = voiceFileRecordService.findById(id);
-                if(tenant==null||voiceFileRecord==null||!tenant.getId().equals(voiceFileRecord.getTenantId())){
-                    return RestResponse.failed("0000","验证失败，无法下载");
-                }
-                if(voiceFileRecord.getStatus()!=null&&voiceFileRecord.getStatus()==1){
-                    String ossUri = getOssTempUri(voiceFileRecord.getOssUrl());
+    public RestResponse fileDownload( @ApiParam(name = "uid",value = "用户id")@PathVariable String uid, @ApiParam(name = "id",value = "记录id") @PathVariable String id){
+        Tenant tenant = tenantService.findById(uid);
+        VoiceFileRecord voiceFileRecord = voiceFileRecordService.findById(id);
+        if(tenant==null||voiceFileRecord==null||!tenant.getId().equals(voiceFileRecord.getTenantId())){
+            return RestResponse.failed("0000","验证失败，无法下载");
+        }
+        if(voiceFileRecord.getStatus()!=null&&voiceFileRecord.getStatus()==1){
+            String ossUri = getOssTempUri(voiceFileRecord.getOssUrl());
+            if(logger.isDebugEnabled()) {
+                logger.debug("生成ossUri地址：[{}]", ossUri);
+            }
+            return RestResponse.success(ossUri);
+        }
+        List<VoiceFileRecord> list = voiceFileRecordService.getListBySessionId(voiceFileRecord.getSessionId());
+        if(list==null||list.size()==0){
+            return RestResponse.failed("0000","无对应的录音文件");
+        }
+        //先判断是否文件已上传，如果是的话，直接生成临时下载链接，否则
+        boolean flag = false;
+        for(int i=0;i<list.size();i++){
+            VoiceFileRecord temp = list.get(i);
+            if(temp.getStatus()==null||1!=temp.getStatus()){
+                temp.setStatus(0);
+                voiceFileRecordService.save(temp);
+                flag=true;
+                break;
+            }
+        }
+        //发起文件上传
+        if(flag) {
+            mqService.publish(new VoiceFileRecordSyncEvent(tenant.getId(), voiceFileRecord.getAppId(), voiceFileRecord.getId(), VoiceFileRecordSyncEvent.TYPE_FILE));
+            return RestResponse.failed("0004", id);
+        }else {
+            String ossUri = getOssTempUri(list.get(0).getOssUrl());
+            return RestResponse.success(ossUri);
+        }
+    }
+
+    @RequestMapping(value = "/polling/{id}",method = RequestMethod.GET)
+    @ResponseBody
+    @ApiOperation(value = "轮询下载结果")
+    public RestResponse fileDownloadPolling(@PathVariable String id){
+        VoiceFileRecord v1 = voiceFileRecordService.findById(id);
+        if(v1 != null) {
+            if (v1.getStatus() != null) {
+                if (v1.getStatus() == 1) {
+                    String ossUri = getOssTempUri(v1.getOssUrl());
                     return RestResponse.success(ossUri);
-                }
-                List<VoiceFileRecord> list = voiceFileRecordService.getListBySessionId(voiceFileRecord.getSessionId());
-                if(list==null||list.size()==0){
-                    return RestResponse.failed("0000","无对应的录音文件");
-                }
-                //先判断是否文件已上传，如果是的话，直接生成临时下载链接，否则
-                boolean flag = false;
-                for(int i=0;i<list.size();i++){
-                    VoiceFileRecord temp = list.get(i);
-                    if(voiceFileRecord.getStatus()==null||1!=temp.getStatus()){
-                        flag=true;
-                        break;
-                    }
-                }
-                //发起文件上传
-                if(flag) {
-                    mqService.publish(new VoiceFileRecordSyncEvent(tenant.getId(), voiceFileRecord.getAppId(), voiceFileRecord.getId(), VoiceFileRecordSyncEvent.TYPE_FILE));
-                    for (int j = 1; j <= 30; j++) {
-                        Thread.sleep(j * 1000);
-                        VoiceFileRecord v1 = voiceFileRecordService.findById(id);
-                        if(v1.getStatus()!=null){
-                            if(v1.getStatus()==1) {
-                                String ossUri = getOssTempUri(v1.getOssUrl());
-                                return RestResponse.success(ossUri);
-                            }else if(v1.getStatus()==-1){
-                                return RestResponse.failed("0000","下载失败，请稍后重试");
-                            }
-                        }
-                    }
-                    return RestResponse.failed("0000","下载超时失败");
-                }else {
-                    String ossUri = getOssTempUri(list.get(0).getOssUrl());
-                    return RestResponse.success(ossUri);
+                } else if (v1.getStatus() == -1) {
+                    return RestResponse.failed("0001", "下载失败，请稍后重试");
                 }
             }
-        };
-        return new WebAsyncTask(callable);
+            return RestResponse.failed("0002","查询中，请稍后重试");
+        }else{
+            return RestResponse.failed("0001", "下载失败，对象不存在");
+        }
     }
+
     @RequestMapping(value = "/{uid}/cdr/download/{id}" ,method = RequestMethod.GET)
     @ResponseBody
     @ApiOperation(value = "会话详单之CDR文件（非录音文件）下载")
-    public WebAsyncTask cdrDownload(@ApiParam(name = "uid",value = "用户id")@PathVariable String uid, @ApiParam(name = "id",value = "记录id") @PathVariable String id){
-        Callable<RestResponse> callable = new Callable<RestResponse>() {
-            public RestResponse call() throws Exception {
-                Tenant tenant = tenantService.findById(uid);
-                VoiceCdr voiceCdr = voiceCdrService.findById(id);
-                if(tenant==null||voiceCdr==null||!tenant.getId().equals(voiceCdr.getTenantId())){
-                    return RestResponse.failed("0000","验证失败，无法下载");
-                }
-                List<VoiceFileRecord> list = getFile(id);
-                if(list==null||list.size()==0){
-                    //TODO 更新CDR
-                    voiceCdr.setRecording(0);
-                    voiceCdrService.save(voiceCdr);
-                    return RestResponse.failed("0401","无对应的录音文件");
-                }
-                //先判断是否文件已上传，如果是的话，直接生成临时下载链接，否则
-                boolean flag = false;
-                for(int i=0;i<list.size();i++){
-                    VoiceFileRecord voiceFileRecord = list.get(i);
-                    if(voiceFileRecord.getStatus()!=null&&1!=voiceFileRecord.getStatus()){
-                        flag=true;
-                        break;
-                    }
-                }
-                //发起文件上传
-                if(flag) {
-                    VoiceFileRecord temp = voiceFileRecordService.findById(list.get(0).getId());
-                    temp.setStatus(0);
-                    voiceFileRecordService.save(temp);
-                    mqService.publish(new VoiceFileRecordSyncEvent(tenant.getId(), voiceCdr.getAppId(), voiceCdr.getId(), VoiceFileRecordSyncEvent.TYPE_CDR));
-                    for (int j = 1; j <= 30; j++) {
-                        Thread.sleep(j * 1000);
-                        VoiceFileRecord v1 = voiceFileRecordService.findById(list.get(0).getId());
-                        if(v1.getStatus()!=null){
-                            if(v1.getStatus()==1) {
-                                String ossUri = getOssTempUri(v1.getOssUrl());
-                                return RestResponse.success(ossUri);
-                            }else if(v1.getStatus()==-1){
-                                return RestResponse.failed("0000","下载失败，请稍后重试");
-                            }
-                        }
-                    }
-                    return RestResponse.failed("0000","下载超时失败");
-                }else {
-                    String ossUri = getOssTempUri(list.get(0).getOssUrl());
-                    return RestResponse.success(ossUri);
-                }
-            }
-        };
-        return new WebAsyncTask(callable);
-    }
-    private List<VoiceFileRecord> getFile(String id){
-        //根据cdr获取业务类型，和业务id，根据业务id和业务类型获取录音文件列表，
+    public RestResponse cdrDownload(@ApiParam(name = "uid",value = "用户id")@PathVariable String uid, @ApiParam(name = "id",value = "记录id") @PathVariable String id){
+        Tenant tenant = tenantService.findById(uid);
         VoiceCdr voiceCdr = voiceCdrService.findById(id);
+        if(tenant==null||voiceCdr==null||!tenant.getId().equals(voiceCdr.getTenantId())){
+            return RestResponse.failed("0000","验证失败，无法下载");
+        }
+        List<VoiceFileRecord> list = getFile(voiceCdr);
+        if(list==null||list.size()==0){
+            //TODO 更新CDR
+            voiceCdr.setRecording(0);
+            voiceCdrService.save(voiceCdr);
+            return RestResponse.failed("0401","无对应的录音文件");
+        }
+        //先判断是否文件已上传，如果是的话，直接生成临时下载链接，否则
+        boolean flag = false;
+        for(int i=0;i<list.size();i++){
+            VoiceFileRecord voiceFileRecord = list.get(i);
+            if(voiceFileRecord.getStatus()==null || 1!=voiceFileRecord.getStatus()){
+                flag=true;
+                break;
+            }
+        }
+        //发起文件上传
+        if(flag) {
+            VoiceFileRecord temp = voiceFileRecordService.findById(list.get(0).getId());
+            temp.setStatus(0);
+            voiceFileRecordService.save(temp);
+            mqService.publish(new VoiceFileRecordSyncEvent(tenant.getId(), voiceCdr.getAppId(), voiceCdr.getId(), VoiceFileRecordSyncEvent.TYPE_CDR));
+            return RestResponse.failed("0004", list.get(0).getId());
+        }else {
+            String ossUri = getOssTempUri(list.get(0).getOssUrl());
+            return RestResponse.success(ossUri);
+        }
+    }
+    private List<VoiceFileRecord> getFile(VoiceCdr voiceCdr){
+        //根据cdr获取业务类型，和业务id，根据业务id和业务类型获取录音文件列表，
         List list = null;
         if(voiceCdr!=null&& StringUtils.isNotEmpty(voiceCdr.getId())) {
-            ProductCode p1 = ProductCode.valueOf(voiceCdr.getType());
+            ProductCode p1 = null;
+            if("call_center_sip".equals(voiceCdr.getType())){
+                p1 = ProductCode.call_center;
+            }else {
+                p1 = ProductCode.valueOf(voiceCdr.getType());
+            }
             switch(p1){
                 case sys_conf:{
                     //获取会议操作者
@@ -271,9 +273,10 @@ public class BillDetailController extends AbstractRestController {
                 case call_center:{
                     //根据sessionid获取呼叫中心交互成员，在获取呼叫中心交谈，在获取文件
                     List<String> temp = callCenterConversationMemberService.getListBySessionId(voiceCdr.getSessionId());
-                    if (temp!=null&&temp.size() > 0) {
-                        list = voiceFileRecordService.getListBySessionId(temp.toArray(new String[0]));
+                    if (temp!=null&&temp.size() == 0) {
+                        return null;
                     }
+                    list = voiceFileRecordService.getListBySessionId( temp.toArray(new String[0]));
                     break;
                 }
             }
