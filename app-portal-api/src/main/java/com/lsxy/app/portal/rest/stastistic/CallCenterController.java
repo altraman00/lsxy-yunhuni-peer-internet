@@ -20,7 +20,7 @@ import java.util.Map;
 @RestController
 public class CallCenterController extends AbstractRestController {
 
-    @Reference(timeout = 3000,check = false,lazy = true)
+    @Reference(timeout = 10000,check = false,lazy = true)
     CallCenterService callCenterService;
 
     @RequestMapping("/plist")
