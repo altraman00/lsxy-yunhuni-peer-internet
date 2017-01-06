@@ -87,12 +87,12 @@ public class Handler_EVENT_SYS_CALL_PLAY_ON_FAIL extends EventHandler{
         if(!iscc){//不是ivr呼叫中心
             return true;
         }
-        boolean isPlaywait = conversationService.isPlayWait(state.getId());
+        boolean isPlaywait = conversationService.isPlayWait(state);
         if(!isPlaywait){//不是ivr呼叫中心排队放音
             return true;
         }
         //等待音播放完成需要移除等待音标记
-        businessStateService.deleteInnerField(state.getId(), CallCenterUtil.IS_PLAYWAIT_FIELD);
+        businessStateService.deleteInnerField(state.getId(), CallCenterUtil.PLAYWAIT_FIELD);
         return false;
     }
     private void ivr(BusinessState state,Map<String,Object> params,String call_id){
