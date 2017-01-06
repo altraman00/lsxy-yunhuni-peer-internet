@@ -820,7 +820,11 @@ public class ConversationService {
      */
     public void stopPlayWait(String area_id,String call_id,String res_id){
         try {
-            if(this.isPlayWait(call_id)){
+            boolean isPlayWait = this.isPlayWait(call_id);
+            if(logger.isDebugEnabled()){
+                logger.info("停止播放排队录音isPlayWait={}",call_id);
+            }
+            if(isPlayWait){
                 Map<String, Object> params = new MapBuilder<String,Object>()
                         .putIfNotEmpty("res_id",res_id)
                         .putIfNotEmpty("user_data",call_id)
