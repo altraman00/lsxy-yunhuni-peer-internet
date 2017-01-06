@@ -1230,27 +1230,4 @@ public class StringUtil extends StringUtils{
 		}
 		return "";
 	}
-	public static String getDecimal(String o,int num){
-		String[] temp = o.split("\\.");
-		String result = temp[0];
-		if(temp.length>1){
-			String re2 = temp[1];
-			if(re2.length()>num){
-				re2 = re2.substring(0,3);
-			}else if(re2.length()<num){
-				int tleng = num-re2.length();
-				for(int i=0;i<tleng;i++){
-					re2+="0";
-				}
-			}
-			result+="."+re2;
-		}else if(temp.length==1){
-			result+=".";
-			for(int i=0;i<num;i++){
-				result+="0";
-			}
-		}
-		return result;
-	}
-
 }
