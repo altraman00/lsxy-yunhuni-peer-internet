@@ -309,7 +309,7 @@
         var app = $('#defaultapp').val();
         var starttime = initialStartTime("#calldate"+type);
 
-        var param ={'type':type,'appId':app,'startTime':starttime, csrfParameterName:csrfToken};
+        var param ={'type':type,'appId':app,'startTime':starttime,'callType':'call_center', csrfParameterName:csrfToken};
         ajaxsync(ctx+"/console/statistics/session/list/session",param,function(result){
             var resultData = result.data;
             callcharts(resultData[0],type);

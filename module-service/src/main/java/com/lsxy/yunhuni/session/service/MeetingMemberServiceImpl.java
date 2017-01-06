@@ -22,4 +22,8 @@ public class MeetingMemberServiceImpl extends AbstractService<MeetingMember> imp
         return meetingMemberDao;
     }
 
+    @Override
+    public MeetingMember findBySessionId(String sessionId) {
+        return meetingMemberDao.findFirstBySessionId(sessionId);
+    }
 }

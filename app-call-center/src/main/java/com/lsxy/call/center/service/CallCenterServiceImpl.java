@@ -113,7 +113,7 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             sql += " AND  type='"+type+"' ";
         }
         if(StringUtil.isNotEmpty(callnum)){
-            sql += " AND ( obj.from_num='"+callnum+"' OR obj.to_num='"+callnum+"'  ) ";
+            sql += " AND ( from_num='"+callnum+"' OR to_num='"+callnum+"'  ) ";
         }
         if(StringUtil.isNotEmpty(agent)){
             sql += " AND  agent = '"+agent+"'";

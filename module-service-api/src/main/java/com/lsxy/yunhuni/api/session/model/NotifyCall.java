@@ -16,6 +16,8 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_notify_call")
 public class NotifyCall extends IdEntity {
+    private String tenantId;//所属租户
+    private String  appId;//所属应用
     private Date startTime;//发起时间
     private Date answerTime;//接听时间
     private Date endTime;//结束时间
@@ -30,6 +32,23 @@ public class NotifyCall extends IdEntity {
     public NotifyCall(String fromNum, String toNum) {
         this.fromNum = fromNum;
         this.toNum = toNum;
+    }
+
+    @Column( name = "tenant_id")
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+    @Column( name = "app_id")
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 
     @Column( name = "start_time")

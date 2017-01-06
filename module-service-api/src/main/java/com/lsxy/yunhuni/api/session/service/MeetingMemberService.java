@@ -8,4 +8,6 @@ import com.lsxy.yunhuni.api.session.model.MeetingMember;
  * Created by zhangxb on 2016/7/19.
  */
 public interface MeetingMemberService extends BaseService<MeetingMember> {
+
+    MeetingMember findBySessionId(String sessionId);
 }

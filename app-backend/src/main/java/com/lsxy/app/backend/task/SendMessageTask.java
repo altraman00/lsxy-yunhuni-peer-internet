@@ -76,7 +76,7 @@ public class SendMessageTask {
                         );
                         List<Message> message = messageService.bacthUpdateStatus(startTime, endTime);
                         List<Account> list = accountService.findByStatus(Account.STATUS_NORMAL);
-                        logger.info("-----------------消息体:{}，用户对象:{}-------------------------", message,list);
+//                        logger.info("-----------------消息体:{}，用户对象:{}-------------------------", message,list);
                         for (int i = 0; i < message.size(); i++) {
                             accountMessageService.insertMultiple(list, message.get(i));
                         }

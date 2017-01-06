@@ -29,8 +29,8 @@ public class CallSession extends IdEntity {
     public static final String TYPE_CALL_CENTER = ProductCode.call_center.name();
     public static final String[] CALL_CENTER_PRODUCT_CODE = {"call_center"};//呼叫中心产品计费项目
     private Integer status;         //状态
-    private App app;            //所属APP
-    private Tenant tenant;      //所属tenant
+    private String appId;            //所属APP
+    private String tenantId;      //所属tenant
     private String relevanceId;//关联标识
     private String type; //查看产品表code字段或枚举类ProductCode
     private String resId; //资源ID
@@ -40,21 +40,21 @@ public class CallSession extends IdEntity {
     public CallSession() {
     }
 
-    public CallSession(Integer status, App app, Tenant tenant, String relevanceId, String type, String fromNum, String toNum) {
+    public CallSession(Integer status, String appId, String tenantId, String relevanceId, String type, String fromNum, String toNum) {
         this.status = status;
-        this.app = app;
-        this.tenant = tenant;
+        this.appId = appId;
+        this.tenantId = tenantId;
         this.relevanceId = relevanceId;
         this.type = type;
         this.fromNum = fromNum;
         this.toNum = toNum;
     }
 
-    public CallSession(String id,Integer status, App app, Tenant tenant, String relevanceId, String type, String fromNum, String toNum) {
+    public CallSession(String id,Integer status, String appId, String tenantId, String relevanceId, String type, String fromNum, String toNum) {
         this.id = id;
         this.status = status;
-        this.app = app;
-        this.tenant = tenant;
+        this.appId = appId;
+        this.tenantId = tenantId;
         this.relevanceId = relevanceId;
         this.type = type;
         this.fromNum = fromNum;
@@ -97,24 +97,22 @@ public class CallSession extends IdEntity {
         this.status = status;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "app_id")
-    public App getApp() {
-        return app;
+    @Column(name = "app_id")
+    public String getAppId() {
+        return appId;
     }
 
-    public void setApp(App app) {
-        this.app = app;
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "tenant_id")
-    public Tenant getTenant() {
-        return tenant;
+    @Column(name = "tenant_id")
+    public String getTenantId() {
+        return tenantId;
     }
 
-    public void setTenant(Tenant tenant) {
-        this.tenant = tenant;
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 
     @Column(name = "from_num")

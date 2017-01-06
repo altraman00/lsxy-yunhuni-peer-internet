@@ -16,12 +16,32 @@ import java.util.Date;
 public class MeetingMember extends IdEntity {
     public static final int JOINTYPE_INVITE = 1;
     public static final int JOINTYPE_CALL = 2;
+
+    private String tenantId;//所属租户
+    private String  appId;//所属应用
     private String number;//参与者号码
     private Date joinTime;//加入时间
     private Integer joinType;//加入类型1.邀请加入2.呼入加入
-    private Meeting meeting;//所属会议
-    private CallSession session;//关联会话
+    private String meetingId;//所属会议
+    private String sessionId;//关联会话
     private String resId;
+
+    @Column( name = "tenant_id")
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+    @Column( name = "app_id")
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
 
     @Column( name = "number" )
     public String getNumber() {
@@ -47,23 +67,23 @@ public class MeetingMember extends IdEntity {
     public void setJoinType(Integer joinType) {
         this.joinType = joinType;
     }
-    @ManyToOne
-    @JoinColumn( name = "meeting_id" )
-    public Meeting getMeeting() {
-        return meeting;
+
+    @Column( name = "meeting_id" )
+    public String getMeetingId() {
+        return meetingId;
     }
 
-    public void setMeeting(Meeting meeting) {
-        this.meeting = meeting;
-    }
-    @OneToOne
-    @JoinColumn( name = "session_id" )
-    public CallSession getSession() {
-        return session;
+    public void setMeetingId(String meetingId) {
+        this.meetingId = meetingId;
     }
 
-    public void setSession(CallSession session) {
-        this.session = session;
+    @Column( name = "session_id" )
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 
 
