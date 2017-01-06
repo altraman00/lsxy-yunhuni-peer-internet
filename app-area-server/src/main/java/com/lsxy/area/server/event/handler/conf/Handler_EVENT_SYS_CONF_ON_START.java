@@ -104,19 +104,19 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
             logger.info("confi_id={},state={}",conf_id,state);
         }
         if(BusinessState.TYPE_CC_CONVERSATION.equals(state.getType())){
-            conversation(state,conf_id);
+            conversation(state,res_id,conf_id);
         }else{
             conf(state,conf_id,res_id);
         }
         return res;
     }
 
-    public void conversation(BusinessState state,String conversationId){
+    public void conversation(BusinessState state,String res_id,String conversationId){
         if(conversationService.isPlayWait(state)){
             if(state.getBusinessData().get(CallCenterUtil.CONVERSATION_STARTED_FIELD) == null) {
                 //会议尚未正式开始播放排队音
                 Map<String, Object> _params = new MapBuilder<String,Object>()
-                        .putIfNotEmpty("res_id",state.getResId())
+                        .putIfNotEmpty("res_id",res_id)
                         .putIfNotEmpty("file", state.getBusinessData().get(CallCenterUtil.PLAYWAIT_FIELD))
                         .putIfNotEmpty("user_data",state.getId())
                         .putIfNotEmpty("is_loop",true)
