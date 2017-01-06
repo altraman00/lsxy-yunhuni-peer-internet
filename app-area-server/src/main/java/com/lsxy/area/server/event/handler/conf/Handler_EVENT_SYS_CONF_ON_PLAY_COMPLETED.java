@@ -80,7 +80,7 @@ public class Handler_EVENT_SYS_CONF_ON_PLAY_COMPLETED extends EventHandler {
     }
 
     private void conversation(BusinessState state, Map<String, Object> params, String conversation_id) {
-        boolean isPlaywait = conversationService.isPlayWait(state);
+        boolean isPlaywait = conversationService.isPlayWait(state.getId());
         if(isPlaywait){
             //等待音播放完成需要移除等待音标记
             businessStateService.deleteInnerField(state.getId(), CallCenterUtil.PLAYWAIT_FIELD);
