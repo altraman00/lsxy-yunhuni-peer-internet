@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -144,18 +145,20 @@ public class ConsumeStatisticsController extends AbstractPortalController {
      * @param list 待处理的list
      * @return
      */
-    private String[] getArrays(List list,Object date) {
+    private BigDecimal[] getArrays(List list,Object date) {
         int leng = getLong(date);
-        String[] list1 = new String[leng];
+        BigDecimal[] list1 = new BigDecimal[leng];
         for(int j=0;j<leng;j++){
-            list1[j]="0";
+            list1[j] = BigDecimal.ZERO;
         }
         for(int i=0;i<list.size();i++){
             Object obj = list.get(i);
             if(obj instanceof ConsumeMonth){
-                list1[((ConsumeMonth)obj).getMonth()-1]=StringUtil.getDecimal(((ConsumeMonth)obj).getAmongAmount().toString(),3);
+                int index = ((ConsumeMonth)obj).getMonth()-1;
+                list1[index] = list1[index].add(((ConsumeMonth)obj).getAmongAmount()).setScale(3,BigDecimal.ROUND_HALF_UP);
             }else if(obj instanceof ConsumeDay){
-                list1[((ConsumeDay)obj).getDay()-1]=StringUtil.getDecimal(((ConsumeDay)obj).getAmongAmount().toString(),3);
+                int index = ((ConsumeDay)obj).getDay()-1;
+                list1[index] = list1[index].add(((ConsumeDay)obj).getAmongAmount()).setScale(3,BigDecimal.ROUND_HALF_UP);
             }
         }
         return list1;

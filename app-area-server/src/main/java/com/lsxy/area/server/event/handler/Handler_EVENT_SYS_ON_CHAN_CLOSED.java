@@ -13,12 +13,13 @@ import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mq.api.MQService;
-import com.lsxy.framework.mq.events.callcenter.CallCenterIncrCostEvent;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
+import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
@@ -30,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -47,8 +47,6 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
     @Autowired
     private BusinessStateService businessStateService;
     @Autowired
-    CalCostService calCostService;
-    @Autowired
     VoiceCdrService voiceCdrService;
     @Autowired
     CalBillingService calBillingService;
@@ -58,7 +56,10 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
     private CallCenterService callCenterService;
     @Autowired
     private ResourceTelenumService resourceTelenumService;
-
+    @Autowired
+    private LineGatewayService lineGatewayService;
+    @Autowired
+    CalCostService calCostService;
     @Autowired
     private MQService mqService;
 
@@ -158,8 +159,9 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
 
         voiceCdr.setType(productCode.name());
         voiceCdr.setRelevanceId(businessState.getId());
+        String host;
         if(cdrSplit[11].trim().equals("0")){
-            //TODO 相对平台是呼入 处理to
+            //相对平台是呼入 处理to
             voiceCdr.setFromNum(cdrSplit[7].trim());
             String toNum = cdrSplit[8].trim().split("@")[0];
             ResourceTelenum num = resourceTelenumService.findByTelNumberOrCallUri(toNum);
@@ -168,8 +170,15 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             }else{
                 voiceCdr.setToNum(toNum);
             }
+            //TODO host根据from来获取
+            String[] fromSplit = cdrSplit[7].trim().split("@");
+            if(fromSplit.length > 1){
+                host = fromSplit[1];
+            }else{
+                host = cdrSplit[10].trim().split("@")[1];
+            }
         }else{
-            //TODO 相对平台是呼出 处理from
+            //相对平台是呼出 处理from
             String fromNum = cdrSplit[7].trim().split("@")[0];
             ResourceTelenum num = resourceTelenumService.findByTelNumberOrCallUri(fromNum);
             if(num != null){
@@ -178,14 +187,40 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
                 voiceCdr.setFromNum(fromNum);
             }
             voiceCdr.setToNum(cdrSplit[8].trim());
+            //host根据to来获取
+            host = cdrSplit[8].trim().split("@")[1];
         }
-
         Date callStartDate = getCallDate(cdrSplit[18].trim());
         voiceCdr.setCallStartDt(callStartDate == null?new Date():callStartDate);
         voiceCdr.setCallAckDt(getCallDate(cdrSplit[19].trim()));
         Date callEndDate = getCallDate(cdrSplit[20].trim());
         voiceCdr.setCallEndDt(callEndDate == null?new Date():callEndDate);
         voiceCdr.setCallTimeLong(Long.parseLong(cdrSplit[21].trim()));
+
+        LineGateway lineGateway = lineGatewayService.findByHost(host);
+        if(lineGateway == null){
+            voiceCdr.setLineId(null);
+            voiceCdr.setLineCost(BigDecimal.ZERO);
+        }else if("0".equals(lineGateway.getId())){
+            //如果线路ID是"0",则说明是opensips呼叫
+            voiceCdr.setLineId("0");
+            voiceCdr.setLineCost(BigDecimal.ZERO);
+            if(ProductCode.call_center.name().equals(voiceCdr.getType())){
+                //如果是opensips呼叫，且是呼叫中心类型，则将呼叫类型设为:呼叫中心-电话线路(用于计费)
+                voiceCdr.setType(ProductCode.call_center_sip.name());
+            }
+        }else{
+            //计算线路成本价
+            voiceCdr.setLineId(lineGateway.getId());
+            if(voiceCdr.getCallAckDt() != null){
+                Integer unit = lineGateway.getLinePriceUnit() == null ? 60:lineGateway.getLinePriceUnit();
+                BigDecimal price =  lineGateway.getLinePrice() == null ? BigDecimal.ZERO : lineGateway.getLinePrice();
+                BigDecimal lineCost = calCostService.calCost(voiceCdr.getCallTimeLong(), unit, price , 1.0);
+                voiceCdr.setLineCost(lineCost);
+            }else{
+                voiceCdr.setLineCost(BigDecimal.ZERO);
+            }
+        }
 
         //sessionId和一些与具体业务相关的信息根据不同的产品业务进行设置
         Map<String, String> data = businessState.getBusinessData();
