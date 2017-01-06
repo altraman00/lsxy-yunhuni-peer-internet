@@ -90,7 +90,7 @@ public class EnqueueHandler extends ActionHandler{
                     if(!businessStateService.closed(callId)){
                         rpcCaller.invoke(sessionContext, rpcrequest);
                     }
-                    businessStateService.updateInnerField(callId, CallCenterUtil.IS_PLAYWAIT_FIELD,CallCenterUtil.IS_PLAYWAIT_TRUE);
+                    businessStateService.updateInnerField(callId, CallCenterUtil.PLAYWAIT_FIELD,playWait);
                 } catch (Throwable e) {
                     logger.error("调用失败",e);
                 }
