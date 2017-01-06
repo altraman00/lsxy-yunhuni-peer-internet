@@ -1,5 +1,6 @@
 package com.lsxy.app.oc.rest.account;
 
+import com.lsxy.app.oc.base.AbstractRestController;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
@@ -26,7 +27,7 @@ import java.util.List;
 @Api(value = "账号管理", description = "" )
 @RequestMapping("/acount")
 @RestController
-public class AccountController {
+public class AccountController extends AbstractRestController {
     public static final String ACCOUNT_MACTIVE_PREFIX = "account_mactive_";
     @Autowired
     private MQService mqService;

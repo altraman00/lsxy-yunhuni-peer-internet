@@ -78,7 +78,7 @@
                                             </div>
                                             <span class="span-required">*</span>
                                         </div>
-                                        <p class="tips">20字符内，符合<a href="${globalWebsite}/develop/book/platform" target="_blank">应用审核规范要求</a></p>
+                                        <p class="tips">20字符内，符合<a href="${globalWebsite}/develop/book/platform?page=application" target="_blank">应用审核规范要求</a></p>
 
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用描述：</lable>

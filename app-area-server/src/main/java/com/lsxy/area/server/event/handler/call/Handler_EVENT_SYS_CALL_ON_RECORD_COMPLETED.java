@@ -87,6 +87,10 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
                 if(conversationService.isCC(state)){
                     type = BusinessState.TYPE_CC_INCOMING;
                 }
+            }else if(BusinessState.TYPE_IVR_CALL.equals(type)){
+                if(conversationService.isCC(state)){
+                    type = BusinessState.TYPE_CC_OUT_CALL;
+                }
             }
             mqService.publish(new RecordCompletedEvent(record_id,state.getTenantId(),state.getAppId(),state.getAreaId(),state.getId(),
                     ProductCode.changeApiCmdToProductCode(type).name(),(String)params.get("record_file"),
@@ -97,13 +101,13 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
             logger.error("发布RecordCompletedEvent失败",t);
         }
 
-        if(canDoivr(state,call_id)){
+        if(canDoivr(state)){
             ivr(record_id,state,params,call_id);
         }
         return res;
     }
 
-    private boolean canDoivr(BusinessState state,String call_id){
+    private boolean canDoivr(BusinessState state){
         if(BusinessState.TYPE_IVR_CALL.equals(state.getType())){//是ivr呼出
             return true;
         }

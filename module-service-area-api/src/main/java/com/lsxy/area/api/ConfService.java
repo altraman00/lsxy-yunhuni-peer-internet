@@ -97,7 +97,7 @@ public interface ConfService {
     public boolean confEnter(String call_id,String conf_id, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException;
 
 
-    public boolean outOfParts(String confId);
+    public boolean outOfParts(String confId,Integer maxParts);
 
     /**
      * 增加会议成员

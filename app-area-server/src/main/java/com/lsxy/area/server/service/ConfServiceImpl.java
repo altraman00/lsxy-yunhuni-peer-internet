@@ -10,7 +10,9 @@ import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
+import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -121,9 +123,6 @@ public class ConfServiceImpl implements ConfService {
         if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }
-        if(maxParts!=null && maxParts>MAX_PARTS){
-            maxParts = MAX_PARTS;
-        }
         //TODO
         String areaId = areaAndTelNumSelector.getAreaId(app);
 
@@ -160,7 +159,7 @@ public class ConfServiceImpl implements ConfService {
                                 .setLineGatewayId(null)
                                 .setBusinessData(new MapBuilder<String,String>()
                                         .putIfNotEmpty("max_seconds",maxDuration == null?null:maxDuration.toString())//会议最大持续时长
-                                        .put("max_parts",maxParts == null?null:maxParts.toString(),""+MAX_PARTS)//最大与会数
+                                        .putIfNotEmpty("max_parts",maxParts!=null && maxParts<=MAX_PARTS? maxParts.toString():""+MAX_PARTS)//最大与会数
                                         .putIfNotEmpty("auto_hangup",autoHangup==null?null:autoHangup.toString())//会议结束是否自动挂断
                                         .putIfNotEmpty("recording",recording==null?null:recording.toString())//是否自动启动录音
                                         .build())
@@ -268,8 +267,11 @@ public class ConfServiceImpl implements ConfService {
             //不能跨app操作
             throw new ConfNotExistsException();
         }
-
-        if(this.outOfParts(confId)){
+        Integer maxParts = null;
+        if(StringUtil.isNotEmpty(state.getBusinessData().get("max_parts"))){
+            maxParts = Integer.parseInt(state.getBusinessData().get("max_parts"));
+        }
+        if(this.outOfParts(confId,maxParts)){
             throw new OutOfConfMaxPartsException();
         }
 
@@ -357,7 +359,28 @@ public class ConfServiceImpl implements ConfService {
             throw new BalanceNotEnoughException();
         }
 
-        if(this.outOfParts(confId)){
+        BusinessState state = businessStateService.get(confId);
+        if(state == null){
+            throw new ConfNotExistsException();
+        }
+
+        if(state.getResId() == null){
+            throw new SystemBusyException();
+        }
+
+        if(state.getClosed()!= null && state.getClosed()){
+            throw new SystemBusyException();
+        }
+
+        if(!appId.equals(state.getAppId())){
+            //不能跨app操作
+            throw new ConfNotExistsException();
+        }
+        Integer maxParts = null;
+        if(StringUtil.isNotEmpty(state.getBusinessData().get("max_parts"))){
+            maxParts = Integer.parseInt(state.getBusinessData().get("max_parts"));
+        }
+        if(this.outOfParts(confId,maxParts)){
             throw new OutOfConfMaxPartsException();
         }
 
@@ -453,12 +476,12 @@ public class ConfServiceImpl implements ConfService {
         }
 
         playFiles = playFileUtil.convertArray(app.getTenant().getId(),appId,playFiles);
-        String areaId = areaAndTelNumSelector.getAreaId(app);
-        Map<String,Object> params = new MapBuilder<String,Object>()
+
+        Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
-                .putIfNotEmpty("file",StringUtils.join(playFiles,"|"))
+                .putIfNotEmpty("content", JSONUtil2.objectToJson(new Object[][]{new Object[]{StringUtils.join(playFiles,"|"),7,""}}))
                 .putIfNotEmpty("user_data",confId)
-                .putIfNotEmpty("areaId",areaId)
+                .put("areaId",conf_state.getAreaId())
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, params);
@@ -755,8 +778,11 @@ public class ConfServiceImpl implements ConfService {
      * @return
      */
     @Override
-    public boolean outOfParts(String confId){
+    public boolean outOfParts(String confId,Integer maxParts){
         String key = key(confId);
+        if(maxParts!=null && maxParts > 0 && maxParts <= MAX_PARTS){
+            return redisCacheService.ssize(key) >= maxParts;
+        }
         return redisCacheService.ssize(key) >= MAX_PARTS;
     }
 

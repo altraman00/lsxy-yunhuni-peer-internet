@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
- * Created by Administrator on 2016/8/9.
+ * Created by liuws on 2016/8/9.
  */
 @ConditionalOnProperty(value = "global.swagger.import", havingValue = "true")
 @Configuration

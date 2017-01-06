@@ -14,7 +14,8 @@ public enum ConsumeCode {
     recording_memory("录音文件存储费"),
     rent_number("号码租用"),
     rent_number_month("号码月租费"),
-    call_center("呼叫中心"),
+    call_center("呼叫中心-IP线路"),
+    call_center_sip("呼叫中心-电话线路"),
     call_center_month("呼叫中心-坐席月租费"),
     flat_balance("平账");
 

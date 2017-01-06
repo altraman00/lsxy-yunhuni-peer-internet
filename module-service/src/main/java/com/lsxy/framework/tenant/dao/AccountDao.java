@@ -73,7 +73,7 @@ public interface AccountDao extends BaseDaoInterface<Account, Serializable> {
      * 清除过期的注册账号
      * @param expireTime 在这个时间以前的，未被激活的账号会被设为过期
      */
-    @Modifying(clearAutomatically = true)
+    @Modifying
     @Query("update Account a set a.status=:expireStatus where a.status=:notActivityStatus and a.createTime < :expireTime")
     void cleanExpireRegisterAccount(@Param("expireStatus")int expireStatus,@Param("notActivityStatus")int notActivityStatus, @Param("expireTime") Date expireTime);
 

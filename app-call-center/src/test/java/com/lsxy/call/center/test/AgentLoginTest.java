@@ -1,7 +1,7 @@
 package com.lsxy.call.center.test;
 
 import com.lsxy.call.center.CallCenterMainClass;
-import com.lsxy.framework.cache.utils.Lua;
+import com.lsxy.call.center.utils.Lua;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.Constants;
 import org.junit.Test;

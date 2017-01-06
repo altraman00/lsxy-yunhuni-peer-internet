@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Administrator on 2016/8/10.
+ * Created by liuws on 2016/8/10.
  */
 public class MemberTopVO implements Serializable{
 
