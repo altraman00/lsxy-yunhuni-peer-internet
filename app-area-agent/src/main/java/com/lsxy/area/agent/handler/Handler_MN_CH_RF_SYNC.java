@@ -79,7 +79,9 @@ public class Handler_MN_CH_RF_SYNC extends RpcRequestHandler{
                 String ymd = DateUtils.formatDate(new Date(), "yyyyMMdd");
                 String ossUri = "tenant_res/" + map.get("tenantId") + "/record_voice/" + map.get("appId") + "/" + ymd + "/" + fileName;
                 String tempUri = "/tmp/" + fileName;
-                logger.info("打包文件地址:["+tempUri+"]");
+                if(logger.isDebugEnabled()) {
+                    logger.debug("打包文件地址:[" + tempUri + "]");
+                }
                 //进行压缩
                 ZipUtil.zip(list, tempUri);
                 //上传文件

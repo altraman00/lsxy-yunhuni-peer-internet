@@ -119,7 +119,9 @@ public class VoiceFileRecordDeletedTask {
                     }
                     try {
                         voiceFileRecordService.delete(temp);
-                        logger.info("删除录音文件记录：{1}成功",temp.getId());
+                        if(logger.isDebugEnabled()) {
+                            logger.debug("删除录音文件记录：{1}成功", temp.getId());
+                        }
                     } catch (Exception e) {
                         logger.error("删除录音文件记录：["+temp.getId()+"]失败，异常",e);
                     }
