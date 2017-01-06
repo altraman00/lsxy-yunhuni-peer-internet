@@ -132,7 +132,12 @@ public class VoiceFileRecordSyncEventHandler implements MQMessageHandler<VoiceFi
         //根据cdr获取业务类型，和业务id，根据业务id和业务类型获取录音文件列表，
         VoiceCdr voiceCdr = voiceCdrService.findById(id);
         if(voiceCdr!=null&& StringUtils.isNotEmpty(voiceCdr.getId())) {
-            ProductCode p1 = ProductCode.valueOf(voiceCdr.getType());
+            ProductCode p1;
+            if(ProductCode.call_center_sip.name().equals(voiceCdr.getType())){
+                p1 = ProductCode.call_center;
+            }else {
+                p1 = ProductCode.valueOf(voiceCdr.getType());
+            }
             switch(p1){
                 case sys_conf:{
                     //获取会议操作者
