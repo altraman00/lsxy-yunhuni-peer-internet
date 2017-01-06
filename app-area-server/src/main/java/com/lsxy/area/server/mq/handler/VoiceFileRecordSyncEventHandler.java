@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.lsxy.yunhuni.api.product.enums.ProductCode.call_center;
+
 /**
  * Created by zhangxb on 2016/11/14.
  */

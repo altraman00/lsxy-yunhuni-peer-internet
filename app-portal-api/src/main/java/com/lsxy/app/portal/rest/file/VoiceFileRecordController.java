@@ -24,13 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.async.WebAsyncTask;
 
-import javax.ws.rs.Path;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
+
+import static com.lsxy.yunhuni.api.product.enums.ProductCode.call_center;
 
 /**
  * 录音文件
