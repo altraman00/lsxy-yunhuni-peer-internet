@@ -5,6 +5,7 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
@@ -438,6 +439,11 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             }
             //新建租用关系
             ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),ResourcesRent.RENT_STATUS_UNUSED);
+            //线路自带号码有过期时间，下个月会自动扣费
+            if("1".equals(resourceTelenum.getType())){
+                Date expireDate = DateUtils.getLastTimeOfMonth(new Date());
+                resourcesRent1.setRentExpire(expireDate);
+            }
             resourcesRentService.save(resourcesRent1);
             //修改号码租用关系
             resourceTelenum.setTenantId(tenant.getId());
@@ -461,6 +467,11 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             }
             //新建租用关系
             ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),ResourcesRent.RENT_STATUS_UNUSED);
+            //线路自带号码有过期时间，下个月会自动扣费
+            if("1".equals(resourceTelenum.getType())){
+                Date expireDate = DateUtils.getLastTimeOfMonth(new Date());
+                resourcesRent1.setRentExpire(expireDate);
+            }
             resourcesRentService.save(resourcesRent1);
             //修改号码租用关系
             resourceTelenum.setTenantId(tenant.getId());
