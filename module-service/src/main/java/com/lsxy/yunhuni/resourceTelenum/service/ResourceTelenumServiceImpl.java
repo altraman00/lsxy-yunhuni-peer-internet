@@ -511,4 +511,10 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     public ResourceTelenum findByTelNumberOrCallUri(String num) {
         return resourceTelenumDao.findFirstByTelNumberOrCallUri(num,num);
     }
+
+    @Override
+    public boolean isCalledByTenantIdAndAppId(String tenantId, String appId) {
+        ResourceTelenum num = resourceTelenumDao.findFirstByTenantIdAndAppIdAndUsableAndIsCalled(tenantId,appId,ResourceTelenum.USABLE_TRUE,ResourceTelenum.ISCALLED_TRUE);
+        return num != null;
+    }
 }

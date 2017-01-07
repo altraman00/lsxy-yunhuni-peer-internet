@@ -107,4 +107,6 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * @return
      */
     ResourceTelenum findByTelNumberOrCallUri(String num);
+
+    boolean isCalledByTenantIdAndAppId(String tenantId, String appId);
 }

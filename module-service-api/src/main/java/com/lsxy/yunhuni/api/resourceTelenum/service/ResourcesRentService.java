@@ -55,7 +55,7 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @param tenant
      * @return
      */
-    List<ResourceTelenum> findOwnUnusedNum(Tenant tenant);
+    List<ResourceTelenum> findOwnUnusedNum(Tenant tenant,String lastOnlineAreaId);
 
     /**
      * 清除过期号资源和租户的关系

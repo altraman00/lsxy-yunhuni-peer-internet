@@ -81,4 +81,6 @@ public interface ResourceTelenumDao  extends BaseDaoInterface<ResourceTelenum, S
     List<ResourceTelenum> findByTelNumberIn(Collection<String> telNumbers);
 
     ResourceTelenum findFirstByTelNumberOrCallUri(String num, String num1);
+
+    ResourceTelenum findFirstByTenantIdAndAppIdAndUsableAndIsCalled(String tenantId, String appId, String usableTrue, String iscalledTrue);
 }

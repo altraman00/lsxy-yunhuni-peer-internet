@@ -121,14 +121,20 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     }
 
     @Override
-    public List<ResourceTelenum> findOwnUnusedNum(Tenant tenant) {
+    public List<ResourceTelenum> findOwnUnusedNum(Tenant tenant,String lastOnlineAreaId) {
         List<ResourceTelenum> telNums = new ArrayList<>();
         List<ResourcesRent> list = resourcesRentDao.findByTenantIdAndRentStatus(tenant.getId(),ResourcesRent.RENT_STATUS_UNUSED);
         if(list != null && list.size()>0){
             for(ResourcesRent rent:list){
                 ResourceTelenum telNumber = rent.getResourceTelenum();
                 if(telNumber != null){
-                    telNums.add(telNumber);
+                    if(StringUtils.isNotBlank(lastOnlineAreaId)){
+                        if(lastOnlineAreaId.equals(telNumber.getAreaId())){
+                            telNums.add(telNumber);
+                        }
+                    }else{
+                        telNums.add(telNumber);
+                    }
                 }
             }
         }

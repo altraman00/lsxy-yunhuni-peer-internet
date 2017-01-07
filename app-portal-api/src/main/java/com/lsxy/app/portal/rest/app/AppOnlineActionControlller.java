@@ -69,7 +69,7 @@ public class AppOnlineActionControlller extends AbstractRestController {
             String lastOnlineNums = appOnlineActionService.findLastOnlineNums(appId);
             App app = appService.findById(appId);
             //获取用户拥有的空闲号
-            List<ResourceTelenum> ownUnusedNums = resourcesRentService.findOwnUnusedNum(tenant);
+            List<ResourceTelenum> ownUnusedNums = resourcesRentService.findOwnUnusedNum(tenant,app.getOnlineAreaId());
             List<Map<String,Object>> telNums = new ArrayList<>();
             boolean hasCalled = false;
             for(ResourceTelenum telNumber:ownUnusedNums){

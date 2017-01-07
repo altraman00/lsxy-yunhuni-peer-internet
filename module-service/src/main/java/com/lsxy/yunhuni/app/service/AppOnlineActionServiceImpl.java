@@ -133,14 +133,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                 String areaId = this.bindNumToApp(app, numList, tenant);
                 //处理区域Id
                 if(StringUtils.isBlank(areaId)){
-                    //如果没有要绑定的号码，则选上一次上线的区域ID
-                    AppOnlineAction lastOnlineAction = appOnlineActionDao.findFirstByAppIdAndActionOrderByCreateTimeDesc(appId,AppOnlineAction.ACTION_ONLINE);
-                    if(lastOnlineAction != null){
-                        areaId = lastOnlineAction.getAreaId();
-                    }
-                }
-                if(StringUtils.isBlank(areaId)){
-                    //如果上一次上线的区域ID为空，则分配一个可用的区域ID
+                    //如果上一次上线的区域ID为空，这次也没有选号码，则分配一个可用的区域ID
                     areaId = areaService.getOneAvailableArea().getId();
                 }
                 Area oldArea = app.getArea();
@@ -185,7 +178,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
      * @param tenant
      */
     private String bindNumToApp(App app, List<String> nums, Tenant tenant) {
-        String areaId = null;
+        String areaId = app.getOnlineAreaId();
         boolean isCalled = false;
         for(String num : nums){
             ResourceTelenum resourceTelenum = resourceTelenumService.findByTelNumber(num);
@@ -222,7 +215,12 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                 }
             }
         }
+
         if((app.getIsIvrService() != null && app.getIsIvrService() == 1)||(app.getIsCallCenter() != null && app.getIsCallCenter() == 1)) {
+            if(!isCalled) {
+                //TODO 获取应用所绑定的号码，判断是否有可呼入的
+                isCalled =  resourceTelenumService.isCalledByTenantIdAndAppId(app.getTenant().getId(),app.getId());
+            }
             if(!isCalled) {
                 //TODO 应用原来是否已绑定了呼入号码，没有则抛异常
                 //抛异常，没有可呼出号码
