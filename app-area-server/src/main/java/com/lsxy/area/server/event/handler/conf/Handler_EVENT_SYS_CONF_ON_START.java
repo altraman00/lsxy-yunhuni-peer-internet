@@ -117,9 +117,10 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
                 //会议尚未正式开始播放排队音
                 Map<String, Object> _params = new MapBuilder<String,Object>()
                         .putIfNotEmpty("res_id",res_id)
-                        .putIfNotEmpty("file", state.getBusinessData().get(CallCenterUtil.PLAYWAIT_FIELD))
-                        .putIfNotEmpty("user_data",state.getId())
-                        .putIfNotEmpty("is_loop",true)
+                        .putIfNotEmpty("content", JSONUtil2.objectToJson(new Object[][]{new Object[]{
+                                state.getBusinessData().get(CallCenterUtil.PLAYWAIT_FIELD),0,""}}))
+                        .putIfNotEmpty("user_data",conversationId)
+                        .putIfNotEmpty("repeat",10)
                         .put("areaId",state.getAreaId())
                         .build();
                 RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, _params);
