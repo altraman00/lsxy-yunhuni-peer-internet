@@ -12,9 +12,7 @@ import com.lsxy.yunhuni.api.app.model.AppOnlineAction;
 import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.model.Area;
-import com.lsxy.yunhuni.api.config.model.AreaSip;
 import com.lsxy.yunhuni.api.config.service.AreaService;
-import com.lsxy.yunhuni.api.config.service.AreaSipService;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.exceptions.TeleNumberBeOccupiedException;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
@@ -71,8 +69,6 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
 
     @Autowired
     CalBillingService calBillingService;
-    @Autowired
-    AreaSipService areaSipService;
     @Autowired
     VoiceFilePlayService voiceFilePlayService;
 
@@ -156,8 +152,6 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                 Area area = new Area();
                 area.setId(areaId);
                 app.setArea(area);
-                AreaSip areaSip = areaSipService.getOneAreaSipByAreaId(areaId);
-                app.setAreaSip(areaSip);
                 //将上一步设为完成
                 for(AppOnlineAction a:actionList){
                     a.setStatus(AppOnlineAction.STATUS_DONE);
@@ -266,23 +260,21 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             Area area = new Area();
             area.setId(areaId);
             app.setArea(area);
-            AreaSip areaSip = areaSipService.getOneAreaSipByAreaId(areaId);
-            app.setAreaSip(areaSip);
             appService.save(app);
             //改变号码的租用关系
             //TODO 应用下线不解除号码绑定
-            List<ResourcesRent> rents = resourcesRentService.findByAppId(app.getId());
-            if(rents != null && rents.size() >0){
-                for(ResourcesRent rent:rents){
-                    rent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
-                    rent.setApp(null);
-                    resourcesRentService.save(rent);
-                    //更新号码信息，清除应用
-                    ResourceTelenum resourceTelenum = rent.getResourceTelenum();
-                    resourceTelenum.setAppId(null);
-                    resourceTelenumService.save( resourceTelenum);
-                }
-            }
+//            List<ResourcesRent> rents = resourcesRentService.findByAppId(app.getId());
+//            if(rents != null && rents.size() >0){
+//                for(ResourcesRent rent:rents){
+//                    rent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
+//                    rent.setApp(null);
+//                    resourcesRentService.save(rent);
+//                    //更新号码信息，清除应用
+//                    ResourceTelenum resourceTelenum = rent.getResourceTelenum();
+//                    resourceTelenum.setAppId(null);
+//                    resourceTelenumService.save( resourceTelenum);
+//                }
+//            }
             return app;
         }else{
             throw new RuntimeException("数据错误");

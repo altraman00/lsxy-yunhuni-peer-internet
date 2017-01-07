@@ -9,7 +9,6 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
-import com.lsxy.yunhuni.api.config.model.AreaSip;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
