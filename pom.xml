@@ -12,7 +12,7 @@
 
     <groupId>com.lsxy</groupId>
     <artifactId>yunhuni</artifactId>
-    <version>1.2.1-RC6</version>
+    <version>1.2.1-RC7</version>
     <properties>
         <spring-security-version>3.2.5.RELEASE</spring-security-version>
         <skip_maven_deploy>false</skip_maven_deploy>
@@ -119,7 +119,7 @@
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-mq</artifactId>
-                <version>1.2.1-RC6</version>
+                <version>1.2.1-RC7</version>
             </dependency>
             <dependency>
             <groupId>com.lsxy</groupId>
@@ -179,7 +179,7 @@
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-oss</artifactId>
-                <version>1.2.1-RC6</version>
+                <version>1.2.1-RC7</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -313,7 +313,7 @@
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-monitor</artifactId>
-                <version>1.2.1-RC6</version>
+                <version>1.2.1-RC7</version>
             </dependency>
 
         </dependencies>
