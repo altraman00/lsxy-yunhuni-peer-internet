@@ -1,6 +1,7 @@
 package com.lsxy.app.oc.rest.tenant;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.lsxy.app.oc.base.AbstractRestController;
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
 import com.lsxy.app.oc.rest.tenant.vo.*;
 import com.lsxy.call.center.api.model.AppExtension;
@@ -61,12 +62,12 @@ import java.util.stream.Collectors;
 
 
 /**
- * Created by Administrator on 2016/8/10.
+ * Created by liuws on 2016/8/10.
  */
 @Api(value = "租户中心", description = "租户中心相关的接口" )
 @RestController
 @RequestMapping("/tenant")
-public class TenantController {
+public class TenantController extends AbstractRestController {
     public static final Logger logger = LoggerFactory.getLogger(TenantController.class);
     @Autowired
     private TenantService tenantService;
@@ -115,7 +116,7 @@ public class TenantController {
 
     @Autowired
     private ApiCallMonthService apiCallMonthService;
-    @Reference(timeout = 3000,check = false,lazy = true)
+    @Reference(timeout = 10000,check = false,lazy = true)
     CallCenterService callCenterService;
     @Reference(timeout = 3000,check = false,lazy = true)
     AppExtensionService appExtensionService;
@@ -1180,30 +1181,40 @@ public class TenantController {
         int leng = getLong(date);
         Object[] list1 = new Object[leng];
         for(int j=0;j<leng;j++){
-            list1[j]=0;
+            list1[j]=0L;
         }
         for(int i=0;i<list.size();i++){
             Object obj = list.get(i);
             if(obj instanceof ConsumeMonth){
-                list1[((ConsumeMonth)obj).getMonth()-1]= StringUtil.getDecimal(((ConsumeMonth)obj).getAmongAmount().toString(),3);
+                int index = ((ConsumeMonth)obj).getMonth()-1;
+                BigDecimal currentValue = (list1[index] instanceof BigDecimal)?((BigDecimal)list1[index]): BigDecimal.ZERO;
+                list1[index] = currentValue.add(((ConsumeMonth)obj).getAmongAmount()).setScale(3,BigDecimal.ROUND_HALF_UP);
             }else if(obj instanceof VoiceCdrMonth){
                 if("amongCostTime".equals(type)){
-                    list1[((VoiceCdrMonth)obj).getMonth()-1]=((VoiceCdrMonth)obj).getAmongCostTime()/60;
+                    int index = ((VoiceCdrMonth)obj).getMonth()-1;
+                    list1[index] = (Long)list1[index] + (((VoiceCdrMonth)obj).getAmongCostTime()/60);
                 }else if("amongCall".equals(type)) {
-                    list1[((VoiceCdrMonth)obj).getMonth()-1]=((VoiceCdrMonth)obj).getAmongCall();
+                    int index = ((VoiceCdrMonth)obj).getMonth()-1;
+                    list1[index] = (Long)list1[index]  + ((VoiceCdrMonth)obj).getAmongCall();
                 }
             }else if(obj instanceof ConsumeDay){
-                list1[((ConsumeDay)obj).getDay()-1]=StringUtil.getDecimal(((ConsumeDay)obj).getAmongAmount().toString(),3);
+                int index = ((ConsumeDay)obj).getDay()-1;
+                BigDecimal currentValue = (list1[index] instanceof BigDecimal)?((BigDecimal)list1[index]): BigDecimal.ZERO;
+                list1[index] = currentValue.add(((ConsumeDay)obj).getAmongAmount()).setScale(3,BigDecimal.ROUND_HALF_UP);
             }else if(obj instanceof VoiceCdrDay){
                 if("amongCostTime".equals(type)){
-                    list1[((VoiceCdrDay)obj).getDay()-1]=((VoiceCdrDay)obj).getAmongCostTime()/60;
+                    int index = ((VoiceCdrDay)obj).getDay()-1;
+                    list1[index]= (Long)list1[index] + ((VoiceCdrDay)obj).getAmongCostTime()/60;
                 }else if("amongCall".equals(type)) {
-                    list1[((VoiceCdrDay)obj).getDay()-1]=((VoiceCdrDay)obj).getAmongCall();
+                    int index = ((VoiceCdrDay)obj).getDay()-1;
+                    list1[index] = (Long)list1[index] + ((VoiceCdrDay)obj).getAmongCall();
                 }
             }else if(obj instanceof ApiCallDay){
-                list1[((ApiCallDay)obj).getDay()-1]=((ApiCallDay)obj).getAmongApi();
+                int index = ((ApiCallDay)obj).getDay()-1;
+                list1[index]= (Long)list1[index] +((ApiCallDay)obj).getAmongApi();
             }else if(obj instanceof ApiCallMonth){
-                list1[((ApiCallMonth) obj).getMonth()-1]=((ApiCallMonth)obj).getAmongApi();
+                int index = ((ApiCallMonth) obj).getMonth()-1;
+                list1[index]= (Long)list1[index] + ((ApiCallMonth)obj).getAmongApi();
             }
         }
         return list1;

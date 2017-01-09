@@ -77,20 +77,20 @@ public class EnqueueHandler extends ActionHandler{
                 try {
                     playWait = playFileUtil.convert(state.getTenantId(),state.getAppId(),playWait);
                     if(logger.isDebugEnabled()){
-                        logger.debug("[][]callid={}开始播放排队等待音={}",state.getTenantId(),state.getAppId(),callId, playWait);
+                        logger.debug("[{}][{}]callid={}开始播放排队等待音={}",state.getTenantId(),state.getAppId(),callId, playWait);
                     }
                     Map<String, Object> params = new MapBuilder<String,Object>()
                             .putIfNotEmpty("res_id",state.getResId())
                             .putIfNotEmpty("content", JSONUtil2.objectToJson(new Object[][]{new Object[]{playWait,0,""}}))
                             .putIfNotEmpty("user_data",callId)
-                            .put("finish_keys","")
+                            .put("finish_keys","")//不允许按键打断
                             .put("areaId",state.getAreaId())
                             .build();
                     RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_START, params);
                     if(!businessStateService.closed(callId)){
                         rpcCaller.invoke(sessionContext, rpcrequest);
                     }
-                    businessStateService.updateInnerField(callId, CallCenterUtil.IS_PLAYWAIT_FIELD,CallCenterUtil.IS_PLAYWAIT_TRUE);
+                    businessStateService.updateInnerField(callId, CallCenterUtil.PLAYWAIT_FIELD,playWait);
                 } catch (Throwable e) {
                     logger.error("调用失败",e);
                 }

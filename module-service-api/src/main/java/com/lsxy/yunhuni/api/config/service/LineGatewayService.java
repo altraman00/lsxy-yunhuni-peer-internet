@@ -11,8 +11,6 @@ import java.util.List;
  * Created by liups on 2016/8/24.
  */
 public interface LineGatewayService extends BaseService<LineGateway> {
-    LineGateway getBestLineGatewayByNumber(String number);
-
     /**
      * 根据条件获取分页数据
      * @param operator 运营商
@@ -26,4 +24,12 @@ public interface LineGatewayService extends BaseService<LineGateway> {
     int batchModify(String[] sql);
 
     List<LineGateway> findByIds(Collection<String> ids);
+
+    /**
+     * 根据ip或域名查找线路
+     * 注：当是用opensip线路时，返回个id为0的线路
+     * @param host
+     * @return
+     */
+    LineGateway findByHost(String host);
 }

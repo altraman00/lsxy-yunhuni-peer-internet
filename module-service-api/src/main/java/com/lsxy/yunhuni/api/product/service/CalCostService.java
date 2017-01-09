@@ -20,6 +20,9 @@ public interface CalCostService {
      * @return
      */
     BigDecimal calCost(ProductItem productItem, String tenantId, Long time);
+
+    BigDecimal calCost(Long time, Integer timeUnit, BigDecimal price, Double discount);
+
     BigDecimal calCost(String code, String tenantId);
     /**
      * 消费计算金额及插入消费表，或插入扣量表
