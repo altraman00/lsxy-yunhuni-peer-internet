@@ -29,7 +29,7 @@ import java.util.Map;
 @RestController
 public class ChannelController extends AbstractAPIController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConfController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ChannelController.class);
 
     @Reference(timeout=3000,check = false,lazy = true)
     private ChannelService channelService;

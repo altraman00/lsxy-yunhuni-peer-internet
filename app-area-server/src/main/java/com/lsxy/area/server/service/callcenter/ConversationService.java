@@ -261,6 +261,11 @@ public class ConversationService {
         if(state == null || (state.getClosed() != null && state.getClosed())){
             throw new ConversationNotExistException();
         }
+
+        if(state.getResId() == null){
+            throw new SystemBusyException();
+        }
+
         if(!appId.equals(state.getAppId())){
             //不能跨app操作
             throw new ConversationNotExistException();
