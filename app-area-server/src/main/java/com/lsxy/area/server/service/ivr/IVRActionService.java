@@ -16,10 +16,7 @@ import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.api.tenant.model.Tenant;
-import com.lsxy.framework.core.utils.JSONUtil2;
-import com.lsxy.framework.core.utils.MapBuilder;
-import com.lsxy.framework.core.utils.StringUtil;
-import com.lsxy.framework.core.utils.UUIDGenerator;
+import com.lsxy.framework.core.utils.*;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
@@ -475,7 +472,7 @@ public class IVRActionService {
             String ivr_action_xml = businessDate.get(IVR_ANSWER_AFTER_XML_FIELD);
             if(StringUtil.isNotEmpty(ivr_action_xml)){
                 businessStateService.deleteInnerField(call_id,IVR_ANSWER_AFTER_XML_FIELD);
-                return handleXML(call_id,ivr_action_xml,state);
+                return handleXML(call_id,null,ivr_action_xml,state);
             }
         }
         String nextUrl = businessDate.get(IVR_NEXT_FIELD);
@@ -487,17 +484,18 @@ public class IVRActionService {
         }
         String resXML = null;
         if(nextUrl == null){//第一次
-            resXML = getFirstIvr(call_id,state.getCallBackUrl(),state.getBusinessData().get("to"));
+            nextUrl = state.getCallBackUrl();
+            resXML = getFirstIvr(call_id,nextUrl,state.getBusinessData().get("to"));
         }else{
             resXML = getNextRequest(call_id,nextUrl,businessDate.get(IVR_ACTION_FIELD),prevResults);
         }
         if(StringUtils.isBlank(resXML)){
             return false;
         }
-        return handleXML(call_id,resXML,state);
+        return handleXML(call_id,nextUrl,resXML,state);
     }
 
-    private boolean handleXML(String call_id,String resXML,BusinessState state){
+    private boolean handleXML(String call_id,String curUrl,String resXML,BusinessState state){
         ActionHandler  h = null;
         Element root = null;
         Element actionEle = null;
@@ -531,7 +529,12 @@ public class IVRActionService {
             if(logger.isDebugEnabled()){
                 logger.debug("[{}][{}]开始处理ivr动作，callId={},ivr={}",state.getTenantId(),state.getAppId(),call_id,h.getAction());
             }
-            return h.handle(call_id,state,actionEle,getNextUrl(root));
+            String nextUrl = getNextUrl(root);
+            if(StringUtil.isNotEmpty(nextUrl)){
+                //如果是相对路径需要根据相对路径返回绝对路径
+                nextUrl = UrlUtils.resolve(curUrl,getNextUrl(root));
+            }
+            return h.handle(call_id,state,actionEle,nextUrl);
         } catch(DocumentException e){
             logger.info("[{}][{}]callId={}处理ivr动作指令出错:{}",state.getTenantId(),state.getAppId(),call_id,e.getMessage());
             //发送ivr格式错误通知
