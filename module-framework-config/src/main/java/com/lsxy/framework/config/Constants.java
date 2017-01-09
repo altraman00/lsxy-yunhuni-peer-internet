@@ -3,7 +3,9 @@ package com.lsxy.framework.config;
 /**
  * @author sds 
  */
-public class Constants { 
+public class Constants {
+
+
 
 	/**
 	 * 配置文件 
