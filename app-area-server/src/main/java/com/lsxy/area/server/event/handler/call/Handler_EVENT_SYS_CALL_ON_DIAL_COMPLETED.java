@@ -153,6 +153,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                     confService.confEnter(call_id,conf_id,null,null,null);
                 } catch (Throwable e) {
                     logger.error("将呼叫加入到会议失败",e);
+                    hungup(state);
                 }
             }
         }else if(BusinessState.TYPE_IVR_CALL.equals(state.getType())){//通过ivr呼出api 发起的呼叫
