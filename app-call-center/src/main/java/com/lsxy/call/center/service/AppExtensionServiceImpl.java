@@ -119,6 +119,9 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
             //TODO 分机opensips注册
             opensipsExtensionService.createExtension(appExtension.getUser(),appExtension.getPassword());
         }
+        if(AppExtension.TYPE_TELPHONE.equals(appExtension.getType())){
+            extensionState.setEnable(appExtension.getId(),ExtensionState.Model.ENABLE_TRUE);
+        }
         return appExtension;
     }
 

@@ -15,7 +15,7 @@ import com.lsxy.call.center.states.state.ExtensionState;
 import com.lsxy.call.center.states.statics.ACs;
 import com.lsxy.call.center.states.statics.CAs;
 import com.lsxy.call.center.utils.ExpressionUtils;
-import com.lsxy.framework.cache.utils.Lua;
+import com.lsxy.call.center.utils.Lua;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
@@ -119,7 +119,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         //初始化座席状态
         if(StringUtils.isBlank(agent.getState())){
             agent.setState(CallCenterAgent.STATE_ONLINE);
-        }else if(!agent.getState().equals("busy") && !agent.getState().equals("away") && !agent.getState().equals("idle") && !agent.getState().startsWith("busy/") && !agent.getState().startsWith("away/")){
+        }else if(!agent.getState().equals("busy") && !agent.getState().equals("away") && !agent.getState().equals("idle")
+                && !agent.getState().startsWith("busy/") && !agent.getState().startsWith("away/") && !agent.getState().equals("online")){
             throw new RequestIllegalArgumentException();
         }
         //校验通道

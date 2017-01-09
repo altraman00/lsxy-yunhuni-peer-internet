@@ -12,4 +12,6 @@ import java.util.List;
  */
 public interface LineGatewayDao extends BaseDaoInterface<LineGateway, Serializable> {
     List<LineGateway> findByIdIn(Collection<String> ids);
+
+    LineGateway findFirstBySipProviderIpInOrSipProviderDomainIn(String[] hosts, String[] hosts1);
 }

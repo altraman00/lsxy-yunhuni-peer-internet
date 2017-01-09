@@ -6,7 +6,7 @@ import com.lsxy.framework.mq.topic.MQTopicConstants;
 import java.math.BigDecimal;
 
 /**
- * Created by Administrator on 2016/12/20.
+ * Created by liuws on 2016/12/20.
  */
 public class CallCenterIncrCostEvent extends AbstractMQEvent {
 

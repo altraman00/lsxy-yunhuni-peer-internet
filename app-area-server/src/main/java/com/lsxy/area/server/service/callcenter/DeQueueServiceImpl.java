@@ -98,10 +98,8 @@ public class DeQueueServiceImpl implements DeQueueService {
             //抛异常后呼叫中心微服务会回滚坐席状态
             throw new IllegalStateException("会话已关闭");
         }
+        conversationService.stopPlayWait(state);
         String conversation = UUIDGenerator.uuid();
-
-        //停止播放排队等待音
-        stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
 
         //更新排队的call的所属交谈id和排队id
         businessStateService.updateInnerField(callId,
@@ -124,6 +122,9 @@ public class DeQueueServiceImpl implements DeQueueService {
         conversationService.create(conversation,state.getBusinessData().get(BusinessState.REF_RES_ID),state.getId(),state.getTenantId(),
                 state.getAppId(),state.getAreaId(),state.getCallBackUrl(),conversationTimeout);
 
+        if(state.getBusinessData().get(CallCenterUtil.PLAYWAIT_FIELD) != null){
+            businessStateService.updateInnerField(conversation,CallCenterUtil.PLAYWAIT_FIELD,state.getBusinessData().get(CallCenterUtil.PLAYWAIT_FIELD));
+        }
         //设置坐席的businessstate
         setAgentState(agentCallId,enQueue,result);
 
@@ -179,7 +180,7 @@ public class DeQueueServiceImpl implements DeQueueService {
             logger.info("会话已关闭callid={}",callId);
             return;
         }
-        stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
+        conversationService.stopPlayWait(state);
 
         callCenterUtil.sendQueueFailEvent(state.getCallBackUrl(),
                 queueId,CallCenterUtil.QUEUE_TYPE_IVR,
@@ -188,10 +189,11 @@ public class DeQueueServiceImpl implements DeQueueService {
                 CallCenterUtil.QUEUE_FAIL_TIMEOUT,
                 callId,null,state.getUserdata());
 
-        if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
+        if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType()) ||
+                BusinessState.TYPE_IVR_CALL.equals(state.getType())){
             ivrActionService.doAction(callId,new MapBuilder<String,Object>()
                     .put("error",CallCenterUtil.QUEUE_FAIL_TIMEOUT).build());
-        };
+        }
     }
 
     @Override
@@ -221,7 +223,7 @@ public class DeQueueServiceImpl implements DeQueueService {
             logger.info("会话已关闭callid={}",callId);
             return;
         }
-        stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
+        conversationService.stopPlayWait(state);
 
         callCenterUtil.sendQueueFailEvent(state.getCallBackUrl(),
                 queueId,CallCenterUtil.QUEUE_TYPE_IVR,
@@ -230,7 +232,8 @@ public class DeQueueServiceImpl implements DeQueueService {
                 CallCenterUtil.QUEUE_FAIL_ERROR,
                 callId,null,state.getUserdata());
 
-        if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
+        if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType()) ||
+                BusinessState.TYPE_IVR_CALL.equals(state.getType())){
             ivrActionService.doAction(callId,new MapBuilder<String,Object>()
                     .put("error",CallCenterUtil.QUEUE_FAIL_ERROR).build());
         }
@@ -300,30 +303,6 @@ public class DeQueueServiceImpl implements DeQueueService {
         }
     }
 
-    /**
-     * 停止播放排队等待音
-     * @param area_id
-     * @param call_id
-     * @param res_id
-     */
-    private void stopPlayWait(String area_id,String call_id,String res_id){
-        try {
-            if(conversationService.isPlayWait(call_id)){
-                    Map<String, Object> params = new MapBuilder<String,Object>()
-                            .putIfNotEmpty("res_id",res_id)
-                            .putIfNotEmpty("user_data",call_id)
-                            .put("areaId",area_id)
-                            .build();
-                    RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_STOP, params);
-                if(!businessStateService.closed(call_id)) {
-                    rpcCaller.invoke(sessionContext, rpcrequest, true);
-                }
-            }
-        } catch (Throwable e) {
-            logger.error("调用失败",e);
-        }
-    }
-
     private void setAgentState(String agentCallId, BaseEnQueue enQueue,EnQueueResult result){
         List<String> innerFields = new ArrayList<>();
         String reserveState = enQueue.getReserve_state();
@@ -348,6 +327,8 @@ public class DeQueueServiceImpl implements DeQueueService {
                 innerFields.add(postNumVoice);
             }
         }
-        businessStateService.updateInnerField(agentCallId,innerFields);
+        if(innerFields.size()>0){
+            businessStateService.updateInnerField(agentCallId,innerFields);
+        }
     }
 }

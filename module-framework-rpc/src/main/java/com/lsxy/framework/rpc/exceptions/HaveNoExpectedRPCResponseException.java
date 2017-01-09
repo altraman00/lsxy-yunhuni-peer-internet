@@ -13,7 +13,7 @@ public class HaveNoExpectedRPCResponseException extends Exception {
     private RPCResponse response;  //当前返回的响应对象
     private static final Logger logger = LoggerFactory.getLogger(HaveNoExpectedRPCResponseException.class);
     public HaveNoExpectedRPCResponseException(RPCRequest request, RPCResponse response) {
-        super("没有得到期待的请求返回值["+request.getSessionid()+"] vs ["+response.getSessionid()+"]");
+        super("没有得到期待的请求返回值[" + request + "] vs [" + response + "]");
         this.request = request;
         this.response = response;
     }
