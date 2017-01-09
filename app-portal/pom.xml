@@ -15,7 +15,6 @@
         <skip_maven_deploy>false</skip_maven_deploy>
     </properties>
     <build>
-        <finalName>portal</finalName>
         <plugins>
 <!--
           <plugin>
