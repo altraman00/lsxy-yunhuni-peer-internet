@@ -1,6 +1,7 @@
 package com.lsxy.app.api.gateway.rest.callcenter;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.lsxy.app.api.gateway.dto.callcenter.InviteAgentInputDTO;
 import com.lsxy.app.api.gateway.dto.callcenter.SetVoiceModeInputDTO;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.app.api.gateway.rest.AbstractAPIController;
@@ -35,7 +36,7 @@ public class ConversationOpsController extends AbstractAPIController {
     public ApiGatewayResponse save(HttpServletRequest request,@PathVariable String accountId, @PathVariable String id,
                                    @RequestHeader(value = "AppID") String appId) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
-            logger.debug("CONVERSATION DISMISS API参数,accountId={},appId={},dto={}",accountId,appId,id);
+            logger.debug("CONVERSATION DISMISS API参数,accountId={},appId={},id={}",accountId,appId,id);
         }
         String ip = WebUtils.getRemoteAddress(request);
         boolean result = conversationOps.dismiss(ip,appId,id);
@@ -47,14 +48,26 @@ public class ConversationOpsController extends AbstractAPIController {
                                   @PathVariable String name,@RequestHeader(value = "AppID") String appId,
                                   @Valid @RequestBody SetVoiceModeInputDTO dto) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
-            logger.debug("CONVERSATION DISMISS API参数,accountId={},appId={},dto={}",accountId,appId,id);
+            logger.debug("CONVERSATION setVoiceMode API参数,accountId={},appId={},id={},name={},dto={}",accountId,appId,id,name,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        CallCenterAgent agent = callCenterAgentService.get(appId,name);
-        if(agent == null){
+        String agentId = callCenterAgentService.getId(appId,name);
+        if(agentId == null){
             throw new AgentNotExistException();
         }
-        boolean result = conversationOps.setVoiceMode(ip,appId,id,agent.getId(),dto.getMode());
+        boolean result = conversationOps.setVoiceMode(ip,appId,id,agentId,dto.getMode());
         return ApiGatewayResponse.success(result);
+    }
+
+
+    @RequestMapping(value = "/{accountId}/callcenter/conversation/{id}/invite_agent",method = RequestMethod.POST)
+    public ApiGatewayResponse invite_agent(HttpServletRequest request,@PathVariable String accountId, @PathVariable String id,
+                                  @RequestHeader(value = "AppID") String appId,
+                                  @Valid @RequestBody InviteAgentInputDTO dto) throws YunhuniApiException {
+        if(logger.isDebugEnabled()){
+            logger.debug("CONVERSATION INVITE_AGENT API参数,accountId={},appId={},id={},dto={}",accountId,appId,id,dto);
+        }
+        String ip = WebUtils.getRemoteAddress(request);
+        return ApiGatewayResponse.success(null);
     }
 }
