@@ -19,22 +19,19 @@
         </encoder>
     </appender>
 
-    <!-- 按照每天生成日志文件 -->
-    <appender name="ROLLINGFILE"  class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <Prudent>true</Prudent>
+    <!-- 循环文件输出（基于时间戳的分文件，是实际项目中用途最广的一种情况） -->
+    <appender name="ROLLINGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/${APP_NAME}.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!--日志文件输出的文件名-->
-            <FileNamePattern>${LOG_HOME}/${APP_NAME}-%d{yyyy-MM-dd}.log</FileNamePattern>
-            <!--日志文件保留天数-->
-            <MaxHistory>30</MaxHistory>
+            <fileNamePattern>${LOG_HOME}/${APP_NAME}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>500MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+        <encoder>
             <pattern>${FILE_LOG_PATTERN}</pattern>
         </encoder>
-        <!--日志文件最大的大小-->
-        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <MaxFileSize>2GB</MaxFileSize>
-        </triggeringPolicy>
     </appender>
     <!-- 异步输出 -->
     <appender name ="AROLLINGFILE" class= "ch.qos.logback.classic.AsyncAppender">
