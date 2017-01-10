@@ -90,6 +90,17 @@ public class Handler_EVENT_SYS_CALL_ON_FAIL extends EventHandler{
                 conversationService.logicExit(conversationId,call_id);
             }
         }
+        if(BusinessState.TYPE_SYS_CONF.equals(state.getType())){
+            String conf_id = state.getBusinessData().get("conf_id");
+            Map<String,Object> notify_data = new MapBuilder<String,Object>()
+                    .putIfNotEmpty("event","conf.join.fail")
+                    .putIfNotEmpty("id",conf_id)
+                    .putIfNotEmpty("time",System.currentTimeMillis())
+                    .putIfNotEmpty("call_id",call_id)
+                    .putIfNotEmpty("user_data",state.getUserdata())
+                    .build();
+            notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,3);
+        }
         return handler_event_sys_call_on_release.handle(request, session);
     }
 }
