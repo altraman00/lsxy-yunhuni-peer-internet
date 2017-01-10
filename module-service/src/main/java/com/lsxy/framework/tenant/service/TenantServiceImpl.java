@@ -185,14 +185,14 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
     @Override
     public int countConsumeTenant() {
         String countSQL = "SELECT count(tenant_id) as c FROM " +
-                "(SELECT tenant_id FROM db_lsxy_bi_yunhuni.tb_bi_consume_hour WHERE deleted=0 AND tenant_id IS NOT NULL GROUP BY tenant_id) a";
+                "(SELECT tenant_id FROM db_lsxy_bi_yunhuni.tb_bi_consume_hour WHERE deleted=0 AND tenant_id IS NOT NULL GROUP BY tenant_id HAVING MAX(among_amount) ) a";
         Query queryCount = em.createNativeQuery(countSQL);
         return ((BigInteger) queryCount.getSingleResult()).intValue();
     }
 
     public int countConsumeTenantDateBetween(Date d1,Date d2){
         String countSQL = "SELECT count(tenant_id) as c FROM " +
-                "(SELECT tenant_id FROM db_lsxy_bi_yunhuni.tb_bi_consume_hour WHERE deleted=0 AND tenant_id IS NOT NULL AND dt between :d1 and :d2 GROUP BY tenant_id) a";
+                "(SELECT tenant_id FROM db_lsxy_bi_yunhuni.tb_bi_consume_hour WHERE deleted=0 AND tenant_id IS NOT NULL AND dt between :d1 and :d2 GROUP BY tenant_id HAVING MAX(among_amount) ) a";
         Query queryCount = em.createNativeQuery(countSQL);
         queryCount.setParameter("d1", d1);
         queryCount.setParameter("d2", d2);
@@ -330,7 +330,7 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
 
     @Override
     public Page<TenantVO> pageListBySearchAndAccount(String name, Date regDateStart, Date regDateEnd, Integer authStatus, Integer accStatus, int pageNo, int pageSize) {
-        String sql0 = "SELECT DISTINCT tenant_id FROM db_lsxy_bi_yunhuni.tb_bi_consume_hour WHERE deleted=0 AND tenant_id IS NOT NULL GROUP BY tenant_id";
+        String sql0 = "SELECT DISTINCT tenant_id FROM db_lsxy_bi_yunhuni.tb_bi_consume_hour WHERE deleted=0 AND tenant_id IS NOT NULL GROUP BY tenant_id HAVING MAX(among_amount)";
         List<String> list= jdbcTemplate.queryForList(sql0,String.class);
         int start = (pageNo-1)*pageSize;
         if(list.size() == 0){
