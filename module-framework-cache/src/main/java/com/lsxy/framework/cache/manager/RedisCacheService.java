@@ -448,6 +448,10 @@ public class RedisCacheService {
 			return set;
 		}
 
+		public boolean sismember(final String key,final String value){
+			return redisTemplate.opsForSet().isMember(key,value);
+		}
+
 		public long ssize(final String key){
 			return redisTemplate.opsForSet().size(key);
 		}

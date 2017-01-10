@@ -3,6 +3,7 @@ package com.lsxy.area.server.event.handler.call;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.AgentIdCallReference;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
@@ -44,6 +45,9 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
 
     @Autowired
     private CallCenterUtil callCenterUtil;
+
+    @Autowired
+    private AgentIdCallReference agentIdCallReference;
 
     @Override
     public String getEventName() {
@@ -114,6 +118,11 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
                 logger.error("将呼叫加入交谈失败",e);
                 conversationService.logicExit(conversation,call_id);
             }
+        }
+
+        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
+            //设置坐席对应的callid
+            agentIdCallReference.set(state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD),state.getId());
         }
         return res;
     }

@@ -623,27 +623,7 @@ public class ConversationService {
         }
     }
 
-    public void setVoiceMode(String areaId,String conversationId, String callId, Integer voiceMode) throws YunhuniApiException {
-        BusinessState call_state = businessStateService.get(callId);
-
-        if(call_state ==null || call_state.getResId() == null){
-            throw new SystemBusyException();
-        }
-
-        if(call_state.getClosed()!= null && call_state.getClosed()){
-            throw new SystemBusyException();
-        }
-
-        BusinessState conversation_state = businessStateService.get(conversationId);
-
-        if(conversation_state == null || conversation_state.getResId() == null){
-            throw new SystemBusyException();
-        }
-
-        if(conversation_state.getClosed()!= null && conversation_state.getClosed()){
-            throw new SystemBusyException();
-        }
-
+    public boolean setVoiceMode(String conversationId, String callId, Integer voiceMode) throws YunhuniApiException {
         if(voiceMode ==null){
             throw new IllegalArgumentException();
         }
@@ -653,12 +633,38 @@ public class ConversationService {
                 voiceMode.intValue() != CallCenterConversationMember.MODE_N){
             throw new IllegalArgumentException();
         }
+        BusinessState call_state = businessStateService.get(callId);
+        if(call_state ==null || call_state.getResId() == null){
+            throw new SystemBusyException();
+        }
+
+        if(call_state.getClosed()!= null && call_state.getClosed()){
+            throw new CallNotExistsException();
+        }
+
+        BusinessState conversation_state = businessStateService.get(conversationId);
+        if(conversation_state == null || conversation_state.getResId() == null){
+            throw new SystemBusyException();
+        }
+
+        if(conversation_state.getClosed()!= null && conversation_state.getClosed()){
+            throw new ConversationNotExistException();
+        }
+
+        if(!call_state.getAppId().equals(conversation_state.getAppId())){
+            throw new IllegalArgumentException();
+        }
+
+        if(!this.sismember(conversationId,callId)){
+            throw new AgentNotConversationMemberException();
+        }
+
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conversation_state.getResId())
                 .putIfNotEmpty("call_res_id",call_state.getResId())
                 .putIfNotEmpty("mode",voiceMode)
                 .putIfNotEmpty("user_data",callId)
-                .putIfNotEmpty("areaId",areaId)
+                .putIfNotEmpty("areaId",call_state.getAreaId())
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_SET_PART_VOICE_MODE, params);
@@ -668,6 +674,7 @@ public class ConversationService {
             throw new InvokeCallException(e);
         }
         businessStateService.updateInnerField(callId,CallCenterUtil.PARTNER_VOICE_MODE_FIELD,voiceMode.toString());
+        return true;
     }
 
     /**
@@ -886,6 +893,16 @@ public class ConversationService {
         }
         return size;
     }
+
+    public boolean sismember(String conversationId,String callId) {
+        String key = key(conversationId);
+        boolean result = redisCacheService.sismember(key,callId);
+        if(logger.isDebugEnabled()){
+            logger.debug("{}是否是交谈={}的成员{}",callId,conversationId,result);
+        }
+        return result;
+    }
+
     /**
      * 增加交谈成员
      * @param conversationId

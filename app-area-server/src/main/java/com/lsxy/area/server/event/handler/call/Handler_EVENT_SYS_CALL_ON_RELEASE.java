@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.AgentIdCallReference;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
@@ -85,6 +86,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
 
     @Autowired
     private CallCenterStatisticsService callCenterStatisticsService;
+
+    @Autowired
+    private AgentIdCallReference agentIdCallReference;
 
     @Override
     public String getEventName() {
@@ -294,6 +298,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                                 state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),preState, curState);
                     }
                 }
+                agentIdCallReference.clear(agentId);
             }
         }
         return res;

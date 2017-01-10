@@ -48,7 +48,8 @@ public enum ApiReturnCodeEnum {
     ConditionNotExist("040401","条件不存在"),
     ConditionExpression("040402","条件表达式错误"),
     ConversationNotExist("040501","交谈不存在"),
-    OutOfConversationMaxParts("040502","超过最大交谈成员数")
+    OutOfConversationMaxParts("040502","超过最大交谈成员数"),
+    AgentNotConversationMember("040503","坐席不是交谈的成员")
     ;
 
     private String code;
