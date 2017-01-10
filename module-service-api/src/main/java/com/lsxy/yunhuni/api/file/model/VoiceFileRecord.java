@@ -38,8 +38,8 @@ public class VoiceFileRecord extends IdEntity {
             return new String[]{"语音回拔","自定义IVR","语音会议"};
         }else if(App.PRODUCT_CALL_CENTER.equals(serviceType)){
             return new String[]{"呼叫中心"};
-        }else{
-            return new String[]{"语音回拔","自定义IVR","语音会议","呼叫中心"};
+        }else{//语音回拔
+            return new String[]{"自定义IVR","语音会议","呼叫中心"};
         }
     }
     @Column(name="cost")
