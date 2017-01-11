@@ -26,7 +26,7 @@ public class ConversationOpsController extends AbstractAPIController {
 
     private static final Logger logger = LoggerFactory.getLogger(ConversationOpsController.class);
 
-    @Reference(timeout=3000,check = false,lazy = true)
+    @Reference(timeout=30000,check = false,lazy = true)
     private ConversationOps conversationOps;
 
     @Reference(timeout=3000,check = false,lazy = true)
@@ -68,6 +68,6 @@ public class ConversationOpsController extends AbstractAPIController {
             logger.debug("CONVERSATION INVITE_AGENT API参数,accountId={},appId={},id={},dto={}",accountId,appId,id,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        return ApiGatewayResponse.success(null);
+        return ApiGatewayResponse.success(conversationOps.inviteAgent(ip,appId,id,dto.getEnqueue(),dto.getMode()));
     }
 }

@@ -74,20 +74,21 @@ public class DeQueueServiceImpl implements DeQueueService {
 
     /**
      * 创建交谈，然后呼叫坐席。
-     * 交谈创建成功事件邀请排队的客户到交谈
+     * 交谈创建成功事件邀请排队的客户到交谈，如果是在交谈上发起排队就忽略这一步
      * 开始呼叫事件中，将坐席加入交谈
      * 坐席拨号完成事件中，播放工号
      * 客户和坐席开始交谈
      * @param tenantId
      * @param appId
-     * @param callId
+     * @param callId   发起排队的呼叫id或交谈id
      * @param queueId
      * @param result
+     * @param conversationId 不为空代表邀请坐席到一个存在的交谈
      * @throws Exception
      */
     @Override
-    public void success(String tenantId, String appId, String callId,
-                        String queueId, EnQueueResult result) throws Exception{
+    public void success(String tenantId, String appId, String callId,String queueType,
+                        String queueId, EnQueueResult result,String conversationId) throws Exception{
         if(logger.isDebugEnabled()){
             logger.debug("排队成功，tenantId={},appId={},callId={},queueId={},result={}",
                     tenantId,appId,callId,queueId,result);
@@ -99,11 +100,17 @@ public class DeQueueServiceImpl implements DeQueueService {
             throw new IllegalStateException("会话已关闭");
         }
         conversationService.stopPlayWait(state);
-        String conversation = UUIDGenerator.uuid();
+        String conversation = conversationId;
+
+        if(conversation == null){
+            conversation = UUIDGenerator.uuid();
+        }
 
         //更新排队的call的所属交谈id和排队id
         businessStateService.updateInnerField(callId,
-                CallCenterUtil.CONVERSATION_FIELD,conversation,CallCenterUtil.QUEUE_ID_FIELD,queueId);
+                CallCenterUtil.CONVERSATION_FIELD,conversation,
+                CallCenterUtil.QUEUE_ID_FIELD,queueId,
+                CallCenterUtil.QUEUE_TYPE_FIELD,queueType);
 
         BaseEnQueue enQueue = result.getBaseEnQueue();
         if(enQueue == null){
@@ -112,15 +119,17 @@ public class DeQueueServiceImpl implements DeQueueService {
         Integer conversationTimeout = enQueue.getConversation_timeout();
 
         //开始呼叫坐席
-        String agentCallId = conversationService.inviteAgent(appId,state.getBusinessData().get(BusinessState.REF_RES_ID),state.getId(),conversation,result.getAgent().getId(),
-                result.getAgent().getName(),result.getExtension().getId(),
-                state.getBusinessData().get("from"),state.getBusinessData().get("to"),
-                result.getExtension().getTelnum(),result.getExtension().getType(),
-                result.getExtension().getUser(),conversationTimeout,45);
-
-        //开始创建交谈
-        conversationService.create(conversation,state.getBusinessData().get(BusinessState.REF_RES_ID),state.getId(),state.getTenantId(),
-                state.getAppId(),state.getAreaId(),state.getCallBackUrl(),conversationTimeout);
+        String agentCallId = conversationService.inviteAgent
+                (appId,state.getBusinessData().get(BusinessState.REF_RES_ID),state.getId(),conversation,result.getAgent().getId(),
+                        result.getAgent().getName(),result.getExtension().getId(),
+                        state.getBusinessData().get("from"),state.getBusinessData().get("to"),
+                        result.getExtension().getTelnum(),result.getExtension().getType(),
+                        result.getExtension().getUser(),conversationTimeout,60);
+        if(conversationId == null){//在现有的交谈上邀请座席，不需要创建交谈
+            //开始创建交谈
+            conversationService.create(conversation,state.getBusinessData().get(BusinessState.REF_RES_ID),enQueue.getChannel(),
+                    state,state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),conversationTimeout);
+        }
 
         if(state.getBusinessData().get(CallCenterUtil.PLAYWAIT_FIELD) != null){
             businessStateService.updateInnerField(conversation,CallCenterUtil.PLAYWAIT_FIELD,state.getBusinessData().get(CallCenterUtil.PLAYWAIT_FIELD));
@@ -145,7 +154,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         }
 
         callCenterUtil.sendQueueSelectedAgentEvent(state.getCallBackUrl(),
-                queueId,CallCenterUtil.QUEUE_TYPE_IVR,
+                queueId,queueType,
                 state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),
                 state.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
                 callId,agentCallId,state.getUserdata());
@@ -156,7 +165,7 @@ public class DeQueueServiceImpl implements DeQueueService {
     }
 
     @Override
-    public void timeout(String tenantId, String appId, String callId,String queueId) {
+    public void timeout(String tenantId, String appId, String callId,String queueId,String queueType) {
         if(logger.isDebugEnabled()){
             logger.debug("排队超时,tenantId={},appId={},callId={}",tenantId,appId,callId);
         }
@@ -183,7 +192,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         conversationService.stopPlayWait(state);
 
         callCenterUtil.sendQueueFailEvent(state.getCallBackUrl(),
-                queueId,CallCenterUtil.QUEUE_TYPE_IVR,
+                queueId,queueType,
                 state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),
                 state.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
                 CallCenterUtil.QUEUE_FAIL_TIMEOUT,
@@ -197,7 +206,7 @@ public class DeQueueServiceImpl implements DeQueueService {
     }
 
     @Override
-    public void fail(String tenantId, String appId, String callId,String queueId, String reason) {
+    public void fail(String tenantId, String appId, String callId,String queueId,String queueType, String reason) {
         if(logger.isDebugEnabled()){
             logger.debug("排队失败,tenantId={},appId={},callId={}",tenantId,appId,callId);
         }
@@ -226,7 +235,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         conversationService.stopPlayWait(state);
 
         callCenterUtil.sendQueueFailEvent(state.getCallBackUrl(),
-                queueId,CallCenterUtil.QUEUE_TYPE_IVR,
+                queueId,queueType,
                 state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),
                 state.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
                 CallCenterUtil.QUEUE_FAIL_ERROR,

@@ -114,10 +114,10 @@ public class EnqueueHandler extends ActionHandler{
         }
 
         try {
-            enQueueService.lookupAgent(state.getTenantId(), state.getAppId(), businessData.get("to"), callId, enQueue);
+            enQueueService.lookupAgent(state.getTenantId(), state.getAppId(), businessData.get("to"), callId, enQueue,CallCenterUtil.QUEUE_TYPE_IVR,null);
         }catch (Throwable t){
             logger.error("调用呼叫中心排队失败",t);
-            deQueueService.fail(state.getTenantId(),state.getAppId(),callId,null,"调用呼叫中心排队失败");
+            deQueueService.fail(state.getTenantId(),state.getAppId(),callId,null,CallCenterUtil.QUEUE_TYPE_IVR,"调用呼叫中心排队失败");
         }
         return true;
     }

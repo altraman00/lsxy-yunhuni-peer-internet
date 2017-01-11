@@ -24,6 +24,7 @@ public class CallCenterQueue extends IdEntity {
     private String appId;
     private String condition;
     private String relevanceId;
+    private String type;
     private Date startTime;
     private Date inviteTime;
     private Date dialTime;
@@ -71,6 +72,15 @@ public class CallCenterQueue extends IdEntity {
 
     public void setRelevanceId(String relevanceId) {
         this.relevanceId = relevanceId;
+    }
+
+    @Column(name = "type")
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     @Column(name = "start_time")

@@ -67,7 +67,7 @@ public class EnqueueServiceTest {
                 public void run() {
                     long start = System.currentTimeMillis();
                     enQueueService.lookupAgent("40288ac9575612a30157561c7ff50004",
-                            "40288ac957e1812e0157e18a994e0000","13692206627","callid1",en);
+                            "40288ac957e1812e0157e18a994e0000","13692206627","callid1",en,null,null);
                     System.out.println("好事：="+(System.currentTimeMillis() - start));
                     countDownLatch.countDown();
                 }

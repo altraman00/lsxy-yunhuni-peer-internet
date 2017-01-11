@@ -7,10 +7,10 @@ import com.lsxy.call.center.api.model.EnQueueResult;
  */
 public interface DeQueueService{
 
-    public void success(String tenantId, String appId, String callId,String queueId, EnQueueResult result) throws Exception;
+    public void success(String tenantId, String appId, String callId,String queueId,String queueType, EnQueueResult result,String conversationId) throws Exception;
 
-    public void timeout(String tenantId, String appId, String callId,String queueId);
+    public void timeout(String tenantId, String appId, String callId,String queueId,String queueType);
 
-    public void fail(String tenantId, String appId, String callId,String queueId,String reason);
+    public void fail(String tenantId, String appId, String callId,String queueId,String queueType,String reason);
 
 }

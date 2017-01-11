@@ -10,4 +10,6 @@ public interface ConversationOps {
     public boolean dismiss(String ip,String appId,String conversationId) throws YunhuniApiException;
 
     public boolean setVoiceMode(String ip,String appId,String conversationId, String agentId, Integer voiceMode) throws YunhuniApiException;
+
+    public boolean inviteAgent(String ip,String appId,String conversationId, String enqueue, Integer voiceMode) throws YunhuniApiException;
 }

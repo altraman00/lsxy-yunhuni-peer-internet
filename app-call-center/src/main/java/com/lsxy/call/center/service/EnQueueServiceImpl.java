@@ -72,16 +72,18 @@ public class EnQueueServiceImpl implements EnQueueService{
     @Autowired
     private QueueBatchInserter queueBatchInserter;
 
-    private CallCenterQueue save(String num,Condition condition,String callId,BaseEnQueue baseEnQueue){
+    private CallCenterQueue save(String num,Condition condition,String callId,String conversationId,BaseEnQueue baseEnQueue,String type){
         CallCenterQueue queue = new CallCenterQueue();
         queue.setId(UUIDGenerator.uuid());
         queue.setTenantId(condition.getTenantId());
         queue.setAppId(condition.getAppId());
         queue.setRelevanceId("");
+        queue.setType(type);
         queue.setCondition(condition.getId());
         queue.setStartTime(new Date());
         queue.setNum(num);
         queue.setOriginCallId(callId);
+        queue.setConversation(conversationId);
         queue.setEnqueue(JSONUtil.objectToJson(baseEnQueue));
         queueBatchInserter.put(queue);
         return queue;
@@ -91,13 +93,14 @@ public class EnQueueServiceImpl implements EnQueueService{
         cqsBatchInserter.put(conditionId, queueId);
     }
 
-    private void publishTimeoutEvent(Condition condition,String queueId,String callId){
+    private void publishTimeoutEvent(Condition condition,String queueId,String type,String callId){
         long start = 0;
         if(logger.isDebugEnabled()){
             start = System.currentTimeMillis();
         }
         mqService.publish(new EnqueueTimeoutEvent(condition.getId(),
                 queueId,
+                type,
                 condition.getTenantId(),
                 condition.getAppId(),
                 callId,
@@ -115,7 +118,7 @@ public class EnQueueServiceImpl implements EnQueueService{
      * @param enQueue
      */
     @Override
-    public void lookupAgent(String tenantId, String appId,String num, String callId, EnQueue enQueue){
+    public void lookupAgent(String tenantId, String appId,String num, String callId, EnQueue enQueue,String queueType,String conversationId){
         String queueId = null;
         try{
             if(tenantId == null){
@@ -160,7 +163,7 @@ public class EnQueueServiceImpl implements EnQueueService{
             try {
                 BeanUtils.copyProperties(baseEnQueue,enQueue);
             } catch (Throwable e) {}
-            queueId = save(num,condition,callId,baseEnQueue).getId();
+            queueId = save(num,condition,callId,conversationId,baseEnQueue,queueType).getId();
 
             //lua脚本找坐席
             String agent = (String)redisCacheService.eval(Lua.LOOKUPAGENT,4,
@@ -177,7 +180,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                     logger.debug("[{}][{}]callid={}发布排队超时事件",tenantId,appId,callId);
                 }
                 addCQS(conditionId,queueId);
-                publishTimeoutEvent(condition,queueId,callId);
+                publishTimeoutEvent(condition,queueId,queueType,callId);
                 String agent_idle = (String)redisCacheService.eval(Lua.LOOKUPAGENTFORIDLE,3,
                         CAs.getKey(condition.getId()),AgentState.getPrefixed(),
                         ExtensionState.getPrefixed(),
@@ -193,7 +196,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                     result.setExtension(appExtensionService.findById(agentState.getExtension(agent)));
                     result.setAgent(callCenterAgentService.findById(agent));
                     result.setBaseEnQueue(baseEnQueue);
-                    deQueueService.success(tenantId,appId,callId,queueId,result);
+                    deQueueService.success(tenantId,appId,callId,queueId,queueType,result,conversationId);
                 }catch (Throwable t1){
                     try{
                         agentState.setState(agent,CallCenterAgent.STATE_IDLE);
@@ -205,7 +208,7 @@ public class EnQueueServiceImpl implements EnQueueService{
             }
         }catch (Throwable e){
             logger.info("[{}][{}]callid={}排队找坐席出错:{}",tenantId,appId,callId,e.getMessage());
-            deQueueService.fail(tenantId,appId,callId,e.getMessage(),queueId);
+            deQueueService.fail(tenantId,appId,callId,e.getMessage(),queueId,queueType);
         }
     }
 
@@ -245,7 +248,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                 if(StringUtil.isNotEmpty(queue.getEnqueue())){
                     result.setBaseEnQueue(JSONUtil2.fromJson(queue.getEnqueue(),BaseEnQueue.class));
                 }
-                deQueueService.success(tenantId,appId,queue.getOriginCallId(),queueId,result);
+                deQueueService.success(tenantId,appId,queue.getOriginCallId(),queueId,queue.getType(),result,queue.getConversation());
             }catch (Throwable t1){
                 logger.info("坐席找排队失败agent={}",agent,t1);
                 try{
@@ -254,7 +257,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                     logger.info("设置坐席状态失败agent={}",agent,t2);
                 }
                 if(queue != null){
-                    deQueueService.fail(tenantId,appId,queue.getOriginCallId(),t1.getMessage(),queueId);
+                    deQueueService.fail(tenantId,appId,queue.getOriginCallId(),t1.getMessage(),queueId,queue.getType());
                 }
             }
         }

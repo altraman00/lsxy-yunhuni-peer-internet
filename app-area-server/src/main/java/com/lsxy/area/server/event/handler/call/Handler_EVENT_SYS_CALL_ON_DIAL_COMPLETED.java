@@ -296,7 +296,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             String queueId = null;
             try{
                 //更新排队记录
-                initorid = conversationService.getInitiator(conversation_id);
+                initorid = state.getBusinessData().get(CallCenterUtil.INITIATOR_FIELD);
                 if(initorid != null){
                     init_state = businessStateService.get(initorid);
                     if(init_state != null){
@@ -412,14 +412,16 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             if(initorid!= null && init_state != null && queueId!=null){
                 if(StringUtil.isNotEmpty(error)){
                     callCenterUtil.sendQueueFailEvent(init_state.getCallBackUrl(),
-                            queueId,CallCenterUtil.QUEUE_TYPE_IVR,
+                            queueId,
+                            init_state.getBusinessData().get(CallCenterUtil.QUEUE_TYPE_FIELD),
                             init_state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),
                             init_state.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
                             CallCenterUtil.QUEUE_FAIL_CALLFAIL,
                             initorid,call_id,init_state.getUserdata());
                 }else{
                     callCenterUtil.sendQueueSuccessEvent(init_state.getCallBackUrl(),
-                            queueId,CallCenterUtil.QUEUE_TYPE_IVR,
+                            queueId,
+                            init_state.getBusinessData().get(CallCenterUtil.QUEUE_TYPE_FIELD),
                             init_state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),
                             init_state.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
                             initorid,call_id,init_state.getUserdata());

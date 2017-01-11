@@ -129,7 +129,7 @@ public class ConversationService {
             return CallCenterConversationMember.INITIATOR_FALSE;
         }
         BusinessState state = businessStateService.get(conversation);
-        if(state != null && state.getBusinessData()!= null){
+        if(state != null && BusinessState.TYPE_CC_CONVERSATION.equals(state.getType()) && state.getBusinessData()!= null){
             String initiator = state.getBusinessData().get(CallCenterUtil.INITIATOR_FIELD);
             if(initiator != null && initiator.equals(callId)){
                 return CallCenterConversationMember.INITIATOR_TRUE;
@@ -172,7 +172,7 @@ public class ConversationService {
     }
 
     public String getInitiator(BusinessState state){
-        if(state != null && state.getBusinessData()!= null){
+        if(state != null && BusinessState.TYPE_CC_CONVERSATION.equals(state.getType()) && state.getBusinessData()!= null){
             return state.getBusinessData().get(CallCenterUtil.INITIATOR_FIELD);
         }
         return null;
@@ -201,7 +201,8 @@ public class ConversationService {
      * @return
      * @throws YunhuniApiException
      */
-    public String create(String id,String ref_res_id,String initiator,String tenantId,String appId, String areaId,String callBackUrl, Integer maxDuration) throws YunhuniApiException {
+    public String create(String id,String ref_res_id,String channel,
+                         BusinessState initiator,String tenantId,String appId, String areaId,String callBackUrl, Integer maxDuration) throws YunhuniApiException {
         if(maxDuration == null || maxDuration > MAX_DURATION){
             maxDuration = MAX_DURATION;
         }
@@ -228,8 +229,10 @@ public class ConversationService {
                 .setAreaId(areaId)
                 .setBusinessData(new MapBuilder<String,String>()
                         .putIfNotEmpty(BusinessState.REF_RES_ID,ref_res_id)
-                        .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,initiator)//交谈发起者的callid
+                        .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,initiator.getId())//交谈发起者的callid
+                        .putIfNotEmpty(CallCenterUtil.CONVERSATION_SYSNUM_FIELD,initiator.getBusinessData().get("from"))
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(initiator))
+                        .putIfNotEmpty(CallCenterUtil.CHANNEL_ID_FIELD,channel)
                         .putIfNotEmpty("max_seconds",maxDuration.toString())//交谈最大持续时长
                         .build())
                 .build();
@@ -239,7 +242,7 @@ public class ConversationService {
             conversation.setId(id);
             conversation.setAppId(appId);
             conversation.setTenantId(tenantId);
-            conversation.setRelevanceId(initiator);
+            conversation.setRelevanceId(initiator.getId());
             conversation.setStartTime(new Date());
             callCenterConversationService.save(conversation);
         }catch (Throwable t){
@@ -370,7 +373,8 @@ public class ConversationService {
                         .putIfNotEmpty(CallCenterUtil.AGENT_NAME_FIELD,agentName)
                         .putIfNotEmpty(CallCenterUtil.AGENT_EXTENSION_FIELD,extension)
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(initiator))
-                        .putIfNotEmpty("from",from)
+                        .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,initiator)
+                        .putIfNotEmpty("from",StringUtil.isEmpty(systemNum)?from:systemNum)
                         .putIfNotEmpty("to",to)
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
