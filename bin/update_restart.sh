@@ -102,8 +102,7 @@ if [ "$pull_ret"x = "Already up-to-date."x ]; then
     if [ $FORCE_INSTALL = true ]; then
         echo "安装模块代码"
         cd $YUNHUNI_HOME
-        mvn clean
-        mvn package -U $ENV_PROFILE -DskipTests=true -pl $APP_NAME -am
+        mvn clean compile package -U $ENV_PROFILE -DskipTests=true -pl $APP_NAME -am
     else
         echo "已经是最新代码了 不用INSTALL了";
     fi
@@ -112,8 +111,7 @@ else
     if [ $FORCE_CLEAN = true ]; then
         echo "清除安装模块代码"
         cd $YUNHUNI_HOME
-        mvn clean
-        mvn package -U $ENV_PROFILE -DskipTests=true -pl $APP_NAME -am
+        mvn clean compile package -U $ENV_PROFILE -DskipTests=true -pl $APP_NAME -am
     else
         echo "已经是最新代码了 不用CLEAN INSTALL了";
     fi
@@ -135,9 +133,9 @@ elif [ $IS_SPRINGBOOT = true ]; then
   echo "starting springboot application...."
 #  nohup mvn -U $ENV_PROFILE spring-boot:run 1>> /opt/yunhuni/logs/$APP_NAME.out 2>> /opt/yunhuni/logs/$APP_NAME.out &
   JAR_FILE=`find ./ -name "app-*.jar"`
-  echo "execute jar file :$JAR_FILE"
-  echo "启动服务：java $JAVA_OPTS -jar $JAR_FILE"
-  nohup java $JAVA_OPTS -jar $JAR_FILE >> /opt/yunhuni/logs/$APP_NAME.out 2>&1 &
+  \cp $JAR_FILE $EXECUTE_HOME/$APP_NAME.jar
+  echo "启动服务：java $JAVA_OPTS -jar $EXECUTE_HOME$APP_NAME.jar"
+  nohup java $JAVA_OPTS -jar $EXECUTE_HOME/$APP_NAME.jar >> /opt/yunhuni/logs/$APP_NAME.out 2>&1 &
 elif [ $IS_TOMCAT_DEPLOY = true ]; then
   echo "deploy war to tomcat...."
   WAR_FILE=`find ./ -name "app-*.war"`
@@ -146,8 +144,7 @@ elif [ $IS_TOMCAT_DEPLOY = true ]; then
 fi
 
 sleep 10;
-PROCESS_NUM=`ps -ef | grep $APP_NAME | grep "java" | grep -v "grep" | wc -l`
-
+PROCESS_NUM=`ps -ef | grep $APP_NAME | grep "java" | grep -v "grep" | grep -v "update_restart" | wc -l`
 if [ $IS_TOMCAT_DEPLOY = false ]; then
     if [ $PROCESS_NUM -eq 1 ];
         then
