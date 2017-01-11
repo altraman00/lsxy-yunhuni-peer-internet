@@ -3,6 +3,7 @@ package com.lsxy.yunhuni.api.resourceTelenum.service;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelenumOrder;
@@ -29,13 +30,6 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      */
     Page<ResourcesRent> findByAppId(String appId,int pageNo, int pageSize);
 
-    /**
-     * 根据号码和租用状态查询租用关系
-     * @param id
-     * @param status
-     * @return
-     */
-    ResourcesRent findByResourceTelenumIdAndStatus(String id, int status);
     /**
      * 根据号码和租用状态查询租用关系
      * @param id
@@ -102,4 +96,11 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @param num
      */
     void unbind(String tenantId, String appId, String num);
+    /**
+     * 绑定号码到应用
+     * @param app
+     * @param nums
+     * @param isNeedCalled 该批次号码是否需要要检验可呼入性
+     */
+    String bindNumToAppAndGetAreaId(App app, List<String> nums, boolean isNeedCalled);
 }

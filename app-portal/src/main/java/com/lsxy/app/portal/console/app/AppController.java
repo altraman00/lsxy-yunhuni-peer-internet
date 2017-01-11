@@ -60,10 +60,10 @@ public class AppController extends AbstractPortalController {
      * @param request
      * @return
      */
-    private RestResponse getAppExtensionList(HttpServletRequest request,String appId){
+    private RestResponse getAppExtensionList(HttpServletRequest request,String appId,Integer pageNo,Integer pageSize){
         String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/app_extension/list/{1}";
-        return  RestRequest.buildSecurityRequest(token).getList(uri, AppExtension.class,appId);
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/app_extension/list/{1}?pageNo={2}&pageSize={3}";
+        return  RestRequest.buildSecurityRequest(token).getPage(uri, AppExtension.class,appId,pageNo,pageSize);
     }
 
     /**

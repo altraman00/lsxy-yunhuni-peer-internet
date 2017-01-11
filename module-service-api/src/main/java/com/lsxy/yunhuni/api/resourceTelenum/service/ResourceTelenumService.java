@@ -116,4 +116,6 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * @param appId
      */
     void appUnbindAll(String tenantId,String appId);
+
+    Page<ResourceTelenum> findOwnUnusedNum(String tenantId, String areaId, int pageNo, int pageSize);
 }

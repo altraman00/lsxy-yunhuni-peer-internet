@@ -522,4 +522,10 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     public void appUnbindAll(String tenantId, String appId) {
         resourceTelenumDao.appUnbindAll(tenantId, appId,new Date());
     }
+
+    @Override
+    public Page<ResourceTelenum> findOwnUnusedNum(String tenantId,String areaId,int pageNo,int pageSize) {
+        String hql = "from ResourceTelenum obj where obj.tenantId = ?1 and obj.areaId = ?2 and obj.appId is null";
+        return  this.pageList(hql,pageNo,pageSize,tenantId,areaId);
+    }
 }

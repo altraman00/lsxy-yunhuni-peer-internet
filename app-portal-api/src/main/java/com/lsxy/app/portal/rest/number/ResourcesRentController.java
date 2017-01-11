@@ -8,6 +8,8 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
@@ -48,6 +50,8 @@ public class ResourcesRentController extends AbstractRestController{
     TelnumLocationService telnumLocationService;
     @Autowired
     CalBillingService calBillingService;
+    @Autowired
+    AppService appService;
     /**
      * 根据省份获取城市
      * @return
@@ -229,17 +233,46 @@ public class ResourcesRentController extends AbstractRestController{
         return RestResponse.success(page);
     }
 
-    @RequestMapping("/app/{appId}/unbind/{num}" )
-    public RestResponse unbind(String appId,String num){
+    @RequestMapping("/app/{appId}/unbind/{rentId}" )
+    public RestResponse unbind(@PathVariable String appId,@PathVariable String rentId){
         Tenant tenant = getCurrentAccount().getTenant();
-        resourcesRentService.unbind(tenant.getId(),appId,num);
+        resourcesRentService.unbind(tenant.getId(),appId,rentId);
         return RestResponse.success();
     }
 
     @RequestMapping("/app/{appId}/unbind_all" )
-    public RestResponse unbindAll(String appId){
+    public RestResponse unbindAll(@PathVariable String appId){
         Tenant tenant = getCurrentAccount().getTenant();
         resourcesRentService.appUnbindAll(tenant.getId(),appId);
         return RestResponse.success();
     }
+
+    @RequestMapping("/num/unused/app/{appId}")
+    public RestResponse findOwnUnusedNum(@PathVariable String appId,int pageNo,int pageSize){
+        Tenant tenant = getCurrentAccount().getTenant();
+        App app = appService.findById(appId);
+        if(!tenant.getId().equals(app.getTenant().getId())){
+            return RestResponse.failed("0000","应用不属于用户");
+        }
+        if(app == null || StringUtils.isBlank(app.getOnlineAreaId())){
+            return RestResponse.failed("0000","应用不存在");
+        }
+        Page<ResourceTelenum> ownUnusedNum = resourceTelenumService.findOwnUnusedNum(tenant.getId(), app.getOnlineAreaId(), pageNo, pageSize);
+        return RestResponse.success(ownUnusedNum);
+    }
+
+    @RequestMapping("/num/bind/app/{appId}")
+    public RestResponse bindNumToApp(@PathVariable String appId,String nums){
+        App app = appService.findById(appId);
+        List numList = null;
+        if(StringUtils.isNotBlank(nums)){
+            numList = Arrays.asList(nums.split(","));
+        }
+        if(numList != null && numList.size() > 0){
+            resourcesRentService.bindNumToAppAndGetAreaId(app,numList,false);
+        }
+        return RestResponse.success();
+    }
+
+
 }

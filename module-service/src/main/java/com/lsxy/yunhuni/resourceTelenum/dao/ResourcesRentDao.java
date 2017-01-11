@@ -69,6 +69,4 @@ public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serial
     @Query(value = "update db_lsxy_bi_yunhuni.tb_bi_resources_rent rent set rent.app_id = null,rent.rent_status = 2,rent.last_time = :date where rent.tenant_id = :tenantId and rent.app_id = :appId and rent.deleted = 0 and rent.rent_status = 1",nativeQuery = true)
     void appUnbindAll(@Param("tenantId") String tenantId, @Param("appId") String appId,@Param("date") Date date);
 
-
-    ResourcesRent findFirstByTenantIdAndAppIdAndResDataAndRentStatus(String tenantId, String appId, String num, int rentStatus);
 }
