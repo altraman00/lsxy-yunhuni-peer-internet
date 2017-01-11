@@ -16,13 +16,6 @@ import java.util.List;
  * Created by zhangxb on 2016/7/1.
  */
 public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serializable> {
-    /**
-     * 根据AppId查找租用关系
-     * @param appId
-     * @param status
-     * @return
-     */
-    List<ResourcesRent> findByAppIdAndRentStatus(String appId, int status);
 
     /**
      * 根据资源ID和状态获取资源租用关系
@@ -31,7 +24,7 @@ public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serial
      * @return
      */
     ResourcesRent findByResourceTelenumIdAndRentStatus(String id, int status);
-    ResourcesRent findByResourceTelenumId(String id);
+
     ResourcesRent findByResDataAndRentStatus(String resData, int status);
 
     /**
@@ -66,5 +59,14 @@ public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serial
     @Modifying
     @Query("update ResourcesRent rent set rent.rentExpire=:expireTime where rent.id=:id")
     void updateResourceRentExpireTime(@Param("id") String id,@Param("expireTime") Date expireTime);
+
+    /**
+     * 应用释放所有的号码
+     * @param tenantId
+     * @param appId
+     */
+    @Modifying
+    @Query(value = "update db_lsxy_bi_yunhuni.tb_bi_resources_rent rent set rent.app_id = null,rent.rent_status = 2,rent.last_time = :date where rent.tenant_id = :tenantId and rent.app_id = :appId and rent.deleted = 0 and rent.rent_status = 1",nativeQuery = true)
+    void appUnbindAll(@Param("tenantId") String tenantId, @Param("appId") String appId,@Param("date") Date date);
 
 }
