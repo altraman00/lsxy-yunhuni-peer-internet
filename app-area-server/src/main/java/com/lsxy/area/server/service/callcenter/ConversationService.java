@@ -532,7 +532,7 @@ public class ConversationService {
                 .putIfNotEmpty("res_id",call_state.getResId())
                 .putIfNotEmpty("conf_res_id",conversation_state.getResId())
                 .put("max_seconds",max_seconds,MAX_DURATION)
-                .putIfNotEmpty(CallCenterUtil.PARTNER_VOICE_MODE_FIELD,voice_mode)
+                .putIfNotEmpty("voice_mode",voice_mode)
                 .putIfNotEmpty("play_file",play_file)
                 .putIfNotEmpty("user_data",call_id)
                 .putIfNotEmpty("areaId", conversation_state.getAreaId())

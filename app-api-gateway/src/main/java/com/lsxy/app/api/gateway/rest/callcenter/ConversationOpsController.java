@@ -2,6 +2,7 @@ package com.lsxy.app.api.gateway.rest.callcenter;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.api.gateway.dto.callcenter.InviteAgentInputDTO;
+import com.lsxy.app.api.gateway.dto.callcenter.InviteOutInputDTO;
 import com.lsxy.app.api.gateway.dto.callcenter.SetVoiceModeInputDTO;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.app.api.gateway.rest.AbstractAPIController;
@@ -69,5 +70,17 @@ public class ConversationOpsController extends AbstractAPIController {
         }
         String ip = WebUtils.getRemoteAddress(request);
         return ApiGatewayResponse.success(conversationOps.inviteAgent(ip,appId,id,dto.getEnqueue(),dto.getMode()));
+    }
+
+    @RequestMapping(value = "/{accountId}/callcenter/conversation/{id}/invite_out",method = RequestMethod.POST)
+    public ApiGatewayResponse invite_out(HttpServletRequest request,@PathVariable String accountId, @PathVariable String id,
+                                           @RequestHeader(value = "AppID") String appId,
+                                           @Valid @RequestBody InviteOutInputDTO dto) throws YunhuniApiException {
+        if(logger.isDebugEnabled()){
+            logger.debug("CONVERSATION INVITE_AGENT API参数,accountId={},appId={},id={},dto={}",accountId,appId,id,dto);
+        }
+        String ip = WebUtils.getRemoteAddress(request);
+        return ApiGatewayResponse.success(conversationOps.inviteOut(ip,appId,id,dto.getFrom(),
+                dto.getTo(),dto.getMaxDialDuration(),dto.getMaxCallDuration(),dto.getMode()));
     }
 }

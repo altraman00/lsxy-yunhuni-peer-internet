@@ -429,7 +429,23 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             }
 
         }else if(BusinessState.TYPE_CC_OUT_CALL.equals(state.getType())){
-            //TODO
+            if(StringUtils.isNotBlank(error)){
+                logger.error("将呼叫加入到交谈失败{}",error);
+            }else{
+                String conversationId = businessData.get(CallCenterUtil.CONVERSATION_FIELD);
+                if(conversationId == null){
+                    throw new InvalidParamException("将呼叫加入到会议失败conversationId为null");
+                }
+                try {
+                    Integer voice_mode = null;
+                    if(state.getBusinessData().get(CallCenterUtil.PARTNER_VOICE_MODE_FIELD) != null){
+                        voice_mode = Integer.parseInt(state.getBusinessData().get(CallCenterUtil.PARTNER_VOICE_MODE_FIELD));
+                    }
+                    conversationService.join(conversationId,call_id,null,null,voice_mode);
+                } catch (Throwable e) {
+                    logger.error("将呼叫加入到会议失败",e);
+                }
+            }
         }
         return res;
     }
