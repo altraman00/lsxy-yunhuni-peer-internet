@@ -34,6 +34,8 @@ TAIL_LOG=false
 source /etc/profile
 ulimit -c unlimited
 
+JAVA_OPTS="-Xms512m -Xmx512m -XX:+UseCMSCompactAtFullCollection -Xmn256m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/opt/yunhuni/crashed.heap"
+
 while getopts "A:P:H:M:STILDC" opt; do
   case $opt in
     A)
@@ -56,6 +58,9 @@ while getopts "A:P:H:M:STILDC" opt; do
       ;;
     I)
       FORCE_INSTALL=true;
+      ;;
+    O)
+      JAVA_OPTS="$JAVA_OPTS $OPTARG";
       ;;
     C)
       FORCE_CLEAN=false;
