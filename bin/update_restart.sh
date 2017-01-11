@@ -36,7 +36,7 @@ ulimit -c unlimited
 
 JAVA_OPTS="-Xms512m -Xmx512m -XX:+UseCMSCompactAtFullCollection -Xmn256m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/opt/yunhuni/crashed.heap"
 
-while getopts "A:P:H:M:STILDC" opt; do
+while getopts "A:P:H:M:O:STILDC" opt; do
   case $opt in
     A)
       APP_NAME="$OPTARG"
