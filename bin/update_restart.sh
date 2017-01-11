@@ -17,6 +17,7 @@
 #git pull
 YUNHUNI_HOME="/opt/yunhuni-peer-internet"
 APP_NAME=""
+EXECUTE_HOME="/opt/yunhuni/"
 ENV_PROFILE="-Pdevelopment"
 #tomcat还是springboot
 IS_TOMCAT=false
@@ -62,7 +63,7 @@ while getopts "A:P:H:STILDC" opt; do
       YUNHUNI_HOME="$OPTARG"
       ;;
     \?)
-      echo "Invalid option: -$OPTARG"   
+      echo "Invalid option: -$OPTARG"
       ;;
   esac
 done
@@ -78,11 +79,6 @@ fi
 
 export MAVEN_OPTS="$MAVEN_OPTS -Xms256m -Xmx512m"
 echo "MAVEN 构建参数：$MAVEN_OPTS"
-#先停止制定的APP服务
-echo "停止现有服务...."
-ps -ef | grep "$APP_NAME.*tomcat7:run" | grep -v grep |awk '{print $2}' | xargs kill -9
-ps -ef | grep "$APP_NAME.*spring-boot:run" | grep -v grep |awk '{print $2}' | xargs kill -9
-
 
 cd $YUNHUNI_HOME
 git remote prune origin
@@ -93,7 +89,8 @@ if [ "$pull_ret"x = "Already up-to-date."x ]; then
     if [ $FORCE_INSTALL = true ]; then
         echo "安装模块代码"
         cd $YUNHUNI_HOME
-        mvn clean compile install -U $ENV_PROFILE -DskipTests=true -pl $APP_NAME -am
+        mvn clean
+        mvn package -U $ENV_PROFILE -DskipTests=true -pl $APP_NAME -am
     else
         echo "已经是最新代码了 不用INSTALL了";
     fi
@@ -102,7 +99,8 @@ else
     if [ $FORCE_CLEAN = true ]; then
         echo "清除安装模块代码"
         cd $YUNHUNI_HOME
-        mvn clean compile install -U $ENV_PROFILE -DskipTests=true -pl $APP_NAME -am
+        mvn clean
+        mvn package -U $ENV_PROFILE -DskipTests=true -pl $APP_NAME -am
     else
         echo "已经是最新代码了 不用CLEAN INSTALL了";
     fi
@@ -112,9 +110,11 @@ if [ $? -ne 0 ];then
         exit 1
 fi
 
+#先停止制定的APP服务
+echo "停止现有服务...."
+ps -ef | grep "$APP_NAME" | grep -v update | grep -v grep| grep -v tail |awk '{print $2}' | xargs kill -9
 
 #启动服务脚本
-
 cd $YUNHUNI_HOME/$APP_NAME
 echo "判断是否是TOMCAT:$IS_TOMCAT"
 if [ $IS_TOMCAT = true ]; then
@@ -123,14 +123,19 @@ if [ $IS_TOMCAT = true ]; then
   #mvn -U $ENV_PROFILE clean tomcat7:run
 elif [ $IS_SPRINGBOOT = true ]; then
   echo "starting springboot application...."
-  nohup mvn -U $ENV_PROFILE spring-boot:run 1>> /opt/yunhuni/logs/$APP_NAME.out 2>> /opt/yunhuni/logs/$APP_NAME.out &
+#  nohup mvn -U $ENV_PROFILE spring-boot:run 1>> /opt/yunhuni/logs/$APP_NAME.out 2>> /opt/yunhuni/logs/$APP_NAME.out &
+  JAR_FILE=`find ./ -name "app-*.jar"`
+  echo "execute jar file :$JAR_FILE"
+  echo "启动服务：java $JAVA_OPTS -jar $JAR_FILE"
+  nohup java $JAVA_OPTS -jar $JAR_FILE >> /opt/yunhuni/logs/$APP_NAME.out 2>&1 &
 elif [ $IS_TOMCAT_DEPLOY = true ]; then
   echo "deploy war to tomcat...."
   nohup mvn -U $ENV_PROFILE tomcat7:redeploy 1>> /opt/yunhuni/logs/$APP_NAME.out 2>> /opt/yunhuni/logs/$APP_NAME.out &
 fi
 
-sleep 20;
+sleep 10;
 PROCESS_NUM=`ps -ef | grep $APP_NAME | grep "java" | grep -v "grep" | wc -l`
+
 if [ $IS_TOMCAT_DEPLOY = false ]; then
     if [ $PROCESS_NUM -eq 1 ];
         then
