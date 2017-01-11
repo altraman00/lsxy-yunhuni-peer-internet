@@ -2,6 +2,7 @@ package com.lsxy.app.oc.rest.tenant;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.oc.rest.tenant.vo.AppNumBindVO;
+import com.lsxy.app.oc.rest.tenant.vo.AppNumVO;
 import com.lsxy.app.oc.rest.tenant.vo.TenantAppVO;
 import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.call.center.api.service.AppExtensionService;
@@ -197,6 +198,28 @@ public class TenantAppController {
     public RestResponse findByAppId(@PathVariable String tid,@PathVariable String appId,
                                     @RequestParam(defaultValue = "1")Integer pageNo,  @RequestParam(defaultValue = "10")Integer pageSize){
         Page<ResourcesRent> page = resourcesRentService.findByAppId(appId, pageNo, pageSize);
+
+        List<ResourcesRent> result = page.getResult();
+        if(result != null && result.size() > 0){
+            List<AppNumVO> appNumVOs = new ArrayList<>();
+            for(ResourcesRent rent : result){
+                AppNumVO vo = new AppNumVO();
+                vo.setRentId(rent.getId());
+                vo.setNum(rent.getResourceTelenum().getTelNumber());
+                vo.setStatus(rent.getRentExpire().compareTo(new Date()) == -1 ? "过期" : "正常");
+                vo.setIsCalled(StringUtils.isBlank(rent.getResourceTelenum().getIsCalled())?ResourceTelenum.ISCALLED_FALSE:rent.getResourceTelenum().getIsCalled());
+                if(ResourceTelenum.ISDIALING_TRUE.equals(rent.getResourceTelenum().getIsDialing()) || ResourceTelenum.ISTHROUGH_TRUE.equals(rent.getResourceTelenum().getIsThrough())){
+                    vo.setIsDialing("1");
+                }else{
+                    vo.setIsDialing("0");
+                }
+                vo.setAreaCode(rent.getResourceTelenum().getAreaCode());
+                vo.setExpireTime(rent.getRentExpire());
+                appNumVOs.add(vo);
+            }
+            page.setResult(appNumVOs);
+        }
+
         return RestResponse.success(page);
     }
 
@@ -225,8 +248,25 @@ public class TenantAppController {
         if(app == null || StringUtils.isBlank(app.getOnlineAreaId())){
             return RestResponse.failed("0000","应用不存在");
         }
-        Page<ResourceTelenum> ownUnusedNum = resourceTelenumService.findOwnUnusedNum(tid, app.getOnlineAreaId(), pageNo, pageSize);
-        return RestResponse.success(ownUnusedNum);
+        Page page = resourceTelenumService.findOwnUnusedNum(tid, app.getOnlineAreaId(), pageNo, pageSize);
+        List<ResourceTelenum> result = page.getResult();
+        if(result != null && result.size() > 0){
+            List<AppNumVO> appNumVOs = new ArrayList<>();
+            for(ResourceTelenum num:result){
+                AppNumVO vo = new AppNumVO();
+                vo.setNum(num.getTelNumber());
+                vo.setIsCalled(StringUtils.isBlank(num.getIsCalled())?ResourceTelenum.ISCALLED_FALSE:num.getIsCalled());
+                if(ResourceTelenum.ISDIALING_TRUE.equals(num.getIsDialing()) || ResourceTelenum.ISTHROUGH_TRUE.equals(num.getIsThrough())){
+                    vo.setIsDialing("1");
+                }else{
+                    vo.setIsDialing("0");
+                }
+                vo.setAreaCode(num.getAreaCode());
+                appNumVOs.add(vo);
+            }
+            page.setResult(appNumVOs);
+        }
+        return RestResponse.success(page);
     }
 
     @ApiOperation(value = "租户App绑定号码")

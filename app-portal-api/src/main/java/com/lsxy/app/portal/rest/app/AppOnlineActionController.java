@@ -32,8 +32,8 @@ import java.util.Map;
  */
 @RequestMapping("/rest/app_online")
 @RestController
-public class AppOnlineActionControlller extends AbstractRestController {
-    private static final Logger logger = LoggerFactory.getLogger(AppOnlineActionControlller.class);
+public class AppOnlineActionController extends AbstractRestController {
+    private static final Logger logger = LoggerFactory.getLogger(AppOnlineActionController.class);
 
     @Autowired
     AppOnlineActionService appOnlineActionService;
