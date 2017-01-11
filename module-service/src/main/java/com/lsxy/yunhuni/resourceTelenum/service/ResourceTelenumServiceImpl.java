@@ -517,4 +517,9 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         ResourceTelenum num = resourceTelenumDao.findFirstByTenantIdAndAppIdAndUsableAndIsCalled(tenantId,appId,ResourceTelenum.USABLE_TRUE,ResourceTelenum.ISCALLED_TRUE);
         return num != null;
     }
+
+    @Override
+    public void appUnbindAll(String tenantId, String appId) {
+        resourceTelenumDao.appUnbindAll(tenantId, appId,new Date());
+    }
 }

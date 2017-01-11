@@ -143,4 +143,13 @@ public class RentTelnumController extends AbstractPortalController {
         List list = getTelnumCity(request);
         return  RestResponse.success(list);
     }
+
+    @RequestMapping("/list/app/{appId}")
+    @ResponseBody
+    public Page<ResourcesRent> findByAppId(HttpServletRequest request,@PathVariable String appId,Integer pageNo,Integer pageSize){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/list/app/{1}?pageNo={2}&pageSize={3}";
+        return RestRequest.buildSecurityRequest(token).getPage(uri, ResourcesRent.class,appId,pageNo,pageSize).getData();
+    }
+
 }

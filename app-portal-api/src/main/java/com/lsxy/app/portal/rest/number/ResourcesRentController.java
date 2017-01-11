@@ -72,7 +72,7 @@ public class ResourcesRentController extends AbstractRestController{
         return RestResponse.success(list);
     }
     /**
-     * 获取租户的呼入号码分页数据
+     * 获取租户的号码分页数据
      * @param pageNo
      * @param pageSize
      * @return
@@ -95,15 +95,7 @@ public class ResourcesRentController extends AbstractRestController{
         resourcesRentService.release(id);
         return RestResponse.success("释放成功");
     }
-    @RequestMapping("/by_app/{appId}")
-    public RestResponse getByAppId(@PathVariable String appId){
-        ResourcesRent rent = null;
-        List<ResourcesRent> rents = resourcesRentService.findByAppId(appId);
-        if(rents != null && rents.size()>0){
-            rent = rents.get(0);
-        }
-        return RestResponse.success(rent);
-    }
+
 
     /**
      * 获取号码列表
@@ -229,5 +221,25 @@ public class ResourcesRentController extends AbstractRestController{
         bigDecimal1 = temp.getAmount().add(bigDecimal1);
         temp.setAmount(bigDecimal1);
         return RestResponse.success(temp);
+    }
+
+    @RequestMapping("/list/app/{appId}" )
+    public RestResponse findByAppId(@PathVariable String appId,Integer pageNo,Integer pageSize){
+        Page<ResourcesRent> page = resourcesRentService.findByAppId(appId, pageNo, pageSize);
+        return RestResponse.success(page);
+    }
+
+    @RequestMapping("/app/{appId}/unbind/{num}" )
+    public RestResponse unbind(String appId,String num){
+        Tenant tenant = getCurrentAccount().getTenant();
+        resourcesRentService.unbind(tenant.getId(),appId,num);
+        return RestResponse.success();
+    }
+
+    @RequestMapping("/app/{appId}/unbind_all" )
+    public RestResponse unbindAll(String appId){
+        Tenant tenant = getCurrentAccount().getTenant();
+        resourcesRentService.appUnbindAll(tenant.getId(),appId);
+        return RestResponse.success();
     }
 }

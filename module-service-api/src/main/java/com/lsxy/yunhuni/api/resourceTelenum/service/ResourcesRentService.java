@@ -27,7 +27,7 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @param appId
      * @return
      */
-    List<ResourcesRent> findByAppId(String appId);
+    Page<ResourcesRent> findByAppId(String appId,int pageNo, int pageSize);
 
     /**
      * 根据号码和租用状态查询租用关系
@@ -89,4 +89,17 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      */
     TelenumOrder telnumNew(Tenant tenant, String[] numIds);
 
+    /**
+     * 释放应用所有的号码
+     * @param appId
+     */
+    void appUnbindAll(String tenantId,String appId);
+
+    /**
+     * 释放应用绑定的单个号码
+     * @param tenantId
+     * @param appId
+     * @param num
+     */
+    void unbind(String tenantId, String appId, String num);
 }

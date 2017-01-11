@@ -96,8 +96,9 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     }
 
     @Override
-    public List<ResourcesRent> findByAppId(String appId) {
-        return resourcesRentDao.findByAppIdAndRentStatus(appId,ResourcesRent.RENT_STATUS_USING);
+    public Page<ResourcesRent> findByAppId(String appId,int pageNo, int pageSize) {
+        String hql = "from ResourcesRent obj where obj.app.id=?1 and obj.rentStatus = 1 order by obj.createTime desc";
+        return  this.pageList(hql,pageNo,pageSize,appId);
     }
 
     @Override
@@ -280,5 +281,22 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
         telenumOrder.setDeadline(c.getTime());
         telenumOrder = telenumOrderService.save(telenumOrder);
         return telenumOrder;
+    }
+
+    @Override
+    public void appUnbindAll(String tenantId,String appId) {
+        resourcesRentDao.appUnbindAll(tenantId,appId,new Date());
+        resourceTelenumService.appUnbindAll(tenantId, appId);
+    }
+
+    @Override
+    public void unbind(String tenantId, String appId, String num) {
+        ResourcesRent rent = resourcesRentDao.findFirstByTenantIdAndAppIdAndResDataAndRentStatus(tenantId,appId,num,ResourcesRent.RENT_STATUS_USING);
+        ResourceTelenum resourceTelenum = rent.getResourceTelenum();
+        resourceTelenum.setAppId(null);
+        resourceTelenumService.save(resourceTelenum);
+        rent.setApp(null);
+        rent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
+        this.save(rent);
     }
 }

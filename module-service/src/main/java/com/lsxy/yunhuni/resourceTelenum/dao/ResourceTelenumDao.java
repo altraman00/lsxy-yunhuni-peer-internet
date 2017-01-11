@@ -83,4 +83,13 @@ public interface ResourceTelenumDao  extends BaseDaoInterface<ResourceTelenum, S
     ResourceTelenum findFirstByTelNumberOrCallUri(String num, String num1);
 
     ResourceTelenum findFirstByTenantIdAndAppIdAndUsableAndIsCalled(String tenantId, String appId, String usableTrue, String iscalledTrue);
+
+    /**
+     * 应用释放所有的号码
+     * @param tenantId
+     * @param appId
+     */
+    @Modifying
+    @Query(value = "update db_lsxy_bi_yunhuni.tb_oc_resource_telenum num set num.app_id = null,num.last_time = :date where num.tenant_id = :tenantId and num.app_id = :appId and num.deleted = 0 ",nativeQuery = true)
+    void appUnbindAll(@Param("tenantId") String tenantId, @Param("appId") String appId,@Param("date") Date date);
 }

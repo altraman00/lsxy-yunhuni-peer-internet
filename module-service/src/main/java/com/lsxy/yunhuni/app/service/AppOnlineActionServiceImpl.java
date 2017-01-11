@@ -130,7 +130,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             if(action.getAction() == AppOnlineAction.ACTION_SELECT_NUM){
                 //当应用有ivr功能时(或者为呼叫中心应用)，绑定IVR号码绑定
                 //判断ivr号码是否被占用
-                String areaId = this.bindNumToApp(app, numList, tenant);
+                String areaId = this.bindNumToAppAndGetAreaId(app, numList, tenant);
                 //处理区域Id
                 if(StringUtils.isBlank(areaId)){
                     //如果上一次上线的区域ID为空，这次也没有选号码，则分配一个可用的区域ID
@@ -177,7 +177,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
      * @param nums
      * @param tenant
      */
-    private String bindNumToApp(App app, List<String> nums, Tenant tenant) {
+    private String bindNumToAppAndGetAreaId(App app, List<String> nums, Tenant tenant) {
         String areaId = app.getOnlineAreaId();
         boolean isCalled = false;
         for(String num : nums){
