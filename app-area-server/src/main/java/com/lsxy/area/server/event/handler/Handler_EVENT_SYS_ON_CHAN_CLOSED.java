@@ -124,6 +124,9 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             }
             voiceCdr.setIvrType(2);
         }else if(BusinessState.TYPE_IVR_CALL.equals(businessState.getType())){
+            if(conversationService.isCC(businessState)){
+                productCode = ProductCode.call_center;
+            }
             voiceCdr.setIvrType(2);
         }
 

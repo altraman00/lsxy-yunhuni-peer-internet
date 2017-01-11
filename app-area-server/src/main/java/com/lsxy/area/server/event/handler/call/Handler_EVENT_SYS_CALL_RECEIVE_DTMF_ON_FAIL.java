@@ -71,13 +71,13 @@ public class Handler_EVENT_SYS_CALL_RECEIVE_DTMF_ON_FAIL extends EventHandler{
         if(state == null){
             throw new InvalidParamException("businessstate is null");
         }
-        if(canDoivr(state,call_id)){
+        if(canDoivr(state)){
             ivr(state,params,call_id);
         }
         return res;
     }
 
-    private boolean canDoivr(BusinessState state,String call_id){
+    private boolean canDoivr(BusinessState state){
         if(BusinessState.TYPE_IVR_CALL.equals(state.getType())){//是ivr呼出
             return true;
         }
