@@ -18,6 +18,7 @@
 YUNHUNI_HOME="/opt/yunhuni-peer-internet"
 APP_NAME=""
 EXECUTE_HOME="/opt/yunhuni/"
+TOMCAT_HOME=/opt/apach-tomcat
 ENV_PROFILE="-Pdevelopment"
 #tomcat还是springboot
 IS_TOMCAT=false
@@ -33,7 +34,7 @@ TAIL_LOG=false
 source /etc/profile
 ulimit -c unlimited
 
-while getopts "A:P:H:STILDC" opt; do
+while getopts "A:P:H:M:STILDC" opt; do
   case $opt in
     A)
       APP_NAME="$OPTARG"
@@ -49,6 +50,9 @@ while getopts "A:P:H:STILDC" opt; do
       ;;
     S)
       IS_SPRINGBOOT=true;
+      ;;
+    M)
+      TOMCAT_HOME="$OPTARG";
       ;;
     I)
       FORCE_INSTALL=true;
@@ -130,7 +134,9 @@ elif [ $IS_SPRINGBOOT = true ]; then
   nohup java $JAVA_OPTS -jar $JAR_FILE >> /opt/yunhuni/logs/$APP_NAME.out 2>&1 &
 elif [ $IS_TOMCAT_DEPLOY = true ]; then
   echo "deploy war to tomcat...."
-  nohup mvn -U $ENV_PROFILE tomcat7:redeploy 1>> /opt/yunhuni/logs/$APP_NAME.out 2>> /opt/yunhuni/logs/$APP_NAME.out &
+  WAR_FILE=`find ./ -name "app-*.war"`
+  echo "cp $WAR_FILE $TOMCAT_HOME/webapps/ROOT.war"
+  cp $WAR_FILE $TOMCAT_HOME/webapps/ROOT.war
 fi
 
 sleep 10;
