@@ -150,14 +150,18 @@ public class ConversationService {
         return false;
     }
 
-    public boolean isPlayWait(String callId){
-        if(StringUtils.isEmpty(callId)){
+    public boolean isPlayWait(String id){
+        if(StringUtils.isEmpty(id)){
             return false;
         }
-        BusinessState state = businessStateService.get(callId);
+        BusinessState state = businessStateService.get(id);
+        return isPlayWait(state);
+    }
+
+    public boolean isPlayWait(BusinessState state){
         if(state != null && state.getBusinessData()!= null){
-            String playWait = state.getBusinessData().get(CallCenterUtil.IS_PLAYWAIT_FIELD);
-            return playWait !=null && playWait.equals(CallCenterUtil.IS_PLAYWAIT_TRUE);
+            String playWait = state.getBusinessData().get(CallCenterUtil.PLAYWAIT_FIELD);
+            return StringUtil.isNotBlank(playWait);
         }
         return false;
     }
@@ -733,7 +737,7 @@ public class ConversationService {
         if(BusinessState.TYPE_IVR_INCOMING.equals(call_state.getType()) ||
                 BusinessState.TYPE_IVR_CALL.equals(call_state.getType())){
             if(call_state.getClosed() == null || !call_state.getClosed()){
-                this.stopPlayWait(call_state.getAreaId(),call_state.getId(),call_state.getResId());
+                this.stopPlayWait(call_state);
                 if(logger.isDebugEnabled()){
                     logger.debug("开始重新进入ivr，callid={}",callId);
                 }
@@ -814,27 +818,39 @@ public class ConversationService {
 
     /**
      * 停止播放排队等待音
-     * @param area_id
-     * @param call_id
-     * @param res_id
      */
-    public void stopPlayWait(String area_id,String call_id,String res_id){
+    public void stopPlayWait(BusinessState state){
         try {
-            boolean isPlayWait = this.isPlayWait(call_id);
+            boolean isPlayWait = this.isPlayWait(state);
             if(logger.isDebugEnabled()){
-                logger.info("停止播放排队录音isPlayWait={} ",call_id);
+                logger.info("停止播放排队录音isPlayWait={}",isPlayWait);
             }
             if(isPlayWait){
                 Map<String, Object> params = new MapBuilder<String,Object>()
-                        .putIfNotEmpty("res_id",res_id)
-                        .putIfNotEmpty("user_data",call_id)
-                        .put("areaId",area_id)
+                        .putIfNotEmpty("res_id",state.getResId())
+                        .putIfNotEmpty("user_data",state.getId())
+                        .put("areaId",state.getAreaId())
                         .build();
                 RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_STOP, params);
-                if(!businessStateService.closed(call_id)) {
+                if(!businessStateService.closed(state.getId())) {
                     rpcCaller.invoke(sessionContext, rpcrequest, true);
                 }
             }
+        } catch (Throwable e) {
+            logger.error("调用失败",e);
+        }
+    }
+
+    public void stopPlay(String area_id,String conversation_id,String res_id){
+        Map<String,Object> params = new MapBuilder<String,Object>()
+                .putIfNotEmpty("res_id",res_id)
+                .putIfNotEmpty("user_data",conversation_id)
+                .putIfNotEmpty("areaId",area_id)
+                .build();
+
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY_STOP, params);
+        try {
+            rpcCaller.invoke(sessionContext, rpcrequest, true);
         } catch (Throwable e) {
             logger.error("调用失败",e);
         }

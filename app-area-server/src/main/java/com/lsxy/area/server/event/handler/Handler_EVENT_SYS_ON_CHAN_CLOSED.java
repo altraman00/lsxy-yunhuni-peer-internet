@@ -191,7 +191,12 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             }
             voiceCdr.setToNum(cdrSplit[8].trim());
             //host根据to来获取
-            host = cdrSplit[8].trim().split("@")[1];
+            String[] toSplit = cdrSplit[8].trim().split("@");
+            if(toSplit.length > 1){
+                host = toSplit[1];
+            }else{
+                host = cdrSplit[10].trim().split("@")[1];
+            }
         }
         Date callStartDate = getCallDate(cdrSplit[18].trim());
         voiceCdr.setCallStartDt(callStartDate == null?new Date():callStartDate);
