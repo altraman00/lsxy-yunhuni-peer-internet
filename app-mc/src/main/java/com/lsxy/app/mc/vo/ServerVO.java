@@ -12,7 +12,15 @@ public class ServerVO {
     private String serverIp;
     private String serverPort;
     private String status;
+    private String version;
 
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
 
     public ServerVO(){}
 

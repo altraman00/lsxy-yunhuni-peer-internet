@@ -1,5 +1,6 @@
 package com.lsxy.framework.monitor;
 
+import com.lsxy.framework.core.utils.StringUtil;
 import org.springframework.stereotype.Component;
 
 /**
@@ -10,7 +11,11 @@ import org.springframework.stereotype.Component;
 public class SystemMonitor extends AbstractMonitor {
 
     public String fetch(){
-        return System.getProperty("systemId","");
+        String version = this.getClass().getPackage().getImplementationVersion();
+        if(StringUtil.isEmpty(version)){
+            version = "1.2.1";
+        }
+        return version;
     }
 
     @Override

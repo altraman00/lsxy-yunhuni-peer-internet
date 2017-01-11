@@ -64,6 +64,7 @@ public class ServerController extends AdminController{
             }
             if(serversCache.contains(key)){
                 server.setStatus(ServerVO.STATUS_OK);
+                server.setVersion(cacheService.get(key));
             }else{
                 server.setStatus(ServerVO.STATUS_FAILED);
             }

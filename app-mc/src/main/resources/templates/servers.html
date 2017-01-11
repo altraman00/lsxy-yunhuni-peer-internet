@@ -17,6 +17,7 @@
     <tr style="font-weight: bolder;background-color: bisque">
         <td>服务组件</td>
         <td>应用名</td>
+        <td>版本号</td>
         <td>服务器</td>
         <td>服务端口</td>
         <td>状态</td>
@@ -25,9 +26,9 @@
     <tr th:each="server:${servers}">
         <td th:text="${server.serverName}">用户控制台01</td>
         <td th:text="${server.appName}">app-portal-01</td>
+        <td th:text="${server.version}">1.0</td>
         <td th:text="|${server.serverHost} - ${server.serverIp}|">p01 - 192.168.10.2</td>
         <td th:text="${server.serverPort}">8080</td>
-
         <td th:style="${server.status eq 'OK'} ? 'background-color: green':'background-color: red'" th:text="${server.status}" style="background-color: green">OK</td>
     </tr>
 </table>
