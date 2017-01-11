@@ -81,6 +81,10 @@ then
    exit 1;
 fi
 
+#先停止制定的APP服务
+echo "停止现有服务...."
+ps -ef | grep "$APP_NAME" | grep -v update | grep -v grep| grep -v tail |awk '{print $2}' | xargs kill -9
+
 export MAVEN_OPTS="$MAVEN_OPTS -Xms256m -Xmx512m"
 echo "MAVEN 构建参数：$MAVEN_OPTS"
 
@@ -114,9 +118,6 @@ if [ $? -ne 0 ];then
         exit 1
 fi
 
-#先停止制定的APP服务
-echo "停止现有服务...."
-ps -ef | grep "$APP_NAME" | grep -v update | grep -v grep| grep -v tail |awk '{print $2}' | xargs kill -9
 
 #启动服务脚本
 cd $YUNHUNI_HOME/$APP_NAME
