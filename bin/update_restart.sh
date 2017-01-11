@@ -146,8 +146,7 @@ elif [ $IS_TOMCAT_DEPLOY = true ]; then
 fi
 
 sleep 10;
-PROCESS_NUM=`ps -ef | grep $APP_NAME | grep "java" | grep -v "grep" | wc -l`
-
+PROCESS_NUM=`ps -ef | grep $APP_NAME | grep "java" | grep -v "grep" | grep -v "update_restart" | wc -l`
 if [ $IS_TOMCAT_DEPLOY = false ]; then
     if [ $PROCESS_NUM -eq 1 ];
         then
