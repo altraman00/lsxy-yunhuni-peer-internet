@@ -7,7 +7,6 @@ import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.framework.api.billing.model.Billing;
 import com.lsxy.framework.api.billing.service.CalBillingService;
-import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
@@ -195,7 +194,8 @@ public class TenantAppController {
 
     @ApiOperation(value = "租户的app绑定的号码")
     @RequestMapping(value = "/tenants/{tid}/res_rent/app/{appId}/res_rent/list" ,method = RequestMethod.GET)
-    public RestResponse findByAppId(@PathVariable String tid,@PathVariable String appId,Integer pageNo,Integer pageSize){
+    public RestResponse findByAppId(@PathVariable String tid,@PathVariable String appId,
+                                    @RequestParam(defaultValue = "1")Integer pageNo,  @RequestParam(defaultValue = "10")Integer pageSize){
         Page<ResourcesRent> page = resourcesRentService.findByAppId(appId, pageNo, pageSize);
         return RestResponse.success(page);
     }
