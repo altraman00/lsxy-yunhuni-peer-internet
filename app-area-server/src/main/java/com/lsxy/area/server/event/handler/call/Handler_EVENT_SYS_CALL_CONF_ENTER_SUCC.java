@@ -143,26 +143,30 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         //会议成员增加
         confService.incrPart(conf_id,call_id);
 
-        Meeting meeting = meetingService.findById(conf_id);
-        if(meeting!=null){
-            String callSessionId = businessData.get(BusinessState.SESSIONID);
-            MeetingMember meetingMember = new MeetingMember();
-            meetingMember.setId(call_id);
-            meetingMember.setAppId(state.getAppId());
-            meetingMember.setTenantId(state.getTenantId());
-            meetingMember.setNumber(businessData.get("to"));
-            meetingMember.setJoinTime(new Date());
-            if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
-                meetingMember.setJoinType(MeetingMember.JOINTYPE_CALL);
-            }else{
-                meetingMember.setJoinType(MeetingMember.JOINTYPE_INVITE);
+        try {
+            Meeting meeting = meetingService.findById(conf_id);
+            if(meeting!=null){
+                String callSessionId = businessData.get(BusinessState.SESSIONID);
+                MeetingMember meetingMember = new MeetingMember();
+                meetingMember.setId(call_id);
+                meetingMember.setAppId(state.getAppId());
+                meetingMember.setTenantId(state.getTenantId());
+                meetingMember.setNumber(businessData.get("to"));
+                meetingMember.setJoinTime(new Date());
+                if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
+                    meetingMember.setJoinType(MeetingMember.JOINTYPE_CALL);
+                }else{
+                    meetingMember.setJoinType(MeetingMember.JOINTYPE_INVITE);
+                }
+                meetingMember.setMeetingId(meeting.getId());
+                if(callSessionId!=null){
+                    meetingMember.setSessionId(callSessionId);
+                }
+                meetingMember.setResId(state.getResId());
+                meetingMemberService.save(meetingMember);
             }
-            meetingMember.setMeetingId(meeting.getId());
-            if(callSessionId!=null){
-                meetingMember.setSessionId(callSessionId);
-            }
-            meetingMember.setResId(state.getResId());
-            meetingMemberService.save(meetingMember);
+        } catch (Exception e) {
+            logger.warn("保存会议成员记录失败",e);
         }
 
         //开始通知开发者
