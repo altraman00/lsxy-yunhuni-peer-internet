@@ -98,6 +98,7 @@ public class DeQueueServiceImpl implements DeQueueService {
             //抛异常后呼叫中心微服务会回滚坐席状态
             throw new IllegalStateException("会话已关闭");
         }
+        conversationService.stopPlayWait(state);
         String conversation = UUIDGenerator.uuid();
 
         //更新排队的call的所属交谈id和排队id
@@ -121,6 +122,9 @@ public class DeQueueServiceImpl implements DeQueueService {
         conversationService.create(conversation,state.getBusinessData().get(BusinessState.REF_RES_ID),state.getId(),state.getTenantId(),
                 state.getAppId(),state.getAreaId(),state.getCallBackUrl(),conversationTimeout);
 
+        if(state.getBusinessData().get(CallCenterUtil.PLAYWAIT_FIELD) != null){
+            businessStateService.updateInnerField(conversation,CallCenterUtil.PLAYWAIT_FIELD,state.getBusinessData().get(CallCenterUtil.PLAYWAIT_FIELD));
+        }
         //设置坐席的businessstate
         setAgentState(agentCallId,enQueue,result);
 
@@ -176,7 +180,7 @@ public class DeQueueServiceImpl implements DeQueueService {
             logger.info("会话已关闭callid={}",callId);
             return;
         }
-        conversationService.stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
+        conversationService.stopPlayWait(state);
 
         callCenterUtil.sendQueueFailEvent(state.getCallBackUrl(),
                 queueId,CallCenterUtil.QUEUE_TYPE_IVR,
@@ -219,7 +223,7 @@ public class DeQueueServiceImpl implements DeQueueService {
             logger.info("会话已关闭callid={}",callId);
             return;
         }
-        conversationService.stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
+        conversationService.stopPlayWait(state);
 
         callCenterUtil.sendQueueFailEvent(state.getCallBackUrl(),
                 queueId,CallCenterUtil.QUEUE_TYPE_IVR,
@@ -323,6 +327,8 @@ public class DeQueueServiceImpl implements DeQueueService {
                 innerFields.add(postNumVoice);
             }
         }
-        businessStateService.updateInnerField(agentCallId,innerFields);
+        if(innerFields.size()>0){
+            businessStateService.updateInnerField(agentCallId,innerFields);
+        }
     }
 }

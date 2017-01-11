@@ -51,9 +51,8 @@ public class CallCenterUtil {
     /**ivr呼叫是否呼叫中心标记存放的字段**/
     public static final String ISCC_FIELD = "ISCC";
     public static final String ISCC_TRUE = "1";
-    /**是否正在播放排队等待音标记存放的字段**/
-    public static final String IS_PLAYWAIT_FIELD = "IS_PLAYWAIT";
-    public static final String IS_PLAYWAIT_TRUE = "1";
+    /**正在播放排队等待音存放的字段**/
+    public static final String PLAYWAIT_FIELD = "IS_PLAYWAIT";
     /**呼叫对应的排队id存放的字段**/
     public static final String QUEUE_ID_FIELD = "QUEUE_ID";
     /**坐席挂机后的状态存放的字段**/
