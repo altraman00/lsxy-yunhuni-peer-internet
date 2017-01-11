@@ -133,9 +133,9 @@ elif [ $IS_SPRINGBOOT = true ]; then
   echo "starting springboot application...."
 #  nohup mvn -U $ENV_PROFILE spring-boot:run 1>> /opt/yunhuni/logs/$APP_NAME.out 2>> /opt/yunhuni/logs/$APP_NAME.out &
   JAR_FILE=`find ./ -name "app-*.jar"`
-  echo "execute jar file :$JAR_FILE"
-  echo "启动服务：java $JAVA_OPTS -jar $JAR_FILE"
-  nohup java $JAVA_OPTS -jar $JAR_FILE >> /opt/yunhuni/logs/$APP_NAME.out 2>&1 &
+  \cp $JAR_FILE $EXECUTE_HOME/$APP_NAME.jar
+  echo "启动服务：java $JAVA_OPTS -jar $EXECUTE_HOME$APP_NAME.jar"
+  nohup java $JAVA_OPTS -jar $EXECUTE_HOME/$APP_NAME.jar >> /opt/yunhuni/logs/$APP_NAME.out 2>&1 &
 elif [ $IS_TOMCAT_DEPLOY = true ]; then
   echo "deploy war to tomcat...."
   WAR_FILE=`find ./ -name "app-*.war"`
