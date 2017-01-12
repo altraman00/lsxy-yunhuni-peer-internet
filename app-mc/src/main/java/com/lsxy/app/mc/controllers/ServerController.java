@@ -11,6 +11,7 @@ import com.lsxy.app.mc.vo.ServerVO;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.Application;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -22,6 +23,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -126,6 +128,12 @@ public class ServerController extends AdminController{
             }
             if(serversCache.contains(key)){
                 server.setStatus(ServerVO.STATUS_OK);
+                //缓存中存储格式 [version startdatetime]
+                String xx[] = cacheService.get(key).split(" ");
+                server.setVersion(xx[0]);
+                if(xx.length > 1){
+                    server.setStartDt(DateUtils.formatDate(new Date(Long.parseLong(xx[1]))));
+                }
                 server.setVersion(cacheService.get(key));
             }else{
                 server.setStatus(ServerVO.STATUS_FAILED);

@@ -14,6 +14,16 @@ public class ServerVO {
     private String serverPort;
     private String status;
     private String version;
+    private String startDt;
+
+
+    public String getStartDt() {
+        return startDt;
+    }
+
+    public void setStartDt(String startDt) {
+        this.startDt = startDt;
+    }
 
     public String getVersion() {
         return version;
