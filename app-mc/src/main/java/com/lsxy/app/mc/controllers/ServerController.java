@@ -1,5 +1,9 @@
 package com.lsxy.app.mc.controllers;
 
+import com.lsxy.app.mc.exceptions.ScriptFileNotExistException;
+import com.lsxy.app.mc.service.ScriptService;
+import com.lsxy.app.mc.utils.RunShellUtil;
+import com.lsxy.app.mc.utils.ShellExecuteException;
 import com.lsxy.app.mc.vo.AreaNodeVO;
 import com.lsxy.app.mc.vo.AreaServerHostVO;
 import com.lsxy.app.mc.vo.AreaServerVO;
@@ -8,12 +12,14 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.framework.web.rest.RestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 import java.util.Set;
@@ -31,6 +37,9 @@ public class ServerController extends AdminController{
     @Autowired
     private RedisCacheService cacheService;
 
+    @Autowired
+    private ScriptService scriptService;
+
     @RequestMapping("/servers")
     public String servers(Model model){
 
@@ -45,6 +54,45 @@ public class ServerController extends AdminController{
         return "servers";
     }
 
+    @RequestMapping("/server/stop")
+    @ResponseBody
+    public RestResponse<String> stopServer(){
+        return RestResponse.success("OK");
+    }
+
+    @RequestMapping("/server/start")
+    @ResponseBody
+    public RestResponse<String> startServer(String host,String app,String version){
+//        String script = "/opt/lsxy_yunwei/lsxy_server.sh -j start -a app-portal-api -r 1.2.0-RC3 -h p05";
+
+        try {
+            String script = scriptService.prepareScript("start.sh");
+            String result = RunShellUtil.run("sh "+script + " -a "+app+"",10);
+            System.out.println(result);
+        } catch (ScriptFileNotExistException | ShellExecuteException e) {
+            e.printStackTrace();
+            return RestResponse.failed("00001","execute exception");
+        }
+        return RestResponse.success("OK");
+    }
+    @RequestMapping("/server/update")
+    @ResponseBody
+    public RestResponse<String> updateServer(String host,String app){
+//        String script = "/opt/lsxy_yunwei/lsxy_server.sh -j start -a app-portal-api -r 1.2.0-RC3 -h p05";
+
+        try {
+            String script = scriptService.prepareScript(ScriptService.SCRIPT_UPDATE);
+            String result = RunShellUtil.run("sh "+script + " -a "+app+" -h "+host+"",10);
+            if(logger.isDebugEnabled()){
+                logger.debug("update completed and result is :");
+                logger.debug(result);
+            }
+        } catch (ScriptFileNotExistException | ShellExecuteException e) {
+            logger.error("update exception: " + host + ":" + app,e);
+            return RestResponse.failed("00001","execute exception");
+        }
+        return RestResponse.success("OK");
+    }
     /**
      * 从配置文件中获取所有服务器并根据服务器配置获取服务器当前状态并返回
      * @return
