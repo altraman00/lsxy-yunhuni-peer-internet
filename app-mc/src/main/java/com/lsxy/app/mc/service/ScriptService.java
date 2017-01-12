@@ -68,10 +68,15 @@ public class ScriptService {
                 if(logger.isDebugEnabled()){
                     logger.debug("config stream is : " + is);
                 }
+                InputStream in2 = this.getClass().getClassLoader().getResourceAsStream(scriptName);
+                if(logger.isDebugEnabled()){
+                    logger.debug("in2 is :" + in2);
+                }
                 InputStream in = this.getClass().getClassLoader().getResourceAsStream("scripts/"+scriptName);
                 if(in == null){
                     throw new ScriptFileNotExistException(scriptName);
                 }
+
                 file.createNewFile();
                 FileOutputStream fos = new FileOutputStream(file);
                 FileUtil.copyStream(in,fos);
