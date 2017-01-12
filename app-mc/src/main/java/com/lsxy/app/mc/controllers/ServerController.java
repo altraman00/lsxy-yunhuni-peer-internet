@@ -88,7 +88,7 @@ public class ServerController extends AdminController{
                 logger.debug(result);
             }
         } catch (ScriptFileNotExistException | ShellExecuteException e) {
-            e.printStackTrace();
+            logger.error("update exception: " + host + ":" + app,e);
             return RestResponse.failed("00001","execute exception");
         }
         return RestResponse.success("OK");
