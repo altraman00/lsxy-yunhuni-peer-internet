@@ -1,6 +1,7 @@
 package com.lsxy.app.mc.service;
 
 import com.lsxy.app.mc.exceptions.ScriptFileNotExistException;
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,10 @@ public class ScriptService {
             }
 
             try {
+                InputStream is = SystemConfig.class.getClassLoader().getResourceAsStream("config.properties");
+                if(logger.isDebugEnabled()){
+                    logger.debug("config stream is : " + is);
+                }
                 InputStream in = this.getClass().getClassLoader().getResourceAsStream("/scripts/"+scriptName);
                 if(in == null){
                     throw new ScriptFileNotExistException(scriptName);
