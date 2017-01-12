@@ -171,7 +171,7 @@ public class RentTelnumController extends AbstractPortalController {
                     vo.setIsDialing("0");
                 }
                 vo.setAreaCode(rent.getResourceTelenum().getAreaCode());
-                vo.setExpireTime(DateUtils.formatDate(rent.getRentExpire(),"yyyy-MM-dd "));
+                vo.setExpireTime(rent.getRentExpire() == null ? "" : DateUtils.formatDate(rent.getRentExpire(),"yyyy-MM-dd "));
                 appNumVOs.add(vo);
             }
             page.setResult(appNumVOs);

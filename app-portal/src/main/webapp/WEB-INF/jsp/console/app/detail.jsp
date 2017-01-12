@@ -237,7 +237,9 @@
                                     </li>
                                     <li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>
                                     <!--号码绑定-->
-                                    <li data-id="number"><a href="#number" data-toggle="tab">号码绑定</a></li>
+                                    <c:if test="${app.status==1}">
+                                        <li data-id="number"><a href="#number" data-toggle="tab">号码绑定</a></li>
+                                    </c:if>
                                     <li class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
@@ -908,7 +910,11 @@
         var name = $('#name').val();
 
         ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':1,'pageSize':20,csrfParameterName:csrfToken},function(response){
-            count=response.data.totalCount;
+            if(response.success){
+                count=response.data.totalCount;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
+            }
         },"post");
 
         //每页显示数量
@@ -947,29 +953,33 @@
     {
         var name = $('#name').val();
         ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':nowPage,'pageSize':listRows,csrfParameterName:csrfToken},function(response){
-            var data =[];
-            for(var j=0;j<response.data.result.length;j++){
-                var tempFile = response.data.result[j];
-                var temp = [tempFile.id,tempFile.name,tempFile.status,resultFileSize(tempFile.size),tempFile.remark,tempFile.reason?tempFile.reason:'',tempFile.sync];
-                data[j]=temp;
-            }
-            var html ='';
-            //数据列表
-            for(var i = 0 ; i<data.length; i++){
-                html +='<tr class="playtr" id="play-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
-                if(data[i][2]==-1){
-                    html+='<td  title="审核不通过原因：'+data[i][5]+'"><span class="nosuccess">审核不通过</span><i class="fa fa-exclamation-triangle"></i></td>';
-                }else if(data[i][2]==1&&data[i][6]==1){
-                    html+='<td ><span class="success">已审核</span></td>';
-                }else{
-                    html+='<td>待审核</td>';
+            if(response.success){
+                var data =[];
+                for(var j=0;j<response.data.result.length;j++){
+                    var tempFile = response.data.result[j];
+                    var temp = [tempFile.id,tempFile.name,tempFile.status,resultFileSize(tempFile.size),tempFile.remark,tempFile.reason?tempFile.reason:'',tempFile.sync];
+                    data[j]=temp;
                 }
-                html+='<td>'+data[i][3]+'</td>';
-                html+='<td id="remark-a-'+data[i][0]+'">'+data[i][4]+'</td>';
-                html+='<td class="operation"> <a onclick="delplay(this)" id="delete-'+data[i][0]+'" >删除</a> <span ></span> <a onclick="editremark(this)" id="remark-b-'+data[i][0]+'">修改备注</a> </td></tr>';
+                var html ='';
+                //数据列表
+                for(var i = 0 ; i<data.length; i++){
+                    html +='<tr class="playtr" id="play-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
+                    if(data[i][2]==-1){
+                        html+='<td  title="审核不通过原因：'+data[i][5]+'"><span class="nosuccess">审核不通过</span><i class="fa fa-exclamation-triangle"></i></td>';
+                    }else if(data[i][2]==1&&data[i][6]==1){
+                        html+='<td ><span class="success">已审核</span></td>';
+                    }else{
+                        html+='<td>待审核</td>';
+                    }
+                    html+='<td>'+data[i][3]+'</td>';
+                    html+='<td id="remark-a-'+data[i][0]+'">'+data[i][4]+'</td>';
+                    html+='<td class="operation"> <a onclick="delplay(this)" id="delete-'+data[i][0]+'" >删除</a> <span ></span> <a onclick="editremark(this)" id="remark-b-'+data[i][0]+'">修改备注</a> </td></tr>';
+                }
+                $('#playtable').find(".playtr").remove();
+                $('#playtable').append(html);
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
             }
-            $('#playtable').find(".playtr").remove();
-            $('#playtable').append(html);
         },"post");
 
     }
@@ -1038,7 +1048,7 @@
                 console.log(list)
 
                 // 绑定号码
-                ajaxsync(ctx + "/console/telenum/callnum//num/bind/app/" + appId ,{nums:list.join(",")},function(response) {
+                ajaxsync(ctx + "/console/telenum/callnum/num/bind/app/" + appId ,{nums:list.join(",")},function(response) {
                     if(response.success){
                         showtoast("绑定成功");
                     }else{
@@ -1048,8 +1058,7 @@
 
                 // 成功隐藏
                 $('#call-modal').modal('hide')
-
-                //TODO 刷新号码绑定分页列表
+                //刷新号码绑定分页列表
                 upnumber();
             },
             intersect:function () {
@@ -1215,7 +1224,7 @@
 
         // $('#playtable').find(".playtr").remove();["✔", "✘"],
         for(var i =0 ; i<data.length; i++){
-            html +='<tr>' +
+            html +='<tr id="rent-'+ data[i].rentId +'">' +
                     '<td class="text-center">'+data[i].num+'</td>' +
                     '<td class="text-center">' + (data[i].status == 0 ? '过期': '正常') + '</td>' +
                     '<td class="text-center">'+ (data[i].isCalled == 0 ? '✘': '✔') +'</td>' +
@@ -1256,7 +1265,7 @@
                                             if(currentPage> 0){
                                                 $('#page' + currentPage + bindNumPage.obj).click();
                                             }else{
-                                                $('#play-'+id).remove();
+                                                $('#rent-'+id).remove();
                                             }
                                         }
                                     }else{
