@@ -12,7 +12,7 @@ public enum Application {
     APP_BACKEND("app.backend", "app-backend"),
     APP_CALL_CENTER("app.cc", "app-call-center"),
     APP_MC("app.mc", "app-mc"),
-    APP_OC("app.oc", "app-oc"),
+    APP_OC("oc.api", "app-oc"),
     APP_OPENSIPS_PROXY("app.opensips.proxy", "app-opensips-proxy"),
     APP_THIRD_JOIN_GATEWAY("app.third.join.gateway", "app-third-join-gateway"),
     APP_PORTAL_API("portal.api", "app-portal-api");
