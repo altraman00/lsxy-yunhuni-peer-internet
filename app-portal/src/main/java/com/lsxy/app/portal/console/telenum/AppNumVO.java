@@ -12,7 +12,7 @@ public class AppNumVO {
     String isCalled;
     String isDialing;
     String areaCode;
-    Date expireTime;
+    String expireTime;
 
     public String getRentId() {
         return rentId;
@@ -62,11 +62,11 @@ public class AppNumVO {
         this.areaCode = areaCode;
     }
 
-    public Date getExpireTime() {
+    public String getExpireTime() {
         return expireTime;
     }
 
-    public void setExpireTime(Date expireTime) {
+    public void setExpireTime(String expireTime) {
         this.expireTime = expireTime;
     }
 }

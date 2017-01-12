@@ -99,7 +99,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
 
     @Override
     public Page<ResourcesRent> findByAppId(String appId,int pageNo, int pageSize) {
-        String hql = "from ResourcesRent obj where obj.app.id=?1 and obj.rentStatus = 1 order by obj.createTime desc";
+        String hql = "from ResourcesRent obj where obj.app.id=?1 and obj.rentStatus = 1 order by obj.lastTime desc";
         return  this.pageList(hql,pageNo,pageSize,appId);
     }
 
