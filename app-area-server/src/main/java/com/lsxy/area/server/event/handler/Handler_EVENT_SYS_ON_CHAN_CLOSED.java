@@ -223,7 +223,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             if(voiceCdr.getCallAckDt() != null){
                 Integer unit = lineGateway.getLinePriceUnit() == null ? 60:lineGateway.getLinePriceUnit();
                 BigDecimal price =  lineGateway.getLinePrice() == null ? BigDecimal.ZERO : lineGateway.getLinePrice();
-                BigDecimal lineCost = calCostService.calCost(voiceCdr.getCallTimeLong(), unit, price , 1.0);
+                BigDecimal lineCost = calCostService.calCost(voiceCdr.getCallTimeLong() + 1, unit, price , 1.0);
                 voiceCdr.setLineCost(lineCost);
             }else{
                 voiceCdr.setLineCost(BigDecimal.ZERO);
