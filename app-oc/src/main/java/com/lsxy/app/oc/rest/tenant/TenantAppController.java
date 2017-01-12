@@ -195,7 +195,7 @@ public class TenantAppController {
 
     @ApiOperation(value = "租户的app绑定的号码")
     @RequestMapping(value = "/tenants/{tid}/res_rent/app/{appId}/res_rent/list" ,method = RequestMethod.GET)
-    public RestResponse findByAppId(@PathVariable String tid,@PathVariable String appId,
+    public RestResponse<AppNumVO> findByAppId(@PathVariable String tid,@PathVariable String appId,
                                     @RequestParam(defaultValue = "1")Integer pageNo,  @RequestParam(defaultValue = "10")Integer pageSize){
         Page<ResourcesRent> page = resourcesRentService.findByAppId(appId, pageNo, pageSize);
 
@@ -239,7 +239,7 @@ public class TenantAppController {
 
     @ApiOperation(value = "租户获取能被应用绑定的号码")
     @RequestMapping(value = "/tenants/{tid}/res_rent/num/unused/app/{appId}" ,method = RequestMethod.GET)
-    public RestResponse findOwnUnusedNum(@PathVariable String tid,@PathVariable String appId,
+    public RestResponse<AppNumVO> findOwnUnusedNum(@PathVariable String tid,@PathVariable String appId,
                                          @RequestParam(defaultValue = "1")Integer pageNo,  @RequestParam(defaultValue = "10")Integer pageSize){
         App app = appService.findById(appId);
         if(!tid.equals(app.getTenant().getId())){
