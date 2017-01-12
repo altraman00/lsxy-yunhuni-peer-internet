@@ -73,8 +73,6 @@ public class CallCenterUtil {
     public static final String AGENT_PRENUMVOICE_FIELD = "AGENT_PRENUMVOICE";
     /**坐席播放工号后的音存放的字段**/
     public static final String AGENT_POSTNUMVOICE_FIELD = "AGENT_POSTNUMVOICE";
-    /**交谈成员收放音模式存放的字段**/
-    public static final String PARTNER_VOICE_MODE_FIELD = "PARTNER_VOICE_MODE";
     /**通道id存放的字段**/
     public static final String CHANNEL_ID_FIELD = "CHANNEL_ID";
     /**条件id存放的字段**/

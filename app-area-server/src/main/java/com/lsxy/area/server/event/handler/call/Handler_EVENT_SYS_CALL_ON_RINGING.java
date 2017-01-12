@@ -111,11 +111,7 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
             /**结束判断振铃前是否客户挂断了呼叫，挂断了要同时挂断被叫的坐席**/
             try {
                 //加入交谈
-                Integer voice_mode = null;
-                if(state.getBusinessData().get(CallCenterUtil.PARTNER_VOICE_MODE_FIELD) != null){
-                    voice_mode = Integer.parseInt(state.getBusinessData().get(CallCenterUtil.PARTNER_VOICE_MODE_FIELD));
-                }
-                conversationService.join(conversation,call_id,null,null,voice_mode);
+                conversationService.join(conversation,call_id,null,null,null);
             } catch (YunhuniApiException e) {
                 logger.error("将呼叫加入交谈失败",e);
                 conversationService.logicExit(conversation,call_id);

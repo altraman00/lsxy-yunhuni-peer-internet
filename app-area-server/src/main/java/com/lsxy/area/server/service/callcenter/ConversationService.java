@@ -107,6 +107,9 @@ public class ConversationService {
     @Autowired
     private CallSessionBatchInserter callSessionBatchInserter;
 
+    @Autowired
+    private ConversationCallVoiceModeReference conversationCallVoiceModeReference;
+
     public BaseEnQueue getEnqueue(String queueId){
         BaseEnQueue enqueue = null;
         try{
@@ -310,7 +313,7 @@ public class ConversationService {
      */
     public String inviteAgent(String appId,String ref_res_id,String initiator, String conversationId,String agentId,String agentName,String extension,
                          String systemNum,String diaplyNum,String agentPhone,String type,String user,
-                          Integer maxDuration, Integer maxDialDuration) throws YunhuniApiException{
+                          Integer maxDuration, Integer maxDialDuration,Integer voiceMode) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
         App app = appService.findById(appId);
         String from = null;
@@ -380,6 +383,7 @@ public class ConversationService {
                         .build())
                 .build();
         businessStateService.save(callstate);
+        conversationCallVoiceModeReference.set(conversationId,callId,voiceMode);
         return callId;
     }
 
@@ -452,11 +456,11 @@ public class ConversationService {
                         .putIfNotEmpty("from",oneTelnumber)
                         .putIfNotEmpty("to",to)
                         .putIfNotEmpty("play_file",playFile)//加入后在交谈中播放这个文件
-                        .putIfNotEmpty(CallCenterUtil.PARTNER_VOICE_MODE_FIELD,voiceMode==null?null:voiceMode.toString())//加入后的声音模式
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
                 .build();
         businessStateService.save(callstate);
+        conversationCallVoiceModeReference.set(conversationId,callId,voiceMode);
         return callId;
     }
 
@@ -510,17 +514,14 @@ public class ConversationService {
         Map<String,String> conversation_business=conversation_state.getBusinessData();
 
         Integer max_seconds = maxDuration == null ? 0 : maxDuration;
-        Integer voice_mode = voiceMode == null ? CallCenterConversationMember.MODE_DEFAULT : voiceMode;
+        Integer voice_mode = voiceMode == null ?
+                conversationCallVoiceModeReference.get(conversation_id,call_id) : voiceMode;
         String play_file = playFile == null ? "" : playFile;
 
         if(call_business != null && call_business.get("max_seconds")!=null){
             max_seconds = Integer.parseInt(call_business.get("max_seconds"));
         }else if(conversation_business != null && conversation_business.get("max_seconds")!=null){
             max_seconds = Integer.parseInt(conversation_business.get("max_seconds"));
-        }
-
-        if(call_business != null && call_business.get(CallCenterUtil.PARTNER_VOICE_MODE_FIELD)!=null){
-            voice_mode = Integer.parseInt(call_business.get(CallCenterUtil.PARTNER_VOICE_MODE_FIELD));
         }
 
         if(call_business != null && call_business.get("play_file")!=null){
@@ -543,14 +544,10 @@ public class ConversationService {
         } catch (Exception e) {
             throw new InvokeCallException(e);
         }
-        List<String> innerFields = new ArrayList<>();
         if(call_business.get(CallCenterUtil.CONVERSATION_FIELD) == null){
-            innerFields.add(CallCenterUtil.CONVERSATION_FIELD);
-            innerFields.add(conversation_id);
+            businessStateService.updateInnerField(call_id,CallCenterUtil.CONVERSATION_FIELD,conversation_id);
         }
-        innerFields.add(CallCenterUtil.PARTNER_VOICE_MODE_FIELD);
-        innerFields.add(voice_mode.toString());
-        businessStateService.updateInnerField(call_id,innerFields);
+        conversationCallVoiceModeReference.set(conversation_id,call_id,voiceMode);
         if(logger.isDebugEnabled()){
             logger.debug("完成呼叫加入交谈call_id={},conversation_id={},maxDuration={},playFile={},voiceMode={}",
                     call_id,conversation_id,maxDuration,playFile,voice_mode);
@@ -677,7 +674,8 @@ public class ConversationService {
         } catch (Exception e) {
             throw new InvokeCallException(e);
         }
-        businessStateService.updateInnerField(callId,CallCenterUtil.PARTNER_VOICE_MODE_FIELD,voiceMode.toString());
+
+        conversationCallVoiceModeReference.set(conversationId,callId,voiceMode);
         return true;
     }
 
@@ -707,6 +705,7 @@ public class ConversationService {
         }catch (Throwable t){
             logger.error("设置交谈成员的结束时间失败",t);
         }
+        conversationCallVoiceModeReference.clear(conversationId, callId);
         //交谈成员递减
         this.decrPart(conversationId,callId);
 
@@ -800,9 +799,7 @@ public class ConversationService {
             }else{
                 member.setIsAgent(CallCenterConversationMember.AGENT_TRUE);
             }
-            if(StringUtil.isNotEmpty(businessData.get(CallCenterUtil.PARTNER_VOICE_MODE_FIELD))){
-                member.setMode(Integer.parseInt(businessData.get(CallCenterUtil.PARTNER_VOICE_MODE_FIELD)));
-            }
+            member.setMode(conversationCallVoiceModeReference.get(conversation_id, call_id));
             callCenterConversationMemberService.save(member);
         }catch (Throwable t){
             logger.error("处理加入交谈失败",t);

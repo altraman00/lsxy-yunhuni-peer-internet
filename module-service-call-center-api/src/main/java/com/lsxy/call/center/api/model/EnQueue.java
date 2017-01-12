@@ -34,6 +34,8 @@ public class EnQueue implements Serializable{
     @XStreamAsAttribute
     private Integer ring_mode;
 
+    private Integer voice_mode;
+
     @XStreamAsAttribute
     private String ring_voice;
 
@@ -119,6 +121,14 @@ public class EnQueue implements Serializable{
 
     public void setRing_mode(Integer ring_mode) {
         this.ring_mode = ring_mode;
+    }
+
+    public Integer getVoice_mode() {
+        return voice_mode;
+    }
+
+    public void setVoice_mode(Integer voice_mode) {
+        this.voice_mode = voice_mode;
     }
 
     public String getRing_voice() {

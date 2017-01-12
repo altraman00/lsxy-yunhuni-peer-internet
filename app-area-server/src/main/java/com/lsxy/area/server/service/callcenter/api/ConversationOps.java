@@ -7,6 +7,7 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.callcenter.AgentIdCallReference;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
+import com.lsxy.area.server.service.callcenter.ConversationCallVoiceModeReference;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.call.center.api.model.EnQueue;
@@ -84,6 +85,9 @@ public class ConversationOps implements com.lsxy.area.api.callcenter.Conversatio
     @Autowired
     private CallSessionService callSessionService;
 
+    @Autowired
+    private ConversationCallVoiceModeReference conversationCallVoiceModeReference;
+
     @Override
     public boolean dismiss(String ip, String appId, String conversationId) throws YunhuniApiException{
         if(StringUtils.isBlank(conversationId)){
@@ -153,6 +157,7 @@ public class ConversationOps implements com.lsxy.area.api.callcenter.Conversatio
         if(enQueue == null){
             throw new RequestIllegalArgumentException();
         }
+        enQueue.setVoice_mode(voiceMode);
 
         App app = appService.findById(appId);
         if(app == null){
@@ -258,62 +263,8 @@ public class ConversationOps implements com.lsxy.area.api.callcenter.Conversatio
         if(conversation_state.getClosed()!= null && conversation_state.getClosed()){
             throw new ConversationNotExistException();
         }
-
-        String callId = UUIDGenerator.uuid();
-        //TODO
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
-        String areaId = selector.getAreaId();
-        String oneTelnumber = selector.getOneTelnumber();
-
-        String lineId = selector.getLineId();
-
-        CallSession callSession = new CallSession();
-        callSession.setStatus(CallSession.STATUS_PREPARING);
-        callSession.setFromNum(oneTelnumber);
-        callSession.setToNum(selector.getToUri());
-        callSession.setAppId(app.getId());
-        callSession.setTenantId(app.getTenant().getId());
-        callSession.setRelevanceId(callId);
-        callSession.setType(CallSession.TYPE_CALL_CENTER);
-        callSession.setResId(null);
-        callSession = callSessionService.save(callSession);
-
-        Map<String, Object> params = new MapBuilder<String,Object>()
-                .putIfNotEmpty("to_uri",selector.getToUri())
-                .putIfNotEmpty("from_uri",oneTelnumber)
-                .putIfNotEmpty("max_answer_seconds",maxDuration)
-                .putIfNotEmpty("max_ring_seconds",maxDial)
-                .putIfNotEmpty("user_data",callId)
-                .putIfNotEmpty("areaId",areaId)
-                .putIfNotEmpty(BusinessState.REF_RES_ID,conversation_state.getBusinessData().get(BusinessState.REF_RES_ID))
-                .build();
-
-        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
-        try {
-            rpcCaller.invoke(sessionContext, rpcrequest);
-        } catch (Exception e) {
-            throw new InvokeCallException(e);
-        }
-        //保存业务数据，后续事件要用到
-        BusinessState callstate = new BusinessState.Builder()
-                .setTenantId(app.getTenant().getId())
-                .setAppId(app.getId())
-                .setId(callId)
-                .setType(BusinessState.TYPE_CC_OUT_CALL)
-                .setCallBackUrl(app.getUrl())
-                .setAreaId(areaId)
-                .setLineGatewayId(lineId)
-                .setBusinessData(new MapBuilder<String,String>()
-                        .putIfNotEmpty(BusinessState.REF_RES_ID,conversation_state.getBusinessData().get(BusinessState.REF_RES_ID))
-                        .putIfNotEmpty("from",oneTelnumber)
-                        .putIfNotEmpty("to",to)
-                        .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,conversation_state.getBusinessData().get(CallCenterUtil.CALLCENTER_FIELD))
-                        .putIfNotEmpty(CallCenterUtil.CONVERSATION_FIELD,conversationId)//所属交谈
-                        .putIfNotEmpty(CallCenterUtil.PARTNER_VOICE_MODE_FIELD,voiceMode==null?null:voiceMode.toString())//加入后的声音模式
-                        .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
-                        .build())
-                .build();
-        businessStateService.save(callstate);
-        return callId;
+        return conversationService.inviteOut(appId,
+                    conversation_state.getBusinessData().get(BusinessState.REF_RES_ID),
+                    conversationId,from,to,maxDuration,maxDial,null,voiceMode);
     }
 }
