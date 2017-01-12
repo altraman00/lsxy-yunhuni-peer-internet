@@ -1029,14 +1029,14 @@
                 var s = this.shop
                 if(!this.shopCheck){
                     p.forEach(function (ex) {
-                        if (!contains(s, ex.id))
-                            s.push(ex.id);
+                        if (!contains(s, ex.num))
+                            s.push(ex.num);
                     })
                 }else{
                     p.forEach(function (ex) {
-                        if (contains(s, ex.id)){
-                            console.log("remove" +ex.id);
-                            s.remove(ex.id);
+                        if (contains(s, ex.num)){
+                            console.log("remove" +ex.num);
+                            s.remove(ex.num);
                         }
 
                     })
@@ -1071,7 +1071,7 @@
             currentPage:function () {
                 var cp = []
                 this.phonelist.forEach(function (ex) {
-                    cp.push(ex.id)
+                    cp.push(ex.num)
                 })
                 this.page = cp
                 this.intersect()
@@ -1299,7 +1299,7 @@
                             className: "btn-primary",
                             callback: function () {
                                 ajaxsync(ctx + "/console/telenum/callnum/app/" + appId + "/unbind_all" ,null,function(response) {
-                                    if(result.success){
+                                    if(response.success){
                                         showtoast("全部解除绑定成功");
                                         //异步加载数据，释放成功
                                         upnumber();
