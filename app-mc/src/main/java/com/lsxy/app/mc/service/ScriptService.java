@@ -64,7 +64,7 @@ public class ScriptService {
             }
 
             try {
-                InputStream is = this.getClass().getClassLoader().getResourceAsStream("config.properties");
+                InputStream is = this.getClass().getClassLoader().getResourceAsStream("scripts/"+scriptName);
                 if(logger.isDebugEnabled()){
                     logger.debug("config stream is : " + is);
                 }
