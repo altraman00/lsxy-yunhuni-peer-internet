@@ -68,7 +68,7 @@ public class ScriptService {
                 if(logger.isDebugEnabled()){
                     logger.debug("config stream is : " + is);
                 }
-                InputStream in = this.getClass().getClassLoader().getResourceAsStream("/scripts/"+scriptName);
+                InputStream in = this.getClass().getClassLoader().getResourceAsStream("scripts/"+scriptName);
                 if(in == null){
                     throw new ScriptFileNotExistException(scriptName);
                 }
