@@ -77,7 +77,7 @@ public class ConversationOpsController extends AbstractAPIController {
                                            @RequestHeader(value = "AppID") String appId,
                                            @Valid @RequestBody InviteOutInputDTO dto) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
-            logger.debug("CONVERSATION INVITE_AGENT API参数,accountId={},appId={},id={},dto={}",accountId,appId,id,dto);
+            logger.debug("CONVERSATION INVITE_OUT API参数,accountId={},appId={},id={},dto={}",accountId,appId,id,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
         return ApiGatewayResponse.success(conversationOps.inviteOut(ip,appId,id,dto.getFrom(),
