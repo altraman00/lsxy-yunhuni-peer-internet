@@ -256,24 +256,29 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             String callCenterId = conversationService.getCallCenter(state);
             if(StringUtils.isNotBlank(error)){
                 //呼叫坐席失败
-                try{
-                    CallCenter callCenter = null;
-                    if(callCenterId!=null){
-                        callCenter = callCenterService.findById(callCenterId);
-                    }
-                    if(logger.isDebugEnabled()){
-                        logger.info("[{}][{}][{}]更新CallCenter,callCenter={},state={}",
-                                state.getTenantId(),state.getAppId(),call_id,callCenter,state);
-                    }
-                    if(callCenter != null){
-                        if(callCenter.getToManualResult() == null){
-                            CallCenter updateCallcenter = new CallCenter();
-                            updateCallcenter.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_AGENT_FAIL);
-                            callCenterService.update(callCenterId,updateCallcenter);
+                BusinessState conversationState = businessStateService.get(conversation_id);
+                if(conversationState != null){
+                    if(conversationState.getBusinessData().get(CallCenterUtil.CONVERSATION_STARTED_FIELD) == null){
+                        try{
+                            CallCenter callCenter = null;
+                            if(callCenterId!=null){
+                                callCenter = callCenterService.findById(callCenterId);
+                            }
+                            if(logger.isDebugEnabled()){
+                                logger.info("[{}][{}][{}]更新CallCenter,callCenter={},state={}",
+                                        state.getTenantId(),state.getAppId(),call_id,callCenter,state);
+                            }
+                            if(callCenter != null){
+                                if(callCenter.getToManualResult() == null){
+                                    CallCenter updateCallcenter = new CallCenter();
+                                    updateCallcenter.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_AGENT_FAIL);
+                                    callCenterService.update(callCenterId,updateCallcenter);
+                                }
+                            }
+                        }catch (Throwable t){
+                            logger.error("更新CallCenter失败",t);
                         }
                     }
-                }catch (Throwable t){
-                    logger.error("更新CallCenter失败",t);
                 }
                 conversationService.exit(conversation_id,call_id);
             }else{
@@ -316,21 +321,24 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 logger.error("更新排队记录失败",t);
             }
 
-            /**交谈成员为2时，视为交谈开始**/
             if(StringUtil.isBlank(error)){
                 BusinessState conversationState = businessStateService.get(conversation_id);
-                if(conversationState != null &&
-                        conversationState.getBusinessData().get(CallCenterUtil.CONVERSATION_STARTED_FIELD) == null){
-                    businessStateService.updateInnerField(conversation_id,
-                            CallCenterUtil.CONVERSATION_STARTED_FIELD,CallCenterUtil.CONVERSATION_STARTED_TRUE);
+                if(conversationState != null){
                     if((conversationState.getClosed()== null || !conversationState.getClosed())){
+                        //交谈开始
+                        if(conversationState.getBusinessData().get(CallCenterUtil.CONVERSATION_STARTED_FIELD) == null){
+                            businessStateService.updateInnerField(conversation_id,
+                                    CallCenterUtil.CONVERSATION_STARTED_FIELD,CallCenterUtil.CONVERSATION_STARTED_TRUE);
+                            //开始录音
+                            conversationService.startRecord(conversationState);
+                        }
+
                         //停止交谈播放排队等待音
                         if(conversationService.isPlayWait(conversationState.getId())){
                             conversationService.stopPlay(conversationState.getAreaId(),
                                     conversationState.getId(),conversationState.getResId());
                         }
-                        //开始录音
-                        conversationService.startRecord(conversationState);
+
                         String agent_num = businessData.get(CallCenterUtil.AGENT_NUM_FIELD);
                         String prevoice = businessData.get(CallCenterUtil.AGENT_PRENUMVOICE_FIELD);
                         String postvoice = businessData.get(CallCenterUtil.AGENT_POSTNUMVOICE_FIELD);
@@ -362,50 +370,53 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                             logger.error("调用失败 ",e);
                         }
                     }
-                    try{
-                        CallCenter callCenter = null;
-                        if(callCenterId!=null){
-                            callCenter = callCenterService.findById(callCenterId);
+
+                    if(conversationState.getBusinessData().get(CallCenterUtil.CONVERSATION_STARTED_FIELD) == null){
+                        try{
+                            CallCenter callCenter = null;
+                            if(callCenterId!=null){
+                                callCenter = callCenterService.findById(callCenterId);
+                            }
+                            if(logger.isDebugEnabled()){
+                                logger.info("[{}][{}][{}]更新CallCenter,callCenter={},state={}",
+                                        state.getTenantId(),state.getAppId(),call_id,callCenter,state);
+                            }
+                            if(callCenter != null){
+                                CallCenter updateCallcenter = new CallCenter();
+                                if(callCenter.getAnswerTime() == null){
+                                    updateCallcenter.setAnswerTime(new Date());
+                                }
+                                if(callCenter.getToManualTime() != null &&
+                                        callCenter.getToManualTimeLong() == null){
+                                    Long toManualTimeLong = (new Date().getTime()
+                                            - callCenter.getToManualTime().getTime()) / 1000;
+                                    updateCallcenter.setToManualTimeLong(toManualTimeLong);
+                                }
+                                if(callCenter.getToManualResult() == null){
+                                    updateCallcenter.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_SUCESS);
+                                }
+                                if(callCenter.getAgent() == null){
+                                    updateCallcenter.setAgent(businessData.get(CallCenterUtil.AGENT_NAME_FIELD));
+                                }
+                                callCenterService.update(callCenterId,updateCallcenter);
+                            }
+                        }catch (Throwable t){
+                            logger.error("更新CallCenter失败",t);
                         }
-                        if(logger.isDebugEnabled()){
-                            logger.info("[{}][{}][{}]更新CallCenter,callCenter={},state={}",
-                                    state.getTenantId(),state.getAppId(),call_id,callCenter,state);
+                        try{
+                            callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
+                                    .Builder(state.getTenantId(),state.getAppId(),new Date())
+                                    .setToManualSuccess(1L)
+                                    .build());
+                        }catch (Throwable t){
+                            logger.error("incrIntoRedis失败",t);
                         }
-                        if(callCenter != null){
-                            CallCenter updateCallcenter = new CallCenter();
-                            if(callCenter.getAnswerTime() == null){
-                                updateCallcenter.setAnswerTime(new Date());
-                            }
-                            if(callCenter.getToManualTime() != null &&
-                                    callCenter.getToManualTimeLong() == null){
-                                Long toManualTimeLong = (new Date().getTime()
-                                        - callCenter.getToManualTime().getTime()) / 1000;
-                                updateCallcenter.setToManualTimeLong(toManualTimeLong);
-                            }
-                            if(callCenter.getToManualResult() == null){
-                                updateCallcenter.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_SUCESS);
-                            }
-                            if(callCenter.getAgent() == null){
-                                updateCallcenter.setAgent(businessData.get(CallCenterUtil.AGENT_NAME_FIELD));
-                            }
-                            callCenterService.update(callCenterId,updateCallcenter);
+                        if((conversationState.getClosed()== null || !conversationState.getClosed())){
+                            //交谈开始事件
+                            callCenterUtil.conversationBeginEvent(state.getCallBackUrl(),conversation_id,
+                                    CallCenterUtil.CONVERSATION_TYPE_QUEUE,queueId,
+                                    state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),call_id);
                         }
-                    }catch (Throwable t){
-                        logger.error("更新CallCenter失败",t);
-                    }
-                    try{
-                        callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
-                                .Builder(state.getTenantId(),state.getAppId(),new Date())
-                                .setToManualSuccess(1L)
-                                .build());
-                    }catch (Throwable t){
-                        logger.error("incrIntoRedis失败",t);
-                    }
-                    if((conversationState.getClosed()== null || !conversationState.getClosed())){
-                        //交谈开始事件
-                        callCenterUtil.conversationBeginEvent(state.getCallBackUrl(),conversation_id,
-                                CallCenterUtil.CONVERSATION_TYPE_QUEUE,queueId,
-                                state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),call_id);
                     }
                 }
             }

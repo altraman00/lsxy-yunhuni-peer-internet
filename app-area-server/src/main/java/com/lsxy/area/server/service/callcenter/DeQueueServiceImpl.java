@@ -140,17 +140,19 @@ public class DeQueueServiceImpl implements DeQueueService {
         //更新排队结果
         updateQueue(queueId,callId,conversation,result.getAgent().getName(),agentCallId,CallCenterQueue.RESULT_SELETEED);
 
-        try{
-            //更新呼叫中心统计数据
-            callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
-                    .Builder(state.getTenantId(),state.getAppId(),new Date())
-                    .setQueueNum(1L)
-                    .setQueueDuration((System.currentTimeMillis()
-                            - Long.parseLong(state.getBusinessData()
-                            .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD)))/1000)
-                    .build());
-        }catch (Throwable t){
-            logger.error("incrIntoRedis失败",t);
+        if(conversationService.isCC(state)){
+            try{
+                //更新呼叫中心统计数据
+                callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
+                        .Builder(state.getTenantId(),state.getAppId(),new Date())
+                        .setQueueNum(1L)
+                        .setQueueDuration((System.currentTimeMillis()
+                                - Long.parseLong(state.getBusinessData()
+                                .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD)))/1000)
+                        .build());
+            }catch (Throwable t){
+                logger.error("incrIntoRedis失败",t);
+            }
         }
 
         callCenterUtil.sendQueueSelectedAgentEvent(state.getCallBackUrl(),
@@ -172,16 +174,18 @@ public class DeQueueServiceImpl implements DeQueueService {
         BusinessState state = businessStateService.get(callId);
 
         if(state != null){
-            updateCallCenterTOMANUALRESULT(state,""+CallCenter.TO_MANUAL_RESULT_TIME_OUT);
-            try{
-                callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
-                        .Builder(state.getTenantId(),state.getAppId(),new Date())
-                        .setQueueNum(1L)
-                        .setQueueDuration((System.currentTimeMillis() - Long.parseLong(state.getBusinessData()
-                                .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD)))/1000)
-                        .build());
-            }catch (Throwable t){
-                logger.error("incrIntoRedis失败",t);
+            if(conversationService.isCC(state)) {
+                updateCallCenterTOMANUALRESULT(state, "" + CallCenter.TO_MANUAL_RESULT_TIME_OUT);
+                try {
+                    callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
+                            .Builder(state.getTenantId(), state.getAppId(), new Date())
+                            .setQueueNum(1L)
+                            .setQueueDuration((System.currentTimeMillis() - Long.parseLong(state.getBusinessData()
+                                    .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD))) / 1000)
+                            .build());
+                } catch (Throwable t) {
+                    logger.error("incrIntoRedis失败", t);
+                }
             }
             updateQueue(queueId,callId,null,null,null,CallCenterQueue.RESULT_FAIL);
         }
@@ -213,17 +217,19 @@ public class DeQueueServiceImpl implements DeQueueService {
         BusinessState state = businessStateService.get(callId);
 
         if(state != null){
-            updateCallCenterTOMANUALRESULT(state,""+CallCenter.TO_MANUAL_RESULT_FAIL);
-            try{
-                callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
-                        .Builder(state.getTenantId(),state.getAppId(),new Date())
-                        .setQueueNum(1L)
-                        .setQueueDuration((System.currentTimeMillis()
-                                - Long.parseLong(state.getBusinessData()
-                                .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD)))/1000)
-                        .build());
-            }catch (Throwable t){
-                logger.error("incrIntoRedis失败",t);
+            if(conversationService.isCC(state)){
+                updateCallCenterTOMANUALRESULT(state,""+CallCenter.TO_MANUAL_RESULT_FAIL);
+                try{
+                    callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
+                            .Builder(state.getTenantId(),state.getAppId(),new Date())
+                            .setQueueNum(1L)
+                            .setQueueDuration((System.currentTimeMillis()
+                                    - Long.parseLong(state.getBusinessData()
+                                    .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD)))/1000)
+                            .build());
+                }catch (Throwable t){
+                    logger.error("incrIntoRedis失败",t);
+                }
             }
             updateQueue(queueId,callId,null,null,null,CallCenterQueue.RESULT_FAIL);
         }
