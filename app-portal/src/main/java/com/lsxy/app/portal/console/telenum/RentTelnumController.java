@@ -8,6 +8,7 @@ import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelenumOrder;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -152,10 +154,31 @@ public class RentTelnumController extends AbstractPortalController {
 
     @RequestMapping("/list/app/{appId}")
     @ResponseBody
-    public Page<ResourcesRent> findByAppId(HttpServletRequest request,@PathVariable String appId,Integer pageNo,Integer pageSize){
+    public RestResponse findByAppId(HttpServletRequest request,@PathVariable String appId,Integer pageNo,Integer pageSize){
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/list/app/{1}?pageNo={2}&pageSize={3}";
-        return RestRequest.buildSecurityRequest(token).getPage(uri, ResourcesRent.class,appId,pageNo,pageSize).getData();
+        Page page =  RestRequest.buildSecurityRequest(token).getPage(uri, ResourcesRent.class,appId,pageNo,pageSize).getData();
+        List<ResourcesRent> result = page.getResult();
+        if(result != null && result.size() > 0){
+            List<AppNumVO> appNumVOs = new ArrayList<>();
+            for(ResourcesRent rent : result){
+                AppNumVO vo = new AppNumVO();
+                vo.setRentId(rent.getId());
+                vo.setNum(rent.getResourceTelenum().getTelNumber());
+                vo.setStatus(rent.getRentExpire().compareTo(new Date()) == -1 ? "0" : "1");
+                vo.setIsCalled(StringUtils.isBlank(rent.getResourceTelenum().getIsCalled())?ResourceTelenum.ISCALLED_FALSE:rent.getResourceTelenum().getIsCalled());
+                if(ResourceTelenum.ISDIALING_TRUE.equals(rent.getResourceTelenum().getIsDialing()) || ResourceTelenum.ISTHROUGH_TRUE.equals(rent.getResourceTelenum().getIsThrough())){
+                    vo.setIsDialing("1");
+                }else{
+                    vo.setIsDialing("0");
+                }
+                vo.setAreaCode(rent.getResourceTelenum().getAreaCode());
+                vo.setExpireTime(rent.getRentExpire());
+                appNumVOs.add(vo);
+            }
+            page.setResult(appNumVOs);
+        }
+        return RestResponse.success(page);
     }
 
 }

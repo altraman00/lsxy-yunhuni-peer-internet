@@ -206,7 +206,7 @@ public class TenantAppController {
                 AppNumVO vo = new AppNumVO();
                 vo.setRentId(rent.getId());
                 vo.setNum(rent.getResourceTelenum().getTelNumber());
-                vo.setStatus(rent.getRentExpire().compareTo(new Date()) == -1 ? "过期" : "正常");
+                vo.setStatus(rent.getRentExpire().compareTo(new Date()) == -1 ? "0" : "1");
                 vo.setIsCalled(StringUtils.isBlank(rent.getResourceTelenum().getIsCalled())?ResourceTelenum.ISCALLED_FALSE:rent.getResourceTelenum().getIsCalled());
                 if(ResourceTelenum.ISDIALING_TRUE.equals(rent.getResourceTelenum().getIsDialing()) || ResourceTelenum.ISTHROUGH_TRUE.equals(rent.getResourceTelenum().getIsThrough())){
                     vo.setIsDialing("1");
