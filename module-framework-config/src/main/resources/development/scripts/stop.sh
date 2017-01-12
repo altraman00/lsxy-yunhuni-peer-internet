@@ -38,12 +38,8 @@ do
  esac
 done
 
-if [ "$APP_NAME"x = "app-portal"x ]
-then
-    echo "ssh root@$host_name /opt/yunhuni-peer-internet/bin/update_restart.sh -A app-portal -D -P development -I -M /opt/tomcat_app_portal/"
-    ssh root@$host_name "/opt/yunhuni-peer-internet/bin/update_restart.sh -A app-portal -D -P development -I -M /opt/tomcat_app_portal/"
-else
-    echo "ssh root@$host_name /opt/yunhuni-peer-internet/bin/update_restart.sh -A $app_name -S -P development -I"
-    ssh root@$host_name "/opt/yunhuni-peer-internet/bin/update_restart.sh -A $app_name -S -P development -I"
-fi
+echo "app_name:$app_name"
+echo "host:$host_name"
+echo "ssh root@$host_name /opt/yunhuni-peer-internet/bin/update_restart.sh -A $app_name -S -P development -I"
 
+ssh root@$host_name "/opt/yunhuni-peer-internet/bin/update_restart.sh -A $app_name -S -P development -I"
