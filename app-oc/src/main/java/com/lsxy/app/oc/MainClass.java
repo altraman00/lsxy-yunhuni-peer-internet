@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Import;
 public class MainClass extends AbstractSpringBootWebStarter{
 
 
-    public static final String systemId = "app.oc";
+    public static final String systemId = "oc.api";
     static {
         System.setProperty("systemId",systemId);
     }
