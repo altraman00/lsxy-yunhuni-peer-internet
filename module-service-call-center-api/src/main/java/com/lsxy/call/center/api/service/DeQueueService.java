@@ -9,8 +9,8 @@ public interface DeQueueService{
 
     public void success(String tenantId, String appId, String callId,String queueId,String queueType, EnQueueResult result,String conversationId) throws Exception;
 
-    public void timeout(String tenantId, String appId, String callId,String queueId,String queueType);
+    public void timeout(String tenantId, String appId, String callId,String queueId,String queueType,String conversationId);
 
-    public void fail(String tenantId, String appId, String callId,String queueId,String queueType,String reason);
+    public void fail(String tenantId, String appId, String callId,String queueId,String queueType,String reason,String conversationId);
 
 }

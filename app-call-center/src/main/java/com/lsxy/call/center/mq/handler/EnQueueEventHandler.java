@@ -38,7 +38,7 @@ public class EnQueueEventHandler implements MQMessageHandler<EnqueueTimeoutEvent
             if(cQs.exists(message.getConditionId(),message.getQueueId())){//排队超时
                 cQs.remove(message.getConditionId(),message.getQueueId());
                 try{
-                    deQueueService.timeout(message.getTenantId(),message.getAppId(),message.getCallId(),message.getQueueId(),message.getType());
+                    deQueueService.timeout(message.getTenantId(),message.getAppId(),message.getCallId(),message.getQueueId(),message.getType(),message.getConversationId());
                 }catch (Throwable t){
                     logger.info("[{}][{}]排队超时事件{}",message.getTenantId(),message.getAppId(),t);
                 }

@@ -334,7 +334,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         }
 
                         //停止交谈播放排队等待音
-                        if(conversationService.isPlayWait(conversationState.getId())){
+                        if(conversationService.isPlayWait(conversationState)){
                             conversationService.stopPlay(conversationState.getAreaId(),
                                     conversationState.getId(),conversationState.getResId());
                         }

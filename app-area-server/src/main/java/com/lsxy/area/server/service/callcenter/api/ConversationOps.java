@@ -10,11 +10,13 @@ import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationCallVoiceModeReference;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
+import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.call.center.api.service.EnQueueService;
 import com.lsxy.call.center.api.utils.EnQueueDecoder;
 import com.lsxy.framework.core.exceptions.api.*;
+import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -87,6 +89,9 @@ public class ConversationOps implements com.lsxy.area.api.callcenter.Conversatio
 
     @Autowired
     private ConversationCallVoiceModeReference conversationCallVoiceModeReference;
+
+    @Autowired
+    private PlayFileUtil playFileUtil;
 
     @Override
     public boolean dismiss(String ip, String appId, String conversationId) throws YunhuniApiException{
@@ -213,6 +218,27 @@ public class ConversationOps implements com.lsxy.area.api.callcenter.Conversatio
                         .build())
                 .build();
         businessStateService.save(state);
+
+        if(StringUtils.isNotBlank(enQueue.getWait_voice())){
+            String playWait = enQueue.getWait_voice();
+            try {
+                //播放排队等待音
+                playWait = playFileUtil.convert(state.getTenantId(),state.getAppId(),playWait);
+                Map<String, Object> _params = new MapBuilder<String,Object>()
+                        .putIfNotEmpty("res_id",conversation_state.getResId())
+                        .putIfNotEmpty("content", JSONUtil2.objectToJson(new Object[][]{new Object[]{playWait,0,""}}))
+                        .putIfNotEmpty("user_data",conversationId)
+                        .putIfNotEmpty("repeat",10)
+                        .put("areaId",conversation_state.getAreaId())
+                        .build();
+                RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, _params);
+                rpcCaller.invoke(sessionContext, rpcrequest,true);
+                businessStateService.updateInnerField(conversationId,CallCenterUtil.PLAYWAIT_FIELD,playWait);
+            } catch (Throwable t) {
+                logger.error("调用失败",t);
+            }
+        }
+
         //开始排队
         try {
             enQueueService.lookupAgent(conversation_state.getTenantId(), conversation_state.getAppId(),
@@ -221,7 +247,7 @@ public class ConversationOps implements com.lsxy.area.api.callcenter.Conversatio
         }catch (Throwable t){
             logger.error("调用呼叫中心排队失败",t);
             deQueueService.fail(conversation_state.getTenantId(),
-                    conversation_state.getAppId(),callId,null,CallCenterUtil.QUEUE_TYPE_INVITE_AGENT,"调用呼叫中心排队失败");
+                    conversation_state.getAppId(),callId,null,CallCenterUtil.QUEUE_TYPE_INVITE_AGENT,"调用呼叫中心排队失败",conversationId);
             businessStateService.delete(callId);
             throw t;
         }

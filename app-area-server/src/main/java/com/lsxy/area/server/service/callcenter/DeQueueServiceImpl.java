@@ -167,7 +167,7 @@ public class DeQueueServiceImpl implements DeQueueService {
     }
 
     @Override
-    public void timeout(String tenantId, String appId, String callId,String queueId,String queueType) {
+    public void timeout(String tenantId, String appId, String callId,String queueId,String queueType,String conversationId) {
         if(logger.isDebugEnabled()){
             logger.debug("排队超时,tenantId={},appId={},callId={}",tenantId,appId,callId);
         }
@@ -189,6 +189,18 @@ public class DeQueueServiceImpl implements DeQueueService {
             }
             updateQueue(queueId,callId,null,null,null,CallCenterQueue.RESULT_FAIL);
         }
+
+
+        if(conversationId != null){//在交谈上排队 需要停止播放交谈排队等待音
+            BusinessState conversationState = businessStateService.get(conversationId);
+            if(conversationState != null && conversationState.getResId() != null &&
+                    (conversationState.getClosed() == null || !conversationState.getClosed()) &&
+                    conversationService.isPlayWait(conversationState)){
+                conversationService.stopPlay(conversationState.getAreaId(),
+                        conversationState.getId(),conversationState.getResId());
+            }
+        }
+
         if(state == null || (state.getClosed() != null && state.getClosed())){
             logger.info("会话已关闭callid={}",callId);
             return;
@@ -210,7 +222,7 @@ public class DeQueueServiceImpl implements DeQueueService {
     }
 
     @Override
-    public void fail(String tenantId, String appId, String callId,String queueId,String queueType, String reason) {
+    public void fail(String tenantId, String appId, String callId,String queueId,String queueType, String reason,String conversationId) {
         if(logger.isDebugEnabled()){
             logger.debug("排队失败,tenantId={},appId={},callId={}",tenantId,appId,callId);
         }
@@ -234,12 +246,23 @@ public class DeQueueServiceImpl implements DeQueueService {
             updateQueue(queueId,callId,null,null,null,CallCenterQueue.RESULT_FAIL);
         }
 
+
+        if(conversationId != null){//在交谈上排队 需要停止播放交谈排队等待音
+            BusinessState conversationState = businessStateService.get(conversationId);
+            if(conversationState != null && conversationState.getResId() != null &&
+                    (conversationState.getClosed() == null || !conversationState.getClosed()) &&
+                    conversationService.isPlayWait(conversationState)){
+                conversationService.stopPlay(conversationState.getAreaId(),
+                        conversationState.getId(),conversationState.getResId());
+            }
+        }
+
         if(state == null || (state.getClosed() != null && state.getClosed())){ 
             logger.info("会话已关闭callid={}",callId);
             return;
         }
         conversationService.stopPlayWait(state);
-
+        
         callCenterUtil.sendQueueFailEvent(state.getCallBackUrl(),
                 queueId,queueType,
                 state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),

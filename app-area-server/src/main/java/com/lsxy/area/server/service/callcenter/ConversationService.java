@@ -759,6 +759,10 @@ public class ConversationService {
                 ivrActionService.doAction(callId,null);
             }
         }else{
+            if(this.isPlayWait(conversation_state)){
+                this.stopPlay(conversation_state.getAreaId(),
+                        conversation_state.getId(),conversation_state.getResId());
+            }
             if(call_state.getClosed() == null || !call_state.getClosed()){
                 //不是ivr 不需要下一步  直接挂断
                 if(logger.isDebugEnabled()) {
@@ -855,6 +859,9 @@ public class ConversationService {
     }
 
     public void stopPlay(String area_id,String conversation_id,String res_id){
+        if(res_id == null){
+            return;
+        }
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",res_id)
                 .putIfNotEmpty("user_data",conversation_id)

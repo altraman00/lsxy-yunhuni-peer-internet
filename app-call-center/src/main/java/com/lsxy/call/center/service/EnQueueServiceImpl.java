@@ -93,7 +93,7 @@ public class EnQueueServiceImpl implements EnQueueService{
         cqsBatchInserter.put(conditionId, queueId);
     }
 
-    private void publishTimeoutEvent(Condition condition,String queueId,String type,String callId){
+    private void publishTimeoutEvent(Condition condition,String queueId,String type,String callId,String conversationId){
         long start = 0;
         if(logger.isDebugEnabled()){
             start = System.currentTimeMillis();
@@ -103,7 +103,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                 type,
                 condition.getTenantId(),
                 condition.getAppId(),
-                callId,
+                callId,conversationId,
                 (condition.getQueueTimeout() == null ? 0 : condition.getQueueTimeout()) * 1000));
         if(logger.isDebugEnabled()){
             logger.debug("发布排队超时事件，耗时={}",(System.currentTimeMillis() - start));
@@ -180,7 +180,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                     logger.debug("[{}][{}]callid={}发布排队超时事件",tenantId,appId,callId);
                 }
                 addCQS(conditionId,queueId);
-                publishTimeoutEvent(condition,queueId,queueType,callId);
+                publishTimeoutEvent(condition,queueId,queueType,callId,conversationId);
                 String agent_idle = (String)redisCacheService.eval(Lua.LOOKUPAGENTFORIDLE,3,
                         CAs.getKey(condition.getId()),AgentState.getPrefixed(),
                         ExtensionState.getPrefixed(),
@@ -208,7 +208,7 @@ public class EnQueueServiceImpl implements EnQueueService{
             }
         }catch (Throwable e){
             logger.info("[{}][{}]callid={}排队找坐席出错:{}",tenantId,appId,callId,e.getMessage());
-            deQueueService.fail(tenantId,appId,callId,e.getMessage(),queueId,queueType);
+            deQueueService.fail(tenantId,appId,callId,e.getMessage(),queueId,queueType,conversationId);
         }
     }
 
@@ -257,7 +257,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                     logger.info("设置坐席状态失败agent={}",agent,t2);
                 }
                 if(queue != null){
-                    deQueueService.fail(tenantId,appId,queue.getOriginCallId(),t1.getMessage(),queueId,queue.getType());
+                    deQueueService.fail(tenantId,appId,queue.getOriginCallId(),t1.getMessage(),queueId,queue.getType(),queue.getConversation());
                 }
             }
         }
