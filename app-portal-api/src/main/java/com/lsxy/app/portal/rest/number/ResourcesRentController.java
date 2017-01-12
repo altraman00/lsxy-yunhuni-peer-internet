@@ -227,12 +227,25 @@ public class ResourcesRentController extends AbstractRestController{
         return RestResponse.success(temp);
     }
 
+    /**
+     * 列出应用所有的绑定号码
+     * @param appId
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
     @RequestMapping("/list/app/{appId}" )
     public RestResponse findByAppId(@PathVariable String appId,Integer pageNo,Integer pageSize){
         Page<ResourcesRent> page = resourcesRentService.findByAppId(appId, pageNo, pageSize);
         return RestResponse.success(page);
     }
 
+    /**
+     * 解除单个绑定号码
+     * @param appId
+     * @param rentId
+     * @return
+     */
     @RequestMapping("/app/{appId}/unbind/{rentId}" )
     public RestResponse unbind(@PathVariable String appId,@PathVariable String rentId){
         Tenant tenant = getCurrentAccount().getTenant();
@@ -240,6 +253,11 @@ public class ResourcesRentController extends AbstractRestController{
         return RestResponse.success();
     }
 
+    /**
+     * 解除应用所有的绑定号码
+     * @param appId
+     * @return
+     */
     @RequestMapping("/app/{appId}/unbind_all" )
     public RestResponse unbindAll(@PathVariable String appId){
         Tenant tenant = getCurrentAccount().getTenant();
@@ -247,6 +265,13 @@ public class ResourcesRentController extends AbstractRestController{
         return RestResponse.success();
     }
 
+    /**
+     * 获取租户未被应用绑定的号码
+     * @param appId
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
     @RequestMapping("/num/unused/app/{appId}")
     public RestResponse findOwnUnusedNum(@PathVariable String appId,int pageNo,int pageSize){
         Tenant tenant = getCurrentAccount().getTenant();
@@ -261,6 +286,12 @@ public class ResourcesRentController extends AbstractRestController{
         return RestResponse.success(ownUnusedNum);
     }
 
+    /**
+     * 将号码绑定给租户
+     * @param appId
+     * @param nums
+     * @return
+     */
     @RequestMapping("/num/bind/app/{appId}")
     public RestResponse bindNumToApp(@PathVariable String appId,String nums){
         App app = appService.findById(appId);

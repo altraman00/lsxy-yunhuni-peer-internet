@@ -55,16 +55,6 @@ public class AppController extends AbstractPortalController {
         String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/test_num_bind/list";
         return  RestRequest.buildSecurityRequest(token).getList(uri, TestNumBind.class);
     }
-    /**
-     * 获取应用下全部分机
-     * @param request
-     * @return
-     */
-    private RestResponse getAppExtensionList(HttpServletRequest request,String appId,Integer pageNo,Integer pageSize){
-        String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/app_extension/list/{1}?pageNo={2}&pageSize={3}";
-        return  RestRequest.buildSecurityRequest(token).getPage(uri, AppExtension.class,appId,pageNo,pageSize);
-    }
 
     /**
      * 创建应用首页

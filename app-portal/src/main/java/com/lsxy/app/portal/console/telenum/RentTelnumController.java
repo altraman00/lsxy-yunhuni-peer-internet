@@ -84,8 +84,9 @@ public class RentTelnumController extends AbstractPortalController {
         String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/res_rent/release?id={1}";
         return  RestRequest.buildSecurityRequest(token).get(uri, String.class,id);
     }
-    /** 获取号码列表
-     * **/
+    /**
+     * 获取号码列表
+     **/
     @RequestMapping("/telnum/plist" )
     @ResponseBody
     public RestResponse telnumPlist(HttpServletRequest request, @RequestParam(defaultValue = "1")Integer pageNo,  @RequestParam(defaultValue = "20")Integer pageSize,
@@ -134,13 +135,18 @@ public class RentTelnumController extends AbstractPortalController {
     @RequestMapping("/province/list" )
     @ResponseBody
     public RestResponse getProvinceList(HttpServletRequest request){
-        List list = getTelnumLocationProvinceList(request);
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/telnum/location/province/list";
+        RestResponse<List<String> > restResponse =  RestRequest.buildSecurityRequest(token).getList(uri, String.class);
+        List list =  restResponse.getData();
         return  RestResponse.success(list);
     }
     @RequestMapping("/city/list" )
     @ResponseBody
     public RestResponse getCityList(HttpServletRequest request){
-        List list = getTelnumCity(request);
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/telnum/city";
+        List list =  RestRequest.buildSecurityRequest(token).getList(uri, Map.class).getData();
         return  RestResponse.success(list);
     }
 
