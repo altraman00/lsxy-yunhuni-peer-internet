@@ -7,7 +7,8 @@ public class ServerVO {
     public static final String STATUS_OK = "OK" ;
     public static final String STATUS_FAILED = "FAILED";
     private String serverName;
-    private String appName;
+    private String appName;     //systemId
+    private String moduleName;  //模块名称
     private String serverHost;
     private String serverIp;
     private String serverPort;
@@ -31,6 +32,14 @@ public class ServerVO {
         this.serverIp = serverIp;
         this.serverPort = serverPort;
         this.status = status;
+    }
+
+    public String getModuleName() {
+        return moduleName;
+    }
+
+    public void setModuleName(String moduleName) {
+        this.moduleName = moduleName;
     }
 
     public String getServerName() {

@@ -5,9 +5,8 @@ import com.lsxy.framework.api.FrameworkApiConfig;
 import com.lsxy.framework.cache.FrameworkCacheConfig;
 import com.lsxy.framework.monitor.FrameworkMonitorConfig;
 import com.lsxy.framework.web.web.AbstractSpringBootWebStarter;
-import com.lsxy.yunhuni.api.YunhuniApiConfig;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
-import org.slf4j.MDC;
+import com.lsxy.yunhuni.api.YunhuniApiConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
@@ -20,7 +19,7 @@ import org.springframework.context.annotation.Import;
 @Import({FrameworkApiConfig.class,FrameworkServiceConfig.class, FrameworkCacheConfig.class, YunhuniApiConfig.class, YunhuniServiceConfig.class, FrameworkMonitorConfig.class})
 public class MainClass  extends AbstractSpringBootWebStarter {
 
-    public static final String systemId = "third.join.gateway";
+    public static final String systemId = "app.third.join.gateway";
 
     static {
         System.setProperty("systemId",systemId);
