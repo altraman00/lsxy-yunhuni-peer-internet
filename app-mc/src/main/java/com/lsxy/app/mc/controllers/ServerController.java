@@ -134,7 +134,6 @@ public class ServerController extends AdminController{
                 if(xx.length > 1){
                     server.setStartDt(DateUtils.formatDate(new Date(Long.parseLong(xx[1]))));
                 }
-                server.setVersion(cacheService.get(key));
             }else{
                 server.setStatus(ServerVO.STATUS_FAILED);
             }
@@ -185,5 +184,8 @@ public class ServerController extends AdminController{
 //        result = JSONUtil2.jsonToList(json, AreaServerVO.class);
 //        System.out.println(result.size());
 //    }
+public static void main(String[] args) {
+    System.out.println("1.2.1-SNAPSHOT 1484215488331".split(" ")[0]);
+}
 
 }
