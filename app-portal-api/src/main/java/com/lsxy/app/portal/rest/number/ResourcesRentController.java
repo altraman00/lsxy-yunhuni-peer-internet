@@ -295,6 +295,9 @@ public class ResourcesRentController extends AbstractRestController{
     @RequestMapping("/num/bind/app/{appId}")
     public RestResponse bindNumToApp(@PathVariable String appId,String nums){
         App app = appService.findById(appId);
+        if(app.getStatus() == null || app.getStatus() == App.STATUS_OFFLINE){
+            return RestResponse.failed("0000","应用没上线");
+        }
         List numList = null;
         if(StringUtils.isNotBlank(nums)){
             numList = Arrays.asList(nums.split(","));
