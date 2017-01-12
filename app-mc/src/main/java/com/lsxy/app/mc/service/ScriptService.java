@@ -64,7 +64,7 @@ public class ScriptService {
             }
 
             try {
-                InputStream in = System.class.getClassLoader().getResourceAsStream("/scripts/"+scriptName);
+                InputStream in = this.getClass().getClassLoader().getResourceAsStream("/scripts/"+scriptName);
                 if(in == null){
                     throw new ScriptFileNotExistException(scriptName);
                 }
