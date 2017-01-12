@@ -1,7 +1,6 @@
 package com.lsxy.user.demo;
 
 import com.lsxy.framework.web.web.AbstractSpringBootWebStarter;
-import org.slf4j.MDC;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
@@ -20,7 +19,7 @@ import static com.lsxy.framework.cache.FrameworkCacheConfig.logger;
 @EnableWebMvc
 public class DemoMainClass extends AbstractSpringBootWebStarter {
 
-    public static final String systemId = "user.join.demo";
+    public static final String systemId = "app.user.demo";
 
     static {
         System.setProperty("systemId",systemId);

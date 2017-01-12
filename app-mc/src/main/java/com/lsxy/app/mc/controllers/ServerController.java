@@ -9,6 +9,7 @@ import com.lsxy.app.mc.vo.AreaServerHostVO;
 import com.lsxy.app.mc.vo.AreaServerVO;
 import com.lsxy.app.mc.vo.ServerVO;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.config.Application;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.StringUtil;
@@ -66,6 +67,10 @@ public class ServerController extends AdminController{
 //        String script = "/opt/lsxy_yunwei/lsxy_server.sh -j start -a app-portal-api -r 1.2.0-RC3 -h p05";
 
         try {
+            Application application = Application.getApplication(app);
+            if(application == null) {
+                throw new IllegalArgumentException(app);
+            }
             String script = scriptService.prepareScript("start.sh");
             String result = RunShellUtil.run("sh "+script + " -a "+app+"",10);
             System.out.println(result);
@@ -75,14 +80,23 @@ public class ServerController extends AdminController{
         }
         return RestResponse.success("OK");
     }
+
+    /**
+     * 更新服务
+     * @param host
+     * @param app
+     * @return
+     */
     @RequestMapping("/server/update")
     @ResponseBody
     public RestResponse<String> updateServer(String host,String app){
-//        String script = "/opt/lsxy_yunwei/lsxy_server.sh -j start -a app-portal-api -r 1.2.0-RC3 -h p05";
-
         try {
+            Application application = Application.getApplication(app);
+            if(application == null) {
+                throw new IllegalArgumentException(app);
+            }
             String script = scriptService.prepareScript(ScriptService.SCRIPT_UPDATE);
-            String result = RunShellUtil.run("sh "+script + " -a "+app+" -h "+host+"",10);
+            String result = RunShellUtil.run("sh "+script + " -a "+application.getModuleName()+" -h "+host+"",10);
             if(logger.isDebugEnabled()){
                 logger.debug("update completed and result is :");
                 logger.debug(result);
