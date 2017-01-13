@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
+import com.lsxy.area.server.batch.CallCenterConversationBatchInserter;
 import com.lsxy.area.server.batch.CallSessionBatchInserter;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.PlayFileUtil;
@@ -111,6 +112,9 @@ public class ConversationService {
 
     @Autowired
     private ConversationCallVoiceModeReference conversationCallVoiceModeReference;
+
+    @Autowired
+    private CallCenterConversationBatchInserter callCenterConversationBatchInserter;
 
     public BaseEnQueue getEnqueue(String queueId){
         BaseEnQueue enqueue = null;
@@ -249,7 +253,7 @@ public class ConversationService {
             conversation.setTenantId(tenantId);
             conversation.setRelevanceId(initiator.getId());
             conversation.setStartTime(new Date());
-            callCenterConversationService.save(conversation);
+            callCenterConversationBatchInserter.put(conversation);
         }catch (Throwable t){
             logger.error("保存CallCenterConversation失败",t);
         }

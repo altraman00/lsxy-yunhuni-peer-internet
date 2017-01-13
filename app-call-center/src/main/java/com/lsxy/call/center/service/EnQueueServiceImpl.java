@@ -3,6 +3,7 @@ package com.lsxy.call.center.service;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.*;
+import com.lsxy.call.center.batch.QueueBatchInserter;
 import com.lsxy.call.center.states.lock.AgentLock;
 import com.lsxy.call.center.states.lock.QueueLock;
 import com.lsxy.call.center.states.state.AgentState;
@@ -10,9 +11,7 @@ import com.lsxy.call.center.states.state.ExtensionState;
 import com.lsxy.call.center.states.statics.ACs;
 import com.lsxy.call.center.states.statics.CAs;
 import com.lsxy.call.center.states.statics.CQs;
-import com.lsxy.call.center.utils.CQSBatchInserter;
 import com.lsxy.call.center.utils.Lua;
-import com.lsxy.call.center.utils.QueueBatchInserter;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.ChannelNotExistException;
 import com.lsxy.framework.core.exceptions.api.ConditionNotExistException;
@@ -64,9 +63,6 @@ public class EnQueueServiceImpl implements EnQueueService{
     private CQs cQs;
 
     @Autowired
-    private CQSBatchInserter cqsBatchInserter;
-
-    @Autowired
     private MQService mqService;
 
     @Autowired
@@ -90,7 +86,7 @@ public class EnQueueServiceImpl implements EnQueueService{
     }
 
     private void addCQS(String conditionId,String queueId){
-        cqsBatchInserter.put(conditionId, queueId);
+        cQs.add(conditionId, queueId);
     }
 
     private void publishTimeoutEvent(Condition condition,String queueId,String type,String callId,String conversationId){

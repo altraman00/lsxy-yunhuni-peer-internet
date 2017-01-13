@@ -1,11 +1,9 @@
-package com.lsxy.area.server.batch;
+package com.lsxy.call.center.batch;
 
+import com.lsxy.call.center.api.model.CallCenterQueue;
+import com.lsxy.call.center.api.service.CallCenterQueueService;
 import com.lsxy.framework.api.base.AsyncBatchInserter;
 import com.lsxy.framework.api.base.BaseService;
-import com.lsxy.yunhuni.api.session.model.CallSession;
-import com.lsxy.yunhuni.api.session.model.VoiceIvr;
-import com.lsxy.yunhuni.api.session.service.CallSessionService;
-import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +18,13 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Created by liuws on 2016/12/13.
  */
 @Component
-public class VoiceIvrBatchInserter extends AsyncBatchInserter<VoiceIvr> {
+public class QueueBatchInserter extends AsyncBatchInserter<CallCenterQueue>{
 
     @Autowired
-    private VoiceIvrService voiceIvrService;
+    private CallCenterQueueService callCenterQueueService;
 
     @Override
-    public BaseService<VoiceIvr> getBaseService() {
-        return voiceIvrService;
+    public BaseService<CallCenterQueue> getBaseService() {
+        return callCenterQueueService;
     }
 }
-
