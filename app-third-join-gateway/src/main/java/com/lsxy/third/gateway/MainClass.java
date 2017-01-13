@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Import;
 @Import({FrameworkApiConfig.class,FrameworkServiceConfig.class, FrameworkCacheConfig.class, YunhuniApiConfig.class, YunhuniServiceConfig.class, FrameworkMonitorConfig.class})
 public class MainClass  extends AbstractSpringBootWebStarter {
 
-    public static final String systemId = "app.third.join.gateway";
+    public static final String systemId = "third.join.gateway";
 
     static {
         System.setProperty("systemId",systemId);

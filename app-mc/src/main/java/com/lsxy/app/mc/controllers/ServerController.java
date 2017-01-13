@@ -134,7 +134,6 @@ public class ServerController extends AdminController{
                 if(xx.length > 1){
                     server.setStartDt(DateUtils.formatDate(new Date(Long.parseLong(xx[1]))));
                 }
-                server.setVersion(cacheService.get(key));
             }else{
                 server.setStatus(ServerVO.STATUS_FAILED);
             }
@@ -171,19 +170,5 @@ public class ServerController extends AdminController{
         return areaServers;
     }
 
-//    public static void main(String[] args) {
-//        String json = "[{\"areaId\":\"area001\",\"areaName\":\"area001\"," +
-//                "    \"hosts\":[" +
-//                "    {\"hostName\":\"localhost\",\"nodes\":[" +
-//                "        {\"nodeId\":\"area001-1\",\"host\":\"localhost\"}," +
-//                "        {\"nodeId\":\"area001-1\",\"host\":\"localhost\"}" +
-//                "]" +
-//                "            }]" +
-//                "        }]" +
-//                "   }";
-//        List<AreaServerVO> result = JSONUtil2.jsonToList(json, AreaServerVO.class);
-//        result = JSONUtil2.jsonToList(json, AreaServerVO.class);
-//        System.out.println(result.size());
-//    }
 
 }
