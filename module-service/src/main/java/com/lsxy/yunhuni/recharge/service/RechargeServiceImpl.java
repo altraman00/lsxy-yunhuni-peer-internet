@@ -110,16 +110,16 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
         Date date = new Date();
         if(tenant != null){
             if(startTime != null && endTime != null){
-                String hql = "from Recharge obj where (obj.status='PAID' or (obj.status='NOTPAID' and obj.deadline>=?1 )) and obj.tenant.id=?2 and obj.createTime between ?3 and ?4 order by obj.createTime desc";
+                String hql = "from Recharge obj where (obj.status='PAID' or (obj.status='NOTPAID' and obj.deadline>=?1 )) and obj.tenantId=?2 and obj.createTime between ?3 and ?4 order by obj.createTime desc";
                 page =  this.pageList(hql,pageNo,pageSize,date,tenant.getId(),startTime,endTime);
             }else if(startTime != null && endTime == null){
-                String hql = "from Recharge obj where (obj.status='PAID' or (obj.status='NOTPAID' and obj.deadline>=?1 )) and obj.tenant.id=?2 and obj.createTime >= ?3 order by obj.createTime desc";
+                String hql = "from Recharge obj where (obj.status='PAID' or (obj.status='NOTPAID' and obj.deadline>=?1 )) and obj.tenantId=?2 and obj.createTime >= ?3 order by obj.createTime desc";
                 page =  this.pageList(hql,pageNo,pageSize,date,tenant.getId(),startTime);
             }else if(startTime == null && endTime != null){
-                String hql = "from Recharge obj where (obj.status='PAID' or (obj.status='NOTPAID' and obj.deadline>=?1 )) and obj.tenant.id=?2 and obj.createTime <= ?3 order by obj.createTime desc";
+                String hql = "from Recharge obj where (obj.status='PAID' or (obj.status='NOTPAID' and obj.deadline>=?1 )) and obj.tenantId=?2 and obj.createTime <= ?3 order by obj.createTime desc";
                 page =  this.pageList(hql,pageNo,pageSize,date,tenant.getId(),endTime);
             }else{
-                String hql = "from Recharge obj where (obj.status='PAID' or (obj.status='NOTPAID' and obj.deadline>=?1 )) and obj.tenant.id=?2 order by obj.createTime desc";
+                String hql = "from Recharge obj where (obj.status='PAID' or (obj.status='NOTPAID' and obj.deadline>=?1 )) and obj.tenantId=?2 order by obj.createTime desc";
                 page =  this.pageList(hql,pageNo,pageSize,date,tenant.getId());
             }
         }
@@ -150,7 +150,7 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
 
     @Override
     public List<Recharge> listByTenant(String tenant) {
-        String hql = "from Recharge obj where obj.tenant.id=?1 order by obj.createTime desc";
+        String hql = "from Recharge obj where obj.tenantId=?1 order by obj.createTime desc";
         return this.list(hql,tenant);
     }
 
@@ -158,16 +158,16 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
     public Page<Recharge> pageListByTenant(String tenant,String type,String source, Integer pageNo, Integer pageSize) {
         Page<Recharge> page = null;
         if(StringUtils.isNotBlank(type) && StringUtils.isNotBlank(source)){
-            String hql = "from Recharge obj where obj.tenant.id=?1 and obj.status ='PAID' and type=?2 and source=?3 order by obj.createTime desc";
+            String hql = "from Recharge obj where obj.tenantId=?1 and obj.status ='PAID' and type=?2 and source=?3 order by obj.createTime desc";
             page =  this.pageList(hql,pageNo,pageSize,tenant,type,source);
         }else if(StringUtils.isNotBlank(type)){
-            String hql = "from Recharge obj where obj.tenant.id=?1 and obj.status ='PAID' and type=?2 order by obj.createTime desc";
+            String hql = "from Recharge obj where obj.tenantId=?1 and obj.status ='PAID' and type=?2 order by obj.createTime desc";
             page =  this.pageList(hql,pageNo,pageSize,tenant,type);
         }else if(StringUtils.isNotBlank(source)){
-            String hql = "from Recharge obj where obj.tenant.id=?1 and obj.status ='PAID' and source=?2 order by obj.createTime desc";
+            String hql = "from Recharge obj where obj.tenantId=?1 and obj.status ='PAID' and source=?2 order by obj.createTime desc";
             page =  this.pageList(hql,pageNo,pageSize,tenant,source);
         }else{
-            String hql = "from Recharge obj where obj.tenant.id=?1 and obj.status ='PAID' order by obj.createTime desc";
+            String hql = "from Recharge obj where obj.tenantId=?1 and obj.status ='PAID' order by obj.createTime desc";
             page =  this.pageList(hql,pageNo,pageSize,tenant);
         }
         return page;

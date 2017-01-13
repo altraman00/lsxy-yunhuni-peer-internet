@@ -1,5 +1,7 @@
 package com.lsxy.app.api.gateway.rest.callcenter.vo;
 
+import com.lsxy.call.center.api.model.AppExtension;
+
 /**
  * Created by liups on 2016/11/18.
  */
@@ -10,6 +12,22 @@ public class ExtensionVO {
     private String password;//    password             varchar(50) comment 'SIP注册密码',
     private String ipaddr;  //SIP 网关IP地址与端口，默认5060，仅用于 type==2的情况
     private String telnum;//    telenum              varchar(32) comment '如果是电话分机，该属性记录电话号码（保留，不用）',
+
+    public ExtensionVO() {
+    }
+
+    public ExtensionVO(String id, String type, String user, String password, String ipaddr, String telnum) {
+        this.id = id;
+        this.type = type;
+        this.user = user;
+        this.password = password;
+        this.ipaddr = ipaddr;
+        this.telnum = telnum;
+    }
+
+    public static ExtensionVO changeAppExtensionToExtensionVO(AppExtension ext){
+        return new ExtensionVO(ext.getId(),ext.getType(),ext.getUser(),ext.getPassword(),ext.getIpaddr(),ext.getTelnum());
+    }
 
     public String getId() {
         return id;

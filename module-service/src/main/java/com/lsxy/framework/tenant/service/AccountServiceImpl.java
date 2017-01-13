@@ -222,7 +222,7 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     //创建主鉴权账号
     private void createApiCertificate(Tenant tenant) {
         ApiCertificate cert = new ApiCertificate();
-        cert.setTenant(tenant);
+        cert.setTenantId(tenant.getId());
         cert.setCertId(UUIDGenerator.uuid());
         cert.setSecretKey(UUIDGenerator.uuid());
         apiCertificateService.save(cert);
