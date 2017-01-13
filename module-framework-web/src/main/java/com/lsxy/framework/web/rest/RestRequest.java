@@ -140,12 +140,14 @@ public class RestRequest {
     private <T> List<T> convertListToConcretList(List<?> objList,Class<T> concretDataType) {
         List<T> concreteList = new ArrayList<>();
         ObjectMapper mapper = new ObjectMapper();
-        objList.stream().filter(obj -> obj instanceof Map).forEach(obj -> {
-            T mapperObject = mapper.convertValue(obj, concretDataType);
-            if (mapperObject != null) {
-                concreteList.add(mapperObject);
-            }
-        });
+        if(objList != null){
+            objList.stream().filter(obj -> obj instanceof Map).forEach(obj -> {
+                T mapperObject = mapper.convertValue(obj, concretDataType);
+                if (mapperObject != null) {
+                    concreteList.add(mapperObject);
+                }
+            });
+        }
         return concreteList;
     }
 
