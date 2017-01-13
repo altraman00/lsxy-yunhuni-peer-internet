@@ -228,7 +228,7 @@ public class ConversationOps implements com.lsxy.area.api.callcenter.Conversatio
                         .putIfNotEmpty("res_id",conversation_state.getResId())
                         .putIfNotEmpty("content", JSONUtil2.objectToJson(new Object[][]{new Object[]{playWait,0,""}}))
                         .putIfNotEmpty("user_data",conversationId)
-                        .putIfNotEmpty("repeat",10)
+                        .putIfNotEmpty("is_loop",true)
                         .put("areaId",conversation_state.getAreaId())
                         .build();
                 RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, _params);
