@@ -55,7 +55,7 @@ public class ApiCertificateServiceImpl extends AbstractService<ApiCertificate> i
 
     @Override
     public ApiCertificate findApiCertificateByTenantId(String tenantId) {
-        String hql = "from ApiCertificate obj where obj.tenant.id=?1";
+        String hql = "from ApiCertificate obj where obj.tenantId=?1";
         List<ApiCertificate> list = this.findByCustomWithParams(hql, tenantId);
         if(list != null && list.size()>0){
             return list.get(0);
