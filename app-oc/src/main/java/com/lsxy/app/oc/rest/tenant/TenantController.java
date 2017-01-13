@@ -672,20 +672,6 @@ public class TenantController extends AbstractRestController {
                 if(Arrays.asList(companyAuth_status).contains(status)) {
                     realnameCorp = realnameCorpService.findByTenantIdNewest(tenant.getId());
                 }
-                //未认证，等待审核，已认证，认证失败
-//                Integer[] wait_auth_status = new Integer[]{Tenant.AUTH_WAIT,Tenant.AUTH_ONESELF_WAIT,Tenant.AUTH_UPGRADE_WAIT};//等待审核
-//                Integer[] auth_success_status = new Integer[]{Tenant.AUTH_COMPANY_SUCCESS,Tenant.AUTH_ONESELF_SUCCESS,Tenant.AUTH_UPGRADE_WAIT,Tenant.AUTH_UPGRADE_SUCCESS,Tenant.AUTH_UPGRADE_FAIL};//已认证
-//                Integer[] auth_fail_status = new Integer[]{Tenant.AUTH_COMPANY_FAIL,Tenant.AUTH_ONESELF_FAIL};
-//                if(Arrays.asList(wait_auth_status).contains(status)){//等待审核
-//                    info.setStatus("未审核");
-//                    info = getAuthInfo(tenant.getId(),status,info);
-//                }else if(Arrays.asList(auth_success_status).contains(status)){//已认证
-//                    info.setStatus("已认证");
-//                    info = getAuthInfo(tenant.getId(),status,info);
-//                }else if(Arrays.asList(auth_fail_status).contains(status)){//认证失败
-//                    info.setStatus("认证失败");
-//                    info = getAuthInfo(tenant.getId(),status,info);
-//                }
 
             }
         }
@@ -693,44 +679,6 @@ public class TenantController extends AbstractRestController {
         map.put("realnamePrivate",realnamePrivate);
         map.put("realnameCorp",realnameCorp);
         return RestResponse.success(map);
-    }
-
-    private AuthInfoVO getAuthInfo(String tenantId,Integer status,AuthInfoVO info){
-        Integer[] privateAuth_status = new Integer[]{Tenant.AUTH_ONESELF_SUCCESS,
-               Tenant.AUTH_ONESELF_WAIT,Tenant.AUTH_ONESELF_FAIL,Tenant.AUTH_UPGRADE_FAIL
-        };//个人认证
-        Integer[] companyAuth_status = new Integer[]{Tenant.AUTH_COMPANY_SUCCESS,
-                Tenant.AUTH_COMPANY_FAIL,Tenant.AUTH_WAIT,Tenant.AUTH_UPGRADE_WAIT,
-                Tenant.AUTH_UPGRADE_SUCCESS};//公司认证
-        AuthInfoVO authInfo = null;
-        if(Arrays.asList(privateAuth_status).contains(status)){
-            authInfo = new PrivateAuthInfoVO();
-            RealnamePrivate p = realnamePrivateService.findByTenantIdNewest(tenantId);
-            if(p!=null){
-                try {
-                    BeanUtils.copyProperties(authInfo,p);
-                } catch (Throwable e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            authInfo.setStatus(info.getStatus());
-            authInfo.setType("个人");
-            info = authInfo;
-        }else if(Arrays.asList(companyAuth_status).contains(status)){
-            authInfo = new CompanyAuthInfoVO();
-            RealnameCorp p = realnameCorpService.findByTenantIdNewest(tenantId);
-            if(p!=null){
-                try {
-                    BeanUtils.copyProperties(authInfo,p);
-                } catch (Throwable e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            authInfo.setStatus(info.getStatus());
-            authInfo.setType("公司");
-            info = authInfo;
-        }
-        return info;
     }
 
     @ApiOperation(value = "重置租户的密码)")
