@@ -170,22 +170,5 @@ public class ServerController extends AdminController{
         return areaServers;
     }
 
-//    public static void main(String[] args) {
-//        String json = "[{\"areaId\":\"area001\",\"areaName\":\"area001\"," +
-//                "    \"hosts\":[" +
-//                "    {\"hostName\":\"localhost\",\"nodes\":[" +
-//                "        {\"nodeId\":\"area001-1\",\"host\":\"localhost\"}," +
-//                "        {\"nodeId\":\"area001-1\",\"host\":\"localhost\"}" +
-//                "]" +
-//                "            }]" +
-//                "        }]" +
-//                "   }";
-//        List<AreaServerVO> result = JSONUtil2.jsonToList(json, AreaServerVO.class);
-//        result = JSONUtil2.jsonToList(json, AreaServerVO.class);
-//        System.out.println(result.size());
-//    }
-public static void main(String[] args) {
-    System.out.println("1.2.1-SNAPSHOT 1484215488331".split(" ")[0]);
-}
 
 }
