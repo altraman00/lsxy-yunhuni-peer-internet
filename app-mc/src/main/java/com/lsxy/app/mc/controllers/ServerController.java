@@ -59,7 +59,22 @@ public class ServerController extends AdminController{
 
     @RequestMapping("/server/stop")
     @ResponseBody
-    public RestResponse<String> stopServer(){
+    public RestResponse<String> stopServer(String host,String app){
+        try {
+            Application application = Application.getApplication(app);
+            if(application == null) {
+                throw new IllegalArgumentException(app);
+            }
+            String script = scriptService.prepareScript(ScriptService.SCRIPT_STOP);
+            String result = RunShellUtil.run("sh "+script + " -a "+application.getModuleName()+" -h "+host+"",10);
+            if(logger.isDebugEnabled()){
+                logger.debug("stop completed and result is :");
+                logger.debug(result);
+            }
+        } catch (ScriptFileNotExistException | ShellExecuteException e) {
+            logger.error("update exception: " + host + ":" + app,e);
+            return RestResponse.failed("00001","execute exception");
+        }
         return RestResponse.success("OK");
     }
 
@@ -74,8 +89,11 @@ public class ServerController extends AdminController{
                 throw new IllegalArgumentException(app);
             }
             String script = scriptService.prepareScript("start.sh");
-            String result = RunShellUtil.run("sh "+script + " -a "+app+"",10);
-            System.out.println(result);
+            String result = RunShellUtil.run("sh "+script + " -a "+application.getModuleName()+" -h " + host,10);
+            if(logger.isDebugEnabled()){
+                logger.debug("start completed and result is :");
+                logger.debug(result);
+            }
         } catch (ScriptFileNotExistException | ShellExecuteException e) {
             e.printStackTrace();
             return RestResponse.failed("00001","execute exception");

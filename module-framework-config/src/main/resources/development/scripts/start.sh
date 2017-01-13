@@ -38,7 +38,12 @@ do
  esac
 done
 
-echo "app_name:$app_name"
-sleep 20
+if [ "$app_name"x = "app-portal"x ]
+then
+    echo "ssh root@$host_name /opt/tomcat_app_portal/bin/startup.sh"
+    ssh root@$host_name "/opt/tomcat_app_portal/bin/startup.sh"
+else
+    echo "ssh root@$host_name /opt/yunhuni-peer-internet/bin/update_restart.sh -A $app_name -S -P development -I"
+    ssh root@$host_name "/opt/yunhuni-peer-internet/bin/update_restart.sh -A $app_name -S -P development -I"
+fi
 
-echo "ok"

@@ -14,7 +14,7 @@ public enum Application {
     APP_MC("app.mc", "app-mc"),
     APP_OC("oc.api", "app-oc"),
     APP_OPENSIPS_PROXY("app.opensips.proxy", "app-opensips-proxy"),
-    APP_THIRD_JOIN_GATEWAY("app.third.join.gateway", "app-third-join-gateway"),
+    APP_THIRD_JOIN_GATEWAY("third.join.gateway", "app-third-join-gateway"),
     APP_PORTAL_API("portal.api", "app-portal-api");
 
     private String appName;
