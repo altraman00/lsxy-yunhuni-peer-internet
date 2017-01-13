@@ -29,7 +29,25 @@ function updateServer(){
 
 }
 
+function stopServer(){
+    var btnStartServer = $(this);
+    var host = btnStartServer.attr("host");
+    var app = btnStartServer.attr("app");
+    var url = ctx + "admin/server/stop?host="+host+"&app="+app;
+
+    $.get( url, function( data ) {
+        if(data && data.success){
+            alert('操作成功');
+        }else{
+            alert('操作失败');
+        }
+    });
+
+}
+
 $(function() {
     $(".btnStartServer").bind("click",startServer);
     $(".btnUpdateServer").bind("click",updateServer);
+    $(".btnStopServer").bind("click",stopServer);
+
 });
