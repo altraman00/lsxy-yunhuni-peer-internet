@@ -15,6 +15,7 @@ import java.util.Date;
 @Component
 public class SystemMonitor extends AbstractMonitor {
 
+    public static final Date systemStartDt = new Date();
     /**
      * 系统监控缓存格式  version starttime
      * @return
@@ -24,9 +25,7 @@ public class SystemMonitor extends AbstractMonitor {
         if(StringUtil.isEmpty(version)){
             version = "1.2.1";
         }
-        RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
-
-        return version + " " + bean.getStartTime();
+        return version + " " + systemStartDt.getTime();
     }
 
     @Override
