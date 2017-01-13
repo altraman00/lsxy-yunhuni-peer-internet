@@ -153,6 +153,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 confService.confEnter(call_id,conf_id,null,null,null);
             } catch (Throwable e) {
                 logger.warn("将呼叫加入到会议失败",e);
+                hungup(state);
                 if(StringUtils.isNotBlank(state.getCallBackUrl())){
                     Map<String,Object> notify_data = new MapBuilder<String,Object>()
                             .putIfNotEmpty("event","conf.join.fail")
