@@ -165,42 +165,11 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
         }
-        ifAutoRecording(state,state.getAreaId(),businessData,res_id,conf_id);
         Meeting meeting = meetingService.findById(conf_id);
         if(meeting != null){
             meeting.setResId(res_id);
             meeting.setStartTime(new Date());
             meetingService.save(meeting);
-        }
-    }
-    /**
-     * 创建会议是否自动录音
-     * @param state
-     * @param businessData
-     * @param res_id
-     * @param conf_id
-     */
-    private void ifAutoRecording(BusinessState state, String areaId, Map<String, String> businessData, String res_id, String conf_id){
-        if(businessData == null){
-            return;
-        }
-        if(!Boolean.parseBoolean(businessData.get("recording"))){
-            return;
-        }
-        Map<String,Object> params = new MapBuilder<String,Object>()
-                .putIfNotEmpty("res_id",res_id)
-                .putIfNotEmpty("max_seconds",businessData.get("max_seconds"))
-                .putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(state.getTenantId(),state.getAppId()))
-                .putIfNotEmpty("user_data",conf_id)
-                .put("areaId",areaId)
-                .build();
-        try {
-            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD, params);
-            if(!businessStateService.closed(conf_id)) {
-                rpcCaller.invoke(sessionContext, rpcrequest);
-            }
-        } catch (Exception e) {
-            logger.error("会议创建自动录音：",e);
         }
     }
 }
