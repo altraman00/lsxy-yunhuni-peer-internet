@@ -89,7 +89,7 @@ public class ServerController extends AdminController{
                 throw new IllegalArgumentException(app);
             }
             String script = scriptService.prepareScript("start.sh");
-            String result = RunShellUtil.run("sh "+script + " -a "+app+" -h " + host,10);
+            String result = RunShellUtil.run("sh "+script + " -a "+application.getModuleName()+" -h " + host,10);
             if(logger.isDebugEnabled()){
                 logger.debug("start completed and result is :");
                 logger.debug(result);
