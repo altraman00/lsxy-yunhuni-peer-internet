@@ -237,9 +237,8 @@
                                     </li>
                                     <li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>
                                     <!--号码绑定-->
-                                    <c:if test="${app.status==1}">
-                                        <li data-id="number"><a href="#number" data-toggle="tab">号码绑定</a></li>
-                                    </c:if>
+
+                                    <li data-id="number"><a href="#number" data-toggle="tab">号码绑定</a></li>
                                     <li class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
@@ -331,7 +330,9 @@
                                         <div class="row margin-bottom-20">
                                             <div class="col-md-12">
                                                 <a class="btn btn-primary" onclick="unallband()">全部解除绑定</a>
-                                                <a class="btn btn-primary" id="call-number">绑定号码</a>
+                                                <c:if test="${app.status==1}">
+                                                    <a class="btn btn-primary" id="call-number">绑定号码</a>
+                                                </c:if>
                                             </div>
                                         </div>
 
