@@ -74,7 +74,7 @@ public class ApiCertificateServiceImpl extends AbstractService<ApiCertificate> i
         Long count = apiCertificateChangeLogService.countTodayCertChangeLogByCert(cert);
         if(count < SK_CHANGE_COUNT_OF_DAY){
             String secretKey = UUIDGenerator.uuid();
-            apiCertificateChangeLogService.insertApiCertificateChangeLog(cert,secretKey,CERT_CHANGE_TYPE_UUID);
+            apiCertificateChangeLogService.insertApiCertificateChangeLog(cert.getId(),secretKey,CERT_CHANGE_TYPE_UUID);
             cert.setSecretKey(secretKey);
             this.save(cert);
             return secretKey;
