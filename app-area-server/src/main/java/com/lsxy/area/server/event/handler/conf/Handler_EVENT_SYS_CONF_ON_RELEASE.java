@@ -10,6 +10,8 @@ import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.call.center.api.model.CallCenterConversation;
 import com.lsxy.call.center.api.service.CallCenterConversationService;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.callcenter.ConversationCompletedEvent;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -67,6 +69,9 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
     @Autowired
     private CallCenterUtil callCenterUtil;
 
+    @Autowired
+    private MQService mqService;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CONF_ON_RELEASE;
@@ -112,19 +117,20 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
         CallCenterConversation conversation = null;
         try{
             conversation = callCenterConversationService.findById(conversation_id);
-            if(conversation!=null){
+            if(conversation != null){
                 CallCenterConversation updateCallCenterConversation = new CallCenterConversation();
                 updateCallCenterConversation.setEndTime(new Date());
+                updateCallCenterConversation.setState(CallCenterConversation.STATE_COMPLETED);
                 callCenterConversationService.update(conversation.getId(),updateCallCenterConversation);
             }
+
         }catch (Throwable t){
-            logger.error("更新交谈记录失败",t);
+            logger.warn("更新交谈记录失败",t);
+            mqService.publish(new ConversationCompletedEvent(conversation_id));
         }
-        if(conversation!=null){
-            callCenterUtil.conversationEndEvent(state.getCallBackUrl(),conversation_id,
-                    CallCenterUtil.CONVERSATION_TYPE_QUEUE,
-                    conversation.getStartTime().getTime(),null,null,null,null,null,null);
-        }
+        callCenterUtil.conversationEndEvent(state.getCallBackUrl(),conversation_id,
+                CallCenterUtil.CONVERSATION_TYPE_QUEUE,
+                conversation!=null?conversation.getStartTime().getTime():null,null,null,null,null,null,null);
     }
 
     private void conf(BusinessState state,Map<String,Object> params,String conf_id){

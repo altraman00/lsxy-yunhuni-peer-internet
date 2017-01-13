@@ -16,6 +16,10 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_call_center_conversation")
 public class CallCenterConversation extends IdEntity {
+
+    public static final String STATE_RUNNING = "running";
+    public static final String STATE_COMPLETED= "completed";
+
     private String tenantId;//所属租户
     private String appId;//所属应用
     private String type;

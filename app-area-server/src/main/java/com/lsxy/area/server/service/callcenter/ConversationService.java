@@ -249,6 +249,8 @@ public class ConversationService {
         try{
             CallCenterConversation conversation = new CallCenterConversation();
             conversation.setId(id);
+            conversation.setState(CallCenterConversation.STATE_RUNNING);
+            conversation.setChannelId(channel);
             conversation.setAppId(appId);
             conversation.setTenantId(tenantId);
             conversation.setRelevanceId(initiator.getId());

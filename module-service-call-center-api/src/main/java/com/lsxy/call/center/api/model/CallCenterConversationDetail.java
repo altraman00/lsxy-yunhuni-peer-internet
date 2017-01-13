@@ -1,5 +1,7 @@
 package com.lsxy.call.center.api.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Date;
 import java.util.List;
 
@@ -9,15 +11,31 @@ import java.util.List;
  */
 public class CallCenterConversationDetail{
 
+    @JsonProperty("id")
     private String id;
+
+    @JsonProperty("type")
     private String type;
+
+    @JsonProperty("state")
     private String state;
+
+    @JsonProperty("channel")
     private String channelId;
+
+    @JsonProperty("queue_id")
     private String queueId;
-    private String conditionId;
+
+    @JsonProperty("begin_time")
     private Date startTime;//发起时间
+
+    @JsonProperty("end_time")
     private Date endTime;//结束时间
+
+    @JsonProperty("end_reason")
     private String endReason;
+
+    @JsonProperty("members")
     private List<MemberDetail> members;
 
     public String getId() {
@@ -26,14 +44,6 @@ public class CallCenterConversationDetail{
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getConditionId() {
-        return conditionId;
-    }
-
-    public void setConditionId(String conditionId) {
-        this.conditionId = conditionId;
     }
 
     public String getType() {
@@ -92,13 +102,32 @@ public class CallCenterConversationDetail{
         this.endReason = endReason;
     }
 
+    public List<MemberDetail> getMembers() {
+        return members;
+    }
 
-    public class MemberDetail{
+    public void setMembers(List<MemberDetail> members) {
+        this.members = members;
+    }
+
+    public static class MemberDetail{
+
+        @JsonProperty("name")
         private String agentName;
+
+        @JsonProperty("extension_id")
         private String extensionId;
+
+        @JsonProperty("call_id")
         private String callId;
+
+        @JsonProperty("begin_time")
         private Date startTime;//发起时间
+
+        @JsonProperty("end_time")
         private Date endTime;//结束时间
+
+        @JsonProperty("mode")
         private Integer mode;//说听模式
 
         public String getAgentName() {

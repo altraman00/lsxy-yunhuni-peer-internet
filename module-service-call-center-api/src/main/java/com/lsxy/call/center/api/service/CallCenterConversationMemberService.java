@@ -24,4 +24,6 @@ public interface CallCenterConversationMemberService  extends BaseService<CallCe
      * @return
      */
     public CallCenterConversationMember findOne(String relevanceId,String callId);
+
+    public List<CallCenterConversationMember> list(String conversationId);
 }

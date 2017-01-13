@@ -1,5 +1,6 @@
-package com.lsxy.area.api.callcenter;
+package com.lsxy.call.center.api.service;
 
+import com.lsxy.call.center.api.model.CallCenterConversationDetail;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 
 /**
@@ -15,4 +16,6 @@ public interface ConversationOps {
 
     public String inviteOut(String ip, String appId, String conversationId, String from,
                       String to, Integer maxDial, Integer maxDuration, Integer voiceMode) throws YunhuniApiException;
+
+    public CallCenterConversationDetail detail(String ip, String appId, String conversationId) throws YunhuniApiException;
 }
