@@ -51,11 +51,10 @@ public abstract class AsyncBatchInserter<T> extends Thread{
                     }
                     stack.clear();
                 }
-                if(e == null){
+                if(queue.size() == 0){
                     try {
                         this.sleep(100);
                     } catch (InterruptedException e1) {
-                        e1.printStackTrace();
                     }
                 }
             }catch (Throwable t){
