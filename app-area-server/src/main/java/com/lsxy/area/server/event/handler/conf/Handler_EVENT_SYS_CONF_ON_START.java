@@ -120,7 +120,7 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
                         .putIfNotEmpty("content", JSONUtil2.objectToJson(new Object[][]{new Object[]{
                                 state.getBusinessData().get(CallCenterUtil.PLAYWAIT_FIELD),0,""}}))
                         .putIfNotEmpty("user_data",conversationId)
-                        .putIfNotEmpty("repeat",10)
+                        .putIfNotEmpty("is_loop",true)
                         .put("areaId",state.getAreaId())
                         .build();
                 RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, _params);
