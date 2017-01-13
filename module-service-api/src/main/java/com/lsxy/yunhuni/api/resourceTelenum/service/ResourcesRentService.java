@@ -61,6 +61,11 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      */
     void resourcesRentTask();
 
+    /**
+     * 充值成功后触发，查看有没有欠费的号码，自动扣费
+     * @param tenantId
+     */
+    void payResourcesRent(String tenantId);
 
     /**
      * 释放号码
@@ -103,4 +108,5 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @param isNeedCalled 该批次号码是否需要要检验可呼入性
      */
     String bindNumToAppAndGetAreaId(App app, List<String> nums, boolean isNeedCalled);
+
 }
