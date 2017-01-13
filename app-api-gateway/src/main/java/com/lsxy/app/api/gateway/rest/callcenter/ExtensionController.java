@@ -42,11 +42,8 @@ public class ExtensionController extends AbstractAPIController {
             throw new AppServiceInvalidException();
         }
         AppExtension rExtension = appExtensionService.create(appId,extension);
-        ExtensionVO vo = new ExtensionVO();
-        try {
-            BeanUtils.copyProperties(vo,rExtension);
-        } catch (Exception e) {
-        }
+        ExtensionVO vo = ExtensionVO.changeAppExtensionToExtensionVO(rExtension);
+
         return ApiGatewayResponse.success(vo);
     }
 
@@ -67,11 +64,7 @@ public class ExtensionController extends AbstractAPIController {
             throw new AppServiceInvalidException();
         }
         AppExtension extension = appExtensionService.findOne(appId, id);
-        ExtensionVO vo = new ExtensionVO();
-        try {
-            BeanUtils.copyProperties(vo,extension);
-        } catch (Exception e) {
-        }
+        ExtensionVO vo = ExtensionVO.changeAppExtensionToExtensionVO(extension);
         return ApiGatewayResponse.success(vo);
     }
 
@@ -88,12 +81,8 @@ public class ExtensionController extends AbstractAPIController {
         List<ExtensionVO> returnResult = new ArrayList<>();
         if(result != null){
             result.stream().forEach(extension -> {
-                ExtensionVO vo = new ExtensionVO();
-                try {
-                    BeanUtils.copyProperties(vo,extension);
-                    returnResult.add(vo);
-                } catch (Exception e) {
-                }
+                ExtensionVO vo = ExtensionVO.changeAppExtensionToExtensionVO(extension);
+                returnResult.add(vo);
             });
         }
         page.setResult(returnResult);

@@ -1,5 +1,7 @@
 package com.lsxy.app.api.gateway.rest.callcenter.vo;
 
+import com.lsxy.call.center.api.model.AgentSkill;
+
 /**
  * Created by liups on 2016/11/18.
  */
@@ -7,6 +9,19 @@ public class AgentSkillVO {
     private String name;
     private Integer score;
     private Boolean enabled;
+
+    public AgentSkillVO() {
+    }
+
+    public AgentSkillVO(String name, Integer score, Boolean enabled) {
+        this.name = name;
+        this.score = score;
+        this.enabled = enabled;
+    }
+
+    public static AgentSkillVO changeAgentSkillToAgentSkillVO(AgentSkill skill){
+        return new AgentSkillVO(skill.getName(),skill.getScore(),skill.getEnabled());
+    }
 
     public String getName() {
         return name;
