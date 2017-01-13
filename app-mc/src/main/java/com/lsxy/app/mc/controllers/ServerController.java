@@ -89,8 +89,11 @@ public class ServerController extends AdminController{
                 throw new IllegalArgumentException(app);
             }
             String script = scriptService.prepareScript("start.sh");
-            String result = RunShellUtil.run("sh "+script + " -a "+app+"",10);
-            System.out.println(result);
+            String result = RunShellUtil.run("sh "+script + " -a "+app+" -h " + host,10);
+            if(logger.isDebugEnabled()){
+                logger.debug("start completed and result is :");
+                logger.debug(result);
+            }
         } catch (ScriptFileNotExistException | ShellExecuteException e) {
             e.printStackTrace();
             return RestResponse.failed("00001","execute exception");
