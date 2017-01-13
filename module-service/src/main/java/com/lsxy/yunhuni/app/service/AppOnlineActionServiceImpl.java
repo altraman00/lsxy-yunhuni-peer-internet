@@ -12,9 +12,7 @@ import com.lsxy.yunhuni.api.app.model.AppOnlineAction;
 import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.model.Area;
-import com.lsxy.yunhuni.api.config.model.AreaSip;
 import com.lsxy.yunhuni.api.config.service.AreaService;
-import com.lsxy.yunhuni.api.config.service.AreaSipService;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.exceptions.TeleNumberBeOccupiedException;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
@@ -71,8 +69,6 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
 
     @Autowired
     CalBillingService calBillingService;
-    @Autowired
-    AreaSipService areaSipService;
     @Autowired
     VoiceFilePlayService voiceFilePlayService;
 
@@ -134,17 +130,11 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             if(action.getAction() == AppOnlineAction.ACTION_SELECT_NUM){
                 //当应用有ivr功能时(或者为呼叫中心应用)，绑定IVR号码绑定
                 //判断ivr号码是否被占用
-                String areaId = this.bindNumToApp(app, numList, tenant);
+                boolean isNeedCalled = (app.getIsIvrService() != null && app.getIsIvrService() == 1)||(app.getIsCallCenter() != null && app.getIsCallCenter() == 1);
+                String areaId = resourcesRentService.bindNumToAppAndGetAreaId(app, numList,isNeedCalled);
                 //处理区域Id
                 if(StringUtils.isBlank(areaId)){
-                    //如果没有要绑定的号码，则选上一次上线的区域ID
-                    AppOnlineAction lastOnlineAction = appOnlineActionDao.findFirstByAppIdAndActionOrderByCreateTimeDesc(appId,AppOnlineAction.ACTION_ONLINE);
-                    if(lastOnlineAction != null){
-                        areaId = lastOnlineAction.getAreaId();
-                    }
-                }
-                if(StringUtils.isBlank(areaId)){
-                    //如果上一次上线的区域ID为空，则分配一个可用的区域ID
+                    //如果上一次上线的区域ID为空，这次也没有选号码，则分配一个可用的区域ID
                     areaId = areaService.getOneAvailableArea().getId();
                 }
                 Area oldArea = app.getArea();
@@ -156,8 +146,6 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                 Area area = new Area();
                 area.setId(areaId);
                 app.setArea(area);
-                AreaSip areaSip = areaSipService.getOneAreaSipByAreaId(areaId);
-                app.setAreaSip(areaSip);
                 //将上一步设为完成
                 for(AppOnlineAction a:actionList){
                     a.setStatus(AppOnlineAction.STATUS_DONE);
@@ -184,59 +172,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         }
     }
 
-    /**
-     * 绑定号码到应用
-     * @param app
-     * @param nums
-     * @param tenant
-     */
-    private String bindNumToApp(App app, List<String> nums, Tenant tenant) {
-        String areaId = null;
-        boolean isCalled = false;
-        for(String num : nums){
-            ResourceTelenum resourceTelenum = resourceTelenumService.findByTelNumber(num);
-            if(resourceTelenum != null){
-                if(resourceTelenum.getStatus()== ResourceTelenum.STATUS_RENTED && tenant.getId().equals(resourceTelenum.getTenantId())){
-                   //是这个租户，则查询租用记录，有没有正在用的
-                   ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumIdAndStatus(resourceTelenum.getId(),ResourcesRent.RENT_STATUS_UNUSED);
-                   if(resourcesRent == null){
-                       throw new TeleNumberBeOccupiedException("此号码已被应用占用：" + resourceTelenum.getTelNumber());
-                   }else if(!resourcesRent.getTenant().getId().equals(tenant.getId()) || resourcesRent.getApp() != null){
-                       throw new TeleNumberBeOccupiedException("此号码不属于本租户：" + resourceTelenum.getTelNumber());
-                   }else{
-                       if(StringUtils.isBlank(areaId)){
-                           // 将区域存到一个变量
-                           areaId = resourceTelenum.getAreaId();
-                       }else if(!areaId.equals(resourceTelenum.getAreaId())){
-                           //号码区域不同，抛异常
-                           throw new RuntimeException("所选号码不属于同一个区域，不能上线");
-                       }
-                       //号码是否是可呼入
-                       if("1".equals(resourceTelenum.getIsCalled())){
-                           isCalled = true;
-                       }
-                       resourcesRent.setApp(app);
-                       resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_USING);
-                       resourcesRentService.save(resourcesRent);
-                       //更新号码信息，设置应用
-                       resourceTelenum.setAppId(app.getId());
-                       resourceTelenumService.save( resourceTelenum);
-                   }
-                }else{
-                    //如果号码被占用，则抛出异常
-                    throw new TeleNumberBeOccupiedException("有一个或多个号码不属于本租户");
-                }
-            }
-        }
-        if((app.getIsIvrService() != null && app.getIsIvrService() == 1)||(app.getIsCallCenter() != null && app.getIsCallCenter() == 1)) {
-            if(!isCalled) {
-                //TODO 应用原来是否已绑定了呼入号码，没有则抛异常
-                //抛异常，没有可呼出号码
-                throw new RuntimeException("没有选定可呼入的号码");
-            }
-        }
-        return areaId;
-    }
+
 
 
     @Override
@@ -266,23 +202,21 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             Area area = new Area();
             area.setId(areaId);
             app.setArea(area);
-            AreaSip areaSip = areaSipService.getOneAreaSipByAreaId(areaId);
-            app.setAreaSip(areaSip);
             appService.save(app);
             //改变号码的租用关系
             //TODO 应用下线不解除号码绑定
-            List<ResourcesRent> rents = resourcesRentService.findByAppId(app.getId());
-            if(rents != null && rents.size() >0){
-                for(ResourcesRent rent:rents){
-                    rent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
-                    rent.setApp(null);
-                    resourcesRentService.save(rent);
-                    //更新号码信息，清除应用
-                    ResourceTelenum resourceTelenum = rent.getResourceTelenum();
-                    resourceTelenum.setAppId(null);
-                    resourceTelenumService.save( resourceTelenum);
-                }
-            }
+//            List<ResourcesRent> rents = resourcesRentService.findByAppId(app.getId());
+//            if(rents != null && rents.size() >0){
+//                for(ResourcesRent rent:rents){
+//                    rent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
+//                    rent.setApp(null);
+//                    resourcesRentService.save(rent);
+//                    //更新号码信息，清除应用
+//                    ResourceTelenum resourceTelenum = rent.getResourceTelenum();
+//                    resourceTelenum.setAppId(null);
+//                    resourceTelenumService.save( resourceTelenum);
+//                }
+//            }
             return app;
         }else{
             throw new RuntimeException("数据错误");
