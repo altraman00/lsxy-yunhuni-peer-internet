@@ -27,7 +27,6 @@ import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.config.model.AreaSip;
 import com.lsxy.yunhuni.api.config.service.TenantConfigService;
 import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.consume.model.Consume;
@@ -71,8 +70,7 @@ public class TenantController extends AbstractRestController {
     public static final Logger logger = LoggerFactory.getLogger(TenantController.class);
     @Autowired
     private TenantService tenantService;
-    @Autowired
-    private TenantConfigService tenantConfigService;
+
     @Autowired
     private AccountService accountService;
     @Autowired
@@ -103,12 +101,7 @@ public class TenantController extends AbstractRestController {
     private MQService mqService;
     @Autowired
     private AppService appService;
-    @Autowired
-    private TestNumBindService testNumBindService;
-    @Autowired
-    private VoiceFilePlayService voiceFilePlayService;
-    @Autowired
-    private VoiceFileRecordService voiceFileRecordService;
+
     @Autowired
     private TenantServiceSwitchService tenantServiceSwitchService;
     @Autowired
@@ -118,8 +111,7 @@ public class TenantController extends AbstractRestController {
     private ApiCallMonthService apiCallMonthService;
     @Reference(timeout = 10000,check = false,lazy = true)
     CallCenterService callCenterService;
-    @Reference(timeout = 3000,check = false,lazy = true)
-    AppExtensionService appExtensionService;
+
 
     @RequestMapping(value = "/list",method = RequestMethod.GET)
     @ApiOperation(value = "获取全部数据")
@@ -679,20 +671,6 @@ public class TenantController extends AbstractRestController {
                 if(Arrays.asList(companyAuth_status).contains(status)) {
                     realnameCorp = realnameCorpService.findByTenantIdNewest(tenant.getId());
                 }
-                //未认证，等待审核，已认证，认证失败
-//                Integer[] wait_auth_status = new Integer[]{Tenant.AUTH_WAIT,Tenant.AUTH_ONESELF_WAIT,Tenant.AUTH_UPGRADE_WAIT};//等待审核
-//                Integer[] auth_success_status = new Integer[]{Tenant.AUTH_COMPANY_SUCCESS,Tenant.AUTH_ONESELF_SUCCESS,Tenant.AUTH_UPGRADE_WAIT,Tenant.AUTH_UPGRADE_SUCCESS,Tenant.AUTH_UPGRADE_FAIL};//已认证
-//                Integer[] auth_fail_status = new Integer[]{Tenant.AUTH_COMPANY_FAIL,Tenant.AUTH_ONESELF_FAIL};
-//                if(Arrays.asList(wait_auth_status).contains(status)){//等待审核
-//                    info.setStatus("未审核");
-//                    info = getAuthInfo(tenant.getId(),status,info);
-//                }else if(Arrays.asList(auth_success_status).contains(status)){//已认证
-//                    info.setStatus("已认证");
-//                    info = getAuthInfo(tenant.getId(),status,info);
-//                }else if(Arrays.asList(auth_fail_status).contains(status)){//认证失败
-//                    info.setStatus("认证失败");
-//                    info = getAuthInfo(tenant.getId(),status,info);
-//                }
 
             }
         }
@@ -700,44 +678,6 @@ public class TenantController extends AbstractRestController {
         map.put("realnamePrivate",realnamePrivate);
         map.put("realnameCorp",realnameCorp);
         return RestResponse.success(map);
-    }
-
-    private AuthInfoVO getAuthInfo(String tenantId,Integer status,AuthInfoVO info){
-        Integer[] privateAuth_status = new Integer[]{Tenant.AUTH_ONESELF_SUCCESS,
-               Tenant.AUTH_ONESELF_WAIT,Tenant.AUTH_ONESELF_FAIL,Tenant.AUTH_UPGRADE_FAIL
-        };//个人认证
-        Integer[] companyAuth_status = new Integer[]{Tenant.AUTH_COMPANY_SUCCESS,
-                Tenant.AUTH_COMPANY_FAIL,Tenant.AUTH_WAIT,Tenant.AUTH_UPGRADE_WAIT,
-                Tenant.AUTH_UPGRADE_SUCCESS};//公司认证
-        AuthInfoVO authInfo = null;
-        if(Arrays.asList(privateAuth_status).contains(status)){
-            authInfo = new PrivateAuthInfoVO();
-            RealnamePrivate p = realnamePrivateService.findByTenantIdNewest(tenantId);
-            if(p!=null){
-                try {
-                    BeanUtils.copyProperties(authInfo,p);
-                } catch (Throwable e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            authInfo.setStatus(info.getStatus());
-            authInfo.setType("个人");
-            info = authInfo;
-        }else if(Arrays.asList(companyAuth_status).contains(status)){
-            authInfo = new CompanyAuthInfoVO();
-            RealnameCorp p = realnameCorpService.findByTenantIdNewest(tenantId);
-            if(p!=null){
-                try {
-                    BeanUtils.copyProperties(authInfo,p);
-                } catch (Throwable e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            authInfo.setStatus(info.getStatus());
-            authInfo.setType("公司");
-            info = authInfo;
-        }
-        return info;
     }
 
     @ApiOperation(value = "重置租户的密码)")
@@ -751,120 +691,6 @@ public class TenantController extends AbstractRestController {
         return RestResponse.success(true);
     }
 
-    @ApiOperation(value = "租户的app列表，以及app上个月指标")
-    @RequestMapping(value="/tenants/{id}/apps",method = RequestMethod.GET)
-    public RestResponse apps(@PathVariable String id) throws MailConfigNotEnabledException, MailContentNullException {
-        List<TenantAppVO> dto = new ArrayList<>();
-        List<App> apps = appService.getAppsByTenantId(id);
-        if(apps != null && apps.size()>0){
-            //获取app上个月的指标
-            Date preMonth = DateUtils.getPrevMonth(new Date());
-            for (App app : apps) {
-                TenantAppVO vo = new TenantAppVO(app);
-                vo.setConsume(consumeMonthService.getAmongAmountByDateAndApp(preMonth,app.getId()));
-                vo.setAmongDuration(voiceCdrMonthService.getAmongCostTimeByDateAndApp(preMonth,app.getId())/60);
-                vo.setSessionCount(voiceCdrMonthService.getAmongCallByDateAndApp(preMonth,app.getId()));
-                dto.add(vo);
-            }
-        }
-        return RestResponse.success(dto);
-    }
-
-    @ApiOperation(value = "获取租户的app信息")
-    @RequestMapping(value="/tenants/{tenant}/apps/{appId}",method = RequestMethod.GET)
-    public RestResponse app(@PathVariable String tenant,@PathVariable String appId) {
-        App app = appService.findById(appId);
-
-        if(app == null || app.getTenant() == null ||
-                !app.getTenant().getId().equals(tenant)){
-            return RestResponse.success(null);
-        }
-        TenantAppVO vo = new TenantAppVO(app);
-        List<TestNumBind> tests = testNumBindService.findByTenant(tenant,appId);
-        vo.setTestPhone(tests.parallelStream().parallel().map(t -> t.getNumber()).collect(Collectors.toList()));
-//        AreaSip areaSip = app.getAreaSip();
-//        if(areaSip!=null){
-//            vo.setSipRegistrar(app.getAreaSip().getRegistrarIp()+":"+app.getAreaSip().getRegistrarPort());
-//        }else{
-//            vo.setSipRegistrar("");
-//        }
-        vo.setSipRegistrar(SystemConfig.getProperty("app.cc.opensips.domain"));
-        int re = tenantConfigService.getRecordingTimeByTenantIdAndAppId(app.getTenant().getId(),app.getId());
-        String temp = "";
-        if(re==7){
-            temp="7天免费存储";
-        }else if(re%30==0){
-            temp = (re/30)+"个月";
-        }
-        vo.setRecordingTime( temp);
-        return RestResponse.success(vo);
-    }
-    @ApiOperation(value = "获取租户的app信息下的分机")
-    @RequestMapping(value="/tenants/{tenant}/app/extension/{appId}",method = RequestMethod.GET)
-    public RestResponse appExtension(@PathVariable String tenant,@PathVariable String appId) {
-        App app = appService.findById(appId);
-        if(app == null || app.getTenant() == null ||
-                !app.getTenant().getId().equals(tenant)){
-            return RestResponse.success(null);
-        }
-        List<AppExtension> appExtensions = appExtensionService.findByAppId(appId);
-        return RestResponse.success(appExtensions);
-    }
-
-    @ApiOperation(value = "获取租户的app放音文件列表")
-    @RequestMapping(value = "/tenants/{tenant}/apps/{appId}/plays",method = RequestMethod.GET)
-    public RestResponse plays(
-            @PathVariable String tenant,@PathVariable String appId,
-            @RequestParam(defaultValue = "1") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(required = false) String name){
-        Page<VoiceFilePlay> page = voiceFilePlayService.pageList(pageNo,pageSize,name,appId,new String[]{tenant},1,null,null);
-        return RestResponse.success(page);
-    }
-
-    @ApiOperation(value = "获取租户的文件容量和剩余")
-    @RequestMapping(value="/tenants/{tenant}/file/totalSize",method = RequestMethod.GET)
-    public RestResponse fileTotalSize(@PathVariable String tenant){
-        Map map = new HashMap();
-        Billing billing = calBillingService.getCalBilling(tenant);
-        if(billing!=null){
-            Long fileTotalSize = billing.getFileTotalSize();
-            map.put("fileRemainSize",fileTotalSize-billing.getFileRemainSize());
-            map.put("fileTotalSize",fileTotalSize);
-        }else{
-            map.put("fileRemainSize",0);
-            map.put("fileTotalSize",0);
-        }
-        return RestResponse.success(map);
-    }
-
-    @ApiOperation(value = "获取租户的app录音文件列表")
-    @RequestMapping(value = "/tenants/{tenant}/apps/{appId}/records",method = RequestMethod.GET)
-    public RestResponse records(
-            @PathVariable String tenant,@PathVariable String appId,
-            @RequestParam(defaultValue = "1") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize){
-        Page<VoiceFileRecord> page = voiceFileRecordService.pageList(pageNo,pageSize,appId,tenant);
-        return RestResponse.success(page);
-    }
-
-    @ApiOperation(value = "批量下载租户的app录音文件")
-    @RequestMapping(value="/tenants/{tenant}/apps/{appId}/records/batch/download",method = RequestMethod.GET)
-    public RestResponse batchDownload(
-            @PathVariable String tenant,@PathVariable String appId,
-            @ApiParam(name = "startTime",value = "格式:yyyy-MM")
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") Date startTime,
-            @ApiParam(name = "endTime",value = "格式:yyyy-MM")
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") Date endTime){
-        return RestResponse.success("url");
-    }
-
-    @ApiOperation(value = "下载单个录音文件")
-    @RequestMapping(value = "/tenants/{tenant}/apps/{appId}/records/{record}",method = RequestMethod.GET)
-    public RestResponse records(
-            @PathVariable String tenant,@PathVariable String appId,@PathVariable String record){
-        return RestResponse.success("url");
-    }
 
     @ApiOperation(value = "获取功能开关")
     @RequestMapping(value = "/tenants/{tenant}/switchs",method = RequestMethod.GET)
@@ -884,11 +710,6 @@ public class TenantController extends AbstractRestController {
         return RestResponse.success(tenantServiceSwitchService.saveOrUpdate(tenant,switchs));
     }
 
-    @ApiOperation(value = "租户的app列表")
-    @RequestMapping(value="/tenants/{id}/app/list",method = RequestMethod.GET)
-    public RestResponse appList(@PathVariable String id) throws MailConfigNotEnabledException, MailContentNullException {
-        return RestResponse.success(appService.getAppsByTenantId(id));
-    }
 
     @ApiOperation(value = "租户的月结账单")
     @RequestMapping(value="/tenants/{tenant}/consume_month",method = RequestMethod.GET)

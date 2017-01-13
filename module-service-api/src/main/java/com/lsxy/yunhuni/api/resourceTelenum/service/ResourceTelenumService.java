@@ -107,4 +107,15 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * @return
      */
     ResourceTelenum findByTelNumberOrCallUri(String num);
+
+    boolean isCalledByTenantIdAndAppId(String tenantId, String appId);
+
+    /**
+     * 解除应用与号码的绑定关系
+     * @param tenantId
+     * @param appId
+     */
+    void appUnbindAll(String tenantId,String appId);
+
+    Page<ResourceTelenum> findOwnUnusedNum(String tenantId, String areaId, int pageNo, int pageSize);
 }

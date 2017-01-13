@@ -14,8 +14,6 @@ import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.app.service.ServiceType;
 import com.lsxy.yunhuni.api.config.model.Area;
-import com.lsxy.yunhuni.api.config.model.AreaSip;
-import com.lsxy.yunhuni.api.config.service.AreaSipService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.app.dao.AppDao;
@@ -45,8 +43,6 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     private ResourcesRentService resourcesRentService;
     @Autowired
     private ResourceTelenumService resourceTelenumService;
-    @Autowired
-    private AreaSipService areaSipService;
     @Autowired
     private RedisCacheService redisCacheService;
 
@@ -139,8 +135,6 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         Area area = new Area();
         area.setId(areaId);
         app.setArea(area);
-        AreaSip areaSip = areaSipService.getOneAreaSipByAreaId(areaId);
-        app.setAreaSip(areaSip);
         app = this.save(app);
         return app;
     }
