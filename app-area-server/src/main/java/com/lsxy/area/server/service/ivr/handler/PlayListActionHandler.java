@@ -53,6 +53,7 @@ public class PlayListActionHandler extends ActionHandler{
     @Override
     public boolean handle(String callId, BusinessState state,Element root,String next) {
         String finish_keys = root.attributeValue("finish_keys");
+        String repeat = root.attributeValue("repeat");
         List<String> plays = new ArrayList<String>();
         List<Element> peles = root.elements("play");
 
@@ -70,6 +71,7 @@ public class PlayListActionHandler extends ActionHandler{
                         .putIfNotEmpty("res_id",res_id)
                         .putIfNotEmpty("content", JSONUtil2.objectToJson(new Object[][]{new Object[]{StringUtils.join(plays,"|"),7,""}}))
                         .putIfNotEmpty("finish_keys",finish_keys)
+                        .putIfNotEmpty("repeat",repeat)
                         .putIfNotEmpty("user_data",callId)
                         .put("areaId",state.getAreaId())
                         .build();
