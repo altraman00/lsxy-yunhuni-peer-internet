@@ -10,6 +10,8 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.api.billing.service.BillingService;
 import com.lsxy.framework.api.billing.service.CalBillingService;
+import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.portal.RechargeSuccessEvent;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeSource;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeStatus;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeType;
@@ -37,21 +39,18 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
 
     @Autowired
     RechargeDao rechargeDao;
-
     @Autowired
     private TenantService tenantService;
-
     @Autowired
     BillingService billingService;
-
     @Autowired
     EntityManager em;
-
     @Autowired
     CalBillingService calBillingService;
-
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private MQService mqService;
 
     @Override
     public BaseDaoInterface<Recharge, Serializable> getDao() {
@@ -70,7 +69,7 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
                 Calendar c = Calendar.getInstance();
                 c.add(Calendar.DAY_OF_MONTH, 1);
                 Date deadline = c.getTime();
-                recharge = new Recharge(tenant,amount, RechargeSource.USER,rechargeType, RechargeStatus.NOTPAID,orderId,null,deadline);
+                recharge = new Recharge(tenant.getId(),amount, RechargeSource.USER,rechargeType, RechargeStatus.NOTPAID,orderId,null,deadline);
                 rechargeDao.save(recharge);
             }
         }
@@ -96,14 +95,13 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
                 recharge.setStatus(RechargeStatus.PAID.name());
                 recharge.setPayTime(curTime);
                 rechargeDao.save(recharge);
-                Tenant tenant = recharge.getTenant();
+                mqService.publish(new RechargeSuccessEvent(recharge.getTenantId()));
                 //redis插入今日充值
-                calBillingService.incRecharge(tenant.getId(),curTime,recharge.getAmount());
+                calBillingService.incRecharge(recharge.getTenantId(),curTime,recharge.getAmount());
             }
         }
         return  recharge;
     }
-
 
     @Override
     public Page<Recharge> pageListByUserNameAndTime(String userName, Integer pageNo, Integer pageSize, Date startTime, Date endTime) throws MatchMutiEntitiesException {
@@ -142,8 +140,9 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
         }
         String orderId = UUIDGenerator.uuid();
         Date curTime = new Date();
-        Recharge recharge = new Recharge(tenant,amount,RechargeSource.valueOf(source),RechargeType.RENGONG, RechargeStatus.PAID,orderId,curTime);
+        Recharge recharge = new Recharge(tenantId,amount,RechargeSource.valueOf(source),RechargeType.RENGONG, RechargeStatus.PAID,orderId,curTime);
         rechargeDao.save(recharge);
+        mqService.publish(new RechargeSuccessEvent(recharge.getTenantId()));
         // redis插入今日充值
         calBillingService.incRecharge(tenantId,curTime,amount);
         return true;

@@ -15,7 +15,7 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_api_cert_changelog")
 public class ApiCertificateChangeLog extends IdEntity {
-    private ApiCertificate apiCertificate;  //对应的鉴权账号（凭证）
+    private String certId;  //对应的鉴权账号Id（凭证）
     private Date changeDate;                //更改的时间
     private String secretKey;               //更改后的secretKey
     private String changeType;              //更改的类型
@@ -25,21 +25,20 @@ public class ApiCertificateChangeLog extends IdEntity {
 
     }
 
-    public ApiCertificateChangeLog(ApiCertificate apiCertificate, String secretKey, String changeType) {
-        this.apiCertificate = apiCertificate;
+    public ApiCertificateChangeLog(String certId, String secretKey, String changeType) {
+        this.certId = certId;
         this.secretKey = secretKey;
         this.changeType = changeType;
         this.changeDate = new Date();
     }
 
-    @ManyToOne
-    @JoinColumn(name = "cert_id")
-    public ApiCertificate getApiCertificate() {
-        return apiCertificate;
+    @Column(name = "cert_id")
+    public String getCertId() {
+        return certId;
     }
 
-    public void setApiCertificate(ApiCertificate apiCertificate) {
-        this.apiCertificate = apiCertificate;
+    public void setCertId(String certId) {
+        this.certId = certId;
     }
 
     @Column(name = "changedt")
