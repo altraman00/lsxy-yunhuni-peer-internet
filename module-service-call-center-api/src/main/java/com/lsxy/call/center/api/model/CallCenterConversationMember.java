@@ -27,14 +27,16 @@ public class CallCenterConversationMember extends IdEntity {
     public static final Integer MODE_N = 4;//无
     public static final Integer MODE_DEFAULT = MODE_I_O;
 
-    private String callId;
     private String relevanceId;//所属呼叫中心交谈
+    private String sessionId;//加入的session
+    private String callId;
     private Date startTime;//发起时间
     private Date endTime;//结束时间
-    private String sessionId;//加入的session
     private String joinNum;//加入的号码
     private String isInitiator;//是否发起方
     private String isAgent;//是否坐席
+    private String agentName;//坐席name
+    private String extensionId;//坐席的分机id
     private Integer mode;//说听模式
 
     @Column(name = "call_id")
@@ -102,6 +104,24 @@ public class CallCenterConversationMember extends IdEntity {
 
     public void setIsAgent(String isAgent) {
         this.isAgent = isAgent;
+    }
+
+    @Column(name = "agent_name")
+    public String getAgentName() {
+        return agentName;
+    }
+
+    public void setAgentName(String agentName) {
+        this.agentName = agentName;
+    }
+
+    @Column(name = "extension_id")
+    public String getExtensionId() {
+        return extensionId;
+    }
+
+    public void setExtensionId(String extensionId) {
+        this.extensionId = extensionId;
     }
 
     @Column(name = "mode")

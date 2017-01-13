@@ -85,12 +85,13 @@ public class ConversationOpsController extends AbstractAPIController {
     }
 
     @RequestMapping(value = "/{accountId}/callcenter/conversation/{id}",method = RequestMethod.GET)
-    public ApiGatewayResponse get(HttpServletRequest request,@PathVariable String accountId, @PathVariable String id,
+    public ApiGatewayResponse getConversationDetail(HttpServletRequest request,@PathVariable String accountId, @PathVariable String id,
                                          @RequestHeader(value = "AppID") String appId) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("CONVERSATION GET API参数,accountId={},appId={},id={},dto={}",accountId,appId,id);
         }
         String ip = WebUtils.getRemoteAddress(request);
+
 //        return ApiGatewayResponse.success(conversationOps.inviteOut(ip,appId,id,dto.getFrom(),
 //                dto.getTo(),dto.getMaxDialDuration(),dto.getMaxCallDuration(),dto.getMode()));
         return null;

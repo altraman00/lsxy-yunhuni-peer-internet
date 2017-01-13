@@ -20,6 +20,8 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.agentserver.EnterConversationEvent;
+import com.lsxy.framework.mq.events.callcenter.ConversationMemberCreateEvent;
+import com.lsxy.framework.mq.events.callcenter.ConversationMemberExitEvent;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
@@ -696,12 +698,7 @@ public class ConversationService {
             return;
         }
         try{
-            CallCenterConversationMember member = callCenterConversationMemberService.findOne(conversationId,callId);
-            if(member != null){
-                CallCenterConversationMember updateMember = new CallCenterConversationMember();
-                updateMember.setEndTime(new Date());
-                callCenterConversationMemberService.update(member.getId(),updateMember);
-            }
+            mqService.publish(new ConversationMemberExitEvent(conversationId,callId));
         }catch (Throwable t){
             logger.error("设置交谈成员的结束时间失败",t);
         }
@@ -788,10 +785,12 @@ public class ConversationService {
             return;
         }
         Map<String,String> businessData = state.getBusinessData();
+
+        callConversationService.incrConversation(call_id,conversation_id);
+        this.incrPart(conversation_id,call_id);
+
+        CallCenterConversationMember member = new CallCenterConversationMember();
         try{
-            callConversationService.incrConversation(call_id,conversation_id);
-            this.incrPart(conversation_id,call_id);
-            CallCenterConversationMember member = new CallCenterConversationMember();
             member.setCallId(call_id);
             member.setRelevanceId(conversation_id);
             member.setStartTime(new Date());
@@ -799,14 +798,17 @@ public class ConversationService {
             member.setJoinNum(businessData.get("to"));
             member.setIsInitiator(this.isInitiator(conversation_id,call_id));
             if(businessData.get(CallCenterUtil.AGENT_ID_FIELD) != null){
-                member.setIsAgent(CallCenterConversationMember.AGENT_FALSE);
-            }else{
                 member.setIsAgent(CallCenterConversationMember.AGENT_TRUE);
+                member.setAgentName(businessData.get(CallCenterUtil.AGENT_NAME_FIELD));
+                member.setExtensionId(businessData.get(CallCenterUtil.AGENT_EXTENSION_FIELD));
+            }else{
+                member.setIsAgent(CallCenterConversationMember.AGENT_FALSE);
             }
             member.setMode(conversationCallVoiceModeReference.get(conversation_id, call_id));
             callCenterConversationMemberService.save(member);
         }catch (Throwable t){
-            logger.error("处理加入交谈失败",t);
+            logger.warn("保存交谈成员失败",t);
+            mqService.publish(new ConversationMemberCreateEvent(JSONUtil2.objectToJson(member)));
         }
         if(state.getType().equals(BusinessState.TYPE_CC_AGENT_CALL)){
             callCenterUtil.agentEnterConversationEvent(state.getCallBackUrl(),
