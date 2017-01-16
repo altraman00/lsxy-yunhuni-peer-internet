@@ -232,6 +232,9 @@ public class RentTelnumController extends AbstractPortalController {
     @RequestMapping(value = "/num/bind/app/{appId}")
     @ResponseBody
     public RestResponse bindNumToApp(HttpServletRequest request,@PathVariable String appId,String nums){
+        if(StringUtils.isBlank(nums)){
+            return RestResponse.failed("0000","没有选定绑定的号码");
+        }
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/num/bind/app/{1}?nums={2}";
         return RestRequest.buildSecurityRequest(token).get(uri, Object.class,appId,nums);
