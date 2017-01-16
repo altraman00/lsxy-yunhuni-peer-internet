@@ -88,7 +88,12 @@ fi
 
 #先停止制定的APP服务
 echo "停止现有服务...."
-ps -ef | grep "$APP_NAME" | grep -v update | grep -v start | grep -v grep| grep -v tail |awk '{print $2}' | xargs kill -9
+if [ $IS_TOMCAT_DEPLOY = true ]; then
+    echo "$TOMCAT_HOME/bin/shutdown.sh"
+    $TOMCAT_HOME/bin/shutdown.sh
+else
+    ps -ef | grep "$APP_NAME" | grep -v update | grep -v start | grep -v grep| grep -v tail |awk '{print $2}' | xargs kill -9
+fi
 
 export MAVEN_OPTS="$MAVEN_OPTS -Xms256m -Xmx512m"
 echo "MAVEN 构建参数：$MAVEN_OPTS"
@@ -141,6 +146,7 @@ elif [ $IS_TOMCAT_DEPLOY = true ]; then
   WAR_FILE=`find ./ -name "app-*.war"`
   echo "cp $WAR_FILE $TOMCAT_HOME/webapps/ROOT.war"
   cp $WAR_FILE $TOMCAT_HOME/webapps/ROOT.war
+  $TOMCAT_HOME/bin/startup.sh
 fi
 
 sleep 10;
