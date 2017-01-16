@@ -3,7 +3,6 @@ package com.lsxy.yunhuni.api.app.model;
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.config.model.Area;
-import com.lsxy.yunhuni.api.config.model.AreaSip;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Where;
@@ -39,9 +38,9 @@ public class App extends IdEntity {
     private Integer isVoiceValidate;//是否语音验证码0否，1是
     private Integer isIvrService;//是否IVR定制服务0否，1是
     private Area area;  //所属区域（应用要指定区域,新建应用在测试区域）
+    private String onlineAreaId;//应用上线区域，一但绑定，不能更改，之后上线只能在这个区域上线
     private Integer isCallCenter;//是否启用呼叫中心服务 是否呼叫中心0否，1是',
     private String serviceType;//服务类型
-    private AreaSip areaSip; //sip接入点信息
     private Long callCenterNum; //呼叫中心应用编号
 
     @Column(name = "is_call_center")
@@ -198,15 +197,13 @@ public class App extends IdEntity {
         this.area = area;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "sip_id")
-    @NotFound(action = NotFoundAction.IGNORE)
-    public AreaSip getAreaSip() {
-        return areaSip;
+    @Column(name = "online_area_id")
+    public String getOnlineAreaId() {
+        return onlineAreaId;
     }
 
-    public void setAreaSip(AreaSip areaSip) {
-        this.areaSip = areaSip;
+    public void setOnlineAreaId(String onlineAreaId) {
+        this.onlineAreaId = onlineAreaId;
     }
 
     @Column(name = "call_center_num")

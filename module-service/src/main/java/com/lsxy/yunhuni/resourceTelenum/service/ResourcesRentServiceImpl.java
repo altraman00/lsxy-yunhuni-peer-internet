@@ -10,12 +10,14 @@ import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.service.GlobalConfigService;
 import com.lsxy.yunhuni.api.config.service.TenantConfigService;
 import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
+import com.lsxy.yunhuni.api.exceptions.TeleNumberBeOccupiedException;
 import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
@@ -96,13 +98,9 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     }
 
     @Override
-    public List<ResourcesRent> findByAppId(String appId) {
-        return resourcesRentDao.findByAppIdAndRentStatus(appId,ResourcesRent.RENT_STATUS_USING);
-    }
-
-    @Override
-    public ResourcesRent findByResourceTelenumIdAndStatus(String id, int status) {
-        return resourcesRentDao.findByResourceTelenumIdAndRentStatus(id,status);
+    public Page<ResourcesRent> findByAppId(String appId,int pageNo, int pageSize) {
+        String hql = "from ResourcesRent obj where obj.app.id=?1 and obj.rentStatus = 1 order by obj.lastTime desc";
+        return  this.pageList(hql,pageNo,pageSize,appId);
     }
 
     @Override
@@ -121,14 +119,20 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     }
 
     @Override
-    public List<ResourceTelenum> findOwnUnusedNum(Tenant tenant) {
+    public List<ResourceTelenum> findOwnUnusedNum(Tenant tenant,String lastOnlineAreaId) {
         List<ResourceTelenum> telNums = new ArrayList<>();
         List<ResourcesRent> list = resourcesRentDao.findByTenantIdAndRentStatus(tenant.getId(),ResourcesRent.RENT_STATUS_UNUSED);
         if(list != null && list.size()>0){
             for(ResourcesRent rent:list){
                 ResourceTelenum telNumber = rent.getResourceTelenum();
                 if(telNumber != null){
-                    telNums.add(telNumber);
+                    if(StringUtils.isNotBlank(lastOnlineAreaId)){
+                        if(lastOnlineAreaId.equals(telNumber.getAreaId())){
+                            telNums.add(telNumber);
+                        }
+                    }else{
+                        telNums.add(telNumber);
+                    }
                 }
             }
         }
@@ -275,4 +279,82 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
         telenumOrder = telenumOrderService.save(telenumOrder);
         return telenumOrder;
     }
+
+    @Override
+    public void appUnbindAll(String tenantId,String appId) {
+        resourcesRentDao.appUnbindAll(tenantId,appId,new Date());
+        resourceTelenumService.appUnbindAll(tenantId, appId);
+    }
+
+    @Override
+    public void unbind(String tenantId, String appId, String rentId) {
+        ResourcesRent rent = this.findById(rentId);
+        ResourceTelenum resourceTelenum = rent.getResourceTelenum();
+        resourceTelenum.setAppId(null);
+        resourceTelenumService.save(resourceTelenum);
+        rent.setApp(null);
+        rent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
+        this.save(rent);
+    }
+
+
+    @Override
+    public String bindNumToAppAndGetAreaId(App app, List<String> nums , boolean isNeedCalled) {
+        String areaId = app.getOnlineAreaId();
+        String tenantId = app.getTenant().getId();
+        boolean isCalled = false;
+        for(String num : nums){
+            if(StringUtils.isNotBlank(num)){
+                ResourceTelenum resourceTelenum = resourceTelenumService.findByTelNumber(num);
+                if(resourceTelenum != null){
+                    if(resourceTelenum.getStatus()== ResourceTelenum.STATUS_RENTED && tenantId.equals(resourceTelenum.getTenantId())){
+                        //是这个租户，则查询租用记录，有没有正在用的
+                        ResourcesRent resourcesRent = resourcesRentDao.findByResourceTelenumIdAndRentStatus(resourceTelenum.getId(),ResourcesRent.RENT_STATUS_UNUSED);
+                        if(resourcesRent == null){
+                            throw new RuntimeException("找不到租用记录：" + resourceTelenum.getTelNumber());
+                        }else if(!resourcesRent.getTenant().getId().equals(tenantId)){
+                            throw new RuntimeException("号码租用记录数据出错：" + resourceTelenum.getTelNumber());
+                        }else if(resourcesRent.getApp() != null){
+                            throw new TeleNumberBeOccupiedException("号码已经被应用占用：" + resourceTelenum.getTelNumber());
+                        }else{
+                            if(StringUtils.isBlank(areaId)){
+                                // 将区域存到一个变量
+                                areaId = resourceTelenum.getAreaId();
+                            }else if(!areaId.equals(resourceTelenum.getAreaId())){
+                                //号码区域不同，抛异常
+                                throw new RuntimeException("所选号码不属于同一个区域");
+                            }
+                            //号码是否是可呼入
+                            if("1".equals(resourceTelenum.getIsCalled())){
+                                isCalled = true;
+                            }
+                            resourcesRent.setApp(app);
+                            resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_USING);
+                            this.save(resourcesRent);
+                            //更新号码信息，设置应用
+                            resourceTelenum.setAppId(app.getId());
+                            resourceTelenumService.save( resourceTelenum);
+                        }
+                    }else{
+                        //如果号码被占用，则抛出异常
+                        throw new TeleNumberBeOccupiedException("有一个或多个号码不属于本租户");
+                    }
+                }
+            }
+        }
+
+        if(isNeedCalled) {
+            if(!isCalled) {
+                //TODO 获取应用所绑定的号码，判断是否有可呼入的
+                isCalled =  resourceTelenumService.isCalledByTenantIdAndAppId(app.getTenant().getId(),app.getId());
+            }
+            if(!isCalled) {
+                //TODO 应用原来是否已绑定了呼入号码，没有则抛异常
+                //抛异常，没有可呼出号码
+                throw new RuntimeException("没有选定可呼入的号码");
+            }
+        }
+        return areaId;
+    }
+
 }
