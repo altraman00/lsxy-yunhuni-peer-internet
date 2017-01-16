@@ -1,20 +1,29 @@
 package com.lsxy.app.mc.controllers;
 
+import com.lsxy.app.mc.exceptions.ScriptFileNotExistException;
+import com.lsxy.app.mc.service.ScriptService;
+import com.lsxy.app.mc.utils.RunShellUtil;
+import com.lsxy.app.mc.utils.ShellExecuteException;
 import com.lsxy.app.mc.vo.AreaNodeVO;
 import com.lsxy.app.mc.vo.AreaServerHostVO;
 import com.lsxy.app.mc.vo.AreaServerVO;
 import com.lsxy.app.mc.vo.ServerVO;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.config.Application;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.framework.web.rest.RestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -26,10 +35,15 @@ import static com.lsxy.framework.core.utils.JSONUtil2.jsonToList;
 @Controller
 public class ServerController extends AdminController{
 
+
     private static final Logger logger = LoggerFactory.getLogger(ServerController.class);
-    
+
+    private static List<ServerVO> servers;
     @Autowired
     private RedisCacheService cacheService;
+
+    @Autowired
+    private ScriptService scriptService;
 
     @RequestMapping("/servers")
     public String servers(Model model){
@@ -45,30 +59,151 @@ public class ServerController extends AdminController{
         return "servers";
     }
 
+    @RequestMapping("/server/stop")
+    @ResponseBody
+    public RestResponse<String> stopServer(String host,String app){
+        try {
+            Application application = Application.getApplication(app);
+            if(application == null) {
+                throw new IllegalArgumentException(app);
+            }
+            String script = scriptService.prepareScript(ScriptService.SCRIPT_STOP);
+            String result = RunShellUtil.run("sh "+script + " -a "+application.getModuleName()+" -h "+host+"",10);
+            if(logger.isDebugEnabled()){
+                logger.debug("stop completed and result is :");
+                logger.debug(result);
+            }
+            //修改服务状态并删除对应服务的缓存key
+            ServerVO server = getServerFromMemory(host,app);
+            server.setStatus(ServerVO.STATUS_STOPED);
+            cacheService.del(getServerRedisKey(host,app));
+
+        } catch (ScriptFileNotExistException | ShellExecuteException e) {
+            logger.error("update exception: " + host + ":" + app,e);
+            return RestResponse.failed("00001","execute exception");
+        }
+        return RestResponse.success("OK");
+    }
+
+
+
+
+    @RequestMapping("/server/start")
+    @ResponseBody
+    public RestResponse<String> startServer(String host,String app,String version){
+//        String script = "/opt/lsxy_yunwei/lsxy_server.sh -j start -a app-portal-api -r 1.2.0-RC3 -h p05";
+
+        try {
+
+            if(isExistStartingServerInTheHost(host)){
+                return RestResponse.failed("00002","同一台主机一次只能启动一个服务");
+            }
+
+            Application application = Application.getApplication(app);
+            if(application == null) {
+                throw new IllegalArgumentException(app);
+            }
+            String script = scriptService.prepareScript("start.sh");
+            String result = RunShellUtil.run("sh "+script + " -a "+application.getModuleName()+" -h " + host,10);
+            if(logger.isDebugEnabled()){
+                logger.debug("start completed and result is :");
+                logger.debug(result);
+            }
+            //修改服务状态为启动中
+            ServerVO server = getServerFromMemory(host,app);
+            server.setStatus(ServerVO.STATUS_STARTING);
+
+        } catch (ScriptFileNotExistException | ShellExecuteException e) {
+            e.printStackTrace();
+            return RestResponse.failed("00001","execute exception");
+        }
+        return RestResponse.success("OK");
+    }
+
+    /**
+     * 是否有服务在指定的 host 主机中处于 启动中 的状态
+     * @param host
+     * @return
+     */
+    private boolean isExistStartingServerInTheHost(String host) {
+        for(ServerVO server:servers){
+            if(server.getServerHost().equals(host)){
+                if(server.getStatus().equals(ServerVO.STATUS_STARTING)){
+                    if(cacheService.get(getServerRedisKey(host,server.getAppName())) == null){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 更新服务
+     * @param host
+     * @param app
+     * @return
+     */
+    @RequestMapping("/server/update")
+    @ResponseBody
+    public RestResponse<String> updateServer(String host,String app){
+        try {
+            if(isExistStartingServerInTheHost(host)){
+                return RestResponse.failed("00002","同一台主机一次只能启动一个服务");
+            }
+
+            Application application = Application.getApplication(app);
+            if(application == null) {
+                throw new IllegalArgumentException(app);
+            }
+            String script = scriptService.prepareScript(ScriptService.SCRIPT_UPDATE);
+            String result = RunShellUtil.run("sh "+script + " -a "+application.getModuleName()+" -h "+host+"",10);
+            if(logger.isDebugEnabled()){
+                logger.debug("update completed and result is :");
+                logger.debug(result);
+            }
+            //修改服务状态为启动中
+            ServerVO server = getServerFromMemory(host,app);
+            server.setStatus(ServerVO.STATUS_UPDATING);
+            cacheService.del(getServerRedisKey(host,app));
+
+        } catch (ScriptFileNotExistException | ShellExecuteException e) {
+            logger.error("update exception: " + host + ":" + app,e);
+            return RestResponse.failed("00001","execute exception");
+        }
+        return RestResponse.success("OK");
+    }
     /**
      * 从配置文件中获取所有服务器并根据服务器配置获取服务器当前状态并返回
      * @return
      */
     private List<ServerVO> getAllServerList() {
-        String serverListJson = SystemConfig.getProperty("app.mc.serverlist","[]");
-        List<ServerVO> result = jsonToList(serverListJson,ServerVO.class);
+        if(servers == null){
+            String serverListJson = SystemConfig.getProperty("app.mc.serverlist","[]");
+            servers = jsonToList(serverListJson,ServerVO.class);
+        }
+
         Set<String> serversCache = cacheService.keys("monitor_*");
         if(logger.isDebugEnabled()){
             logger.debug("search monitor_* from redis and result is : {}" ,serversCache);
         }
 
-        for(ServerVO server:result){
-            String key = "monitor_"+server.getAppName()+"_"+server.getServerHost()+"_";
+        for(ServerVO server:servers){
+            String key = getServerRedisKey(server.getServerHost(),server.getAppName());
             if(logger.isDebugEnabled()){
                 logger.debug("find server connection status, key is :{}",key);
             }
             if(serversCache.contains(key)){
                 server.setStatus(ServerVO.STATUS_OK);
-            }else{
-                server.setStatus(ServerVO.STATUS_FAILED);
+                //缓存中存储格式 [version startdatetime]
+                String xx[] = cacheService.get(key).split(" ");
+                server.setVersion(xx[0]);
+                if(xx.length > 1){
+                    server.setStartDt(DateUtils.formatDate(new Date(Long.parseLong(xx[1]))));
+                }
             }
         }
-        return result;
+        return servers;
     }
 
 
@@ -100,19 +235,31 @@ public class ServerController extends AdminController{
         return areaServers;
     }
 
-//    public static void main(String[] args) {
-//        String json = "[{\"areaId\":\"area001\",\"areaName\":\"area001\"," +
-//                "    \"hosts\":[" +
-//                "    {\"hostName\":\"localhost\",\"nodes\":[" +
-//                "        {\"nodeId\":\"area001-1\",\"host\":\"localhost\"}," +
-//                "        {\"nodeId\":\"area001-1\",\"host\":\"localhost\"}" +
-//                "]" +
-//                "            }]" +
-//                "        }]" +
-//                "   }";
-//        List<AreaServerVO> result = JSONUtil2.jsonToList(json, AreaServerVO.class);
-//        result = JSONUtil2.jsonToList(json, AreaServerVO.class);
-//        System.out.println(result.size());
-//    }
 
+    /**
+     * 根据host 和app 返回对应redis缓存的key value
+     * @param host
+     * @param app
+     * @return
+     */
+    private String getServerRedisKey(String host, String app) {
+        String key = "monitor_"+app+"_"+host+"_";
+        return key;
+    }
+
+
+    /**
+     * 在内存中根据host 和 app找到对应的servervo对象
+     * @param host
+     * @param app
+     * @return
+     */
+    private ServerVO getServerFromMemory(String host, String app) {
+        for(ServerVO server:servers){
+            if(server.getAppName().equals(app) && server.getServerHost().equals(host)){
+                return server;
+            }
+        }
+        return null;
+    }
 }
