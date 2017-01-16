@@ -58,7 +58,7 @@
                     </div>
                     <div class="form-group reader">
                         <div class="col-lg-9 col-lg-offset-3">
-                            <input type="checkbox"  id="registerRead"> 点击阅读<a href="${globalWebsite}/develop/book/platform" target="_blank">注册协议</a> <span class="tips-error" id="registerReadMsg" hidden>请先阅读注册协议</span>
+                            <input type="checkbox"  id="registerRead"> 点击阅读<a href="${globalWebsite}/develop/book/platform?page=registered" target="_blank">注册协议</a> <span class="tips-error" id="registerReadMsg" hidden>请先阅读注册协议</span>
                         </div>
                     </div>
                     <div class="form-group ">

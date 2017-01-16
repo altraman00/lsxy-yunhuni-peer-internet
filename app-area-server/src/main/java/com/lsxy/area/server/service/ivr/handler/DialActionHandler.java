@@ -103,7 +103,7 @@ public class DialActionHandler extends ActionHandler{
     public boolean handle(String callId,BusinessState state, Element root,String next) {
         //更新下一步
         businessStateService.updateInnerField(callId,IVRActionService.IVR_NEXT_FIELD,next);
-        dial(callId,state.getResId(),state.getAppId(),state.getTenantId(),state.getBusinessData().get(CallCenterUtil.CALLCENTER_FIELD),root);
+        dial(callId,state.getResId(),state.getAppId(),state.getTenantId(),conversationService.isCC(state),state.getBusinessData().get(CallCenterUtil.CALLCENTER_FIELD),root);
         return true;
     }
 
@@ -121,7 +121,7 @@ public class DialActionHandler extends ActionHandler{
         return Long.parseLong(s);
     }
 
-    public boolean dial(String ivr_call_id, String parent_call_res_id, String appId, String tenantId,String callCenterId, Element root){
+    public boolean dial(String ivr_call_id, String parent_call_res_id, String appId, String tenantId,boolean isCC,String callCenterId, Element root){
         App app = appService.findById(appId);
         //解析xml
         String ring_play_file = root.elementTextTrim("play");
@@ -173,7 +173,6 @@ public class DialActionHandler extends ActionHandler{
 
         CallSession callSession = null;
 
-        boolean isCC = conversationService.isCC(ivr_call_id);
         if(isCC){
             callId = UUIDGenerator.uuid();
 
@@ -254,8 +253,8 @@ public class DialActionHandler extends ActionHandler{
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
                         .putIfNotEmpty(BusinessState.REF_RES_ID,parent_call_res_id)
-                        .putIfNotEmpty(CallCenterUtil.ISCC_FIELD,isCC?CallCenterUtil.ISCC_TRUE:null)
-                        .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,callCenterId)
+                        .putIfWhere(CallCenterUtil.ISCC_FIELD,isCC,CallCenterUtil.ISCC_TRUE)
+                        .putIfWhere(CallCenterUtil.CALLCENTER_FIELD,isCC,callCenterId)
                         .putIfNotEmpty("ivr_call_id",ivr_call_id)
                         .putIfNotEmpty("from",from)
                         .putIfNotEmpty("to",to)

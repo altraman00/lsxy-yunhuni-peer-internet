@@ -16,7 +16,7 @@ import java.math.BigDecimal;
  */
 public interface CallCenterDao extends BaseDaoInterface<CallCenter, Serializable> {
 
-    @Modifying(clearAutomatically = true)
+    @Modifying
     @Query("update CallCenter a set a.cost=a.cost+:cost where a.id=:id")
     public void incrCost(@Param("id") String id,@Param("cost") BigDecimal cost);
 }

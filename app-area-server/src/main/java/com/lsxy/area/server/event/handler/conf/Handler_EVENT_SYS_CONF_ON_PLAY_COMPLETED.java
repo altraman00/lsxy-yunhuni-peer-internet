@@ -3,6 +3,8 @@ package com.lsxy.area.server.event.handler.conf;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.CallCenterUtil;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -36,6 +38,9 @@ public class Handler_EVENT_SYS_CONF_ON_PLAY_COMPLETED extends EventHandler {
 
     @Autowired
     private NotifyCallbackUtil notifyCallbackUtil;
+
+    @Autowired
+    private ConversationService conversationService;
 
     @Override
     public String getEventName() {
@@ -75,7 +80,11 @@ public class Handler_EVENT_SYS_CONF_ON_PLAY_COMPLETED extends EventHandler {
     }
 
     private void conversation(BusinessState state, Map<String, Object> params, String conversation_id) {
-        //TODO
+        boolean isPlaywait = conversationService.isPlayWait(state.getId());
+        if(isPlaywait){
+            //等待音播放完成需要移除等待音标记
+            businessStateService.deleteInnerField(state.getId(), CallCenterUtil.PLAYWAIT_FIELD);
+        }
     }
 
     private void conf(BusinessState state,Map<String,Object> params,String conf_id){

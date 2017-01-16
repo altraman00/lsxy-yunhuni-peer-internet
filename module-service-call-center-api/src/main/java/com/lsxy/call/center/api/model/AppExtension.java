@@ -6,6 +6,7 @@ import org.hibernate.annotations.Where;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  * 应用分机
@@ -30,6 +31,8 @@ public class AppExtension extends IdEntity {
     private String ext;//    ext                  varchar(32) comment '分机短号（保留，不用）',
     private String did;//    did                  varchar(32) comment '分机直通号（保留，不用）',
     private String ipaddr;  //SIP 网关IP地址与端口，默认5060，仅用于 type==2的情况
+
+    private Boolean enable; //分机是否可用（不存到数据库）
 
     @Column(name = "app_id")
     public String getAppId() {
@@ -114,6 +117,15 @@ public class AppExtension extends IdEntity {
 
     public void setIpaddr(String ipaddr) {
         this.ipaddr = ipaddr;
+    }
+
+    @Transient
+    public Boolean getEnable() {
+        return enable;
+    }
+
+    public void setEnable(Boolean enable) {
+        this.enable = enable;
     }
 }
 

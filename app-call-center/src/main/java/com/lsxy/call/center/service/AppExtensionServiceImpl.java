@@ -119,6 +119,9 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
             //TODO 分机opensips注册
             opensipsExtensionService.createExtension(appExtension.getUser(),appExtension.getPassword());
         }
+        if(AppExtension.TYPE_TELPHONE.equals(appExtension.getType())){
+            extensionState.setEnable(appExtension.getId(),ExtensionState.Model.ENABLE_TRUE);
+        }
         return appExtension;
     }
 
@@ -171,7 +174,15 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     @Override
     public Page<AppExtension> getPage(String appId, Integer pageNo, Integer pageSize) {
         String hql = "from AppExtension obj where obj.appId=?1";
-        return this.pageList(hql, pageNo, pageSize, appId);
+        Page page = this.pageList(hql, pageNo, pageSize, appId);
+        List<AppExtension> result = page.getResult();
+        if(result != null && result.size() > 0){
+            for(AppExtension ext : result){
+                boolean enable = extensionState.getEnable(ext.getId());
+                ext.setEnable(enable);
+            }
+        }
+        return page;
     }
 
     @Override

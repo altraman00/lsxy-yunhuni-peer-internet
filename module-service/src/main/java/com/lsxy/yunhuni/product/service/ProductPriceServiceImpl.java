@@ -7,10 +7,13 @@ import com.lsxy.yunhuni.api.product.model.ProductPrice;
 import com.lsxy.yunhuni.api.product.service.ProductPriceService;
 import com.lsxy.yunhuni.product.dao.ProductPriceDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Created by liups on 2016/8/27.
@@ -41,4 +44,17 @@ public class ProductPriceServiceImpl extends AbstractService<ProductPrice> imple
         String hql = "FROM ProductPrice obj ORDER BY obj.createTime DESC ";
         return pageList(hql,pageNo,pageSize);
     }
+
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "entity", key = "'entity_' + #entity.id", beforeInvocation = true),
+                    @CacheEvict(value = "product", key = "'product_price_' + #entity.productItem.id", beforeInvocation = true)
+            }
+    )
+    public ProductPrice save(ProductPrice entity) {
+        //更新最后修改时间
+        entity.setLastTime(new Date());
+        return getDao().save(entity);
+    }
+
 }

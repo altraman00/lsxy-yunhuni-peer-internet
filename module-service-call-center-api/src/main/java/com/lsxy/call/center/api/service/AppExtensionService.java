@@ -43,9 +43,8 @@ public interface AppExtensionService extends BaseService<AppExtension> {
      * @param pageNo
      * @param pageSize
      * @return
-     * @throws YunhuniApiException
      */
-    Page<AppExtension> getPage(String appId, Integer pageNo, Integer pageSize) throws YunhuniApiException;
+    Page<AppExtension> getPage(String appId, Integer pageNo, Integer pageSize);
 
     /**
      * 获取一个分机
