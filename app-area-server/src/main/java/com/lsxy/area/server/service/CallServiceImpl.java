@@ -199,6 +199,7 @@ public class CallServiceImpl implements CallService {
                 .build();
 
         if(StringUtils.isNotBlank(ring_tone)){
+            ring_tone = playFileUtil.convertArray(app.getTenant().getId(),appId,ring_tone);
             params.put("ring_play_file",ring_tone);
             params.put("ring_play_mode",ring_tone_mode);
         }
@@ -478,7 +479,7 @@ public class CallServiceImpl implements CallService {
      * @param dtos 播放文件内容
      * @return
      */
-    public String getPlayContent(String tenantId,String appId,String play_file,List<List<Object>> dtos) throws PlayFileNotExistsException {
+    public String getPlayContent(String tenantId,String appId,String play_file,List<List<Object>> dtos) throws YunhuniApiException {
         play_file = playFileUtil.convertArray(tenantId, appId, play_file);
         if(dtos == null){
             dtos = new ArrayList<>();
@@ -492,6 +493,15 @@ public class CallServiceImpl implements CallService {
         }
         if(dtos != null){
             for(List<Object> play:dtos){
+                Integer type;
+                try{
+                    type = Integer.valueOf(play.get(1) + "");
+                }catch (Exception e){
+                    throw new RequestIllegalArgumentException();
+                }
+                if(type == null || type < 0 || type > 6){
+                    throw new RequestIllegalArgumentException();
+                }
                 if(play.get(1).equals(0)){
                     play.set(0,playFileUtil.convertArray(tenantId, appId, (String) play.get(0)));
                 }
