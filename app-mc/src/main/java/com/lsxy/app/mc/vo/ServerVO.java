@@ -15,7 +15,7 @@ public class ServerVO {
     private String serverHost;
     private String serverIp;
     private String serverPort;
-    private String status;
+    private String status = STATUS_STOPED;
     private String version;
     private String startDt;
 
