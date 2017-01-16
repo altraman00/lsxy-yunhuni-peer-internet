@@ -9,13 +9,17 @@ import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.CallConversationService;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
 import com.lsxy.call.center.api.service.CallCenterConversationService;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
+import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.session.model.Meeting;
@@ -73,6 +77,12 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
 
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterConversationMemberService callCenterConversationMemberService;
+
+    @Autowired
+    private RPCCaller rpcCaller;
+
+    @Autowired
+    private SessionContext sessionContext;
 
     @Override
     public String getEventName() {
@@ -143,6 +153,8 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         //会议成员增加
         confService.incrPart(conf_id,call_id);
 
+        ifAutoRecording(conf_id);
+
         try {
             Meeting meeting = meetingService.findById(conf_id);
             if(meeting!=null){
@@ -189,6 +201,40 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         }
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
+        }
+    }
+
+    /**
+     * 创建会议是否自动录音
+     * @param conf_id
+     */
+    private void ifAutoRecording(String conf_id){
+        BusinessState state = businessStateService.get(conf_id);
+        if(state == null){
+            return;
+        }
+        if(state.getClosed() != null && state.getClosed()){
+            return;
+        }
+        if(state.getResId() == null){
+            return;
+        }
+        if(!Boolean.parseBoolean(state.getBusinessData().get("recording"))){
+            return;
+        }
+        Map<String,Object> params = new MapBuilder<String,Object>()
+                .putIfNotEmpty("res_id",state.getResId())
+                .putIfNotEmpty("max_seconds",state.getBusinessData().get("max_seconds"))
+                .putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(state.getTenantId(),state.getAppId()))
+                .putIfNotEmpty("user_data",conf_id)
+                .put("areaId",state.getAreaId())
+                .build();
+        try {
+            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD, params);
+            rpcCaller.invoke(sessionContext, rpcrequest);
+            businessStateService.deleteInnerField(conf_id,"recording");
+        } catch (Exception e) {
+            logger.error("会议创建自动录音：",e);
         }
     }
 }
