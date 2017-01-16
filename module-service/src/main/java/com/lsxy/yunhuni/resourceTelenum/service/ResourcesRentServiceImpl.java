@@ -223,15 +223,8 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
             resourceTelenum.setTenantId(tenant.getId());
             resourceTelenum = resourceTelenumService.save(resourceTelenum);
-            ResourcesRent resourcesRent = new ResourcesRent();
-            resourcesRent.setTenant(tenant);
-            resourcesRent.setResourceTelenum(resourceTelenum);
-            resourcesRent.setResData(resourceTelenum.getTelNumber());
-            resourcesRent.setResName("号码资源");
-            resourcesRent.setResType("1");
-            Date date = DateUtils.getLastTimeOfMonth(new Date());
-            resourcesRent.setRentExpire(date);
-            resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
+            Date expireDate = DateUtils.getLastTimeOfMonth(new Date());
+            ResourcesRent resourcesRent = new ResourcesRent(tenant,null,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),expireDate,ResourcesRent.RENT_STATUS_UNUSED);
             this.save(resourcesRent);
         }
         //扣费
