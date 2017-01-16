@@ -18,9 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -87,12 +84,16 @@ public class Handler_MN_CH_VF_SYNC extends RpcRequestHandler{
      */
     private Integer downFile(String uri,String path){
         Integer result = -1;
-        logger.error("文件下载开始{}---->{},时间:{}",uri,path, DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
+        if(logger.isDebugEnabled()){
+            logger.debug("文件下载开始{}---->{},时间:{}",uri,path, DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
+        }
         File newFile = new File(path);
         long start = new Date().getTime();
         //先判断文件是否存在，如果存在则不下载
         if(newFile.exists()){
-            logger.info("文件已存在，覆盖原文件:{},下载信息:{}",path,uri);
+            if(logger.isDebugEnabled()) {
+                logger.debug("文件已存在，覆盖原文件:{},下载信息:{}", path, uri);
+            }
         }
         //补充文件夹
         new File(path.substring(0,path.lastIndexOf("/"))).mkdirs();
@@ -103,7 +104,9 @@ public class Handler_MN_CH_VF_SYNC extends RpcRequestHandler{
         } catch (Exception e) {
             logger.error("文件流输出异常,{]", e);
         }
-        logger.error("文件下载结束{}---->{},结果:{},时间:{},花费时间{}",uri,path,result, DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"),new Date().getTime()-start);
+        if(logger.isDebugEnabled()) {
+            logger.debug("文件下载结束{}---->{},结果:{},时间:{},花费时间{}", uri, path, result, DateUtils.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"), new Date().getTime() - start);
+        }
         return result;
     }
 //    /**
