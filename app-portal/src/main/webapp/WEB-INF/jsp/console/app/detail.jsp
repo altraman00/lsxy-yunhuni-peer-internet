@@ -1064,7 +1064,7 @@
             },
             intersect:function () {
                 var point = Array.intersect(this.shop,this.page);
-                if(point.length >= this.page.length)
+                if(point.length >= this.page.length && this.page.length >0)
                     this.shopCheck = true
                 else
                     this.shopCheck = false
