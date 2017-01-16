@@ -94,6 +94,11 @@ public class ServerController extends AdminController{
 //        String script = "/opt/lsxy_yunwei/lsxy_server.sh -j start -a app-portal-api -r 1.2.0-RC3 -h p05";
 
         try {
+
+            if(isExistStartingServerInTheHost(host)){
+                return RestResponse.failed("00002","同一台主机一次只能启动一个服务");
+            }
+
             Application application = Application.getApplication(app);
             if(application == null) {
                 throw new IllegalArgumentException(app);
@@ -116,6 +121,24 @@ public class ServerController extends AdminController{
     }
 
     /**
+     * 是否有服务在指定的 host 主机中处于 启动中 的状态
+     * @param host
+     * @return
+     */
+    private boolean isExistStartingServerInTheHost(String host) {
+        for(ServerVO server:servers){
+            if(server.getServerHost().equals(host)){
+                if(server.getStatus().equals(ServerVO.STATUS_STARTING)){
+                    if(cacheService.get(getServerRedisKey(host,server.getAppName())) == null){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * 更新服务
      * @param host
      * @param app
@@ -125,6 +148,10 @@ public class ServerController extends AdminController{
     @ResponseBody
     public RestResponse<String> updateServer(String host,String app){
         try {
+            if(isExistStartingServerInTheHost(host)){
+                return RestResponse.failed("00002","同一台主机一次只能启动一个服务");
+            }
+
             Application application = Application.getApplication(app);
             if(application == null) {
                 throw new IllegalArgumentException(app);
