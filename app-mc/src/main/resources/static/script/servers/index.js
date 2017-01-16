@@ -10,6 +10,7 @@ function startServer(){
         }else{
             alert('启动失败');
         }
+        location.reload();
     });
 
 }
@@ -25,6 +26,7 @@ function updateServer(){
         }else{
             alert('更新失败');
         }
+        location.reload();
     });
 
 }
@@ -41,8 +43,8 @@ function stopServer(){
         }else{
             alert('操作失败');
         }
+        location.reload();
     });
-
 }
 
 $(function() {
