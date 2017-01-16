@@ -132,9 +132,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
 
         String areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
         //TODO 应用新建 时落到测试区域，并指定一个sip接入点
-        Area area = new Area();
-        area.setId(areaId);
-        app.setArea(area);
+        app.setAreaId(areaId);
         app = this.save(app);
         return app;
     }

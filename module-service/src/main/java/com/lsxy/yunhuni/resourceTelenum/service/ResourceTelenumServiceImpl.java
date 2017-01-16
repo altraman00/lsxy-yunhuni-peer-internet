@@ -264,7 +264,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             //当用户指定了号码
             if(notBlankFrom.size() > 0){
                 //查出用户指定的号码
-                List<ResourceTelenum> availableNums = resourceTelenumDao.findCallingTelnumByTenantIdAndAppIdAndTelnum(app.getTenant().getId(), notBlankFrom,app.getId(),app.getArea().getId());
+                List<ResourceTelenum> availableNums = resourceTelenumDao.findCallingTelnumByTenantIdAndAppIdAndTelnum(app.getTenant().getId(), notBlankFrom,app.getId(),app.getAreaId());
                 //可用号码列表不为空
                 if(availableNums == null || availableNums.size() > 0){
                     for(String fr:from){
@@ -289,7 +289,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         }
         //经过以上处理后，返回号码结果还是空的话，则不根据传入的from来选号码，选租户应用下的号码，或者租户下不被应用绑定的号码
         if(result.size() == 0){
-            ResourceTelenum availableNum = resourceTelenumDao.findCallingTelnumByTenantIdAndAppId(app.getTenant().getId(), app.getId(), app.getArea().getId());
+            ResourceTelenum availableNum = resourceTelenumDao.findCallingTelnumByTenantIdAndAppId(app.getTenant().getId(), app.getId(), app.getAreaId());
             if(availableNum == null){
                 availableNum = this.findOneFreeDialingNumber(lineIds);
             }

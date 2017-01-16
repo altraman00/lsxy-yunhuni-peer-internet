@@ -155,7 +155,11 @@ public class RentTelnumController extends AbstractPortalController {
     public RestResponse findByAppId(HttpServletRequest request,@PathVariable String appId,Integer pageNo,Integer pageSize){
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/list/app/{1}?pageNo={2}&pageSize={3}";
-        Page page =  RestRequest.buildSecurityRequest(token).getPage(uri, ResourcesRent.class,appId,pageNo,pageSize).getData();
+        RestResponse<Page<ResourcesRent>> response = RestRequest.buildSecurityRequest(token).getPage(uri, ResourcesRent.class, appId, pageNo, pageSize);
+        if(!response.isSuccess()){
+            return response;
+        }
+        Page page =  response.getData();
         List<ResourcesRent> result = page.getResult();
         if(result != null && result.size() > 0){
             List<AppNumVO> appNumVOs = new ArrayList<>();
@@ -200,7 +204,11 @@ public class RentTelnumController extends AbstractPortalController {
     public RestResponse findOwnUnusedNum(HttpServletRequest request,@PathVariable String appId,int pageNo,int pageSize){
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/num/unused/app/{1}?pageNo={2}&pageSize={3}";
-        Page page =   RestRequest.buildSecurityRequest(token).getPage(uri, ResourceTelenum.class,appId,pageNo,pageSize).getData();
+        RestResponse<Page<ResourceTelenum>> response = RestRequest.buildSecurityRequest(token).getPage(uri, ResourceTelenum.class, appId, pageNo, pageSize);
+        if(!response.isSuccess()){
+            return response;
+        }
+        Page page =   response.getData();
         List<ResourceTelenum> result = page.getResult();
         if(result != null && result.size() > 0){
             List<AppNumVO> appNumVOs = new ArrayList<>();
