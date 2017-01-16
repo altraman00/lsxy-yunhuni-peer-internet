@@ -49,4 +49,11 @@ public class CallCenterConversationMemberServiceImpl extends AbstractService<Cal
         String hql = "FROM CallCenterConversationMember obj WHERE obj.relevanceId=?1";
         return this.list(hql,conversationId);
     }
+
+    @Override
+    public void updateMode(String conversationId,String callId, int mode) {
+        String sql = "update db_lsxy_bi_yunhuni.tb_bi_call_center_conversation_member set mode="+mode+
+                " where relevance_id='"+conversationId+"' and call_id='"+callId+"'";
+        jdbcTemplate.execute(sql);
+    }
 }

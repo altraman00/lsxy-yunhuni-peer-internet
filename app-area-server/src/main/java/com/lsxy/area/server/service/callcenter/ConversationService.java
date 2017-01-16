@@ -684,6 +684,12 @@ public class ConversationService {
         }
 
         conversationCallVoiceModeReference.set(conversationId,callId,voiceMode);
+
+        try{
+            callCenterConversationMemberService.updateMode(conversationId,callId,voiceMode);
+        }catch (Throwable t){
+            logger.warn("更新conversationmember mode 失败",t);
+        }
         return true;
     }
 
