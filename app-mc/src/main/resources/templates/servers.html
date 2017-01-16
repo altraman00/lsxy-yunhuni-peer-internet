@@ -39,11 +39,11 @@
         <td th:text="${server.startDt}">2016-01-01 22:22:33</td>
         <td th:text="|${server.serverHost} - ${server.serverIp}|">p01 - 192.168.10.2</td>
         <td th:text="${server.serverPort}">8080</td>
-        <td th:style="${server.status eq 'OK'} ? 'background-color: green':'background-color: red'" th:text="${server.status}" style="background-color: green">OK</td>
+        <td th:style="${server.status eq  T(com.lsxy.app.mc.vo.ServerVO).STATUS_OK} ? 'background-color: green':'background-color: red'" th:text="${server.status}" style="background-color: green">OK</td>
         <td>
-            <span><a th:unless="${server.status eq 'OK'}" class="btnStartServer" href="javascript:void(0);" th:attr="host=${server.serverHost},app=${server.appName}">启动</a></span>
-            <span><a th:unless="${server.appName eq 'app.mc'}"  th:if="${server.status eq 'OK'}"  class="btnStopServer"  href="javascript:void(0);" th:attr="host=${server.serverHost},app=${server.appName}">停止</a></span>
-            <span><a th:unless="${server.appName eq 'app.mc'}"  th:if="${server.status eq 'OK'}"  class="btnRestartServer"  href="javascript:void(0);" th:attr="host=${server.serverHost},app=${server.appName}">重启</a></span>
+            <span><a th:unless="${server.status eq T(com.lsxy.app.mc.vo.ServerVO).STATUS_OK}" class="btnStartServer" href="javascript:void(0);" th:attr="host=${server.serverHost},app=${server.appName}">启动</a></span>
+            <span><a th:unless="${server.appName eq 'app.mc'}"  th:if="${server.status eq  T(com.lsxy.app.mc.vo.ServerVO).STATUS_OK}"  class="btnStopServer"  href="javascript:void(0);" th:attr="host=${server.serverHost},app=${server.appName}">停止</a></span>
+            <span><a th:unless="${server.appName eq 'app.mc'}"  th:if="${server.status eq  T(com.lsxy.app.mc.vo.ServerVO).STATUS_OK}"  class="btnRestartServer"  href="javascript:void(0);" th:attr="host=${server.serverHost},app=${server.appName}">重启</a></span>
             <span><a th:unless="${server.appName eq 'app.mc'}" class="btnUpdateServer"  href="javascript:void(0);" th:attr="host=${server.serverHost},app=${server.appName}">更新</a></span>
             <span><a href="javascript:void(0);" class="btnServerLog" th:attr="host=${server.serverHost},app=${server.appName}">日志</a></span>
         </td>
