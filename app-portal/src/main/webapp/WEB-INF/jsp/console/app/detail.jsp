@@ -1186,6 +1186,7 @@
      *绑定号码分页
      */
     function upnumber(){
+        $('#uploadButton').hide();
         //获取数据总数
         var count = 0;
         var params = {"pageNo":1,"pageSize":10};
