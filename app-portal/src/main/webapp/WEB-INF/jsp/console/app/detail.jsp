@@ -1064,7 +1064,7 @@
             },
             intersect:function () {
                 var point = Array.intersect(this.shop,this.page);
-                if(point.length >= this.page.length)
+                if(point.length >= this.page.length && this.page.length >0)
                     this.shopCheck = true
                 else
                     this.shopCheck = false
@@ -1186,6 +1186,7 @@
      *绑定号码分页
      */
     function upnumber(){
+        $('#uploadButton').hide();
         //获取数据总数
         var count = 0;
         var params = {"pageNo":1,"pageSize":10};
