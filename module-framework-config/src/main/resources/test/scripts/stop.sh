@@ -40,10 +40,10 @@ done
 
 if [ "$app_name"x = "app-portal"x ]
 then
-    echo "ssh root@$host_name /opt/tomcat_app_portal/bin/startup.sh"
-    ssh root@$host_name "nohup /opt/yunhuni-peer-internet/bin/update_restart.sh -A $app_name -D -P development -I -M /opt/tomcat_app_portal >> /opt/yunhuni/logs/$app_name.out 2>&1 &"
+    echo "ssh root@d03 ps -ef | grep tomcat_app_portal | grep -v update | grep -v grep| grep -v tail | awk '{print \$2}' | xargs kill -9"
+    ssh root@d03 "ps -ef | grep tomcat_app_portal | grep -v update | grep -v grep| grep -v tail | awk '{print \$2}' | xargs kill -9"
 else
-    echo "ssh root@$host_name nohup /opt/yunhuni-peer-internet/bin/update_restart.sh -A $app_name -S -P development -I >> /opt/yunhuni/logs/$app_name.out 2>&1 &"
-    ssh root@$host_name "nohup /opt/yunhuni-peer-internet/bin/update_restart.sh -A $app_name -S -P development -I >> /opt/yunhuni/logs/$app_name.out 2>&1 &"
+    echo "ssh root@$host_name ps -ef | grep $app_name | grep -v update | grep -v grep| grep -v tail | awk '{print \$2}' | xargs kill -9"
+    ssh root@$host_name "ps -ef | grep $app_name | grep -v update | grep -v grep| grep -v tail | awk '{print \$2}' | xargs kill -9"
 fi
 
