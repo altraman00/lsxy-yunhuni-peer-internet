@@ -430,6 +430,9 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         resourceTelenum = this.save(resourceTelenum);
         //只更改租户
         if(tenantType != 0&&!isEditNum){
+            if(resourceTelenum.getTelNumber().equals(testCallNumber)){
+                throw new RuntimeException("测试号码'" +testCallNumber+ "'不能绑定租户");
+            }
             if(tenantType==2){//如果修改租户，需要删除号码和租户的关系
                 ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumId(resourceTelenum.getId());
                 if(resourcesRent!=null&&StringUtils.isNotEmpty(resourcesRent.getId())){//释放存在旧的关系
@@ -458,6 +461,9 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 resourcesRentService.save(resourcesRent);
             }
         }else if(tenantType!=0&&isEditNum){//同时修改租户和号码
+            if(resourceTelenum.getTelNumber().equals(testCallNumber)){
+                throw new RuntimeException("测试号码'" +testCallNumber+ "'不能绑定租户");
+            }
             if(tenantType==2){//如果修改租户，需要删除号码和租户的关系
                 ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumId(resourceTelenum.getId());
                 if(resourcesRent!=null&&StringUtils.isNotEmpty(resourcesRent.getId())){//释放存在旧的关系

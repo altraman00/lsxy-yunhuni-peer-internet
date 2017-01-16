@@ -172,7 +172,7 @@
                         font-size: 14px;
                         background-color: #dff0d8;
                     ">
-                        我的号码列表没有可选号码，如需租用号码，请前往“号码管理”中的“我的号码”
+                        我的号码列表没有可呼入号码选择，如需租用号码，请前往“号码管理”中的“我的号码”
                     </div>
                     <div class="input text-center" >
                         <a type="button"  class="btn btn-primary btn-box tabModalBtn" href="${ctx}/console/telenum/callnum/index">立即前往</a>

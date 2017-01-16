@@ -97,7 +97,11 @@ public class AppOnlineActionController extends AbstractRestController {
             appOnlineActionService.actionOfSelectNum(appId);
             if((app.getIsIvrService() != null && app.getIsIvrService() == 1) || (app.getIsCallCenter() != null && app.getIsCallCenter() == 1)){
                 //如果 没有呼出号码，而且上线的应用需要呼出号码，则将needCalledNum设为true
-                if(hasCalled == false){
+                if(!hasCalled){
+                    //TODO 获取应用所绑定的号码，判断是否有可呼入的
+                    hasCalled =  resourceTelenumService.isCalledByTenantIdAndAppId(app.getTenant().getId(),app.getId());
+                }
+                if(!hasCalled){
                     result.put("needCalledNum",true);
                 }
             }
