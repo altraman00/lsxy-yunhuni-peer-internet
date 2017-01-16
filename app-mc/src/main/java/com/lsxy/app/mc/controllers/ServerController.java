@@ -174,8 +174,6 @@ public class ServerController extends AdminController{
                 if(xx.length > 1){
                     server.setStartDt(DateUtils.formatDate(new Date(Long.parseLong(xx[1]))));
                 }
-            }else{
-                server.setStatus(ServerVO.STATUS_FAILED);
             }
         }
         return servers;
