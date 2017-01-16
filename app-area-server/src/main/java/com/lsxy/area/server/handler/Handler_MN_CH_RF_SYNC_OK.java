@@ -26,6 +26,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
+import static com.lsxy.yunhuni.api.product.enums.ProductCode.call_center;
+
 /**
  * Created by zhagnxb 2016-11-15
  * 录音文件同步成功
