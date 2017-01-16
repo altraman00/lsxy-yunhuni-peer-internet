@@ -60,10 +60,10 @@ public class AreaAndTelNumSelector {
         List<TelnumSortEntity> to2Num = new ArrayList<>();
         if(app.getStatus() == app.STATUS_ONLINE){
             //查找租户私有线路
-            List<LineGatewayVO> lineGateways = lineGatewayToTenantService.findByTenantIdAndAreaId(app.getTenant().getId(),app.getArea().getId());
+            List<LineGatewayVO> lineGateways = lineGatewayToTenantService.findByTenantIdAndAreaId(app.getTenant().getId(),app.getAreaId());
             if(lineGateways == null || lineGateways.size() == 0){
                 //如果没有私有线路，找公共线路
-                lineGateways = lineGatewayToPublicService.findAllLineGatewayByAreaId(app.getArea().getId());
+                lineGateways = lineGatewayToPublicService.findAllLineGatewayByAreaId(app.getAreaId());
             }
             if(lineGateways == null || lineGateways.size() == 0){
                 //TODO 没有线路，则抛出异常
@@ -105,11 +105,7 @@ public class AreaAndTelNumSelector {
             if(testNums != null && testNums.size() > 0 && testNums.containsAll(tos)){
                 ResourceTelenum callNum = null;
                 //获取测试用的区域
-                String areaId = null;
-                Area area = app.getArea();
-                if(area != null){
-                    areaId = area.getId();
-                }
+                String areaId = app.getAreaId();
                 if(StringUtils.isBlank(areaId)){
                     areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
                 }
@@ -130,7 +126,7 @@ public class AreaAndTelNumSelector {
                 throw new AppOffLineException();
             }
         }
-        selector = new Selector(app.getArea().getId(),toNum,to1Num,to2Num);
+        selector = new Selector(app.getAreaId(),toNum,to1Num,to2Num);
         return selector;
     }
 
@@ -189,11 +185,7 @@ public class AreaAndTelNumSelector {
 
 
     public String getAreaId(App app){
-        String areaId = null;
-        Area area = app.getArea();
-        if(area != null){
-            areaId = area.getId();
-        }
+        String areaId = app.getAreaId();
         if(StringUtils.isBlank(areaId)){
             areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
         }

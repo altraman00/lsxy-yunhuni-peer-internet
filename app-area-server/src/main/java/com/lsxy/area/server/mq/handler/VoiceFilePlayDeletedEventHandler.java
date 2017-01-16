@@ -80,7 +80,7 @@ public class VoiceFilePlayDeletedEventHandler implements MQMessageHandler<VoiceF
             }
             Map<String, Object> params = new HashMap<>();
             App app = appService.findById(event.getAppId());
-            params.put("areaId",app.getArea().getId());
+            params.put("areaId",app.getAreaId());
             RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_DELETED,params);
             request.setBody(param);
             try {
