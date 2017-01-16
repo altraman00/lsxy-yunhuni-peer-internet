@@ -178,12 +178,13 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                 if(rent[2] != null){
                     appId = (String) rent[2];
                 }
-                monthlyRentPay(tenantId, curTime, cost, rentId, appId);
+                //如果有一次余额不够了，说明这个租户没钱了，所以断开循环
+                if (!monthlyRentPay(tenantId, curTime, cost, rentId, appId)) break;
             }
         }
     }
 
-    private void monthlyRentPay(String tenantId, Date curTime, BigDecimal cost, String rentId, String appId) {
+    private boolean monthlyRentPay(String tenantId, Date curTime, BigDecimal cost, String rentId, String appId) {
         BigDecimal balance = calBillingService.getBalance(tenantId);
         //获取每月号码扣费金额
         if(balance.compareTo(cost) == 1 || balance.compareTo(cost) == 0){
@@ -196,6 +197,9 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
             //插入消费记录
             Consume consume = new Consume(curTime, ConsumeCode.rent_number_month.name(),cost,ConsumeCode.rent_number_month.getName(),appId,tenantId,rentId);
             consumeService.consume(consume);
+            return true;
+        }else{
+            return false;
         }
     }
 
