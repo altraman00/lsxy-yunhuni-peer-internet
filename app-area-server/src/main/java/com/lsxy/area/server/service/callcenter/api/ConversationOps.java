@@ -11,9 +11,6 @@ import com.lsxy.area.server.service.callcenter.ConversationCallVoiceModeReferenc
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.PlayFileUtil;
-import com.lsxy.call.center.api.model.CallCenterConversation;
-import com.lsxy.call.center.api.model.CallCenterConversationDetail;
-import com.lsxy.call.center.api.model.CallCenterConversationMember;
 import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
 import com.lsxy.call.center.api.service.CallCenterConversationService;
@@ -43,9 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -304,56 +299,5 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
         return conversationService.inviteOut(appId,
                     conversation_state.getBusinessData().get(BusinessState.REF_RES_ID),
                     conversationId,from,to,maxDuration,maxDial,null,voiceMode);
-    }
-
-    @Override
-    public CallCenterConversationDetail detail(String ip, String appId, String conversationId) throws YunhuniApiException {
-        if(StringUtils.isBlank(conversationId)){
-            throw new RequestIllegalArgumentException();
-        }
-        App app = appService.findById(appId);
-        if(app == null){
-            throw new AppNotFoundException();
-        }
-        String whiteList = app.getWhiteList();
-        if(StringUtils.isNotBlank(whiteList)){
-            if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
-            }
-        }
-        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
-            throw new AppServiceInvalidException();
-        }
-        CallCenterConversation conversation = callCenterConversationService.findById(conversationId);
-        if(conversation == null){
-            return null;
-        }
-        CallCenterConversationDetail detail = new CallCenterConversationDetail();
-
-        detail.setId(conversation.getId());
-        detail.setType(conversation.getType());
-        detail.setState(conversation.getState());
-        detail.setChannelId(conversation.getChannelId());
-        detail.setQueueId(conversation.getQueueId());
-        detail.setStartTime(conversation.getStartTime());
-        detail.setEndTime(conversation.getEndTime());
-        detail.setEndReason(conversation.getEndReason());
-
-        List<CallCenterConversationMember> cms = callCenterConversationMemberService.list(conversationId);
-        if(cms != null && cms.size() > 0){
-            List<CallCenterConversationDetail.MemberDetail> members = new ArrayList<>();
-            for (CallCenterConversationMember cm : cms) {
-                CallCenterConversationDetail.MemberDetail member = new CallCenterConversationDetail.MemberDetail();
-                member.setAgentName(cm.getAgentName());
-                member.setExtensionId(cm.getExtensionId());
-                member.setCallId(cm.getCallId());
-                member.setStartTime(cm.getStartTime());
-                member.setEndTime(cm.getEndTime());
-                member.setMode(cm.getMode());
-                members.add(member);
-            }
-            detail.setMembers(members);
-        }
-        return detail;
     }
 }
