@@ -65,7 +65,7 @@
             <tr th:each="areaNode:${areaServerHost.nodes}">
                 <td th:text="${areaNode.nodeId}">area001-1</td>
                 <td th:text="${areaNode.host}">ap01</td>
-                <td th:style="${areaNode.status eq T(com.lsxy.app.mc.vo.ServerVO).STATUS_OK} ? 'background-color: green':'background-color: red'"
+                <td th:style="${areaNode.status eq 'OK'} ? 'background-color: green':'background-color: red'"
                     th:text="${areaNode.status}" style="background-color: green">OK</td>
 
 
