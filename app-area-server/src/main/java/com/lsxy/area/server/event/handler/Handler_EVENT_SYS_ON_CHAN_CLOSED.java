@@ -191,7 +191,12 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             }
             voiceCdr.setToNum(cdrSplit[8].trim());
             //host根据to来获取
-            host = cdrSplit[8].trim().split("@")[1];
+            String[] toSplit = cdrSplit[8].trim().split("@");
+            if(toSplit.length > 1){
+                host = toSplit[1];
+            }else{
+                host = cdrSplit[10].trim().split("@")[1];
+            }
         }
         Date callStartDate = getCallDate(cdrSplit[18].trim());
         voiceCdr.setCallStartDt(callStartDate == null?new Date():callStartDate);
@@ -218,7 +223,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             if(voiceCdr.getCallAckDt() != null){
                 Integer unit = lineGateway.getLinePriceUnit() == null ? 60:lineGateway.getLinePriceUnit();
                 BigDecimal price =  lineGateway.getLinePrice() == null ? BigDecimal.ZERO : lineGateway.getLinePrice();
-                BigDecimal lineCost = calCostService.calCost(voiceCdr.getCallTimeLong(), unit, price , 1.0);
+                BigDecimal lineCost = calCostService.calCost(voiceCdr.getCallTimeLong() + 1, unit, price , 1.0);
                 voiceCdr.setLineCost(lineCost);
             }else{
                 voiceCdr.setLineCost(BigDecimal.ZERO);
