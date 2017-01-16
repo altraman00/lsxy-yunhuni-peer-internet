@@ -8,8 +8,9 @@ function startServer(){
         if(data && data.success){
             alert('启动成功');
         }else{
-            alert('启动失败');
+            alert('启动失败:' + data.errorMsg);
         }
+        location.reload();
     });
 
 }
@@ -23,8 +24,9 @@ function updateServer(){
         if(data && data.success){
             alert('更新成功');
         }else{
-            alert('更新失败');
+            alert('更新失败:'+data.errorMsg);
         }
+        location.reload();
     });
 
 }
@@ -41,8 +43,8 @@ function stopServer(){
         }else{
             alert('操作失败');
         }
+        location.reload();
     });
-
 }
 
 $(function() {
