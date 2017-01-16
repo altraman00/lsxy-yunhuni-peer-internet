@@ -4,8 +4,11 @@ package com.lsxy.app.mc.vo;
  * Created by tandy on 16/11/21.
  */
 public class ServerVO {
-    public static final String STATUS_OK = "OK" ;
-    public static final String STATUS_FAILED = "FAILED";
+    public static final String STATUS_OK = "正常" ;           // 服务正常
+    public static final String STATUS_FAILED = "启动失败";     //服务启动失败
+    public static final String STATUS_STOPED = "已停止";    //服务停止了
+    public static final String STATUS_STARTING = "启动中";    //服务启动中
+    public static final String STATUS_UPDATING = "更新中";
     private String serverName;
     private String appName;     //systemId
     private String moduleName;  //模块名称

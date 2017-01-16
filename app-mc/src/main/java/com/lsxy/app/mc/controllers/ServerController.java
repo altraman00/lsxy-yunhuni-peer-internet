@@ -35,8 +35,10 @@ import static com.lsxy.framework.core.utils.JSONUtil2.jsonToList;
 @Controller
 public class ServerController extends AdminController{
 
+
     private static final Logger logger = LoggerFactory.getLogger(ServerController.class);
-    
+
+    private static List<ServerVO> servers;
     @Autowired
     private RedisCacheService cacheService;
 
@@ -71,12 +73,20 @@ public class ServerController extends AdminController{
                 logger.debug("stop completed and result is :");
                 logger.debug(result);
             }
+            //修改服务状态并删除对应服务的缓存key
+            ServerVO server = getServerFromMemory(host,app);
+            server.setStatus(ServerVO.STATUS_STOPED);
+            cacheService.del(getServerRedisKey(host,app));
+
         } catch (ScriptFileNotExistException | ShellExecuteException e) {
             logger.error("update exception: " + host + ":" + app,e);
             return RestResponse.failed("00001","execute exception");
         }
         return RestResponse.success("OK");
     }
+
+
+
 
     @RequestMapping("/server/start")
     @ResponseBody
@@ -94,6 +104,10 @@ public class ServerController extends AdminController{
                 logger.debug("start completed and result is :");
                 logger.debug(result);
             }
+            //修改服务状态为启动中
+            ServerVO server = getServerFromMemory(host,app);
+            server.setStatus(ServerVO.STATUS_STARTING);
+
         } catch (ScriptFileNotExistException | ShellExecuteException e) {
             e.printStackTrace();
             return RestResponse.failed("00001","execute exception");
@@ -121,6 +135,11 @@ public class ServerController extends AdminController{
                 logger.debug("update completed and result is :");
                 logger.debug(result);
             }
+            //修改服务状态为启动中
+            ServerVO server = getServerFromMemory(host,app);
+            server.setStatus(ServerVO.STATUS_UPDATING);
+            cacheService.del(getServerRedisKey(host,app));
+
         } catch (ScriptFileNotExistException | ShellExecuteException e) {
             logger.error("update exception: " + host + ":" + app,e);
             return RestResponse.failed("00001","execute exception");
@@ -132,15 +151,18 @@ public class ServerController extends AdminController{
      * @return
      */
     private List<ServerVO> getAllServerList() {
-        String serverListJson = SystemConfig.getProperty("app.mc.serverlist","[]");
-        List<ServerVO> result = jsonToList(serverListJson,ServerVO.class);
+        if(servers == null){
+            String serverListJson = SystemConfig.getProperty("app.mc.serverlist","[]");
+            servers = jsonToList(serverListJson,ServerVO.class);
+        }
+
         Set<String> serversCache = cacheService.keys("monitor_*");
         if(logger.isDebugEnabled()){
             logger.debug("search monitor_* from redis and result is : {}" ,serversCache);
         }
 
-        for(ServerVO server:result){
-            String key = "monitor_"+server.getAppName()+"_"+server.getServerHost()+"_";
+        for(ServerVO server:servers){
+            String key = getServerRedisKey(server.getServerHost(),server.getAppName());
             if(logger.isDebugEnabled()){
                 logger.debug("find server connection status, key is :{}",key);
             }
@@ -156,7 +178,7 @@ public class ServerController extends AdminController{
                 server.setStatus(ServerVO.STATUS_FAILED);
             }
         }
-        return result;
+        return servers;
     }
 
 
@@ -189,4 +211,30 @@ public class ServerController extends AdminController{
     }
 
 
+    /**
+     * 根据host 和app 返回对应redis缓存的key value
+     * @param host
+     * @param app
+     * @return
+     */
+    private String getServerRedisKey(String host, String app) {
+        String key = "monitor_"+app+"_"+host+"_";
+        return key;
+    }
+
+
+    /**
+     * 在内存中根据host 和 app找到对应的servervo对象
+     * @param host
+     * @param app
+     * @return
+     */
+    private ServerVO getServerFromMemory(String host, String app) {
+        for(ServerVO server:servers){
+            if(server.getAppName().equals(app) && server.getServerHost().equals(host)){
+                return server;
+            }
+        }
+        return null;
+    }
 }
