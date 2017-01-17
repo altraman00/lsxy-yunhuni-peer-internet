@@ -94,6 +94,10 @@ public class CallController extends AbstractAPIController{
             //语音回拔两个号码不能是同一个
             throw new DuoCallbackNumIsSampleException();
         }
+        //TODO 暂不支持模式为1
+        if(dto.getRecord_mode() == 1){
+            throw new RequestIllegalArgumentException();
+        }
 
         callId = callService.duoCallback(ip,appId,dto.getFrom1(),dto.getTo1(),dto.getFrom2(),dto.getTo2(),dto.getRing_tone(),dto.getRing_tone_mode(),dto.getMax_dial_duration(),
                 dto.getMax_call_duration(),dto.getRecording(),dto.getRecord_mode(),dto.getUser_data());
