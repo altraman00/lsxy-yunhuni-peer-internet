@@ -502,7 +502,7 @@ public class CallServiceImpl implements CallService {
                 if(type == null || type < 0 || type > 6){
                     throw new RequestIllegalArgumentException();
                 }
-                if(play.get(1).equals(0)){
+                if(type == 0){
                     play.set(0,playFileUtil.convertArray(tenantId, appId, (String) play.get(0)));
                 }
             }
