@@ -128,7 +128,7 @@ public class ServerController extends AdminController{
     private boolean isExistStartingServerInTheHost(String host) {
         for(ServerVO server:servers){
             if(server.getServerHost().equals(host)){
-                if(server.getStatus().equals(ServerVO.STATUS_STARTING)){
+                if(server.getStatus() != null && server.getStatus().equals(ServerVO.STATUS_STARTING)){
                     if(cacheService.get(getServerRedisKey(host,server.getAppName())) == null){
                         return true;
                     }

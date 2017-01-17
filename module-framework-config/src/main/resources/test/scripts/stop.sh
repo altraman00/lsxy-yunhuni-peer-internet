@@ -41,7 +41,7 @@ done
 if [ "$app_name"x = "app-portal"x ]
 then
     echo "ssh root@d03 ps -ef | grep tomcat_app_portal | grep -v update | grep -v grep| grep -v tail | awk '{print \$2}' | xargs kill -9"
-    ssh root@d03 "ps -ef | grep tomcat_app_portal | grep -v update | grep -v grep| grep -v tail | awk '{print \$2}' | xargs kill -9"
+    ssh root@$host_name "ps -ef | grep tomcat_app_portal | grep -v update | grep -v grep| grep -v tail | awk '{print \$2}' | xargs kill -9"
 else
     echo "ssh root@$host_name ps -ef | grep $app_name | grep -v update | grep -v grep| grep -v tail | awk '{print \$2}' | xargs kill -9"
     ssh root@$host_name "ps -ef | grep $app_name | grep -v update | grep -v grep| grep -v tail | awk '{print \$2}' | xargs kill -9"
