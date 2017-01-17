@@ -1,12 +1,9 @@
 package com.lsxy.app.api.gateway.rest;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lsxy.app.api.gateway.dto.DuoCallbackDTO;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.framework.core.exceptions.api.ApiReturnCodeEnum;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
-import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.MethodArgumentNotValidException;
