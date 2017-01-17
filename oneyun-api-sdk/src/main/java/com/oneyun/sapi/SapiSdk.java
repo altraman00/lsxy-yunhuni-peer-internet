@@ -633,7 +633,7 @@ public class SapiSdk extends SapiSdkConfig {
      * @param userDate 用户数据,最大128个字符
      * @return
      */
-    public String IvrCall(String appId,String from,String to,Integer maxDialDuration,Integer maxCallDuration,String userDate) throws IOException, NoSuchAlgorithmException, InvalidKeyException, KeyManagementException {
+    public String ivrCall(String appId,String from,String to,Integer maxDialDuration,Integer maxCallDuration,String userDate) throws IOException, NoSuchAlgorithmException, InvalidKeyException, KeyManagementException {
         Map<String,Object> params = new HashMap<String,Object>();
         params.put("from",from);
         params.put("to",to);
