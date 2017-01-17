@@ -1,5 +1,6 @@
 package com.lsxy.app.api.gateway.rest;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.framework.core.exceptions.api.ApiReturnCodeEnum;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
@@ -38,7 +39,7 @@ public class AbstractAPIController {
         }
         if(resultEx instanceof YunhuniApiException){
             failed = ApiGatewayResponse.failed(((YunhuniApiException) resultEx).getCode(),resultEx.getMessage());
-        }else if(resultEx instanceof MethodArgumentNotValidException){
+        }else if(resultEx instanceof MethodArgumentNotValidException || resultEx instanceof JsonMappingException){
             failed = ApiGatewayResponse.failed(ApiReturnCodeEnum.IllegalArgument.getCode(), ApiReturnCodeEnum.IllegalArgument.getMsg());
         }else{
             failed = ApiGatewayResponse.failed(ApiReturnCodeEnum.UnknownFail.getCode(), ApiReturnCodeEnum.UnknownFail.getMsg());
