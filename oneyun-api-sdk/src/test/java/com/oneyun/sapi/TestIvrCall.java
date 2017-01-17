@@ -31,8 +31,8 @@ public class TestIvrCall extends BaseTest{
     public void test1(){
         String from = null;
         String to = phone2;
-        String maxDialDuration = null;
-        String maxCallDuration = null;
+        String maxDialDuration = "50";
+        String maxCallDuration = "50";
         String userDate = null;
         logger.info("[开始][from为空]");
         send( appId, from, to, maxDialDuration, maxCallDuration, userDate);
@@ -41,13 +41,13 @@ public class TestIvrCall extends BaseTest{
     @Test
     public void test2(){
         String from = null;
-        String to = null;
+        String to = phone2;
         String maxDialDuration = null;
         String maxCallDuration = null;
         String userDate = null;
-        logger.info("[开始][from1为空]");
+        logger.info("[开始][from指定存在的号码]");
         send( appId, from, to, maxDialDuration, maxCallDuration, userDate);
-        logger.info("[结束][from1为空]");
+        logger.info("[结束][from指定存在的号码]");
     }
     @Test
     public void test3(){
