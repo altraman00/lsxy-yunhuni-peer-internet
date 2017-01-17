@@ -120,9 +120,6 @@ public class CallController extends AbstractAPIController{
         if(StringUtils.isBlank(dto.getTo())){
             throw new RequestIllegalArgumentException();
         }
-        if(dto.getMax_dial_duration() == null){
-            throw new RequestIllegalArgumentException();
-        }
 
         //将二维数组是为空的数组去掉
         List<List<Object>> playContent = dto.getPlay_content();
