@@ -12,11 +12,11 @@ public interface ApiCertificateChangeLogService extends BaseService<ApiCertifica
 
     /**
      * 插入更改日志
-     * @param certificate 鉴权账号（凭证）
+     * @param certId 鉴权账号Id（凭证）
      * @param secretKey 更改后的secretKey
      * @param changeType 更改类型
      */
-    void insertApiCertificateChangeLog(ApiCertificate certificate,String secretKey,String changeType);
+    void insertApiCertificateChangeLog(String certId,String secretKey,String changeType);
 
 
     /**

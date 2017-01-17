@@ -205,7 +205,7 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
                 //创建主鉴权账号
                 createApiCertificate(tenant);
                 //帐务数据创建
-                createBilling(tenant);
+                createBilling(tenant.getId());
             }else{
                 throw new RegisterException("注册信息不可用，已存在重复的注册信息！");
             }
@@ -222,16 +222,16 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     //创建主鉴权账号
     private void createApiCertificate(Tenant tenant) {
         ApiCertificate cert = new ApiCertificate();
-        cert.setTenant(tenant);
+        cert.setTenantId(tenant.getId());
         cert.setCertId(UUIDGenerator.uuid());
         cert.setSecretKey(UUIDGenerator.uuid());
         apiCertificateService.save(cert);
     }
     //帐务数据创建
-    private void createBilling(Tenant tenant) {
+    private void createBilling(String tenantId) {
         long defaultSize = Long.parseLong(SystemConfig.getProperty("portal.voiceflieplay.maxsize"))*1024*1024;
         Billing billing = new Billing();
-        billing.setTenant(tenant);
+        billing.setTenantId(tenantId);
         billing.setBalance(new BigDecimal(0.00));
         billing.setSmsRemain(0L);
         billing.setVoiceRemain(0L);

@@ -20,28 +20,20 @@ import java.util.Date;
 @Table(schema = "db_lsxy_base", name = "tb_base_recharge")
 public class Recharge  extends IdEntity {
 
-    private Tenant tenant;                //所属租户
+    private String tenantId;                //所属租户
     private BigDecimal amount;                //充值金额
-    private String source;                  //充值类型（没错，它们英文写反了） 参考RechargeSource
-    private String type;                  //充值渠道（没错，它们英文写反了） 参考RechargeType
+    private String source;                  //充值类型（用户充值，手工等各个类型） 参考RechargeSource
+    private String type;                  //充值渠道（支付宝,银联，人工等） 参考RechargeType
     private String status;                //充值状态 参考RechargeStatus
     private String orderId;               //订单ID
     private Date payTime;                   //付款时间,人工充值的付款时间为创建时的时间
     private Date deadline;//过期时间
-    @Column(name = "deadline")
-    public Date getDeadline() {
-        return deadline;
-    }
-
-    public void setDeadline(Date deadline) {
-        this.deadline = deadline;
-    }
 
     public Recharge() {
     }
 
-    public Recharge(Tenant tenant, BigDecimal amount, RechargeSource source, RechargeType type, RechargeStatus status, String orderId, Date payTime) {
-        this.tenant = tenant;
+    public Recharge(String tenantId, BigDecimal amount, RechargeSource source, RechargeType type, RechargeStatus status, String orderId, Date payTime) {
+        this.tenantId = tenantId;
         this.amount = amount;
         this.source = source.name();
         this.type = type.name();
@@ -49,8 +41,8 @@ public class Recharge  extends IdEntity {
         this.orderId = orderId;
         this.payTime = payTime;
     }
-    public Recharge(Tenant tenant, BigDecimal amount, RechargeSource source, RechargeType type, RechargeStatus status, String orderId, Date payTime,Date deadline) {
-        this.tenant = tenant;
+    public Recharge(String tenantId, BigDecimal amount, RechargeSource source, RechargeType type, RechargeStatus status, String orderId, Date payTime,Date deadline) {
+        this.tenantId = tenantId;
         this.amount = amount;
         this.source = source.name();
         this.type = type.name();
@@ -59,14 +51,14 @@ public class Recharge  extends IdEntity {
         this.payTime = payTime;
         this.deadline = deadline;
     }
-    @ManyToOne
-    @JoinColumn(name = "tenant_id")
-    public Tenant getTenant() {
-        return tenant;
+
+    @Column(name = "tenant_id")
+    public String getTenantId() {
+        return tenantId;
     }
 
-    public void setTenant(Tenant tenant) {
-        this.tenant = tenant;
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 
     @Column(name = "amount")
@@ -121,5 +113,14 @@ public class Recharge  extends IdEntity {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    @Column(name = "deadline")
+    public Date getDeadline() {
+        return deadline;
+    }
+
+    public void setDeadline(Date deadline) {
+        this.deadline = deadline;
     }
 }
