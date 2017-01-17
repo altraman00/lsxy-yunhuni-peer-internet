@@ -30,6 +30,8 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import java.io.Serializable;
@@ -328,7 +330,18 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
 
     @Override
     public List<Account> findByStatus(Integer status) {
-        return accountDao.findByStatus(status);
+        int pageNo = 1;
+        int pageSize = 20;
+        List<Account> resultList = new ArrayList<>();
+        Page<Account> accountPage = this.pageList(pageNo,pageSize);
+        resultList.addAll(accountPage.getResult());
+        while(accountPage.getCurrentPageNo() < accountPage.getTotalPageCount()){
+            pageNo = (int)accountPage.getCurrentPageNo() + 1;
+            accountPage = this.pageList( pageNo ,pageSize);
+            resultList.addAll(accountPage.getResult());
+        }
+//        return accountDao.findByStatus(status);
+        return resultList;
     }
 
     @Override
