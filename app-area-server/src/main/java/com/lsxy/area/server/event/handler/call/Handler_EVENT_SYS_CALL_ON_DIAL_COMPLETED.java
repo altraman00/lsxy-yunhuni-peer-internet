@@ -164,6 +164,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                             .build();
                     notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,3);
                 }
+                hungup(state);
             }
         }else if(BusinessState.TYPE_IVR_CALL.equals(state.getType())){//通过ivr呼出api 发起的呼叫
             //发送拨号结束通知
