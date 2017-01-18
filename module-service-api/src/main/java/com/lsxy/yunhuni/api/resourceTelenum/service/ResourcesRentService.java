@@ -9,7 +9,6 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelenumOrder;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 租户号码租用service
@@ -29,6 +28,14 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @return
      */
     Page<ResourcesRent> findByAppId(String appId,int pageNo, int pageSize);
+
+
+    /**
+     * 根据ID获取租用关系
+     * @param appId
+     * @return
+     */
+    List<ResourcesRent> findByAppId(String appId);
 
     /**
      * 根据号码和租用状态查询租用关系
