@@ -5,6 +5,7 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
@@ -101,7 +102,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         //所拥有的线路ID列表
         List<String> lineIds = lineGateways.parallelStream().map(LineGateway::getId).collect(Collectors.toList());
 
-        String numSql = "SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum num WHERE num.deleted=0 AND num.status = 0 AND num.usable=1 AND tel_number <> :testNum ";
+        String numSql = "SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum num WHERE num.deleted=0 AND num.status = 0 AND num.type='1' AND num.usable=1 AND tel_number <> :testNum ";
         if(StringUtils.isNotEmpty(telNum)){
             numSql += " and num.tel_number LIKE :telNum";
         }
@@ -263,7 +264,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             //当用户指定了号码
             if(notBlankFrom.size() > 0){
                 //查出用户指定的号码
-                List<ResourceTelenum> availableNums = resourceTelenumDao.findCallingTelnumByTenantIdAndAppIdAndTelnum(app.getTenant().getId(), notBlankFrom,app.getId(),app.getArea().getId());
+                List<ResourceTelenum> availableNums = resourceTelenumDao.findCallingTelnumByTenantIdAndAppIdAndTelnum(app.getTenant().getId(), notBlankFrom,app.getId(),app.getAreaId());
                 //可用号码列表不为空
                 if(availableNums == null || availableNums.size() > 0){
                     for(String fr:from){
@@ -288,7 +289,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         }
         //经过以上处理后，返回号码结果还是空的话，则不根据传入的from来选号码，选租户应用下的号码，或者租户下不被应用绑定的号码
         if(result.size() == 0){
-            ResourceTelenum availableNum = resourceTelenumDao.findCallingTelnumByTenantIdAndAppId(app.getTenant().getId(), app.getId(), app.getArea().getId());
+            ResourceTelenum availableNum = resourceTelenumDao.findCallingTelnumByTenantIdAndAppId(app.getTenant().getId(), app.getId(), app.getAreaId());
             if(availableNum == null){
                 availableNum = this.findOneFreeDialingNumber(lineIds);
             }
@@ -429,6 +430,9 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         resourceTelenum = this.save(resourceTelenum);
         //只更改租户
         if(tenantType != 0&&!isEditNum){
+            if(resourceTelenum.getTelNumber().equals(testCallNumber)){
+                throw new RuntimeException("测试号码'" +testCallNumber+ "'不能绑定租户");
+            }
             if(tenantType==2){//如果修改租户，需要删除号码和租户的关系
                 ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumId(resourceTelenum.getId());
                 if(resourcesRent!=null&&StringUtils.isNotEmpty(resourcesRent.getId())){//释放存在旧的关系
@@ -438,9 +442,15 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             }
             //新建租用关系
             ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),ResourcesRent.RENT_STATUS_UNUSED);
+            //线路自带号码有过期时间，下个月会自动扣费
+            if("1".equals(resourceTelenum.getType())){
+                Date expireDate = DateUtils.getLastTimeOfMonth(new Date());
+                resourcesRent1.setRentExpire(expireDate);
+            }
             resourcesRentService.save(resourcesRent1);
             //修改号码租用关系
             resourceTelenum.setTenantId(tenant.getId());
+            resourceTelenum.setAppId(null);
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
             this.save(resourceTelenum);
         }else if(tenantType==0&& isEditNum){//只更改手机号码
@@ -451,6 +461,9 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 resourcesRentService.save(resourcesRent);
             }
         }else if(tenantType!=0&&isEditNum){//同时修改租户和号码
+            if(resourceTelenum.getTelNumber().equals(testCallNumber)){
+                throw new RuntimeException("测试号码'" +testCallNumber+ "'不能绑定租户");
+            }
             if(tenantType==2){//如果修改租户，需要删除号码和租户的关系
                 ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumId(resourceTelenum.getId());
                 if(resourcesRent!=null&&StringUtils.isNotEmpty(resourcesRent.getId())){//释放存在旧的关系
@@ -460,9 +473,15 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             }
             //新建租用关系
             ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),ResourcesRent.RENT_STATUS_UNUSED);
+            //线路自带号码有过期时间，下个月会自动扣费
+            if("1".equals(resourceTelenum.getType())){
+                Date expireDate = DateUtils.getLastTimeOfMonth(new Date());
+                resourcesRent1.setRentExpire(expireDate);
+            }
             resourcesRentService.save(resourcesRent1);
             //修改号码租用关系
             resourceTelenum.setTenantId(tenant.getId());
+            resourceTelenum.setAppId(null);
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
             this.save(resourceTelenum);
         }
@@ -497,5 +516,22 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     @Override
     public ResourceTelenum findByTelNumberOrCallUri(String num) {
         return resourceTelenumDao.findFirstByTelNumberOrCallUri(num,num);
+    }
+
+    @Override
+    public boolean isCalledByTenantIdAndAppId(String tenantId, String appId) {
+        ResourceTelenum num = resourceTelenumDao.findFirstByTenantIdAndAppIdAndUsableAndIsCalled(tenantId,appId,ResourceTelenum.USABLE_TRUE,ResourceTelenum.ISCALLED_TRUE);
+        return num != null;
+    }
+
+    @Override
+    public void appUnbindAll(String tenantId, String appId) {
+        resourceTelenumDao.appUnbindAll(tenantId, appId,new Date());
+    }
+
+    @Override
+    public Page<ResourceTelenum> findOwnUnusedNum(String tenantId,String areaId,int pageNo,int pageSize) {
+        String hql = "from ResourceTelenum obj where obj.tenantId = ?1 and obj.areaId = ?2 and obj.appId is null";
+        return  this.pageList(hql,pageNo,pageSize,tenantId,areaId);
     }
 }

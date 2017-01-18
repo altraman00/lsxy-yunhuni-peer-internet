@@ -48,6 +48,7 @@
         <module>module-service-call-center-api</module>
         <module>app-mc</module>
         <module>app-opensips-proxy</module>
+        <module>oneyun-api-sdk</module>
 
     </modules>
     <packaging>pom</packaging>

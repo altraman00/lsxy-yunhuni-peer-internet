@@ -236,6 +236,9 @@
                                         </a>
                                     </li>
                                     <li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>
+                                    <!--号码绑定-->
+
+                                    <li data-id="number"><a href="#number" data-toggle="tab">号码绑定</a></li>
                                     <li class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
@@ -321,6 +324,39 @@
                                             <%--<div id="voicepage"></div>--%>
                                         <%--</section>--%>
                                     </div>
+                                    <!--号码绑定-->
+                                    <div class="tab-pane fade" id="number">
+                                        <p class="margin-bottom-20"></p>
+                                        <div class="row margin-bottom-20">
+                                            <div class="col-md-12">
+                                                <a class="btn btn-primary" onclick="unallband()">全部解除绑定</a>
+                                                <c:if test="${app.status==1}">
+                                                    <a class="btn btn-primary" id="call-number">绑定号码</a>
+                                                </c:if>
+                                            </div>
+                                        </div>
+
+                                        <table class="table table-striped cost-table-history tablelist" id="number-table">
+                                            <thead>
+                                            <tr>
+                                                <th class="text-center">号码</th>
+                                                <th class="text-center">状态</th>
+                                                <th class="text-center">可呼入</th>
+                                                <th class="text-center">可呼出</th>
+                                                <th class="text-center"><span class="text-center-l-fixed">归属地</span></th>
+                                                <th class="text-center">有效期</th>
+                                                <th class="text-center">操作</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="band-table">
+
+                                            </tbody>
+                                        </table>
+                                        <section class="panel panel-default yunhuni-personal">
+                                            <div id="bandpage"></div>
+                                        </section>
+                                    </div>
+                                    <!--号码绑定end-->
 
                                 </div>
                             </section>
@@ -335,6 +371,51 @@
     </section>
 
 
+<!--号码绑定-->
+<div id="vue-application">
+    <div class="modal fade call-detail-modal" id="call-modal" tabindex="100" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">绑定号码</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th><input type="checkbox" v-model="shopCheck" @click="isCheck" />全选</th>
+                            <th>号码</th>
+                            <th class="text-center">可呼入</th>
+                            <th class="text-center">可呼出</th>
+                            <th class="text-center"><span class="text-center-l-fixed">归属地</span></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="item in phonelist">
+                            <td scope="row"><input type="checkbox" v-model="shop" value="{{ item.num }}"/></td>
+                            <td>{{ item.num }}</td>
+                            <td class="text-center">{{ isCall[item.isCalled] }}</td>
+                            <td class="text-center">{{ isCall[item.isDialing]}}</td>
+                            <td class="text-center"><span class="text-center-l-fixed">{{ item.areaCode}}</span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <!--分页-->
+                    <div id="datatablepage"></div>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-primary" @click="band" v-if="shop.length > 0">立即绑定</a>
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--号码绑定end-->
 
 <!---mobilebox-->
 <div class="shadow-bg" id="show-bg"></div>
@@ -471,6 +552,7 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/application/detail.js'> </script>
 <!--syncpage-->
 <script type="text/javascript" src='${resPrefixUrl }/js/page.js'></script>
+<script type="text/javascript" src='${resPrefixUrl }/js/vue/vue.min.js'></script>
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/vendor/jquery.ui.widget.js"></script>
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.fileupload.js"></script>
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.fileupload-ui.js"></script>
@@ -829,7 +911,11 @@
         var name = $('#name').val();
 
         ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':1,'pageSize':20,csrfParameterName:csrfToken},function(response){
-            count=response.data.totalCount;
+            if(response.success){
+                count=response.data.totalCount;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
+            }
         },"post");
 
         //每页显示数量
@@ -868,29 +954,33 @@
     {
         var name = $('#name').val();
         ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':nowPage,'pageSize':listRows,csrfParameterName:csrfToken},function(response){
-            var data =[];
-            for(var j=0;j<response.data.result.length;j++){
-                var tempFile = response.data.result[j];
-                var temp = [tempFile.id,tempFile.name,tempFile.status,resultFileSize(tempFile.size),tempFile.remark,tempFile.reason?tempFile.reason:'',tempFile.sync];
-                data[j]=temp;
-            }
-            var html ='';
-            //数据列表
-            for(var i = 0 ; i<data.length; i++){
-                html +='<tr class="playtr" id="play-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
-                if(data[i][2]==-1){
-                    html+='<td  title="审核不通过原因：'+data[i][5]+'"><span class="nosuccess">审核不通过</span><i class="fa fa-exclamation-triangle"></i></td>';
-                }else if(data[i][2]==1&&data[i][6]==1){
-                    html+='<td ><span class="success">已审核</span></td>';
-                }else{
-                    html+='<td>待审核</td>';
+            if(response.success){
+                var data =[];
+                for(var j=0;j<response.data.result.length;j++){
+                    var tempFile = response.data.result[j];
+                    var temp = [tempFile.id,tempFile.name,tempFile.status,resultFileSize(tempFile.size),tempFile.remark,tempFile.reason?tempFile.reason:'',tempFile.sync];
+                    data[j]=temp;
                 }
-                html+='<td>'+data[i][3]+'</td>';
-                html+='<td id="remark-a-'+data[i][0]+'">'+data[i][4]+'</td>';
-                html+='<td class="operation"> <a onclick="delplay(this)" id="delete-'+data[i][0]+'" >删除</a> <span ></span> <a onclick="editremark(this)" id="remark-b-'+data[i][0]+'">修改备注</a> </td></tr>';
+                var html ='';
+                //数据列表
+                for(var i = 0 ; i<data.length; i++){
+                    html +='<tr class="playtr" id="play-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
+                    if(data[i][2]==-1){
+                        html+='<td  title="审核不通过原因：'+data[i][5]+'"><span class="nosuccess">审核不通过</span><i class="fa fa-exclamation-triangle"></i></td>';
+                    }else if(data[i][2]==1&&data[i][6]==1){
+                        html+='<td ><span class="success">已审核</span></td>';
+                    }else{
+                        html+='<td>待审核</td>';
+                    }
+                    html+='<td>'+data[i][3]+'</td>';
+                    html+='<td id="remark-a-'+data[i][0]+'">'+data[i][4]+'</td>';
+                    html+='<td class="operation"> <a onclick="delplay(this)" id="delete-'+data[i][0]+'" >删除</a> <span ></span> <a onclick="editremark(this)" id="remark-b-'+data[i][0]+'">修改备注</a> </td></tr>';
+                }
+                $('#playtable').find(".playtr").remove();
+                $('#playtable').append(html);
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
             }
-            $('#playtable').find(".playtr").remove();
-            $('#playtable').append(html);
         },"post");
 
     }
@@ -905,9 +995,331 @@
         if(type=='play'){
             upplay();
         }
+        if(type=='number'){
+            upnumber();
+        }
     });
 
 //    fileTotalSoze();
+
+
+    // 号码绑定
+    var vue = new Vue({
+        el: '#vue-application',
+        data : {
+            isCall: ["✘", "✔"],
+            phonelist:[],
+            shop:[],
+            shopCheck:false,
+            page:[]
+        },
+        watch:{
+            'shop':function () {
+                this.intersect()
+            }
+        },
+        methods:{
+            clear:function () {
+                this.phonelist = []
+                this.shop = []
+                this.shopCheck = false,
+                        this.page = []
+            },
+            isCheck:function () {
+                var p = this.phonelist
+                var s = this.shop
+                if(!this.shopCheck){
+                    p.forEach(function (ex) {
+                        if (!contains(s, ex.num))
+                            s.push(ex.num);
+                    })
+                }else{
+                    p.forEach(function (ex) {
+                        if (contains(s, ex.num)){
+                            console.log("remove" +ex.num);
+                            s.remove(ex.num);
+                        }
+
+                    })
+                }
+                this.shop = s;
+            },
+            band:function () {
+                var list =  this.shop
+                console.log(list)
+
+                // 绑定号码
+                ajaxsync(ctx + "/console/telenum/callnum/num/bind/app/" + appId ,{nums:list.join(",")},function(response) {
+                    if(response.success){
+                        showtoast("绑定成功");
+                    }else{
+                        showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+                    }
+                });
+
+                // 成功隐藏
+                $('#call-modal').modal('hide')
+                //刷新号码绑定分页列表
+                upnumber();
+            },
+            intersect:function () {
+                var point = Array.intersect(this.shop,this.page);
+                if(point.length >= this.page.length && this.page.length >0)
+                    this.shopCheck = true
+                else
+                    this.shopCheck = false
+            },
+            currentPage:function () {
+                var cp = []
+                this.phonelist.forEach(function (ex) {
+                    cp.push(ex.num)
+                })
+                this.page = cp
+                this.intersect()
+            },
+            setPhoneList: function (nowPage, listRows) {
+                this.shopCheck = false
+
+                var data = [];
+                ajaxsync(ctx + "/console/telenum/callnum/num/unused/app/" + appId ,{pageNo:nowPage,pageSize:listRows},function(response) {
+                    if(response.success){
+                        data = response.data.result;
+                    }else{
+                        showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+                    }
+                });
+
+                this.phonelist = data //赋值
+                this.currentPage()  // 初始化
+            }
+        }
+    });
+
+    //数组辅助 元素是否存在数组内
+    function contains(a, obj) {
+        for (var i = 0; i < a.length; i++) {
+            if (a[i] === obj)
+                return true;
+        }
+        return false;
+    }
+
+    ///数组辅助
+    Array.prototype.indexOf = function(val) {
+        for (var i = 0; i < this.length; i++) {
+            if (this[i] == val) return i;
+        }
+        return -1;
+    };
+
+    ///数组辅助 删除指定元素
+    Array.prototype.remove = function(val) {
+        var index = this.indexOf(val);
+        if (index > -1) {
+            this.splice(index, 1);
+        }
+    };
+
+    ///数组辅助 集合取交集
+    Array.intersect = function () {
+        var result = new Array();
+        var obj = {};
+        for (var i = 0; i < arguments.length; i++) {
+            for (var j = 0; j < arguments[i].length; j++) {
+                var str = arguments[i][j];
+                if (!obj[str]) {
+                    obj[str] = 1;
+                }
+                else {
+                    obj[str]++;
+                    if (obj[str] == arguments.length)
+                    {
+                        result.push(str);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    $('#call-number').click(function () {
+        vue.clear();  //重置数据
+        modalPage();
+        $('#call-modal').modal('show');
+    });
+
+    //分页
+    function modalPage() {
+        //获取数据总数
+        var count = 0;
+        var params = {"pageNo":1,"pageSize":10};
+        ajaxsync(ctx + "/console/telenum/callnum/num/unused/app/" + appId ,params,function(response) {
+            if(response.success){
+                count = response.data.totalCount;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+            }
+        });
+
+        //每页显示数量
+        var listRow = 10;
+        //显示多少个分页按钮
+        var showPageCount = 5;
+        //指定id，创建分页标签
+        var pageId = 'datatablepage';
+        //searchTable 为方法名
+        var page = new Page(count, listRow, showPageCount, pageId, searchTable);
+        page.show();
+    }
+
+    /**
+     * 分页回调方法
+     * @param nowPage 当前页数
+     * @param listRows 每页显示多少条数据
+     * */
+    var searchTable = function (nowPage, listRows) {
+        vue.setPhoneList(nowPage, listRows);
+    }
+
+    var bindNumPage;
+    /**
+     *绑定号码分页
+     */
+    function upnumber(){
+        $('#uploadButton').hide();
+        //获取数据总数
+        var count = 0;
+        var params = {"pageNo":1,"pageSize":10};
+        ajaxsync(ctx + "/console/telenum/callnum/list/app/" + appId ,params,function(response) {
+            if(response.success){
+                count = response.data.totalCount;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+            }
+        });
+        //每页显示数量
+        var listRow = 10;
+        //显示多少个分页按钮
+        var showPageCount = 5;
+        //指定id，创建分页标签
+        var pageId = 'bandpage';
+        //searchTable 为方法名
+        bindNumPage = new Page(count,listRow,showPageCount,pageId,numberTable);
+        bindNumPage.show();
+    }
+
+    /**
+     * 分页回调方法
+     * @param nowPage 当前页数
+     * @param listRows 每页显示多少条数据
+     * */
+    var numberTable = function(nowPage,listRows){
+        var html = '';
+        var data = [];
+        ajaxsync(ctx + "/console/telenum/callnum/list/app/" + appId,{pageNo:nowPage,pageSize:listRows},function(response){
+            if(response.success){
+                data = response.data.result;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
+            }
+        },"get");
+
+        // $('#playtable').find(".playtr").remove();["✔", "✘"],
+        for(var i =0 ; i<data.length; i++){
+            html +='<tr id="rent-'+ data[i].rentId +'">' +
+                    '<td class="text-center">'+data[i].num+'</td>' +
+                    '<td class="text-center">' + (data[i].status == 0 ? '过期': '正常') + '</td>' +
+                    '<td class="text-center">'+ (data[i].isCalled == 0 ? '✘': '✔') +'</td>' +
+                    '<td class="text-center">'+ (data[i].isDialing == 0 ? '✘': '✔') +'</td>' +
+                    '<td class="text-center"><span class="text-center-l-fixed">'+data[i].areaCode+'</span></td>' +
+                    '<td class="text-center"> ' + data[i].expireTime + ' </td>' +
+                    '<td class="text-center"><a onclick="unband(\''+data[i].rentId+'\')">解除绑定</a></td>' +
+                    '</tr>'
+        }
+        $('#band-table').html(html);
+    }
+
+
+    /**
+     * 解除绑定
+     * */
+    function unband(id) {
+        bootbox.setLocale("zh_CN");
+        bootbox.dialog({
+                    title: "提示",
+                    message: '<div class="row">  ' +
+                    '<div class="col-md-12 text-center">你确认要执行这操作吗？</div>  </div>',
+                    buttons: {
+                        success: {
+                            label: "确认",
+                            className: "btn-primary",
+                            callback: function () {
+                                ajaxsync(ctx + "/console/telenum/callnum/app/" + appId + "/unbind/" + id ,null,function(response) {
+                                    if(response.success){
+                                        showtoast("解除绑定成功")
+                                        if(bindNumPage){
+                                            var currentPage;
+                                            if(((bindNumPage.nowPage - 1) * bindNumPage.listRow +1) <= --bindNumPage.count){
+                                                currentPage = bindNumPage.nowPage;
+                                            }else {
+                                                currentPage = bindNumPage.nowPage - 1;
+                                            }
+                                            if(currentPage> 0){
+                                                $('#page' + currentPage + bindNumPage.obj).click();
+                                            }else{
+                                                $('#rent-'+id).remove();
+                                            }
+                                        }
+                                    }else{
+                                        showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+                                    }
+                                });
+                                //异步加载数据，释放成功
+                            }
+                        },
+                        cancel:{
+                            label: "关闭",
+                            className: "btn-default",
+                        }
+                    }
+                }
+        );
+    }
+
+    /**
+     * 解除全部绑定
+     * */
+    function unallband() {
+        bootbox.setLocale("zh_CN");
+        bootbox.dialog({
+                    title: "提示",
+                    message: '<div class="row">  ' +
+                    '<div class="col-md-12 text-center">你确认要执行这操作吗？</div>  </div>',
+                    buttons: {
+                        success: {
+                            label: "确认",
+                            className: "btn-primary",
+                            callback: function () {
+                                ajaxsync(ctx + "/console/telenum/callnum/app/" + appId + "/unbind_all" ,null,function(response) {
+                                    if(response.success){
+                                        showtoast("全部解除绑定成功");
+                                        //异步加载数据，释放成功
+                                        upnumber();
+                                    }else{
+                                        showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+                                    }
+                                });
+                            }
+                        },
+                        cancel:{
+                            label: "关闭",
+                            className: "btn-default",
+                        }
+                    }
+                }
+        );
+    }
+
 </script>
 
 </body>

@@ -14,8 +14,6 @@ import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.app.service.ServiceType;
 import com.lsxy.yunhuni.api.config.model.Area;
-import com.lsxy.yunhuni.api.config.model.AreaSip;
-import com.lsxy.yunhuni.api.config.service.AreaSipService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.app.dao.AppDao;
@@ -45,8 +43,6 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     private ResourcesRentService resourcesRentService;
     @Autowired
     private ResourceTelenumService resourceTelenumService;
-    @Autowired
-    private AreaSipService areaSipService;
     @Autowired
     private RedisCacheService redisCacheService;
 
@@ -136,11 +132,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
 
         String areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
         //TODO 应用新建 时落到测试区域，并指定一个sip接入点
-        Area area = new Area();
-        area.setId(areaId);
-        app.setArea(area);
-        AreaSip areaSip = areaSipService.getOneAreaSipByAreaId(areaId);
-        app.setAreaSip(areaSip);
+        app.setAreaId(areaId);
         app = this.save(app);
         return app;
     }

@@ -23,7 +23,7 @@ public class NotifyCallDTO implements Serializable {
     private Integer repeat = 1;     //重复播放次数
     @Min(1)
     @Max(5 * 60)
-    private Integer max_dial_duration;  //最大拨号等待时间（秒）
+    private Integer max_dial_duration = 45;  //最大拨号等待时间（秒）
     @Size(max = 128)
     private String user_data;
 

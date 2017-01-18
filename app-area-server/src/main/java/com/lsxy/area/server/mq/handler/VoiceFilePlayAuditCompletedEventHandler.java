@@ -13,6 +13,7 @@ import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,10 +103,8 @@ public class VoiceFilePlayAuditCompletedEventHandler implements MQMessageHandler
         }
         Map<String, Object> params = new HashMap<>();
         App app = appService.findById(appId);
-        String areaId;
-        if(app.getArea()!= null){
-            areaId = app.getArea().getId();
-        }else{
+        String areaId = app.getAreaId();
+        if(StringUtils.isBlank(areaId)){
             areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
         }
         params.put("areaId",areaId);

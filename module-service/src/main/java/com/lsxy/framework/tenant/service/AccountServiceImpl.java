@@ -30,6 +30,8 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import java.io.Serializable;
@@ -203,7 +205,7 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
                 //创建主鉴权账号
                 createApiCertificate(tenant);
                 //帐务数据创建
-                createBilling(tenant);
+                createBilling(tenant.getId());
             }else{
                 throw new RegisterException("注册信息不可用，已存在重复的注册信息！");
             }
@@ -220,16 +222,16 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     //创建主鉴权账号
     private void createApiCertificate(Tenant tenant) {
         ApiCertificate cert = new ApiCertificate();
-        cert.setTenant(tenant);
+        cert.setTenantId(tenant.getId());
         cert.setCertId(UUIDGenerator.uuid());
         cert.setSecretKey(UUIDGenerator.uuid());
         apiCertificateService.save(cert);
     }
     //帐务数据创建
-    private void createBilling(Tenant tenant) {
+    private void createBilling(String tenantId) {
         long defaultSize = Long.parseLong(SystemConfig.getProperty("portal.voiceflieplay.maxsize"))*1024*1024;
         Billing billing = new Billing();
-        billing.setTenant(tenant);
+        billing.setTenantId(tenantId);
         billing.setBalance(new BigDecimal(0.00));
         billing.setSmsRemain(0L);
         billing.setVoiceRemain(0L);
@@ -328,7 +330,18 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
 
     @Override
     public List<Account> findByStatus(Integer status) {
-        return accountDao.findByStatus(status);
+        int pageNo = 1;
+        int pageSize = 20;
+        List<Account> resultList = new ArrayList<>();
+        Page<Account> accountPage = this.pageList(pageNo,pageSize);
+        resultList.addAll(accountPage.getResult());
+        while(accountPage.getCurrentPageNo() < accountPage.getTotalPageCount()){
+            pageNo = (int)accountPage.getCurrentPageNo() + 1;
+            accountPage = this.pageList( pageNo ,pageSize);
+            resultList.addAll(accountPage.getResult());
+        }
+//        return accountDao.findByStatus(status);
+        return resultList;
     }
 
     @Override
