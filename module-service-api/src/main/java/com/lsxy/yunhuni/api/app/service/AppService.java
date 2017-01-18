@@ -4,6 +4,7 @@ import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.List;
 
@@ -76,4 +77,6 @@ public interface AppService extends BaseService<App> {
     App create(App app);
 
     boolean enabledService(String tenantId,String appId,ServiceType service);
+
+    void deleteApp(String appId) throws InvocationTargetException, IllegalAccessException;
 }
