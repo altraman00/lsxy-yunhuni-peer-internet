@@ -95,7 +95,7 @@ public class CallController extends AbstractAPIController{
             throw new DuoCallbackNumIsSampleException();
         }
         //TODO 暂不支持模式为1
-        if(dto.getRecord_mode() == 1){
+        if(dto.getRing_tone_mode() != null && dto.getRing_tone_mode() == 1){
             throw new RequestIllegalArgumentException();
         }
 
