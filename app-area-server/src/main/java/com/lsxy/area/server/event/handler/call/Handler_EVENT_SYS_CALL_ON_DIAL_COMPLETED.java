@@ -139,6 +139,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.info("call_id={},state={}",call_id,state);
         }
+        businessStateService.deleteInnerField(call_id,BusinessState.RINGING_TAG);
         Map<String,String> businessData = state.getBusinessData();
 
         if(BusinessState.TYPE_SYS_CONF.equals(state.getType())){//该呼叫是通过(会议邀请呼叫)发起需要将呼叫加入会议

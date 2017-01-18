@@ -25,6 +25,10 @@ public class BusinessState implements Serializable{
     /**交谈中的虚拟呼叫(逻辑上的，实际上不存在呼叫资源)**/
     public static final String TYPE_CC_CONVERSATION_SHADOW_CALL = "conversation_shadow_call";
 
+    /**振铃标记  表示呼叫正在振铃，拨号结束事件中移除该标记**/
+    public static final String RINGING_TRUE = "1";
+    public static final String RINGING_TAG ="RINGING_TAG";
+
     public static final String SESSIONID = "sessionid";
 
     /**引用的res_id，同一个会议的所有会话资源的ref_res_id要一样，如果没有ref_res_id，那么ref_res_id等于自身的res_id**/

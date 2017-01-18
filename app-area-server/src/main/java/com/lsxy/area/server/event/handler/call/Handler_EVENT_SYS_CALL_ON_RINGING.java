@@ -71,6 +71,7 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
         if(state == null){
             throw new InvalidParamException("businessstate is null");
         }
+        businessStateService.updateInnerField(call_id,BusinessState.RINGING_TAG,BusinessState.RINGING_TRUE);
         if(res_id!=null){
             businessStateService.updateResId(call_id,res_id);
         }
