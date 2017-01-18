@@ -124,7 +124,7 @@ public class ConversationService {
                 enqueue = JSONUtil2.fromJson(ccQueue.getEnqueue(),BaseEnQueue.class);
             }
         }catch (Throwable t){
-            logger.error("获取排队信息失败",t);
+            logger.error("获取排队信息失败 ",t);
         }
         return enqueue;
     }

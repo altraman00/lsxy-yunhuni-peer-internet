@@ -7,14 +7,12 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-
+import org.springframework.jdbc.core.JdbcTemplate;
 import java.io.Serializable;
 import java.util.List;
-
 /**
- * Created by zhangxb on 2016/11/11.
+ * Created by liuws on 2016/11/18.
  */
 @Service
 @com.alibaba.dubbo.config.annotation.Service

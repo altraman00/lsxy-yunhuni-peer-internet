@@ -127,4 +127,7 @@ public interface TenantService extends BaseService<Tenant> {
     List<Tenant> getListByPage();
 
     List<Tenant> findByIds(Collection<String> ids);
+
+    Page<TenantVO> pageListBySearchAndAccount(String name,Date regDateStart,Date regDateEnd,
+                                    Integer authStatus,Integer accStatus,int pageNo,int pageSize);
 }

@@ -23,6 +23,13 @@
         </xsd:restriction>
     </xsd:simpleType>
 
+    <xs:simpleType name="playrepeat">
+        <xs:restriction base="xs:int">
+            <xs:minInclusive value="1"></xs:minInclusive>
+            <xs:maxInclusive value="10"></xs:maxInclusive>
+        </xs:restriction>
+    </xs:simpleType>
+
     <xs:simpleType name="positivenumber">
         <xs:restriction base="xs:int">
             <xs:minInclusive value="1"></xs:minInclusive>
@@ -66,15 +73,17 @@
         <xs:simpleContent>
             <xsd:extension base="playfile">
                 <xs:attribute name="finish_keys" type="finish_keys"></xs:attribute>
+                <xs:attribute name="repeat" type="playrepeat"></xs:attribute>
             </xsd:extension>
         </xs:simpleContent>
     </xs:complexType>
 
     <xs:complexType name="playlist">
-        <xs:sequence minOccurs="1" maxOccurs="unbounded">
+        <xs:sequence minOccurs="1" maxOccurs="10">
             <xs:element name="play" type="play"></xs:element>
         </xs:sequence>
         <xs:attribute name="finish_keys" type="finish_keys"></xs:attribute>
+        <xs:attribute name="repeat" type="playrepeat"></xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="record">
@@ -103,7 +112,7 @@
         <xs:attribute name="finish_keys" type="finish_keys"></xs:attribute>
         <xs:attribute name="first_key_timeout" type="positivenumber"></xs:attribute>
         <xs:attribute name="continues_keys_timeout" type="positivenumber"></xs:attribute>
-        <xs:attribute name="play_repeat" type="positivenumber"></xs:attribute>
+        <xs:attribute name="play_repeat" type="playrepeat"></xs:attribute>
         <xs:attribute name="if_break_on_key" type="xs:boolean"></xs:attribute>
     </xs:complexType>
 

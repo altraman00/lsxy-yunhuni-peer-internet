@@ -21,17 +21,16 @@ public class DuoCallbackDTO implements Serializable {
     @Min(0)
     @Max(3)
     private Integer ring_tone_mode = 0;     //自定义回铃音播放模式0：收到对端回铃后开始播放 1：拨号时即开始播放，收到对端回铃后停止播放 2：拨号时即开始播放，对端接听或者挂机后停止播放
-    @NotNull
     @Min(1)
     @Max(5 * 60)
-    private Integer max_dial_duration;  //最大拨号等待时间（秒）
+    private Integer max_dial_duration = 45;  //最大拨号等待时间（秒）
     @NotNull
     @Min(1)
     @Max(60 * 60 * 6)
     private Integer max_call_duration;  // 最大接通时间（秒）
     private Boolean recording = false ;         //是否录音
     @Min(0)
-    @Max(2)
+    @Max(3)
     private Integer record_mode = 0;        // 录音模式0: 双向接通后录音  1：开始呼叫第一方时启动录音  2: 开始呼叫第二方时启动录音
 //    private Integer countdown_time ;       //倒计时时间点
 //    private String countdown_voice;       //倒计时播放语音文件

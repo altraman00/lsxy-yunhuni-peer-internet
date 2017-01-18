@@ -10,10 +10,13 @@ import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.call.center.api.service.CallCenterConversationService;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
+import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
@@ -35,6 +38,12 @@ import java.util.Map;
 public class Handler_EVENT_SYS_CALL_CONF_ENTER_FAIL extends EventHandler{
 
     private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_SYS_CALL_CONF_ENTER_FAIL.class);
+
+    @Autowired
+    private RPCCaller rpcCaller;
+
+    @Autowired
+    private SessionContext sessionContext;
 
     @Autowired
     private AppService appService;
@@ -139,10 +148,11 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_FAIL extends EventHandler{
         }
         if(StringUtils.isNotBlank(state.getCallBackUrl())){
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                    .putIfNotEmpty("event","conf.joined.fail")
+                    .putIfNotEmpty("event","conf.join.fail")
                     .putIfNotEmpty("id",conf_id)
+                    .putIfNotEmpty("time",System.currentTimeMillis())
                     .putIfNotEmpty("call_id",call_id)
-                    .putIfNotEmpty("user_data",user_data)
+                    .putIfNotEmpty("user_data",state.getUserdata())
                     .build();
             notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,3);
         }
@@ -151,6 +161,24 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_FAIL extends EventHandler{
         }
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
+        }
+        hungup(state);
+    }
+
+    private void hungup(BusinessState state){
+        Map<String, Object> params = new MapBuilder<String,Object>()
+                .putIfNotEmpty("res_id",state.getResId())
+                .putIfNotEmpty("user_data",state.getId())
+                .put("areaId",state.getAreaId())
+                .build();
+
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
+        try {
+            if(!businessStateService.closed(state.getId())) {
+                rpcCaller.invoke(sessionContext, rpcrequest, true);
+            }
+        } catch (Throwable e) {
+            logger.error("调用失败",e);
         }
     }
 }

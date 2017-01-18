@@ -161,11 +161,6 @@ public class HomeController extends AbstractPortalController {
         return RestRequest.buildSecurityRequest(token).get(url, Map.class).getData();
     }
 
-    private ResourcesRent getIvrNumber(String token, String appId) {
-        String url = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/by_app/{1}";
-        return RestRequest.buildSecurityRequest(token).get(url, ResourcesRent.class,appId).getData();
-    }
-
     private Map getAvgDdr(String token,String type){
         String url = PortalConstants.REST_PREFIX_URL +   "/rest/day_statics/get?type={1}";
         return RestRequest.buildSecurityRequest(token).get(url, Map.class,type).getData();

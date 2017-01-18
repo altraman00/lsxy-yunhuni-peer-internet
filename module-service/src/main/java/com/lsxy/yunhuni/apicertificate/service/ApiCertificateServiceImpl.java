@@ -55,7 +55,7 @@ public class ApiCertificateServiceImpl extends AbstractService<ApiCertificate> i
 
     @Override
     public ApiCertificate findApiCertificateByTenantId(String tenantId) {
-        String hql = "from ApiCertificate obj where obj.tenant.id=?1";
+        String hql = "from ApiCertificate obj where obj.tenantId=?1";
         List<ApiCertificate> list = this.findByCustomWithParams(hql, tenantId);
         if(list != null && list.size()>0){
             return list.get(0);
@@ -74,7 +74,7 @@ public class ApiCertificateServiceImpl extends AbstractService<ApiCertificate> i
         Long count = apiCertificateChangeLogService.countTodayCertChangeLogByCert(cert);
         if(count < SK_CHANGE_COUNT_OF_DAY){
             String secretKey = UUIDGenerator.uuid();
-            apiCertificateChangeLogService.insertApiCertificateChangeLog(cert,secretKey,CERT_CHANGE_TYPE_UUID);
+            apiCertificateChangeLogService.insertApiCertificateChangeLog(cert.getId(),secretKey,CERT_CHANGE_TYPE_UUID);
             cert.setSecretKey(secretKey);
             this.save(cert);
             return secretKey;

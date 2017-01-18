@@ -15,7 +15,6 @@ import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.model.GlobalConfig;
 import com.lsxy.yunhuni.api.config.model.TenantConfig;
-import com.lsxy.yunhuni.api.config.service.AreaSipService;
 import com.lsxy.yunhuni.api.config.service.GlobalConfigService;
 import com.lsxy.yunhuni.api.config.service.TenantConfigService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
@@ -56,8 +55,6 @@ public class AppController extends AbstractRestController {
     private OSSService ossService;
     @Autowired
     private MQService mqService;
-    @Autowired
-    private AreaSipService areaSipService;
     @Autowired
     private TenantConfigService tenantConfigService;
     @Autowired

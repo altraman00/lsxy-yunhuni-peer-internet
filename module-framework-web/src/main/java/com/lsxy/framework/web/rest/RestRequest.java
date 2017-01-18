@@ -140,12 +140,14 @@ public class RestRequest {
     private <T> List<T> convertListToConcretList(List<?> objList,Class<T> concretDataType) {
         List<T> concreteList = new ArrayList<>();
         ObjectMapper mapper = new ObjectMapper();
-        objList.stream().filter(obj -> obj instanceof Map).forEach(obj -> {
-            T mapperObject = mapper.convertValue(obj, concretDataType);
-            if (mapperObject != null) {
-                concreteList.add(mapperObject);
-            }
-        });
+        if(objList != null){
+            objList.stream().filter(obj -> obj instanceof Map).forEach(obj -> {
+                T mapperObject = mapper.convertValue(obj, concretDataType);
+                if (mapperObject != null) {
+                    concreteList.add(mapperObject);
+                }
+            });
+        }
         return concreteList;
     }
 
@@ -219,7 +221,12 @@ public class RestRequest {
         if(payload instanceof  Map){
             Map<String,Object> params = (Map<String, Object>) payload;
             if(params != null){
-                params.keySet().stream().forEach(key -> requestEntity.add(key, MapUtils.getString(params, key, "")));
+                params.keySet().stream().forEach(key -> {
+                    String value = MapUtils.getString(params, key, null);
+                    if(value != null){
+                        requestEntity.add(key, value);
+                    }
+                });
             }
             entity = new HttpEntity(requestEntity,headers);
         }else{

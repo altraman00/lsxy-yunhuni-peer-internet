@@ -11,10 +11,8 @@ import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.core.exceptions.api.*;
-import com.lsxy.framework.core.utils.JSONUtil;
-import com.lsxy.framework.core.utils.JSONUtil2;
-import com.lsxy.framework.core.utils.MapBuilder;
-import com.lsxy.framework.core.utils.UUIDGenerator;
+import com.lsxy.framework.core.utils.*;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
@@ -35,11 +33,13 @@ import com.lsxy.yunhuni.api.session.service.CaptchaCallService;
 import com.lsxy.yunhuni.api.session.service.NotifyCallService;
 import com.lsxy.yunhuni.api.session.service.VoiceCallbackService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.time.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -199,6 +199,7 @@ public class CallServiceImpl implements CallService {
                 .build();
 
         if(StringUtils.isNotBlank(ring_tone)){
+            ring_tone = playFileUtil.convertArray(app.getTenant().getId(),appId,ring_tone);
             params.put("ring_play_file",ring_tone);
             params.put("ring_play_mode",ring_tone_mode);
         }
@@ -478,7 +479,7 @@ public class CallServiceImpl implements CallService {
      * @param dtos 播放文件内容
      * @return
      */
-    public String getPlayContent(String tenantId,String appId,String play_file,List<List<Object>> dtos) throws PlayFileNotExistsException {
+    public String getPlayContent(String tenantId,String appId,String play_file,List<List<Object>> dtos) throws YunhuniApiException {
         play_file = playFileUtil.convertArray(tenantId, appId, play_file);
         if(dtos == null){
             dtos = new ArrayList<>();
@@ -492,8 +493,61 @@ public class CallServiceImpl implements CallService {
         }
         if(dtos != null){
             for(List<Object> play:dtos){
-                if(play.get(1).equals(0)){
-                    play.set(0,playFileUtil.convertArray(tenantId, appId, (String) play.get(0)));
+                Integer type;
+                try{
+                    type = Integer.valueOf(play.get(1) + "");
+                }catch (Exception e){
+                    throw new RequestIllegalArgumentException();
+                }
+                if(type == null || type < 0 || type > 5){
+                    throw new RequestIllegalArgumentException();
+                }
+                String content = play.get(0) + "";
+                switch(type){
+                    case 0:
+                        //文件播放。此时，放音内容应是文件名字符串。
+                        play.set(0,playFileUtil.convertArray(tenantId, appId, content));
+                        break;
+                    case 1:
+                        //数字播放。此时，放音内容应是十进制整数。
+                        try{
+                            Integer.valueOf(content);
+                        }catch (Exception e){
+                            throw new RequestIllegalArgumentException();
+                        }
+                        break;
+                    case 2:
+                        //数值播放。此时，放音内容应是十进制整数或者浮点数。
+                        try{
+                            Double.valueOf(content);
+                        }catch (Exception e){
+                            throw new RequestIllegalArgumentException();
+                        }
+                        break;
+                    case 3:
+                        //金额播放。此时，放音内容应是十进制整数或者浮点数。
+                        try{
+                            Double.valueOf(content);
+                        }catch (Exception e){
+                            throw new RequestIllegalArgumentException();
+                        }
+                        break;
+                    case 4:
+                        //日期时间播放。
+                        try {
+                            org.apache.commons.lang3.time.DateUtils.parseDate(content,"yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm","yyyy-MM-dd","yyyy-MM","HH:mm:ss","HH:mm");
+                        } catch (ParseException e) {
+                            throw new RequestIllegalArgumentException();
+                        }
+                        break;
+                    case 5:
+                        //时长播放。
+                        try {
+                            org.apache.commons.lang3.time.DateUtils.parseDate(content,"HH:mm:ss","HH:mm");
+                        } catch (ParseException e) {
+                            throw new RequestIllegalArgumentException();
+                        }
+                        break;
                 }
             }
         }
