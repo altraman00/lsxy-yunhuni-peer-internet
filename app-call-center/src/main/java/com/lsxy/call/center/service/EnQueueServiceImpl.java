@@ -191,6 +191,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                     EnQueueResult result = new EnQueueResult();
                     result.setExtension(appExtensionService.findById(agentState.getExtension(agent)));
                     result.setAgent(callCenterAgentService.findById(agent));
+                    result.setFetchTime(condition.getFetchTimeout());
                     result.setBaseEnQueue(baseEnQueue);
                     deQueueService.success(tenantId,appId,callId,queueId,queueType,result,conversationId);
                 }catch (Throwable t1){
@@ -244,6 +245,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                 if(StringUtil.isNotEmpty(queue.getEnqueue())){
                     result.setBaseEnQueue(JSONUtil2.fromJson(queue.getEnqueue(),BaseEnQueue.class));
                 }
+                result.setFetchTime(conditionService.findById(queue.getCondition()).getFetchTimeout());
                 deQueueService.success(tenantId,appId,queue.getOriginCallId(),queueId,queue.getType(),result,queue.getConversation());
             }catch (Throwable t1){
                 logger.info("坐席找排队失败agent={}",agent,t1);
