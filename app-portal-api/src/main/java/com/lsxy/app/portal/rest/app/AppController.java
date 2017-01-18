@@ -167,7 +167,7 @@ public class AppController extends AbstractRestController {
         boolean flag = appService.isAppBelongToUser(getCurrentAccountUserName(), id);
         if(flag){
             App resultApp = appService.findById(id);
-            appService.delete(resultApp);
+            appService.deleteApp(resultApp.getId());
             deletedVF(resultApp);
             return RestResponse.success();
         }else{

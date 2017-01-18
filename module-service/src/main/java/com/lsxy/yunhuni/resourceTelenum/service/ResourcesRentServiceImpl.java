@@ -104,6 +104,12 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     }
 
     @Override
+    public List<ResourcesRent> findByAppId(String appId) {
+        String hql = "from ResourcesRent obj where obj.app.id=?1 and obj.rentStatus = 1 order by obj.lastTime desc";
+        return this.list(hql,appId);
+    }
+
+    @Override
     public ResourcesRent findByResourceTelenumId(String id) {
         String hql = "  From ResourcesRent obj WHERE obj.rentStatus<>'"+ResourcesRent.RENT_STATUS_RELEASE+"' AND obj.resourceTelenum.id='"+id+"' ";
         try {
