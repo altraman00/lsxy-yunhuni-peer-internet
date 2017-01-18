@@ -81,9 +81,10 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
                     throw new RequestIllegalArgumentException();
                 }
                 //只能是纯数字
-                String reg = "^\\d*$";
-                boolean b = Pattern.compile(reg).matcher(appExtension.getUser()).find();
-                if(!b){
+                String reg = "^\\d{6,12}$";
+                boolean uB = Pattern.compile(reg).matcher(appExtension.getUser()).find();
+                boolean pB = Pattern.compile(reg).matcher(appExtension.getPassword()).find();
+                if(!uB || !pB){
                     throw new RequestIllegalArgumentException();
                 }
 
