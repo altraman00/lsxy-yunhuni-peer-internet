@@ -480,7 +480,6 @@ public class CallServiceImpl implements CallService {
      * @return
      */
     public String getPlayContent(String tenantId,String appId,String play_file,List<List<Object>> dtos) throws YunhuniApiException {
-        play_file = playFileUtil.convertArray(tenantId, appId, play_file);
         if(dtos == null){
             dtos = new ArrayList<>();
         }
@@ -547,6 +546,10 @@ public class CallServiceImpl implements CallService {
                         } catch (ParseException e) {
                             throw new RequestIllegalArgumentException();
                         }
+                        break;
+                    case 7:
+                        //文件播放。此时，放音内容应是文件名字符串。
+                        play.set(0,playFileUtil.convertArray(tenantId, appId, content));
                         break;
                 }
             }
