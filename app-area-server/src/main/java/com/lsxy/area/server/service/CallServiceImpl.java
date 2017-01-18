@@ -499,7 +499,7 @@ public class CallServiceImpl implements CallService {
                 }catch (Exception e){
                     throw new RequestIllegalArgumentException();
                 }
-                if(type == null || type < 0 || type > 5){
+                if(type == null || type < 0 || (type > 5 && type != 7)){
                     throw new RequestIllegalArgumentException();
                 }
                 String content = play.get(0) + "";
