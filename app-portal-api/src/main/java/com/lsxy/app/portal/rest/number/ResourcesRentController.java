@@ -8,6 +8,8 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
@@ -48,6 +50,8 @@ public class ResourcesRentController extends AbstractRestController{
     TelnumLocationService telnumLocationService;
     @Autowired
     CalBillingService calBillingService;
+    @Autowired
+    AppService appService;
     /**
      * 根据省份获取城市
      * @return
@@ -72,7 +76,7 @@ public class ResourcesRentController extends AbstractRestController{
         return RestResponse.success(list);
     }
     /**
-     * 获取租户的呼入号码分页数据
+     * 获取租户的号码分页数据
      * @param pageNo
      * @param pageSize
      * @return
@@ -95,15 +99,7 @@ public class ResourcesRentController extends AbstractRestController{
         resourcesRentService.release(id);
         return RestResponse.success("释放成功");
     }
-    @RequestMapping("/by_app/{appId}")
-    public RestResponse getByAppId(@PathVariable String appId){
-        ResourcesRent rent = null;
-        List<ResourcesRent> rents = resourcesRentService.findByAppId(appId);
-        if(rents != null && rents.size()>0){
-            rent = rents.get(0);
-        }
-        return RestResponse.success(rent);
-    }
+
 
     /**
      * 获取号码列表
@@ -230,4 +226,87 @@ public class ResourcesRentController extends AbstractRestController{
         temp.setAmount(bigDecimal1);
         return RestResponse.success(temp);
     }
+
+    /**
+     * 列出应用所有的绑定号码
+     * @param appId
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
+    @RequestMapping("/list/app/{appId}" )
+    public RestResponse findByAppId(@PathVariable String appId,Integer pageNo,Integer pageSize){
+        Page<ResourcesRent> page = resourcesRentService.findByAppId(appId, pageNo, pageSize);
+        return RestResponse.success(page);
+    }
+
+    /**
+     * 解除单个绑定号码
+     * @param appId
+     * @param rentId
+     * @return
+     */
+    @RequestMapping("/app/{appId}/unbind/{rentId}" )
+    public RestResponse unbind(@PathVariable String appId,@PathVariable String rentId){
+        Tenant tenant = getCurrentAccount().getTenant();
+        resourcesRentService.unbind(tenant.getId(),appId,rentId);
+        return RestResponse.success();
+    }
+
+    /**
+     * 解除应用所有的绑定号码
+     * @param appId
+     * @return
+     */
+    @RequestMapping("/app/{appId}/unbind_all" )
+    public RestResponse unbindAll(@PathVariable String appId){
+        Tenant tenant = getCurrentAccount().getTenant();
+        resourcesRentService.appUnbindAll(tenant.getId(),appId);
+        return RestResponse.success();
+    }
+
+    /**
+     * 获取租户未被应用绑定的号码
+     * @param appId
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
+    @RequestMapping("/num/unused/app/{appId}")
+    public RestResponse findOwnUnusedNum(@PathVariable String appId,int pageNo,int pageSize){
+        Tenant tenant = getCurrentAccount().getTenant();
+        App app = appService.findById(appId);
+        if(!tenant.getId().equals(app.getTenant().getId())){
+            return RestResponse.failed("0000","应用不属于用户");
+        }
+        if(app == null || StringUtils.isBlank(app.getOnlineAreaId())){
+            return RestResponse.failed("0000","应用不存在");
+        }
+        Page<ResourceTelenum> ownUnusedNum = resourceTelenumService.findOwnUnusedNum(tenant.getId(), app.getOnlineAreaId(), pageNo, pageSize);
+        return RestResponse.success(ownUnusedNum);
+    }
+
+    /**
+     * 将号码绑定给租户
+     * @param appId
+     * @param nums
+     * @return
+     */
+    @RequestMapping("/num/bind/app/{appId}")
+    public RestResponse bindNumToApp(@PathVariable String appId,String nums){
+        App app = appService.findById(appId);
+        if(app.getStatus() == null || app.getStatus() == App.STATUS_OFFLINE){
+            return RestResponse.failed("0000","应用没上线");
+        }
+        List numList = null;
+        if(StringUtils.isNotBlank(nums)){
+            numList = Arrays.asList(nums.split(","));
+        }
+        if(numList != null && numList.size() > 0){
+            resourcesRentService.bindNumToAppAndGetAreaId(app,numList,false);
+        }
+        return RestResponse.success();
+    }
+
+
 }

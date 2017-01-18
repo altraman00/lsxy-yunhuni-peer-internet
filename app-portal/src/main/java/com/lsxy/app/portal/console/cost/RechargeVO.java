@@ -1,8 +1,5 @@
 package com.lsxy.app.portal.console.cost;
 
-import com.lsxy.framework.api.tenant.model.Tenant;
-import com.lsxy.yunhuni.api.recharge.model.Recharge;
-
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -10,8 +7,8 @@ import java.util.Date;
  * 充值页面展示VO
  * Created by liups on 2016/7/5.
  */
-public class RechargeVO extends Recharge{
-    private Tenant tenant;                //所属租户
+public class RechargeVO {
+    private String tenantId;                //所属租户
     private BigDecimal amount;                //充值金额
     private String type;                  //充值方式
     private String status;                //充值状态
@@ -25,62 +22,50 @@ public class RechargeVO extends Recharge{
 
     }
 
-    @Override
-    public Tenant getTenant() {
-        return tenant;
+    public String getTenantId() {
+        return tenantId;
     }
 
-    @Override
-    public void setTenant(Tenant tenant) {
-        this.tenant = tenant;
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 
-    @Override
     public BigDecimal getAmount() {
         return amount;
     }
 
-    @Override
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
-    @Override
     public String getType() {
         return type;
     }
 
-    @Override
     public void setType(String type) {
         this.type = type;
     }
 
-    @Override
     public String getStatus() {
         return status;
     }
 
-    @Override
     public void setStatus(String status) {
         this.status = status;
     }
 
-    @Override
     public String getOrderId() {
         return orderId;
     }
 
-    @Override
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
 
-    @Override
     public Date getCreateTime() {
         return createTime;
     }
 
-    @Override
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }

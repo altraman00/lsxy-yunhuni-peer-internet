@@ -26,6 +26,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
+import static com.lsxy.yunhuni.api.product.enums.ProductCode.call_center;
+
 /**
  * Created by zhagnxb 2016-11-15
  * 录音文件同步成功
@@ -58,31 +60,31 @@ public class Handler_MN_CH_RF_SYNC_OK extends RpcRequestHandler {
         if(VoiceFileRecordSyncEvent.TYPE_CDR.equals(type)) {
             VoiceCdr voiceCdr = voiceCdrService.findById(key);
             if (voiceCdr == null || StringUtil.isEmpty(voiceCdr.getId())) {
-                logger.debug("Handler_MN_CH_RF_SYNC_OK录音文件同步失败,无对应cdr存在，map[{}]",map);
+                logger.error("Handler_MN_CH_RF_SYNC_OK录音文件同步失败,无对应cdr存在");
                 return null;
             }
             list = getFile(voiceCdr.getId());
             if (list == null || list.size() == 0) {
-                logger.debug("Handler_MN_CH_RF_SYNC_OK录音文件同步失败:无对应的录音文件记录");
+                logger.error("Handler_MN_CH_RF_SYNC_OK录音文件同步失败:无对应的录音文件记录");
                 return null;
             }
         }else if(VoiceFileRecordSyncEvent.TYPE_FILE.equals(type)){
             VoiceFileRecord voiceFileRecord = voiceFileRecordService.findById(key);
             if (voiceFileRecord == null || StringUtil.isEmpty(voiceFileRecord.getId())) {
-                logger.debug("Handler_MN_CH_RF_SYNC_OK录音文件同步失败,无对应录音记录存在，map[{}]",map);
+                logger.error("Handler_MN_CH_RF_SYNC_OK录音文件同步失败,无对应录音记录存在，map["+map+"]");
                 return null;
             }
             list = voiceFileRecordService.getListBySessionId(voiceFileRecord.getSessionId());
             if (list == null || list.size() == 0) {
-                logger.debug("Handler_MN_CH_RF_SYNC_OK录音文件同步失败:无对应的录音文件记录");
+                logger.error("Handler_MN_CH_RF_SYNC_OK录音文件同步失败:无对应的录音文件记录");
                 return null;
             }
         }else{
-            logger.debug("Handler_MN_CH_RF_SYNC_OK录音文件同步失败:对应类型错误,map[{}]",map);
+            logger.error("Handler_MN_CH_RF_SYNC_OK录音文件同步失败:对应类型错误,map["+map+"]");
             return null;
         }
         if(list==null||list.size()==0){
-            logger.debug("Handler_MN_CH_RF_SYNC_OK录音文件同步结果处理失败:无对应的录音文件");
+            logger.error("Handler_MN_CH_RF_SYNC_OK录音文件同步结果处理失败:无对应的录音文件");
         }else{
             int status = (Integer) map.get("status");
             String ossUri = "";

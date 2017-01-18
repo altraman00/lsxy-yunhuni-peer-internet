@@ -148,10 +148,11 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_FAIL extends EventHandler{
         }
         if(StringUtils.isNotBlank(state.getCallBackUrl())){
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                    .putIfNotEmpty("event","conf.joined.fail")
+                    .putIfNotEmpty("event","conf.join.fail")
                     .putIfNotEmpty("id",conf_id)
+                    .putIfNotEmpty("time",System.currentTimeMillis())
                     .putIfNotEmpty("call_id",call_id)
-                    .putIfNotEmpty("user_data",user_data)
+                    .putIfNotEmpty("user_data",state.getUserdata())
                     .build();
             notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,3);
         }

@@ -49,7 +49,7 @@ public class RestAuthenticationProvider implements AuthenticationProvider {
         ApiCertificate apiCertificate = apiCertificateService.findApiCertificateSecretKeyByCertId(apiKey);
         if(apiCertificate != null){
             secretKey = apiCertificate.getSecretKey();
-            tenantId = apiCertificate.getTenant().getId();
+            tenantId = apiCertificate.getTenantId();
         }
 
 

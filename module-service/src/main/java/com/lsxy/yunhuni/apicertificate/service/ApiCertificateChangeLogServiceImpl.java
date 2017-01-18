@@ -27,8 +27,8 @@ public class ApiCertificateChangeLogServiceImpl extends AbstractService<ApiCerti
 
 
     @Override
-    public void insertApiCertificateChangeLog(ApiCertificate certificate, String secretKey, String changeType) {
-        ApiCertificateChangeLog log = new ApiCertificateChangeLog(certificate,secretKey,changeType);
+    public void insertApiCertificateChangeLog(String certId, String secretKey, String changeType) {
+        ApiCertificateChangeLog log = new ApiCertificateChangeLog(certId,secretKey,changeType);
         this.save(log);
     }
 
@@ -37,6 +37,6 @@ public class ApiCertificateChangeLogServiceImpl extends AbstractService<ApiCerti
         String date = DateUtils.getDate("yyyy-MM-dd");
         Date today = DateUtils.parseDate(date);
         Date nextDate = DateUtils.nextDate(today);
-        return apiCertificateChangeLogDao.countByApiCertificateAndChangeDateBetween(cert,today,nextDate);
+        return apiCertificateChangeLogDao.countByCertIdAndChangeDateBetween(cert.getId(),today,nextDate);
     }
 }

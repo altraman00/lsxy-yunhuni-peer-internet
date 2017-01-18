@@ -87,34 +87,10 @@ public class AgentController extends AbstractAPIController {
             throw new AppServiceInvalidException();
         }
         CallCenterAgent agent = callCenterAgentService.get(appId,agentName);
-        AgentVO agentVO = getAgentVO(agent);
+        AgentVO agentVO = AgentVO.changeCallCenterAgentToAgentVO(agent);
         return ApiGatewayResponse.success(agentVO);
     }
 
-    /**
-     * 转成AgentVO字段
-     * @param agent
-     * @return
-     */
-    private AgentVO getAgentVO(CallCenterAgent agent) {
-        AgentVO agentVO = new AgentVO();
-        try {
-            List<AgentSkillVO> skillVOs = new ArrayList<>();
-            BeanUtils.copyProperties(agentVO,agent);
-            List skills = agentVO.getSkills();
-            skills.stream().forEach(skill ->{
-                AgentSkillVO skillVO = new AgentSkillVO();
-                try {
-                    BeanUtils.copyProperties(skillVO,skill);
-                    skillVOs.add(skillVO);
-                } catch (Exception e) {
-                }
-            });
-            agentVO.setSkills(skillVOs);
-        } catch (Exception e) {
-        }
-        return agentVO;
-    }
 
     @RequestMapping(value = "/{account_id}/callcenter/agent",method = RequestMethod.GET)
     public ApiGatewayResponse page(HttpServletRequest request, @RequestHeader("AppID") String appId,
@@ -127,7 +103,7 @@ public class AgentController extends AbstractAPIController {
         Page page  = callCenterAgentService.getPage(appId,pageNo,pageSize);
         List<AgentVO> agentVOs = new ArrayList<>();
         List<CallCenterAgent> result = page.getResult();
-        result.stream().forEach(agent -> agentVOs.add(getAgentVO(agent)));
+        result.stream().forEach(agent -> agentVOs.add(AgentVO.changeCallCenterAgentToAgentVO(agent)));
         page.setResult(agentVOs);
         return ApiGatewayResponse.success(page);
     }

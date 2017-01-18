@@ -43,16 +43,20 @@ public class Handler_MN_CH_VF_DELETED_OK extends RpcRequestHandler {
             if(VoiceFilePlayDeleteEvent.FILE.equals(type)){
                 try {
                     voiceFilePlayService.updateDeletedStautsByid((String) map.get("id"), VoiceFilePlay.DELETED_SUCCESS);
-                    logger.error("删除放音文件，更新成功记录:{}", map);
+                    if(logger.isDebugEnabled()) {
+                        logger.debug("删除放音文件，更新成功记录:{}", map);
+                    }
                 }catch (Exception e){
-                    logger.error("删除放音文件，更新失败记录:{},异常{}", map);
+                    logger.error("删除放音文件，更新失败记录:"+map.toString()+",异常:",e);
                 }
             }else if(VoiceFilePlayDeleteEvent.APP.equals(type)){
                 try {
                     voiceFilePlayService.updateDeletedStautsByAppId((String) map.get("id"), VoiceFilePlay.DELETED_SUCCESS);
-                    logger.error("删除放音文件，更新成功记录:{}", map);
+                    if(logger.isDebugEnabled()) {
+                        logger.debug("删除放音文件，更新成功记录:{}", map);
+                    }
                 }catch (Exception e) {
-                    logger.debug("删除放音文件，更新失败记录:{},异常{}", map,e);
+                    logger.error("删除放音文件，更新失败记录:"+map+",异常:",e);
                 }
             }else{
                 if(logger.isDebugEnabled()){

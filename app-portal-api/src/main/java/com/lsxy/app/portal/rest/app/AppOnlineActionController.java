@@ -32,8 +32,8 @@ import java.util.Map;
  */
 @RequestMapping("/rest/app_online")
 @RestController
-public class AppOnlineActionControlller extends AbstractRestController {
-    private static final Logger logger = LoggerFactory.getLogger(AppOnlineActionControlller.class);
+public class AppOnlineActionController extends AbstractRestController {
+    private static final Logger logger = LoggerFactory.getLogger(AppOnlineActionController.class);
 
     @Autowired
     AppOnlineActionService appOnlineActionService;
@@ -69,7 +69,7 @@ public class AppOnlineActionControlller extends AbstractRestController {
             String lastOnlineNums = appOnlineActionService.findLastOnlineNums(appId);
             App app = appService.findById(appId);
             //获取用户拥有的空闲号
-            List<ResourceTelenum> ownUnusedNums = resourcesRentService.findOwnUnusedNum(tenant);
+            List<ResourceTelenum> ownUnusedNums = resourcesRentService.findOwnUnusedNum(tenant,app.getOnlineAreaId());
             List<Map<String,Object>> telNums = new ArrayList<>();
             boolean hasCalled = false;
             for(ResourceTelenum telNumber:ownUnusedNums){
@@ -97,7 +97,11 @@ public class AppOnlineActionControlller extends AbstractRestController {
             appOnlineActionService.actionOfSelectNum(appId);
             if((app.getIsIvrService() != null && app.getIsIvrService() == 1) || (app.getIsCallCenter() != null && app.getIsCallCenter() == 1)){
                 //如果 没有呼出号码，而且上线的应用需要呼出号码，则将needCalledNum设为true
-                if(hasCalled == false){
+                if(!hasCalled){
+                    //TODO 获取应用所绑定的号码，判断是否有可呼入的
+                    hasCalled =  resourceTelenumService.isCalledByTenantIdAndAppId(app.getTenant().getId(),app.getId());
+                }
+                if(!hasCalled){
                     result.put("needCalledNum",true);
                 }
             }

@@ -1,7 +1,6 @@
 package com.lsxy.yunhuni.api.app.model;
 
 import com.lsxy.framework.api.base.IdEntity;
-import com.lsxy.yunhuni.api.config.model.AreaSip;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;

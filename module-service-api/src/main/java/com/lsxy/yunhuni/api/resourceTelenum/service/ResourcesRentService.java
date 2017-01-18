@@ -3,6 +3,7 @@ package com.lsxy.yunhuni.api.resourceTelenum.service;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelenumOrder;
@@ -27,15 +28,8 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @param appId
      * @return
      */
-    List<ResourcesRent> findByAppId(String appId);
+    Page<ResourcesRent> findByAppId(String appId,int pageNo, int pageSize);
 
-    /**
-     * 根据号码和租用状态查询租用关系
-     * @param id
-     * @param status
-     * @return
-     */
-    ResourcesRent findByResourceTelenumIdAndStatus(String id, int status);
     /**
      * 根据号码和租用状态查询租用关系
      * @param id
@@ -55,7 +49,7 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @param tenant
      * @return
      */
-    List<ResourceTelenum> findOwnUnusedNum(Tenant tenant);
+    List<ResourceTelenum> findOwnUnusedNum(Tenant tenant,String lastOnlineAreaId);
 
     /**
      * 清除过期号资源和租户的关系
@@ -67,6 +61,11 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      */
     void resourcesRentTask();
 
+    /**
+     * 充值成功后触发，查看有没有欠费的号码，自动扣费
+     * @param tenantId
+     */
+    void payResourcesRent(String tenantId);
 
     /**
      * 释放号码
@@ -88,5 +87,26 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * 创建订单
      */
     TelenumOrder telnumNew(Tenant tenant, String[] numIds);
+
+    /**
+     * 释放应用所有的号码
+     * @param appId
+     */
+    void appUnbindAll(String tenantId,String appId);
+
+    /**
+     * 释放应用绑定的单个号码
+     * @param tenantId
+     * @param appId
+     * @param num
+     */
+    void unbind(String tenantId, String appId, String num);
+    /**
+     * 绑定号码到应用
+     * @param app
+     * @param nums
+     * @param isNeedCalled 该批次号码是否需要要检验可呼入性
+     */
+    String bindNumToAppAndGetAreaId(App app, List<String> nums, boolean isNeedCalled);
 
 }
