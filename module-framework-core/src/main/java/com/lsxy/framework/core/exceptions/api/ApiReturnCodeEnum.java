@@ -45,6 +45,7 @@ public enum ApiReturnCodeEnum {
     AgentNotExist("040202","座席不存在"),
     AgentIsBusy("040203","座席正忙"),
     ChannelNotExist("040301","通道不存在"),
+    ChannelCanNotDelete("040302","通道不能删除(请先删除排队条件)"),
     ConditionNotExist("040401","条件不存在"),
     ConditionExpression("040402","条件表达式错误"),
     ConversationNotExist("040501","交谈不存在"),

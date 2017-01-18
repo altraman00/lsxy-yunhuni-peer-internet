@@ -161,8 +161,8 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
 
     @Override
     public boolean callOut(String ip, String appId, String name, String from, String to, Integer maxDialSeconds, Integer maxAnswerSeconds) throws YunhuniApiException {
+
         return false;
     }
-
 
 }

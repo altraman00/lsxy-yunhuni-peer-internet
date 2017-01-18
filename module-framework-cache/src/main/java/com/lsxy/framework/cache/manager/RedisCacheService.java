@@ -419,6 +419,14 @@ public class RedisCacheService {
 			
 		}
 
+		public long zsize(String key){
+			return redisTemplate.opsForZSet().size(key);
+		}
+
+		public Set zReverseRange(final String key, final long start, final long end){
+			return redisTemplate.opsForZSet().reverseRange(key, start, end);
+		}
+
 		public Set zRange(final String key, final long start, final long end) {
 			return redisTemplate.opsForZSet().range(key, start, end);
 		}

@@ -936,7 +936,7 @@ public class ConversationService {
     }
 
     /**
-     * 减少交谈成员
+     * 移除交谈成员
      * @param conversationId
      */
     public void decrPart(String conversationId,String callId){
