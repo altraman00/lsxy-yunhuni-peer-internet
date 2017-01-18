@@ -5,7 +5,7 @@
     <parent>
         <artifactId>yunhuni</artifactId>
         <groupId>com.lsxy</groupId>
-        <version>1.2.1-RC9</version>
+        <version>1.2.1-RC10</version>
     </parent>
     <packaging>jar</packaging>
     <modelVersion>4.0.0</modelVersion>
