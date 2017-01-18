@@ -260,7 +260,7 @@ public class ConfServiceImpl implements ConfService {
         }
 
         if(state.getClosed()!= null && state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConfNotExistsException();
         }
 
         if(!appId.equals(state.getAppId())){
