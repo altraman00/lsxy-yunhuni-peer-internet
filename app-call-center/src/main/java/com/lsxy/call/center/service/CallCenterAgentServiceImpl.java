@@ -536,12 +536,14 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             //将技能放到map,key是技能名
             Map<String,AgentSkill> skillMap = new HashMap<>();
             skills.parallelStream().forEach(skill -> skillMap.put(skill.getName(),skill));
-            skillOpts.stream().forEach(opt -> {
+            int count = 0;
+            for(AgentSkillOperationDTO opt :skillOpts){
                 switch (opt.getOpt()){
                     case 0:{
                         //删除全部
                         agentSkillService.deleteByAgent(agentId);
                         skillMap.clear();
+                        count ++;
                         break;
                     }
                     case 1:{
@@ -556,12 +558,14 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                                     agentSkill.setEnabled(opt.getEnabled());
                                 }
                                 agentSkillService.save(agentSkill);
+                                count ++;
                             }else{
                                 AgentSkill newSkill = new AgentSkill(tenantId,appId,agentId,opt.getName(),
                                         opt.getScore() == null?0:opt.getScore(),
                                         opt.getEnabled()== null?false:opt.getEnabled());
                                 agentSkillService.save(newSkill);
                                 skillMap.put(newSkill.getName(),newSkill);
+                                count ++;
                             }
                         }
                         break;
@@ -570,10 +574,15 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                         //删除一个
                         agentSkillService.deleteByAgentAndName(agentId,opt.getName());
                         skillMap.remove(opt.getName());
+                        count ++;
                         break;
                     }
                 }
-            });
+            }
+            if(count == 0 ){
+                throw new RequestIllegalArgumentException();
+            }
+
             Collection<AgentSkill> newSkills = skillMap.values();
             Map<String,Integer> skillScore = new HashMap<>();
             newSkills.parallelStream().forEach(skill -> {
