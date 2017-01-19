@@ -24,7 +24,7 @@ import java.util.Set;
 @Component
 public class ASyncSaveApiLogTask {
     private static final Logger logger = LoggerFactory.getLogger(ASyncSaveApiLogTask.class);
-
+    private AntPathMatcher antPathMatcher = new AntPathMatcher();
     private static Set<String> requestMappingPatternList = null;
 
     @Autowired
@@ -56,7 +56,6 @@ public class ASyncSaveApiLogTask {
         for(String pattern : patterns){
             if(StringUtils.isNotBlank(pattern)){
                 //匹配路径
-                AntPathMatcher antPathMatcher = new AntPathMatcher();
                 String matchingPattern =  antPathMatcher.match(pattern, uri)?pattern:( !pattern.endsWith("/") && antPathMatcher.match(pattern + "/", uri)? pattern:null);
                 if(StringUtils.isNotBlank(matchingPattern)){
                     type = matchingPattern;
