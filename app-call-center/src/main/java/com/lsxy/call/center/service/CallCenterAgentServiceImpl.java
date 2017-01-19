@@ -572,9 +572,11 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                     }
                     case 2:{
                         //删除一个
-                        agentSkillService.deleteByAgentAndName(agentId,opt.getName());
-                        skillMap.remove(opt.getName());
-                        count ++;
+                        if(StringUtils.isNotBlank(opt.getName())){
+                            agentSkillService.deleteByAgentAndName(agentId,opt.getName());
+                            skillMap.remove(opt.getName());
+                            count ++;
+                        }
                         break;
                     }
                 }

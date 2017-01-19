@@ -62,6 +62,9 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
         Recharge recharge = null;
         //充值类型一定要是规定好的类型,当没有该类型时，枚举类会抛出IllegalArgumentException异常
         RechargeType rechargeType = RechargeType.valueOf(type);
+        if(!RechargeType.UNIONPAY.equals(rechargeType) && !RechargeType.ALIPAY.equals(rechargeType)){
+            throw new IllegalArgumentException();
+        }
         if(rechargeType != null && amount.compareTo(new BigDecimal(0))==1 && username != null){
             Tenant tenant = tenantService.findTenantByUserName(username);
             if(tenant != null){
