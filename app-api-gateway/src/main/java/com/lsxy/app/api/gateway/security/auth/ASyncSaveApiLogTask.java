@@ -80,13 +80,9 @@ public class ASyncSaveApiLogTask {
      * @return
      */
     public Set<String> getRequestMappingPatternList(){
-        if(requestMappingPatternList != null){
-            return requestMappingPatternList;
-        }else{
+        if(requestMappingPatternList == null){
             synchronized(ASyncSaveApiLogTask.class){
-                if(requestMappingPatternList != null){
-                    return requestMappingPatternList;
-                }else{
+                if(requestMappingPatternList == null){
                     requestMappingPatternList = new HashSet<>();
                     Map<RequestMappingInfo, HandlerMethod> map = requestMappingHandlerMapping.getHandlerMethods();
                     for (Iterator<RequestMappingInfo> iterator = map.keySet().iterator(); iterator.hasNext();) {
@@ -94,10 +90,10 @@ public class ASyncSaveApiLogTask {
                         Set<String> patterns = info.getPatternsCondition().getPatterns();
                         requestMappingPatternList.addAll(patterns);
                     }
-                    return requestMappingPatternList;
                 }
             }
         }
+        return requestMappingPatternList;
     }
 
 }
