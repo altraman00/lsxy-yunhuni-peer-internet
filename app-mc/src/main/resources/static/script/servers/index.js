@@ -16,7 +16,7 @@ function startServer(){
 
 }
 function updateServer(){
-    updateDialog.init("1111");
+    updateDialog.initForm("1111");
     updateDialog.dialog("open");
 /*
     var btnStartServer = $(this);
@@ -72,7 +72,7 @@ $(function() {
         close: function() {
             document.forms[0].reset();
         },
-        init:function(version){
+        initForm:function(version){
             $("txtUpdateVersion").val(version);
         }
     });
