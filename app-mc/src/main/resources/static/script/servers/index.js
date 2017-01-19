@@ -23,7 +23,7 @@ function updateServer(){
     var host = btnStartServer.attr("host");
     var app = btnStartServer.attr("app");
     var version = btnStartServer.attr("version");
-    updateForm.txtUpdateVersion.value = version;
+    updateDialog.find("#txtUpdateVersion").val(version);
     updateDialog.dialog("open");
 /*
 
