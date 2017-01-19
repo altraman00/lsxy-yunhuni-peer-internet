@@ -1,3 +1,4 @@
+
 function startServer(){
     var btnStartServer = $(this);
     var host = btnStartServer.attr("host");
@@ -47,9 +48,27 @@ function stopServer(){
     });
 }
 
+
+var dialog;
 $(function() {
     $(".btnStartServer").bind("click",startServer);
     $(".btnUpdateServer").bind("click",updateServer);
     $(".btnStopServer").bind("click",stopServer);
+    dialog = $( "#dialog-form" ).dialog({
+        autoOpen: false,
+        height: 400,
+        width: 350,
+        modal: true,
+        buttons: {
+            "确定": function(){alert(1);},
+            "取消": function() {
+                dialog.dialog( "close" );
+            }
+        },
+        close: function() {
+            document.forms[0].reset();
+        }
+    });
+    dialog.dialog( "open" );
 
 });
