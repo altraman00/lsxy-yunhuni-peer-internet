@@ -65,7 +65,7 @@ public class ASyncSaveApiLogTask {
         }
         //由于{}里面的是变量名称，如：/v1/account/{account_id}/call/duo_callback，同样的接口可能会改变，所以变成*
         if(StringUtils.isNotBlank(type)){
-            type = type.replaceAll("\\{\\w*\\}", "*");
+            type = type.replaceAll("\\{[^/]+?\\}", "*");
         }
         log.setType(type);
         apiInvokeLogService.save(log);
