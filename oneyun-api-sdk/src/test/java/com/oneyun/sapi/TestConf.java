@@ -424,9 +424,9 @@ public class TestConf extends BaseTest{
     }
     @Test
     public void test27(){
-        String confId = "8a2a294c59ab17140159ab5b4fce0001";
+        String confId = "8a2d9fed59b4ca740159b4dcf9a60000";
         String from = null;
-        String to = phone1;
+        String to = phone2;
         String maxDuration = "50";
         String maxDialDuration = null;
         String dialVoiceStopCond = null;
@@ -490,7 +490,7 @@ public class TestConf extends BaseTest{
         String maxDuration = "50";
         String maxDialDuration = "50";
         String dialVoiceStopCond = null;
-        String playFile = null;
+        String playFile = voice_file1;
         String voiceMode = null;
         logger.info("[开始][dial_voice_stop_cond默认]");
         call( appId, confId, from , to, maxDuration , maxDialDuration , dialVoiceStopCond , playFile , voiceMode);
@@ -499,9 +499,9 @@ public class TestConf extends BaseTest{
     }
     @Test
     public void test32(){
-        String confId = "8a2d9fed59ab16d80159ab7e73b8000b";
+        String confId = "8a2a294c59b4caae0159b4e2e9f60005";
         String from = null;
-        String to = phone1;
+        String to = phone2;
         String maxDuration = "50";
         String maxDialDuration = "50";
         String dialVoiceStopCond = "0";
@@ -559,7 +559,7 @@ public class TestConf extends BaseTest{
     }
     @Test
     public void test36(){
-        String confId = "8a2a294c59ab17140159ab5b4fce0001";
+        String confId = "8a2a294c59b4caae0159b54674c4000b";
         String from = null;
         String to = phone1;
         String maxDuration = "50";
@@ -572,11 +572,15 @@ public class TestConf extends BaseTest{
         logger.info("[结束][play_file设置]");
         //8a2d9fed59ab16d80159ab4cb4f30003
     }
+
+
+
+
     @Test
     public void test37(){
-        String confId = "8a2a294c59ab17140159ab5b4fce0001";
+        String confId = "8a2a294c59b4caae0159b5498c970015";
         String from = null;
-        String to = phone1;
+        String to = phone2;
         String maxDuration = "50";
         String maxDialDuration = "50";
         String dialVoiceStopCond = null;
@@ -589,7 +593,7 @@ public class TestConf extends BaseTest{
     }
     @Test
     public void test38(){
-        String confId = "8a2a294c59ab81070159ab836ff00001";
+        String confId = "8a2a294c59b4caae0159b54adeb7001c";
         String from = null;
         String to = phone1;
         String maxDuration = "50";
@@ -604,9 +608,9 @@ public class TestConf extends BaseTest{
     }
     @Test
     public void test39(){
-        String confId = "8a2a294c59ab81070159ab836ff00001";
+        String confId = "8a2a294c59b4caae0159b54adeb7001c";
         String from = null;
-        String to = phone1;
+        String to = phone2;
         String maxDuration = "50";
         String maxDialDuration = "50";
         String dialVoiceStopCond = null;
@@ -619,9 +623,9 @@ public class TestConf extends BaseTest{
     }
     @Test
     public void test40(){
-        String confId = "8a2a294c59ab81070159ab836ff00001";
+        String confId = "8a2a294c59b4caae0159b54c16430021";
         String from = null;
-        String to = phone1;
+        String to = phone2;
         String maxDuration = "50";
         String maxDialDuration = "50";
         String dialVoiceStopCond = null;
@@ -634,9 +638,9 @@ public class TestConf extends BaseTest{
     }
     @Test
     public void test41(){
-        String confId = "8a2a294c59ab81070159ab836ff00001";
+        String confId = "8a2d9fed59b4ca740159b54dfe22001d";
         String from = null;
-        String to = phone1;
+        String to = phone2;
         String maxDuration = "50";
         String maxDialDuration = "50";
         String dialVoiceStopCond = null;
