@@ -16,6 +16,9 @@ function startServer(){
 
 }
 function updateServer(){
+    updateDialog.init("1111");
+    updateDialog.dialog("open");
+/*
     var btnStartServer = $(this);
     var host = btnStartServer.attr("host");
     var app = btnStartServer.attr("app");
@@ -29,6 +32,7 @@ function updateServer(){
         }
         location.reload();
     });
+    */
 
 }
 
@@ -49,12 +53,12 @@ function stopServer(){
 }
 
 
-var dialog;
+var updateDialog;
 $(function() {
     $(".btnStartServer").bind("click",startServer);
     $(".btnUpdateServer").bind("click",updateServer);
     $(".btnStopServer").bind("click",stopServer);
-    dialog = $( "#dialog-form" ).dialog({
+    updateDialog = $( "#update-dialog-form" ).dialog({
         autoOpen: false,
         height: 400,
         width: 350,
@@ -67,8 +71,11 @@ $(function() {
         },
         close: function() {
             document.forms[0].reset();
+        },
+        init:function(version){
+            $("txtUpdateVersion").val(version);
         }
     });
-    dialog.dialog( "open" );
+    // dialog.dialog( "open" );
 
 });
