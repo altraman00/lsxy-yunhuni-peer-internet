@@ -1,3 +1,5 @@
+var updateDialog;
+var updateForm;
 
 function startServer(){
     var btnStartServer = $(this);
@@ -15,13 +17,16 @@ function startServer(){
     });
 
 }
+
 function updateServer(){
-    updateDialog.initForm("1111");
-    updateDialog.dialog("open");
-/*
     var btnStartServer = $(this);
     var host = btnStartServer.attr("host");
     var app = btnStartServer.attr("app");
+    var version = btnStartServer.attr("version");
+    updateForm.txtUpdateVersion.value = version;
+    updateDialog.dialog("open");
+/*
+
     var url = ctx + "admin/server/update?host="+host+"&app="+app;
 
     $.get( url, function( data ) {
@@ -53,7 +58,6 @@ function stopServer(){
 }
 
 
-var updateDialog;
 $(function() {
     $(".btnStartServer").bind("click",startServer);
     $(".btnUpdateServer").bind("click",updateServer);
@@ -71,11 +75,11 @@ $(function() {
         },
         close: function() {
             document.forms[0].reset();
-        },
-        initForm:function(version){
-            $("txtUpdateVersion").val(version);
         }
     });
     // dialog.dialog( "open" );
+    updateForm = updateDialog.find( "form" ).on( "submit", function( event ) {
+        event.preventDefault();
+    });
 
 });

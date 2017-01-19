@@ -47,7 +47,7 @@
         <td>
             <span><a th:unless="${server.status eq T(com.lsxy.app.mc.vo.ServerVO).STATUS_OK}" class="btnStartServer" href="javascript:void(0);" th:attr="host=${server.serverHost},app=${server.appName}">启动</a></span>
             <span><a th:unless="${server.appName eq 'app.mc'}"  th:if="${server.status eq  T(com.lsxy.app.mc.vo.ServerVO).STATUS_OK}"  class="btnStopServer"  href="javascript:void(0);" th:attr="host=${server.serverHost},app=${server.appName}">停止</a></span>
-            <span><a th:unless="${server.appName eq 'app.mc'}" class="btnUpdateServer"  href="javascript:void(0);" th:attr="host=${server.serverHost},app=${server.appName}">更新</a></span>
+            <span><a th:unless="${server.appName eq 'app.mc'}" class="btnUpdateServer"  href="javascript:void(0);" th:attr="host=${server.serverHost},app=${server.appName},version=${server.version}">更新</a></span>
             <span><a href="javascript:void(0);" class="btnServerLog" th:attr="host=${server.serverHost},app=${server.appName}">日志</a></span>
         </td>
     </tr>
