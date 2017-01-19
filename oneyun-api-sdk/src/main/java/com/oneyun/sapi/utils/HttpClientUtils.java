@@ -183,8 +183,10 @@ public class HttpClientUtils {
         //转换为键值对
         List<NameValuePair> params = new ArrayList();
         for (Map.Entry<String,Object> en : param.entrySet()) {
-            String value = en.getValue()==null ? null:en.getValue().toString();
-            params.add(new BasicNameValuePair(en.getKey().toString(),value));
+            String value = en.getValue()==null ? "":en.getValue().toString();
+            if(en.getValue() != null) {
+                params.add(new BasicNameValuePair(en.getKey().toString(), value));
+            }
         }
         String str = EntityUtils.toString(new UrlEncodedFormEntity(params, Consts.UTF_8));
         if(StringUtils.isNotEmpty(str)){
