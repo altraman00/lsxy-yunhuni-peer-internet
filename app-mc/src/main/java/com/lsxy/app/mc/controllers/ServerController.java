@@ -189,6 +189,8 @@ public class ServerController extends AdminController{
         }
 
         for(ServerVO server:servers){
+            //重置一下服务器状态
+            server.setStatus(ServerVO.STATUS_STOPED);
             String key = getServerRedisKey(server.getServerHost(),server.getAppName());
             if(logger.isDebugEnabled()){
                 logger.debug("find server connection status, key is :{}",key);
