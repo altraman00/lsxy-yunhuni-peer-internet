@@ -373,7 +373,7 @@ public class ConversationService {
                 .setTenantId(app.getTenant().getId())
                 .setAppId(app.getId())
                 .setId(callId)
-                .setType(BusinessState.TYPE_CC_AGENT_CALL)
+                .setType(BusinessState.TYPE_CC_INVITE_AGENT_CALL)
                 .setCallBackUrl(app.getUrl())
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
@@ -385,6 +385,82 @@ public class ConversationService {
                         .putIfNotEmpty(CallCenterUtil.AGENT_EXTENSION_FIELD,extension)
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(initiator))
                         .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,initiator)
+                        .putIfNotEmpty("from",StringUtil.isEmpty(systemNum)?from:systemNum)
+                        .putIfNotEmpty("to",to)
+                        .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
+                        .build())
+                .build();
+        businessStateService.save(callstate);
+        conversationCallVoiceModeReference.set(conversationId,callId,voiceMode);
+        return callId;
+    }
+
+    public String agentCall(String appId,String conversationId,String agentId,String agentName,String extension,
+                              String systemNum,String agentPhone,String type,String user,
+                              Integer maxDuration, Integer maxDialDuration,Integer voiceMode) throws YunhuniApiException{
+        String callId = UUIDGenerator.uuid();
+        App app = appService.findById(appId);
+        String from = null;
+        String to = null;
+        String areaId = null;
+        String lineId = null;
+
+        if(AppExtension.TYPE_TELPHONE.equals(type)){
+            AreaAndTelNumSelector.Selector selector =
+                    areaAndTelNumSelector.getTelnumberAndAreaId(app,systemNum,agentPhone);
+            areaId = selector.getAreaId();
+            lineId = selector.getLineId();
+            from = selector.getOneTelnumber();
+            to = selector.getToUri();
+        }else{
+            areaId = areaAndTelNumSelector.getAreaId(app);
+            //TODO 获取平台号码
+            from = (systemNum) + "@"+areaId+".area.oneyun.com";
+            to = user + "@" + sip_address;
+        }
+        CallSession callSession = new CallSession();
+        callSession.setId(UUIDGenerator.uuid());
+        callSession.setStatus(CallSession.STATUS_PREPARING);
+        callSession.setFromNum(from);
+        callSession.setToNum(to);
+        callSession.setAppId(app.getId());
+        callSession.setTenantId(app.getTenant().getId());
+        callSession.setRelevanceId(callId);
+        callSession.setType(CallSession.TYPE_CALL_CENTER);
+        callSession.setResId(null);
+        callSessionBatchInserter.put(callSession);
+        Map<String, Object> params = new MapBuilder<String,Object>()
+                .putIfNotEmpty("to_uri",to)
+                .putIfNotEmpty("from_uri",from)
+                .put("max_answer_seconds",maxDuration, IVRActionService.MAX_DURATION_SEC)
+                .putIfNotEmpty("max_ring_seconds",maxDialDuration)
+                .putIfNotEmpty("user_data",callId)
+                .put("areaId",areaId)
+                .putIfNotEmpty(BusinessState.REF_RES_ID,null)
+                .build();
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
+        try {
+            rpcCaller.invoke(sessionContext, rpcrequest);
+        } catch (Exception e) {
+            throw new InvokeCallException(e);
+        }
+        //保存业务数据，后续事件要用到
+        BusinessState callstate = new BusinessState.Builder()
+                .setTenantId(app.getTenant().getId())
+                .setAppId(app.getId())
+                .setId(callId)
+                .setType(BusinessState.TYPE_CC_INVITE_AGENT_CALL)
+                .setCallBackUrl(app.getUrl())
+                .setAreaId(areaId)
+                .setLineGatewayId(lineId)
+                .setBusinessData(new MapBuilder<String,String>()
+                        .putIfNotEmpty(BusinessState.REF_RES_ID,null)
+                        .putIfNotEmpty(CallCenterUtil.CONVERSATION_FIELD,conversationId)
+                        .putIfNotEmpty(CallCenterUtil.AGENT_ID_FIELD,agentId)
+                        .putIfNotEmpty(CallCenterUtil.AGENT_NAME_FIELD,agentName)
+                        .putIfNotEmpty(CallCenterUtil.AGENT_EXTENSION_FIELD,extension)
+                        .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,null)
+                        .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,null)
                         .putIfNotEmpty("from",StringUtil.isEmpty(systemNum)?from:systemNum)
                         .putIfNotEmpty("to",to)
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
@@ -453,7 +529,7 @@ public class ConversationService {
                 .setTenantId(app.getTenant().getId())
                 .setAppId(app.getId())
                 .setId(callId)
-                .setType(BusinessState.TYPE_CC_OUT_CALL)
+                .setType(BusinessState.TYPE_CC_INVITE_OUT_CALL)
                 .setCallBackUrl(app.getUrl())
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
@@ -728,7 +804,8 @@ public class ConversationService {
         //退出呼叫所在的交谈
         callConversationService.decrConversation(callId,conversationId);
 
-        if(call_state.getType().equals(BusinessState.TYPE_CC_AGENT_CALL)){
+        if(call_state.getType().equals(BusinessState.TYPE_CC_INVITE_AGENT_CALL) ||
+                call_state.getType().equals(BusinessState.TYPE_CC_AGENT_CALL)){
             callCenterUtil.agentExitConversationEvent(call_state.getCallBackUrl(),
                     call_state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD),
                     call_state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),
@@ -822,7 +899,8 @@ public class ConversationService {
             logger.warn("保存交谈成员失败",t);
             mqService.publish(new ConversationMemberCreateEvent(JSONUtil2.objectToJson(member)));
         }
-        if(state.getType().equals(BusinessState.TYPE_CC_AGENT_CALL)){
+        if(state.getType().equals(BusinessState.TYPE_CC_INVITE_AGENT_CALL) ||
+                state.getType().equals(BusinessState.TYPE_CC_AGENT_CALL)){
             callCenterUtil.agentEnterConversationEvent(state.getCallBackUrl(),
                     businessData.get(CallCenterUtil.AGENT_ID_FIELD),
                     businessData.get(CallCenterUtil.AGENT_NAME_FIELD),

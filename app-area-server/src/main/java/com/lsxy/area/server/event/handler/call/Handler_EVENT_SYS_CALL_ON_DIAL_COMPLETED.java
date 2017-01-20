@@ -38,6 +38,7 @@ import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
 import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
+import org.aspectj.weaver.ast.Call;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -193,7 +194,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(state.getTenantId(),state.getAppId(),
                                 new Date()).setCallOutSuccess(1L).build());
                     }catch (Throwable t){
-                        logger.error("incrIntoRedis失败",t);
+                        logger.warn("incrIntoRedis失败",t);
                     }
                 }
                 ivrActionService.doAction(call_id,null);
@@ -261,7 +262,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                             .build());
                 }
             }
-        }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
+        }else if(BusinessState.TYPE_CC_INVITE_AGENT_CALL.equals(state.getType())){
             String conversation_id = businessData.get(CallCenterUtil.CONVERSATION_FIELD);
             String agentId = businessData.get(CallCenterUtil.AGENT_ID_FIELD);
             String callCenterId = conversationService.getCallCenter(state);
@@ -287,7 +288,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                 }
                             }
                         }catch (Throwable t){
-                            logger.error("更新CallCenter失败",t);
+                            logger.warn("更新CallCenter失败",t);
                         }
                     }
                 }
@@ -329,7 +330,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                     }
                 }
             }catch (Throwable t){
-                logger.error("更新排队记录失败",t);
+                logger.warn("更新排队记录失败",t);
             }
 
             if(StringUtil.isBlank(error)){
@@ -378,7 +379,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                             logger.info("[{}][{}]放音文件不存在{},{},{},{}",state.getTenantId(),state.getAppId(),
                                     agent_num,prevoice,postvoice,e);
                         }catch(Throwable e) {
-                            logger.error("调用失败 ",e);
+                            logger.warn("调用失败 ",e);
                         }
                     }
 
@@ -412,7 +413,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                 callCenterService.update(callCenterId,updateCallcenter);
                             }
                         }catch (Throwable t){
-                            logger.error("更新CallCenter失败",t);
+                            logger.warn("更新CallCenter失败",t);
                         }
                         try{
                             callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
@@ -420,7 +421,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                     .setToManualSuccess(1L)
                                     .build());
                         }catch (Throwable t){
-                            logger.error("incrIntoRedis失败",t);
+                            logger.warn("incrIntoRedis失败",t);
                         }
                         if((conversationState.getClosed()== null || !conversationState.getClosed())){
                             //交谈开始事件
@@ -450,18 +451,33 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 }
             }
 
-        }else if(BusinessState.TYPE_CC_OUT_CALL.equals(state.getType())){
+        }else if(BusinessState.TYPE_CC_INVITE_OUT_CALL.equals(state.getType())){
             if(StringUtils.isNotBlank(error)){
-                logger.error("将呼叫加入到交谈失败{}",error);
+                logger.warn("邀请外线加入到交谈失败{}",error);
+            }else{
+
+            }
+        }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
+            if(StringUtils.isNotBlank(error)){
+                logger.warn("呼叫坐席失败{}",error);
             }else{
                 String conversationId = businessData.get(CallCenterUtil.CONVERSATION_FIELD);
                 if(conversationId == null){
-                    throw new InvalidParamException("将呼叫加入到会议失败conversationId为null");
+                    return res;
+                }
+                String to = businessData.get("invite_telnum");
+                if(to == null){
+                    return res;
                 }
                 try {
-                    conversationService.join(conversationId,call_id,null,null,null);
-                } catch (Throwable e) {
-                    logger.error("将呼叫加入到会议失败",e);
+                    conversationService.create(conversationId,
+                            state.getBusinessData().get(BusinessState.REF_RES_ID),null,
+                            state,state.getTenantId(),state.getAppId(),
+                            state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION);
+                    //坐席加入交谈成功事件中要呼叫这个号码
+                    businessStateService.updateInnerField(conversationId,"invite_telnum",to);
+                } catch (YunhuniApiException e) {
+                    conversationService.logicExit(conversationId,call_id);
                 }
             }
         }
@@ -481,7 +497,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 rpcCaller.invoke(sessionContext, rpcrequest, true);
             }
         } catch (Throwable e) {
-            logger.error("调用失败",e);
+            logger.warn("调用失败",e);
         }
     }
 }

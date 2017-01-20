@@ -1,8 +1,8 @@
 package com.lsxy.call.center.test;
 
 import com.lsxy.call.center.CallCenterMainClass;
-import com.lsxy.call.center.states.state.AgentState;
-import com.lsxy.call.center.states.state.ExtensionState;
+import com.lsxy.call.center.api.states.state.AgentState;
+import com.lsxy.call.center.api.states.state.ExtensionState;
 import com.lsxy.framework.config.Constants;
 import org.junit.Test;
 import org.junit.runner.RunWith;

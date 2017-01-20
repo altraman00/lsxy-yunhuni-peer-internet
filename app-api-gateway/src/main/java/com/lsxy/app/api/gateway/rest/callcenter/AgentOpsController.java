@@ -1,6 +1,7 @@
 package com.lsxy.app.api.gateway.rest.callcenter;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.lsxy.app.api.gateway.dto.callcenter.AgentCallOutInputDTO;
 import com.lsxy.app.api.gateway.dto.callcenter.RejectTaskInputDTO;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.app.api.gateway.rest.AbstractAPIController;
@@ -30,10 +31,22 @@ public class AgentOpsController extends AbstractAPIController {
                                      @PathVariable String name, @RequestHeader(value = "AppID") String appId,
                                      @Valid @RequestBody RejectTaskInputDTO dto) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
-            logger.debug("CONVERSATION LIST API参数,accountId={},appId={},name={},dto={}",accountId,appId,name,dto);
+            logger.debug("AGENT REJECT API参数,accountId={},appId={},name={},dto={}",accountId,appId,name,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
         agentOps.reject(ip,appId,name,dto.getQueueId(),dto.getData());
+        return ApiGatewayResponse.success(true);
+    }
+
+    @RequestMapping(value = "/{accountId}/callcenter/agent/{name}/call_out",method = RequestMethod.POST)
+    public ApiGatewayResponse call_out(HttpServletRequest request, @PathVariable String accountId,
+                                     @PathVariable String name, @RequestHeader(value = "AppID") String appId,
+                                     @Valid @RequestBody AgentCallOutInputDTO dto) throws YunhuniApiException {
+        if(logger.isDebugEnabled()){
+            logger.debug("AGENT CALLOUT API参数,accountId={},appId={},name={},dto={}",accountId,appId,name,dto);
+        }
+        String ip = WebUtils.getRemoteAddress(request);
+        agentOps.callOut(ip,appId,name,dto.getFrom(),dto.getTo(),dto.getMaxDialSeconds(),dto.getMaxAnswerSeconds());
         return ApiGatewayResponse.success(true);
     }
 }

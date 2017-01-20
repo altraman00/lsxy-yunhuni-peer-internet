@@ -6,7 +6,6 @@ import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.service.callcenter.AgentIdCallReference;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationService;
-import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -79,7 +78,7 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
             logger.info("call_id={},state={}",call_id,state);
         }
 
-        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
+        if(BusinessState.TYPE_CC_INVITE_AGENT_CALL.equals(state.getType())){
             /**开始判断振铃前是否客户挂断了呼叫，挂断了要同时挂断被叫的坐席**/
             Map<String,String> businessData = state.getBusinessData();
             String conversation = businessData.get(CallCenterUtil.CONVERSATION_FIELD);
@@ -117,6 +116,20 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
                 logger.error("将呼叫加入交谈失败",e);
                 conversationService.logicExit(conversation,call_id);
             }
+        }else if(BusinessState.TYPE_CC_INVITE_OUT_CALL.equals(state.getType())){
+            String conversationId = state.getBusinessData().get(CallCenterUtil.CONVERSATION_FIELD);
+            if(conversationId == null){
+                throw new InvalidParamException("将呼叫加入到会议失败conversationId为null");
+            }
+            try {
+                conversationService.join(conversationId,call_id,null,null,null);
+            } catch (Throwable e) {
+                logger.error("将呼叫加入到会议失败",e);
+                conversationService.logicExit(conversationId,call_id);
+            }
+        }
+        if(BusinessState.TYPE_CC_INVITE_AGENT_CALL.equals(state.getType()) ||
+            BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
             //设置坐席对应的callid
             agentIdCallReference.set(state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD),state.getId());
         }

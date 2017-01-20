@@ -274,7 +274,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                             .build());
                 }
             }
-        }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
+        }else if(BusinessState.TYPE_CC_INVITE_AGENT_CALL.equals(state.getType()) ||
+                BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())
+                ){
             String agentId = state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD);
             if(agentId != null){
                 String preState = null;

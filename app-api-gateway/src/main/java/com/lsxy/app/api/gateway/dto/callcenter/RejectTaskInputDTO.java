@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
- * Created by Administrator on 2017/1/16.
+ * Created by liuws on 2017/1/16.
  */
 public class RejectTaskInputDTO extends CommonDTO {
 

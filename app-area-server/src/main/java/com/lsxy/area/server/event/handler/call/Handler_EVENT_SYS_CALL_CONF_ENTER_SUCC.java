@@ -114,7 +114,9 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("call_id={},state={}",call_id,state);
         }
-        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) ||
+        if(BusinessState.TYPE_CC_INVITE_AGENT_CALL.equals(state.getType()) ||
+                BusinessState.TYPE_CC_INVITE_OUT_CALL.equals(state.getType()) ||
+                BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) ||
                 BusinessState.TYPE_CC_OUT_CALL.equals(state.getType()) ||
                 conversationService.isCC(state)){
             conversation(state,call_id);
@@ -138,6 +140,16 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
         conversationService.join(conversation_id,call_id);
+
+        String to = businessData.get("invite_telnum");
+        if(to != null){
+            try{
+                conversationService.inviteOut(appId,state.getBusinessData()
+                        .get(BusinessState.REF_RES_ID),conversation_id,null,to,null,null,null,null);
+            }catch (Throwable t){
+                conversationService.exit(conversation_id,call_id);
+            }
+        }
     }
 
     public void conf(BusinessState state,String call_id){
