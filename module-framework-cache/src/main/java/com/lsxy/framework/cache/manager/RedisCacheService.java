@@ -484,8 +484,8 @@ public class RedisCacheService {
 			return redisTemplate.opsForHash().putIfAbsent(key,field,value);
 		}
 
-		public void hdel(final String key,final String field){
-			redisTemplate.opsForHash().delete(key,field);
+		public void hdel(final String key,final String... fields){
+			redisTemplate.opsForHash().delete(key,fields);
 		}
 
 	public BoundHashOperations getHashOps(String key){

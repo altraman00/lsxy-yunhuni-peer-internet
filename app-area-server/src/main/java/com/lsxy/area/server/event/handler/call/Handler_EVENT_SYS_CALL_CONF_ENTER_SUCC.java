@@ -149,6 +149,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
             try{
                 conversationService.inviteOut(appId,conversationState.getBusinessData().get(BusinessState.REF_RES_ID),
                         conversation_id,conversationState.getBusinessData().get("invite_from"),to,null,null,null,null);
+                businessStateService.deleteInnerField(conversation_id,"invite_to","invite_from");
             }catch (Throwable t){
                 conversationService.exit(conversation_id,call_id);
             }
