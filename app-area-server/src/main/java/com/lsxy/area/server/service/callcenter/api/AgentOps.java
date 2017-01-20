@@ -243,7 +243,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     state.getBusinessData().get(BusinessState.REF_RES_ID),null,state,
                     state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),maxAnswerSeconds);
             //坐席加入交谈成功事件中要呼叫这个号码
-            businessStateService.updateInnerField(conversationId,"invite_telnum",to);
+            businessStateService.updateInnerField(conversationId,"invite_from",from,"invite_to",to);
         }else{
             AgentLock agentLock = new AgentLock(redisCacheService,agent);
             if(!agentLock.lock()){
@@ -262,7 +262,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                             extension.getId(),from,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null);
                     callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_FETCHING,true);
                     //坐席加入交谈成功事件中要呼叫这个号码
-                    businessStateService.updateInnerField(callId,"invite_telnum",to);
+                    businessStateService.updateInnerField(callId,"invite_from",from,"invite_to",to);
                 }catch (Throwable t){
                     callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_IDLE,true);
                     throw t;

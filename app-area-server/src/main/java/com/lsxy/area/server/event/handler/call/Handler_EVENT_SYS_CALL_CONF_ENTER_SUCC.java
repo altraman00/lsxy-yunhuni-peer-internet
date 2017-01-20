@@ -139,13 +139,16 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         if(StringUtils.isBlank(appId)){
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
-        conversationService.join(conversation_id,call_id);
 
-        String to = businessData.get("invite_telnum");
+        BusinessState conversationState = businessStateService.get(conversation_id);
+        if(conversationState == null || (conversationState.getClosed() !=null && conversationState.getClosed())){
+            return;
+        }
+        String to = conversationState.getBusinessData().get("invite_to");
         if(to != null){
             try{
-                conversationService.inviteOut(appId,state.getBusinessData()
-                        .get(BusinessState.REF_RES_ID),conversation_id,null,to,null,null,null,null);
+                conversationService.inviteOut(appId,conversationState.getBusinessData().get(BusinessState.REF_RES_ID),
+                        conversation_id,conversationState.getBusinessData().get("invite_from"),to,null,null,null,null);
             }catch (Throwable t){
                 conversationService.exit(conversation_id,call_id);
             }

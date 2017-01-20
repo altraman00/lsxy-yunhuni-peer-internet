@@ -465,17 +465,17 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 if(conversationId == null){
                     return res;
                 }
-                String to = businessData.get("invite_telnum");
-                if(to == null){
-                    return res;
-                }
+                String to = businessData.get("invite_to");
                 try {
+                    if(to == null){
+                        throw new NullPointerException();
+                    }
                     conversationService.create(conversationId,
                             state.getBusinessData().get(BusinessState.REF_RES_ID),null,
                             state,state.getTenantId(),state.getAppId(),
                             state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION);
                     //坐席加入交谈成功事件中要呼叫这个号码
-                    businessStateService.updateInnerField(conversationId,"invite_telnum",to);
+                    businessStateService.updateInnerField(conversationId,"invite_from",businessData.get("invite_from"),"invite_to",to);
                 } catch (YunhuniApiException e) {
                     conversationService.logicExit(conversationId,call_id);
                 }
