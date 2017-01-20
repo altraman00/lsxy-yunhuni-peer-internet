@@ -140,13 +140,14 @@ public class ServerController extends AdminController{
 
     /**
      * 更新服务
-     * @param host
-     * @param app
+     * @param host  主机
+     * @param app 应用名称
+     * @param version 指定更新的版本号
      * @return
      */
     @RequestMapping("/server/update")
     @ResponseBody
-    public RestResponse<String> updateServer(String host,String app){
+    public RestResponse<String> updateServer(String host,String app,String version){
         try {
             if(isExistStartingServerInTheHost(host)){
                 return RestResponse.failed("00002","同一台主机一次只能启动一个服务");
@@ -157,7 +158,7 @@ public class ServerController extends AdminController{
                 throw new IllegalArgumentException(app);
             }
             String script = scriptService.prepareScript(ScriptService.SCRIPT_UPDATE);
-            String result = RunShellUtil.run("sh "+script + " -a "+application.getModuleName()+" -h "+host+"",10);
+            String result = RunShellUtil.run("sh "+script + " -a "+application.getModuleName()+" -h "+host+" -r "+version,10);
             if(logger.isDebugEnabled()){
                 logger.debug("update completed and result is :");
                 logger.debug(result);

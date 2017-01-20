@@ -24,19 +24,12 @@ function updateServer(){
     var app = btnStartServer.attr("app");
     var version = btnStartServer.attr("version");
     updateDialog.find("#txtUpdateVersion").val(version);
+    updateDialog.find("#txtUpdateHost").val(host);
+    updateDialog.find("#txtUpdateApp").val(app);
     updateDialog.dialog("open");
 /*
 
-    var url = ctx + "admin/server/update?host="+host+"&app="+app;
 
-    $.get( url, function( data ) {
-        if(data && data.success){
-            alert('更新成功');
-        }else{
-            alert('更新失败:'+data.errorMsg);
-        }
-        location.reload();
-    });
     */
 
 }
@@ -57,6 +50,22 @@ function stopServer(){
     });
 }
 
+/**
+ * 执行更新动作
+ */
+function doUpdate(){
+
+    var url = ctx + "admin/server/update?host="+host+"&app="+app;
+
+    $.get( url, function( data ) {
+        if(data && data.success){
+            alert('更新成功');
+        }else{
+            alert('更新失败:'+data.errorMsg);
+        }
+        location.reload();
+    });
+}
 
 $(function() {
     $(".btnStartServer").bind("click",startServer);
@@ -68,9 +77,9 @@ $(function() {
         width: 350,
         modal: true,
         buttons: {
-            "确定": function(){alert(1);},
+            "确定": doUpdate,
             "取消": function() {
-                dialog.dialog( "close" );
+                updateDialog.dialog( "close" );
             }
         },
         close: function() {
