@@ -54,8 +54,11 @@ function stopServer(){
  * 执行更新动作
  */
 function doUpdate(){
+    var version = updateDialog.find("#txtUpdateVersion").val();
+    var host = updateDialog.find("#txtUpdateHost").val();
+    var app = updateDialog.find("#txtUpdateApp").val();
 
-    var url = ctx + "admin/server/update?host="+host+"&app="+app;
+    var url = ctx + "admin/server/update?host="+host+"&app="+app+"&version="+version;
 
     $.get( url, function( data ) {
         if(data && data.success){
