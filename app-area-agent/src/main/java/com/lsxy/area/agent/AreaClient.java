@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Date;
 
 /**
  * Created by tandy on 16/7/30.
@@ -33,10 +34,19 @@ public class AreaClient {
     @Autowired
     private Client client;
 
+    private long startDateTime;
+
+    private String agentVersion;
+
+    public AreaClient(){
+        startDateTime = new Date().getTime();
+        agentVersion = this.getClass().getPackage().getImplementationVersion();
+    }
+
 
     @PostConstruct
     public void start() throws ClientBindException {
-        logger.info("客户端启动:  {}  {}-{}" , serverUrl, areaid,nodeid);
+        logger.info("客户端启动:  {}  {}-{} 版本号：{}" , serverUrl, areaid,nodeid,agentVersion);
 
         client.setServerUrl(serverUrl);
         client.setClientId(areaid,nodeid);

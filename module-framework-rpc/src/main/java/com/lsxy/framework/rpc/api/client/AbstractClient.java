@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -106,20 +107,6 @@ public abstract class AbstractClient implements Client{
     }
 
 
-    public static void main(String[] args) {
-        int size = 20;
-        int j = 0;
-        int count = 0;
-        while(true && j < 2){
-            int idx = count ++ % size;
-            System.out.println(idx);
-            if(idx == (size-1)){
-                j ++;
-            }
-        }
-
-    }
-
 //    public String[] getServerUrls() {
 //        return serverUrls;
 //    }
@@ -204,10 +191,11 @@ public abstract class AbstractClient implements Client{
      */
     protected void doConnect(Session session) throws ClientConnecException {
         try {
+            String version = this.getClass().getPackage().getImplementationVersion();
             if(session==null || !session.isValid()){
                 throw new ClientConnecException("客户端连接通道无效,无法发送区域节点注册指令:"+session.getId());
             }
-            String param = "aid=" + areaid+"&nid="+nodeid+"&sessionid="+session.getId();
+            String param = "aid=" + areaid+"&nid="+nodeid+"&sessionid="+session.getId()+"&v="+version+"&t="+new Date().getTime();
             RPCRequest request = RPCRequest.newRequest(ServiceConstants.CH_MN_CONNECT,param);
             RPCResponse response = getRpcCaller().invokeWithReturn(session, request);
             if(response == null){
