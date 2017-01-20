@@ -53,6 +53,15 @@ public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serial
     List<Object[]> findInfoExpireRent(@Param("expireTime") Date date);
 
     /**
+     * 获取租户过期但没被释放的号码资源
+     * @param curTime
+     * @return
+     */
+    @Query(value = "SELECT rent.id,rent.tenant_id ,rent.app_id FROM db_lsxy_bi_yunhuni.tb_bi_resources_rent rent " +
+            "WHERE ( rent.deleted=0) AND rent.rent_status in (1,2) AND rent.res_type=1 AND rent.tenant_id = :tenantId AND rent.rent_expire<:expireTime",nativeQuery = true)
+    List<Object[]> findInfoExpireRentByTenantId(@Param("tenantId") String tenantId ,@Param("expireTime") Date curTime);
+
+    /**
      * 号码续费过期时间延长
      * @param expireTime
      */
@@ -68,5 +77,6 @@ public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serial
     @Modifying
     @Query(value = "update db_lsxy_bi_yunhuni.tb_bi_resources_rent rent set rent.app_id = null,rent.rent_status = 2,rent.last_time = :date where rent.tenant_id = :tenantId and rent.app_id = :appId and rent.deleted = 0 and rent.rent_status = 1",nativeQuery = true)
     void appUnbindAll(@Param("tenantId") String tenantId, @Param("appId") String appId,@Param("date") Date date);
+
 
 }

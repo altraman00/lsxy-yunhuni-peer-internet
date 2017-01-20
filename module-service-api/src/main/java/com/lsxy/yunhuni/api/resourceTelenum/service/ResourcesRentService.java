@@ -9,7 +9,6 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelenumOrder;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 租户号码租用service
@@ -29,6 +28,14 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @return
      */
     Page<ResourcesRent> findByAppId(String appId,int pageNo, int pageSize);
+
+
+    /**
+     * 根据ID获取租用关系
+     * @param appId
+     * @return
+     */
+    List<ResourcesRent> findByAppId(String appId);
 
     /**
      * 根据号码和租用状态查询租用关系
@@ -61,6 +68,11 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      */
     void resourcesRentTask();
 
+    /**
+     * 充值成功后触发，查看有没有欠费的号码，自动扣费
+     * @param tenantId
+     */
+    void payResourcesRent(String tenantId);
 
     /**
      * 释放号码
@@ -103,4 +115,5 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @param isNeedCalled 该批次号码是否需要要检验可呼入性
      */
     String bindNumToAppAndGetAreaId(App app, List<String> nums, boolean isNeedCalled);
+
 }

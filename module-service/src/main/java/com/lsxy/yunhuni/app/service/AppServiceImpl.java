@@ -13,7 +13,8 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.app.service.ServiceType;
-import com.lsxy.yunhuni.api.config.model.Area;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.app.dao.AppDao;
@@ -22,6 +23,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.List;
 
@@ -132,9 +134,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
 
         String areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
         //TODO 应用新建 时落到测试区域，并指定一个sip接入点
-        Area area = new Area();
-        area.setId(areaId);
-        app.setArea(area);
+        app.setAreaId(areaId);
         app = this.save(app);
         return app;
     }
@@ -197,5 +197,23 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void deleteApp(String appId) throws InvocationTargetException, IllegalAccessException {
+        //TODO 应用删除解除号码绑定
+        List<ResourcesRent> rents = resourcesRentService.findByAppId(appId);
+        if(rents != null && rents.size() >0){
+            for(ResourcesRent rent:rents){
+                rent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
+                rent.setApp(null);
+                resourcesRentService.save(rent);
+                //更新号码信息，清除应用
+                ResourceTelenum resourceTelenum = rent.getResourceTelenum();
+                resourceTelenum.setAppId(null);
+                resourceTelenumService.save( resourceTelenum);
+            }
+        }
+        this.delete(appId);
     }
 }

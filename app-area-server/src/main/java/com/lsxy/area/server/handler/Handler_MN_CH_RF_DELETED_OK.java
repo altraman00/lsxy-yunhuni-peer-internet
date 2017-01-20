@@ -46,20 +46,21 @@ public class Handler_MN_CH_RF_DELETED_OK extends RpcRequestHandler {
                 list1.add(map.get("id"));
             } else {
                 //失败不用更新
-                if (logger.isDebugEnabled()) {
-                    logger.debug("删除录音文件失败记录,{}", map);
-                }
+                logger.error("删除录音文件失败记录,"+ map);
             }
         }
         try {
             voiceFileRecordService.batchUpdateAADelete(list1, VoiceFilePlay.DELETED_SUCCESS);
-            logger.info("删除录音文件，更新成功记录:{}", list1);
+            if(logger.isDebugEnabled()) {
+                logger.debug("删除录音文件，更新成功记录:"+list1);
+            }
         } catch (Exception e) {
-            logger.error("删除放音文件，更新失败记录:{},异常{}", list1,e);
+            logger.error("删除放音文件，更新失败记录:"+list1+",异常{}" ,e);
         }
         if (logger.isDebugEnabled()) {
             logger.debug("响应MN_CH_RF_DELETED_OK操作结束:{}", request);
         }
         return null;
     }
+
 }

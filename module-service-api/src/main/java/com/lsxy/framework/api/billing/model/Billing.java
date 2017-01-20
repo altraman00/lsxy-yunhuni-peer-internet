@@ -17,7 +17,7 @@ import java.util.Date;
 @Table(schema="db_lsxy_base",name = "tb_base_billing")
 public class Billing extends IdEntity {
 
-    private Tenant tenant;                //所属租户
+    private String tenantId;                //所属租户
     private BigDecimal balance;               //余额
     private Long voiceRemain;          //剩余语音流量（秒）
     private Long smsRemain;            //语音短信余量（条）
@@ -33,14 +33,14 @@ public class Billing extends IdEntity {
     public void setFileRemainSize(Long fileRemainSize) {
         this.fileRemainSize = fileRemainSize;
     }
-    @OneToOne
-    @JoinColumn(name = "tenant_id")
-    public Tenant getTenant() {
-        return tenant;
+
+    @Column(name = "tenant_id")
+    public String getTenantId() {
+        return tenantId;
     }
 
-    public void setTenant(Tenant tenant) {
-        this.tenant = tenant;
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 
     @Column(name = "balance")

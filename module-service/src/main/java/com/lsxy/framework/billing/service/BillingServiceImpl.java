@@ -49,7 +49,7 @@ public class BillingServiceImpl extends AbstractService<Billing> implements Bill
     @Override
     @Cacheable(value="billing",key = "'billing_'+#tenantId" ,unless="#result == null")
     public Billing findBillingByTenantId(String tenantId) {
-        String hql = "from Billing obj where obj.tenant.id=?1";
+        String hql = "from Billing obj where obj.tenantId=?1";
         try {
             return this.findUnique(hql,tenantId);
         } catch (MatchMutiEntitiesException e) {
@@ -64,11 +64,7 @@ public class BillingServiceImpl extends AbstractService<Billing> implements Bill
     @Caching(
             evict = {
                     @CacheEvict(value = "entity", key = "'entity_' + #entity.id", beforeInvocation = true),
-                    @CacheEvict(value = "billing", key = "'billing_' + #entity.tenant.id", beforeInvocation = true)
-            },
-            put = {
-                    @CachePut(value = "entity", key = "'entity_' + #entity.id",unless = "#entity == null"),
-                    @CachePut(value = "billing", key = "'billing_' + #entity.tenant.id",unless = "#entity == null"),
+                    @CacheEvict(value = "billing", key = "'billing_' + #entity.tenantId", beforeInvocation = true)
             }
     )
     @Override

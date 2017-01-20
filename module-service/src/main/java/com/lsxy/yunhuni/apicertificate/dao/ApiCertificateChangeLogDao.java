@@ -14,10 +14,10 @@ import java.util.Date;
 public interface ApiCertificateChangeLogDao extends BaseDaoInterface<ApiCertificateChangeLog, Serializable> {
     /**
      * 获取一定时间段内的secretKey变更记录的次数
-     * @param cert 鉴权账号（凭证）
+     * @param certId 鉴权账号（凭证）
      * @param start 开始时间
      * @param end 结束时间
      * @return
      */
-    Long countByApiCertificateAndChangeDateBetween(ApiCertificate cert, Date start,Date end);
+    Long countByCertIdAndChangeDateBetween(String certId, Date start, Date end);
 }

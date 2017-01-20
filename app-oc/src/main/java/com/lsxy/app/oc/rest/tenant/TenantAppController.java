@@ -280,6 +280,8 @@ public class TenantAppController {
         List numList = null;
         if(nums != null && nums.length > 0){
             numList = Arrays.asList(nums);
+        }else{
+            return RestResponse.failed("0000","没有选定绑定的号码");
         }
         if(numList != null && numList.size() > 0){
             resourcesRentService.bindNumToAppAndGetAreaId(app,numList,false);

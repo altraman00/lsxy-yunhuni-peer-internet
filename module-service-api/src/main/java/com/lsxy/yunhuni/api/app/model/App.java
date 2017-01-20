@@ -16,7 +16,6 @@ import javax.persistence.*;
 @Entity
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_app")
-
 public class App extends IdEntity {
     public static int STATUS_ONLINE = 1;//上线
     public static int STATUS_OFFLINE = 2;//没上线
@@ -37,7 +36,7 @@ public class App extends IdEntity {
     private Integer isRecording;//是否录音服务0否，1是
     private Integer isVoiceValidate;//是否语音验证码0否，1是
     private Integer isIvrService;//是否IVR定制服务0否，1是
-    private Area area;  //所属区域（应用要指定区域,新建应用在测试区域）
+    private String areaId;  //所属区域（应用要指定区域,新建应用在测试区域）
     private String onlineAreaId;//应用上线区域，一但绑定，不能更改，之后上线只能在这个区域上线
     private Integer isCallCenter;//是否启用呼叫中心服务 是否呼叫中心0否，1是',
     private String serviceType;//服务类型
@@ -186,15 +185,13 @@ public class App extends IdEntity {
         this.isIvrService = isIvrService;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "area_id")
-    @NotFound(action = NotFoundAction.IGNORE)
-    public Area getArea() {
-        return area;
+    @Column(name = "area_id")
+    public String getAreaId() {
+        return areaId;
     }
 
-    public void setArea(Area area) {
-        this.area = area;
+    public void setAreaId(String areaId) {
+        this.areaId = areaId;
     }
 
     @Column(name = "online_area_id")

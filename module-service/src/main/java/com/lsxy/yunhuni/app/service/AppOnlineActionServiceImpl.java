@@ -137,15 +137,15 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                     //如果上一次上线的区域ID为空，这次也没有选号码，则分配一个可用的区域ID
                     areaId = areaService.getOneAvailableArea().getId();
                 }
-                Area oldArea = app.getArea();
-                if(oldArea != null && !oldArea.getId().equals(areaId)){
+                if(!areaId.equals(app.getAreaId())){
                     // 区域不一样时，进行区域迁移操作(重新同步放音文件)
                     voiceFilePlayService.renewSyncByAppId(appId);
                 }
                 //绑定应用与区域的关系
-                Area area = new Area();
-                area.setId(areaId);
-                app.setArea(area);
+                app.setAreaId(areaId);
+                if(StringUtils.isBlank(app.getOnlineAreaId())){
+                    app.setOnlineAreaId(areaId);
+                }
                 //将上一步设为完成
                 for(AppOnlineAction a:actionList){
                     a.setStatus(AppOnlineAction.STATUS_DONE);
@@ -194,14 +194,12 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             //应用状态改为下线
             app.setStatus(App.STATUS_OFFLINE);
             String areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
-            if(!areaId.equals(app.getArea().getId())){
+            if(!areaId.equals(app.getAreaId())){
                 // 当区域和测试区域不一样时，进行区域迁移（重新同步放音文件）
                 voiceFilePlayService.renewSyncByAppId(appId);
             }
             //应用区域设置为测试区域
-            Area area = new Area();
-            area.setId(areaId);
-            app.setArea(area);
+            app.setAreaId(areaId);
             appService.save(app);
             //改变号码的租用关系
             //TODO 应用下线不解除号码绑定

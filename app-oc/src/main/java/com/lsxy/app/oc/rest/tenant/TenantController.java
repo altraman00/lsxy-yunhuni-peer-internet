@@ -17,7 +17,6 @@ import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mail.MailConfigNotEnabledException;
 import com.lsxy.framework.mail.MailContentNullException;
 import com.lsxy.framework.mq.api.MQService;
@@ -131,6 +130,8 @@ public class TenantController extends AbstractRestController {
     @RequestParam(required = false) Integer authStatus,
     @ApiParam(name = "accStatus",value = "账号状态，2正常/启用，1被锁定/禁用")
     @RequestParam(required = false) Integer accStatus,
+    @ApiParam(name = "isCost",value = "消费状态，1已消费，0未消费")
+    @RequestParam(required = false,defaultValue = "0") int isCost,
     @RequestParam(required = false,defaultValue = "1") Integer pageNo,
     @RequestParam(required = false,defaultValue = "10") Integer pageSize){
         if(begin!=null){
@@ -141,10 +142,10 @@ public class TenantController extends AbstractRestController {
         }
         Page<TenantVO> list = null;
         Page<TenantVO> list2 = null;
-        try {
+        if(isCost == 1){
+            list = tenantService.pageListBySearchAndAccount(name, begin, end, authStatus, accStatus, pageNo, pageSize);
+        }else{
             list = tenantService.pageListBySearch(name, begin, end, authStatus, accStatus, pageNo, pageSize);
-        }catch (Exception e){
-            logger.error("报错:{}",e);
         }
         try{
             //修改余额取值
@@ -157,7 +158,7 @@ public class TenantController extends AbstractRestController {
                     BigDecimal bigDecimal = calBillingService.getBalance(tenantVO.getId());
                     DayStatics currentStatics = calBillingService.getCurrentStatics(tenantVO.getId());
                     tenantVO.setRemainCoin(bigDecimal.doubleValue());
-                    tenantVO.setCostCoin(currentStatics.getConsume());
+                    tenantVO.setCostCoin(currentStatics.getConsume());//消费额
                     tenantVO.setTotalCoin(currentStatics.getRecharge());
                     tenantVO.setSessionCount(currentStatics.getCallSum());
                     tenantVO.setSessionTime(currentStatics.getCallCostTime()/60);

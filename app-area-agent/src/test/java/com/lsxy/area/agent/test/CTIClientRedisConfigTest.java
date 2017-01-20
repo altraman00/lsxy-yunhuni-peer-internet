@@ -4,6 +4,7 @@ import com.lsxy.area.agent.AreaAgentMainClass;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.Constants;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,4 +50,30 @@ public class CTIClientRedisConfigTest {
     public void test002(){
         ctiClientContext.loadConfig();
     }
+
+
+    @Test
+    public void test003() throws InterruptedException {
+        Assert.assertNotNull(cacheService);
+        cacheService.set("a","3");
+        Assert.assertTrue(cacheService.get("a").equals("3"));
+        cacheService.set("a","1");
+        Assert.assertTrue(cacheService.get("a").equals("1"));
+
+        int i=0;
+        while(i<10000){
+            System.out.println("set a="+i);
+            try {
+                cacheService.set("a", i + "");
+                Assert.assertTrue(cacheService.get("a").equals(i + ""));
+            }catch(Exception ex){
+                System.out.println("出现异常");
+            }
+            i++;
+            Thread.sleep(1000);
+
+        }
+
+    }
+
 }

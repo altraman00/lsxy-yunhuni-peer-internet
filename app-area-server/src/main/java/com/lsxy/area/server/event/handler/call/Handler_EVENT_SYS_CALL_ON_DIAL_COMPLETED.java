@@ -142,18 +142,28 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
         Map<String,String> businessData = state.getBusinessData();
 
         if(BusinessState.TYPE_SYS_CONF.equals(state.getType())){//该呼叫是通过(会议邀请呼叫)发起需要将呼叫加入会议
-            if(StringUtils.isNotBlank(error)){
-                logger.error("将呼叫加入到会议失败{}",error);
-            }else{
-                String conf_id = businessData.get("conf_id");
+            String conf_id = businessData.get("conf_id");
+            try {
                 if(conf_id == null){
                     throw new InvalidParamException("将呼叫加入到会议失败conf_id为null");
                 }
-                try {
-                    confService.confEnter(call_id,conf_id,null,null,null);
-                } catch (Throwable e) {
-                    logger.error("将呼叫加入到会议失败",e);
+                if(StringUtils.isNotBlank(error)){
+                    throw new RuntimeException("邀请呼叫加入会议失败"+error);
                 }
+                confService.confEnter(call_id,conf_id,null,null,null);
+            } catch (Throwable e) {
+                logger.warn("将呼叫加入到会议失败",e);
+                if(StringUtils.isNotBlank(state.getCallBackUrl())){
+                    Map<String,Object> notify_data = new MapBuilder<String,Object>()
+                            .putIfNotEmpty("event","conf.join.fail")
+                            .putIfNotEmpty("id",conf_id)
+                            .putIfNotEmpty("time",System.currentTimeMillis())
+                            .putIfNotEmpty("call_id",call_id)
+                            .putIfNotEmpty("user_data",state.getUserdata())
+                            .build();
+                    notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,3);
+                }
+                hungup(state);
             }
         }else if(BusinessState.TYPE_IVR_CALL.equals(state.getType())){//通过ivr呼出api 发起的呼叫
             //发送拨号结束通知

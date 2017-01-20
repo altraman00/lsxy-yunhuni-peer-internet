@@ -51,7 +51,7 @@ import java.util.List;
  */
 @Service
 public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> implements ResourcesRentService {
-    Logger logger = LoggerFactory.getLogger(ResourcesRentServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(ResourcesRentServiceImpl.class);
     @Autowired
     public ResourcesRentDao resourcesRentDao;
     @Override
@@ -101,6 +101,12 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     public Page<ResourcesRent> findByAppId(String appId,int pageNo, int pageSize) {
         String hql = "from ResourcesRent obj where obj.app.id=?1 and obj.rentStatus = 1 order by obj.lastTime desc";
         return  this.pageList(hql,pageNo,pageSize,appId);
+    }
+
+    @Override
+    public List<ResourcesRent> findByAppId(String appId) {
+        String hql = "from ResourcesRent obj where obj.app.id=?1 and obj.rentStatus = 1 order by obj.lastTime desc";
+        return this.list(hql,appId);
     }
 
     @Override
@@ -159,24 +165,49 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                 appId = (String) rent[2];
             }
             if(StringUtils.isNotBlank(tenantId)){
-                BigDecimal balance = calBillingService.getBalance(tenantId);
                 //获取每月号码扣费金额
                 BigDecimal cost = calCostService.calCost(ProductCode.rent_number_month.name(),tenantId);
-                if(balance.compareTo(cost) == 1 || balance.compareTo(cost) == 0){
-                    Date expireDate = DateUtils.getLastTimeOfMonth(curTime);
-                    if(logger.isDebugEnabled()){
-                        logger.debug("号码租用过期时间：{}",DateUtils.formatDate(expireDate,"yyyy-MM-dd HH:mm:ss"));
-                    }
-                    resourcesRentDao.updateResourceRentExpireTime(rentId,expireDate);
-                    //TODO 支付
-                    //插入消费记录
-                    Consume consume = new Consume(curTime, ConsumeCode.rent_number_month.name(),cost,ConsumeCode.rent_number_month.getName(),appId,tenantId,rentId);
-                    consumeService.consume(consume);
-                }
+                monthlyRentPay(tenantId, curTime, cost, rentId, appId);
             }
         }
     }
 
+    @Override
+    public void payResourcesRent(String tenantId) {
+        if(StringUtils.isNotBlank(tenantId)){
+            Date curTime = new Date();
+            List<Object[]> resourcesRents = resourcesRentDao.findInfoExpireRentByTenantId(tenantId,curTime);
+            BigDecimal cost = calCostService.calCost(ProductCode.rent_number_month.name(),tenantId);
+            for(Object[] rent:resourcesRents){
+                String rentId = (String) rent[0];
+                String appId = "0";
+                if(rent[2] != null){
+                    appId = (String) rent[2];
+                }
+                //如果有一次余额不够了，说明这个租户没钱了，所以断开循环
+                if (!monthlyRentPay(tenantId, curTime, cost, rentId, appId)) break;
+            }
+        }
+    }
+
+    private boolean monthlyRentPay(String tenantId, Date curTime, BigDecimal cost, String rentId, String appId) {
+        BigDecimal balance = calBillingService.getBalance(tenantId);
+        //获取每月号码扣费金额
+        if(balance.compareTo(cost) == 1 || balance.compareTo(cost) == 0){
+            Date expireDate = DateUtils.getLastTimeOfMonth(curTime);
+            if(logger.isDebugEnabled()){
+                logger.debug("更新租用记录：{}，号码租用过期时间：{}",rentId,DateUtils.formatDate(expireDate,"yyyy-MM-dd HH:mm:ss"));
+            }
+            resourcesRentDao.updateResourceRentExpireTime(rentId,expireDate);
+            //TODO 支付
+            //插入消费记录
+            Consume consume = new Consume(curTime, ConsumeCode.rent_number_month.name(),cost,ConsumeCode.rent_number_month.getName(),appId,tenantId,rentId);
+            consumeService.consume(consume);
+            return true;
+        }else{
+            return false;
+        }
+    }
 
     @Override
     @CacheEvict(value = "entity", key = "'entity_' + #id", beforeInvocation = true)
@@ -202,15 +233,8 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
             resourceTelenum.setTenantId(tenant.getId());
             resourceTelenum = resourceTelenumService.save(resourceTelenum);
-            ResourcesRent resourcesRent = new ResourcesRent();
-            resourcesRent.setTenant(tenant);
-            resourcesRent.setResourceTelenum(resourceTelenum);
-            resourcesRent.setResData(resourceTelenum.getTelNumber());
-            resourcesRent.setResName("号码资源");
-            resourcesRent.setResType("1");
-            Date date = DateUtils.getLastTimeOfMonth(new Date());
-            resourcesRent.setRentExpire(date);
-            resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
+            Date expireDate = DateUtils.getLastTimeOfMonth(new Date());
+            ResourcesRent resourcesRent = new ResourcesRent(tenant,null,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),expireDate,ResourcesRent.RENT_STATUS_UNUSED);
             this.save(resourcesRent);
         }
         //扣费
