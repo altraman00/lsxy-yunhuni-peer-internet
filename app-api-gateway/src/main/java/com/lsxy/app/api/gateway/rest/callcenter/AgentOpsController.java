@@ -1,6 +1,7 @@
 package com.lsxy.app.api.gateway.rest.callcenter;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.lsxy.app.api.gateway.dto.callcenter.AgentCallAgentInputDTO;
 import com.lsxy.app.api.gateway.dto.callcenter.AgentCallOutInputDTO;
 import com.lsxy.app.api.gateway.dto.callcenter.RejectTaskInputDTO;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
@@ -40,13 +41,25 @@ public class AgentOpsController extends AbstractAPIController {
 
     @RequestMapping(value = "/{accountId}/callcenter/agent/{name}/call_out",method = RequestMethod.POST)
     public ApiGatewayResponse call_out(HttpServletRequest request, @PathVariable String accountId,
-                                     @PathVariable String name, @RequestHeader(value = "AppID") String appId,
-                                     @Valid @RequestBody AgentCallOutInputDTO dto) throws YunhuniApiException {
+                                       @PathVariable String name, @RequestHeader(value = "AppID") String appId,
+                                       @Valid @RequestBody AgentCallOutInputDTO dto) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("AGENT CALLOUT API参数,accountId={},appId={},name={},dto={}",accountId,appId,name,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
         agentOps.callOut(ip,appId,name,dto.getFrom(),dto.getTo(),dto.getMaxDialSeconds(),dto.getMaxAnswerSeconds());
+        return ApiGatewayResponse.success(true);
+    }
+
+    @RequestMapping(value = "/{accountId}/callcenter/agent/{name}/call_agent",method = RequestMethod.POST)
+    public ApiGatewayResponse call_agent(HttpServletRequest request, @PathVariable String accountId,
+                                       @PathVariable String name, @RequestHeader(value = "AppID") String appId,
+                                       @Valid @RequestBody AgentCallAgentInputDTO dto) throws YunhuniApiException {
+        if(logger.isDebugEnabled()){
+            logger.debug("AGENT CALLAGENT API参数,accountId={},appId={},name={},dto={}",accountId,appId,name,dto);
+        }
+        String ip = WebUtils.getRemoteAddress(request);
+        agentOps.callAgent(ip,appId,name,null,dto.getEnqueue(),null,null);
         return ApiGatewayResponse.success(true);
     }
 }

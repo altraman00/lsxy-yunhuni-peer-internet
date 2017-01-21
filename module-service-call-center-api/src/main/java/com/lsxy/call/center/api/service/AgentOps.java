@@ -12,4 +12,7 @@ public interface AgentOps {
 
     public boolean callOut(String ip,String appId,String name,String from,String to,Integer maxDialSeconds,Integer maxAnswerSeconds) throws YunhuniApiException;
 
+
+    public boolean callAgent(String ip,String appId,String name,String from,String enqueueXml,Integer maxDialSeconds,Integer maxAnswerSeconds) throws YunhuniApiException;
+
 }

@@ -33,6 +33,9 @@ import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import org.apache.commons.lang.StringUtils;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -263,6 +266,117 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_FETCHING,true);
                     //坐席加入交谈成功事件中要呼叫这个号码
                     businessStateService.updateInnerField(callId,"invite_from",from,"invite_to",to);
+                }catch (Throwable t){
+                    callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_IDLE,true);
+                    throw t;
+                }
+            }finally {
+                agentLock.unlock();
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean callAgent(String ip, String appId, String name, String from, String enqueueXml, Integer maxDialSeconds, Integer maxAnswerSeconds) throws YunhuniApiException {
+        if(StringUtil.isBlank(enqueueXml)){
+            throw new RequestIllegalArgumentException();
+        }
+        try {
+            Document doc = DocumentHelper.parseText(enqueueXml);
+            if(!ivrActionService.validateXMLSchema(doc)){
+                throw new RequestIllegalArgumentException();
+            }
+        } catch (DocumentException e) {
+            throw new RequestIllegalArgumentException();
+        }
+
+        if(maxAnswerSeconds == null || maxAnswerSeconds > ConversationService.MAX_DURATION){
+            maxAnswerSeconds = ConversationService.MAX_DURATION;
+        }
+
+        App app = appService.findById(appId);
+        if(app == null){
+            throw new AppNotFoundException();
+        }
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList)){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
+            throw new AppServiceInvalidException();
+        }
+
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
+        if(!isAmountEnough){
+            throw new BalanceNotEnoughException();
+        }
+        String conversationId = UUIDGenerator.uuid();
+        //根据坐席name 找到坐席
+        String agent = callCenterAgentService.getId(appId,name);
+        if(StringUtil.isEmpty(agent)){
+            throw new AgentNotExistException();
+        }
+        CallCenterAgent callCenterAgent = callCenterAgentService.findById(agent);
+        if(callCenterAgent == null){
+            throw new AgentNotExistException();
+        }
+        //获取坐席状态
+        AgentState.Model aState = agentState.get(agent);
+        if(aState == null || aState.getState() == null){
+            throw new AgentNotExistException();
+        }
+        if(aState.getExtension() == null){
+            throw new ExtensionNotExistException();
+        }
+        //座席没有报道
+        if (aState.getLastRegTime() + AgentState.REG_EXPIRE < System.currentTimeMillis()) {
+            //TODO 坐席没有报道 另外定义一个异常
+            throw new AgentNotExistException();
+        }
+        ExtensionState.Model eState = extensionState.get(aState.getExtension());
+
+        //分机不可用
+        if(eState == null || !ExtensionState.Model.ENABLE_TRUE.equals(eState.getEnable())){
+            //TODO 分机不可用 另外定义一个异常
+            throw new ExtensionNotExistException();
+        }
+        AppExtension extension = appExtensionService.findById(aState.getExtension());
+        if(extension == null){
+            throw new ExtensionNotExistException();
+        }
+        BusinessState state = businessStateService.get(agent);
+        //有正在处理的交谈
+        if(state != null && (state.getClosed() == null || !state.getClosed())){
+            //TODO 将其他交谈全部设置为保持（cti需要提供批量）
+
+            //TODO 创建新的交谈，交谈创建成功事件中将坐席加入到新的交谈， 坐席加入交谈成功事件中进行排队，在振铃事件中把排到的坐席加入交谈 交谈正式开始
+            conversationService.create(conversationId,
+                    state.getBusinessData().get(BusinessState.REF_RES_ID),null,state,
+                    state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),maxAnswerSeconds);
+            //坐席加入交谈成功事件中要排队找坐席
+            businessStateService.updateInnerField(conversationId,"enqueue_xml",enqueueXml);
+        }else{
+            AgentLock agentLock = new AgentLock(redisCacheService,agent);
+            if(!agentLock.lock()){
+                throw new SystemBusyException();
+            }
+            //TODO 坐席加锁
+            //TODO 呼叫坐席接通后,创建新的交谈,交谈创建成功事件中将坐席加入到交谈， 坐席加入交谈成功事件中进行排队，在振铃事件中把排到的坐席加入交谈 交谈正式开始
+            //TODO FINALLY 坐席解锁
+            try {
+                if(!CallCenterAgent.STATE_IDLE.equals(agentState.getState(agent))){
+                    throw new SystemBusyException();
+                }
+                try{
+                    String callId = conversationService.agentCall(appId,conversationId,agent,
+                            callCenterAgent.getName(),
+                            extension.getId(),from,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null);
+                    callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_FETCHING,true);
+                    //坐席加入交谈成功事件中要排队找坐席
+                    businessStateService.updateInnerField(conversationId,"enqueue_xml",enqueueXml);
                 }catch (Throwable t){
                     callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_IDLE,true);
                     throw t;
