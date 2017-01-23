@@ -12,6 +12,7 @@ import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.call.center.api.model.CallCenterAgent;
+import com.lsxy.call.center.api.model.CallCenterConversationMember;
 import com.lsxy.call.center.api.model.CallCenterQueue;
 import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.api.states.lock.AgentLock;
@@ -32,6 +33,7 @@ import com.lsxy.yunhuni.api.app.service.ServiceType;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -347,7 +349,11 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         if(extension == null){
             throw new ExtensionNotExistException();
         }
-        BusinessState state = businessStateService.get(agent);
+        BusinessState state = null;
+        String callId = agentIdCallReference.get(agent);
+        if(callId != null){
+            state = businessStateService.get(callId);
+        }
         //有正在处理的交谈
         if(state != null && (state.getClosed() == null || !state.getClosed())){
             //TODO 将其他交谈全部设置为保持（cti需要提供批量）
@@ -371,7 +377,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     throw new SystemBusyException();
                 }
                 try{
-                    String callId = conversationService.agentCall(appId,conversationId,agent,
+                    callId = conversationService.agentCall(appId,conversationId,agent,
                             callCenterAgent.getName(),
                             extension.getId(),from,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null);
                     callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_FETCHING,true);
@@ -388,4 +394,201 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         return true;
     }
 
+
+    @Override
+    public boolean setVoiceMode(String appId,String ip,String name,String conversationId,Integer mode) throws YunhuniApiException {
+        if(StringUtils.isBlank(name)){
+            throw new RequestIllegalArgumentException();
+        }
+        if(StringUtils.isBlank(conversationId)){
+            throw new RequestIllegalArgumentException();
+        }
+        if(mode == null){
+            mode = CallCenterConversationMember.MODE_DEFAULT;
+        }
+        if(!ArrayUtils.contains(CallCenterConversationMember.MODE_ARRAY,mode)){
+            throw new RequestIllegalArgumentException();
+        }
+        App app = appService.findById(appId);
+        if(app == null){
+            throw new AppNotFoundException();
+        }
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList)){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
+            throw new AppServiceInvalidException();
+        }
+        String agentId = callCenterAgentService.getId(appId,name);
+        if(agentId == null){
+            throw new AgentNotExistException();
+        }
+        String callId = agentIdCallReference.get(agentId);
+        if(callId == null){
+            throw new CallNotExistsException();
+        }
+        return conversationService.setVoiceMode(conversationId,callId,mode);
+    }
+
+    @Override
+    public boolean enter(String appId,String ip,String name,String conversationId,Integer mode,Boolean holding) throws YunhuniApiException {
+
+        if(StringUtils.isBlank(name)){
+            throw new RequestIllegalArgumentException();
+        }
+        if(StringUtils.isBlank(conversationId)){
+            throw new RequestIllegalArgumentException();
+        }
+        if(mode == null){
+            mode = CallCenterConversationMember.MODE_DEFAULT;
+        }
+        if(!ArrayUtils.contains(CallCenterConversationMember.MODE_ARRAY,mode)){
+            throw new RequestIllegalArgumentException();
+        }
+        App app = appService.findById(appId);
+        if(app == null){
+            throw new AppNotFoundException();
+        }
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList)){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
+            throw new AppServiceInvalidException();
+        }
+        BusinessState conversationState = businessStateService.get(conversationId);
+
+        if(conversationState == null || (conversationState.getClosed()!= null && conversationState.getClosed())){
+            throw new ConversationNotExistException();
+        }
+
+        if(conversationState.getResId() == null){
+            throw new SystemBusyException();
+        }
+
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
+        if(!isAmountEnough){
+            throw new BalanceNotEnoughException();
+        }
+        //根据坐席name 找到坐席
+        String agent = callCenterAgentService.getId(appId,name);
+        if(StringUtil.isEmpty(agent)){
+            throw new AgentNotExistException();
+        }
+        CallCenterAgent callCenterAgent = callCenterAgentService.findById(agent);
+        if(callCenterAgent == null){
+            throw new AgentNotExistException();
+        }
+        //获取坐席状态
+        AgentState.Model aState = agentState.get(agent);
+        if(aState == null || aState.getState() == null){
+            throw new AgentNotExistException();
+        }
+        if(aState.getExtension() == null){
+            throw new ExtensionNotExistException();
+        }
+        //座席没有报道
+        if (aState.getLastRegTime() + AgentState.REG_EXPIRE < System.currentTimeMillis()) {
+            //TODO 坐席没有报道 另外定义一个异常
+            throw new AgentNotExistException();
+        }
+        ExtensionState.Model eState = extensionState.get(aState.getExtension());
+
+        //分机不可用
+        if(eState == null || !ExtensionState.Model.ENABLE_TRUE.equals(eState.getEnable())){
+            //TODO 分机不可用 另外定义一个异常
+            throw new ExtensionNotExistException();
+        }
+        AppExtension extension = appExtensionService.findById(aState.getExtension());
+        if(extension == null){
+            throw new ExtensionNotExistException();
+        }
+        BusinessState state = null;
+        String callId = agentIdCallReference.get(agent);
+        if(callId != null){
+            state = businessStateService.get(callId);
+        }
+
+        if(state != null && (state.getClosed() == null || !state.getClosed())){
+            //呼叫已经存在
+            if(holding!=null && !holding){
+                //TODO 退出原有交谈
+            }else{
+                //TODO 保持原有交谈,设置其它交谈的收放音模式
+            }
+            //加入交谈
+            try {
+                conversationService.join(conversationId,callId,null,null,null);
+            } catch (YunhuniApiException e) {
+                logger.info("加入交谈失败:{}",e.getCode());
+                conversationService.logicExit(conversationId,callId);
+            }
+        }else{
+            //呼叫不存在 需要呼叫坐席
+            AgentLock agentLock = new AgentLock(redisCacheService,agent);
+            if(!agentLock.lock()){
+                throw new SystemBusyException();
+            }
+            //TODO 坐席加锁
+            //TODO 呼叫坐席接通后,将坐席加入到交谈
+            //TODO FINALLY 坐席解锁
+            try {
+                if(!CallCenterAgent.STATE_IDLE.equals(agentState.getState(agent))){
+                    throw new SystemBusyException();
+                }
+                try{
+                    callId = conversationService.agentCall(appId,conversationId,agent,
+                            callCenterAgent.getName(),
+                            extension.getId(),null,extension.getTelnum(),extension.getType(),extension.getUser(),null,null,null);
+                    callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_FETCHING,true);
+                    //坐席加入交谈成功事件中要排队找坐席
+                }catch (Throwable t){
+                    callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_IDLE,true);
+                    throw t;
+                }
+            }finally {
+                agentLock.unlock();
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean exit(String appId,String ip,String name,String conversationId) throws YunhuniApiException {
+        if(StringUtils.isBlank(name)){
+            throw new RequestIllegalArgumentException();
+        }
+        if(StringUtils.isBlank(conversationId)){
+            throw new RequestIllegalArgumentException();
+        }
+        App app = appService.findById(appId);
+        if(app == null){
+            throw new AppNotFoundException();
+        }
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList)){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
+            throw new AppServiceInvalidException();
+        }
+
+        String agentId = callCenterAgentService.getId(appId,name);
+        if(agentId == null){
+            throw new AgentNotExistException();
+        }
+        String callId = agentIdCallReference.get(agentId);
+        if(callId == null){
+            throw new CallNotExistsException();
+        }
+        conversationService.exit(conversationId,callId);
+        return true;
+    }
 }

@@ -465,31 +465,42 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 if(conversationId == null){
                     return res;
                 }
-                if(businessData.get("invite_to") != null){
+                BusinessState conversationState = businessStateService.get(conversationId);
+                if(conversationState !=null ){
+                    //直接加入交谈
                     try {
-                        conversationService.create(conversationId,
-                                state.getBusinessData().get(BusinessState.REF_RES_ID),null,
-                                state,state.getTenantId(),state.getAppId(),
-                                state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION);
-                        //坐席加入交谈成功事件中要呼叫这个号码
-                        businessStateService.updateInnerField(conversationId,"invite_from",
-                                businessData.get("invite_from"),"invite_to",businessData.get("invite_to"));
-                        businessStateService.deleteInnerField(call_id,"invite_to","invite_from");
+                        conversationService.join(conversationId,call_id,null,null,null);
                     } catch (YunhuniApiException e) {
+                        logger.info("加入交谈失败:{}",e.getCode());
                         conversationService.logicExit(conversationId,call_id);
                     }
-                }else if(businessData.get("enqueue_xml") != null){
-                    try {
-                        conversationService.create(conversationId,
-                                state.getBusinessData().get(BusinessState.REF_RES_ID),null,
-                                state,state.getTenantId(),state.getAppId(),
-                                state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION);
-                        //坐席加入交谈成功事件中要呼叫这个号码
-                        businessStateService.updateInnerField(conversationId,"enqueue_xml",
-                                businessData.get("enqueue_xml"));
-                        businessStateService.deleteInnerField(call_id,"enqueue_xml");
-                    } catch (YunhuniApiException e) {
-                        conversationService.logicExit(conversationId,call_id);
+                }else{
+                    if(businessData.get("invite_to") != null){
+                        try {
+                            conversationService.create(conversationId,
+                                    state.getBusinessData().get(BusinessState.REF_RES_ID),null,
+                                    state,state.getTenantId(),state.getAppId(),
+                                    state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION);
+                            //坐席加入交谈成功事件中要呼叫这个号码
+                            businessStateService.updateInnerField(conversationId,"invite_from",
+                                    businessData.get("invite_from"),"invite_to",businessData.get("invite_to"));
+                            businessStateService.deleteInnerField(call_id,"invite_to","invite_from");
+                        } catch (YunhuniApiException e) {
+                            conversationService.logicExit(conversationId,call_id);
+                        }
+                    }else if(businessData.get("enqueue_xml") != null){
+                        try {
+                            conversationService.create(conversationId,
+                                    state.getBusinessData().get(BusinessState.REF_RES_ID),null,
+                                    state,state.getTenantId(),state.getAppId(),
+                                    state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION);
+                            //坐席加入交谈成功事件中要呼叫这个号码
+                            businessStateService.updateInnerField(conversationId,"enqueue_xml",
+                                    businessData.get("enqueue_xml"));
+                            businessStateService.deleteInnerField(call_id,"enqueue_xml");
+                        } catch (YunhuniApiException e) {
+                            conversationService.logicExit(conversationId,call_id);
+                        }
                     }
                 }
             }

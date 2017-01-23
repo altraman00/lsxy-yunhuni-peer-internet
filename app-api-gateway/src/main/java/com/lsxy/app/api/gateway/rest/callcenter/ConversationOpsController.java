@@ -37,7 +37,7 @@ public class ConversationOpsController extends AbstractAPIController {
     private CallCenterConversationService callCenterConversationService;
 
     @RequestMapping(value = "/{accountId}/callcenter/conversation/{id}",method = RequestMethod.DELETE)
-    public ApiGatewayResponse save(HttpServletRequest request,@PathVariable String accountId, @PathVariable String id,
+    public ApiGatewayResponse dismiss(HttpServletRequest request,@PathVariable String accountId, @PathVariable String id,
                                    @RequestHeader(value = "AppID") String appId) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("CONVERSATION DISMISS API参数,accountId={},appId={},id={}",accountId,appId,id);

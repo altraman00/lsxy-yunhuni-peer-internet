@@ -31,6 +31,7 @@ import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -556,6 +557,9 @@ public class ConversationService {
         if(this.outOfParts(conversationId)){
             throw new OutOfConversationMaxPartsException();
         }
+        if(sismember(conversationId, callId)){
+            return true;
+        }
         return this.enter(callId,conversationId,maxDuration,playFile,voiceMode);
     }
 
@@ -710,13 +714,10 @@ public class ConversationService {
 
     public boolean setVoiceMode(String conversationId, String callId, Integer voiceMode) throws YunhuniApiException {
         if(voiceMode ==null){
-            throw new IllegalArgumentException();
+            throw new RequestIllegalArgumentException();
         }
-        if(voiceMode.intValue() != CallCenterConversationMember.MODE_I_O&&
-                voiceMode.intValue() != CallCenterConversationMember.MODE_I&&
-                voiceMode.intValue() != CallCenterConversationMember.MODE_O&&
-                voiceMode.intValue() != CallCenterConversationMember.MODE_N){
-            throw new IllegalArgumentException();
+        if(!ArrayUtils.contains(CallCenterConversationMember.MODE_ARRAY,voiceMode)){
+            throw new RequestIllegalArgumentException();
         }
         BusinessState call_state = businessStateService.get(callId);
         if(call_state ==null || call_state.getResId() == null){

@@ -26,6 +26,7 @@ public class CallCenterConversationMember extends IdEntity {
     public static final Integer MODE_O = 3;//放音
     public static final Integer MODE_N = 4;//无
     public static final Integer MODE_DEFAULT = MODE_I_O;
+    public static final Integer[] MODE_ARRAY = new Integer[]{MODE_I,MODE_I_O,MODE_N,MODE_O};
 
     private String relevanceId;//所属呼叫中心交谈
     private String sessionId;//加入的session

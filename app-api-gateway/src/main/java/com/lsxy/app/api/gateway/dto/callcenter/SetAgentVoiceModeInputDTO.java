@@ -10,13 +10,24 @@ import javax.validation.constraints.NotNull;
 /**
  * Created by liuws on 2017/1/10.
  */
-public class SetVoiceModeInputDTO extends CommonDTO {
+public class SetAgentVoiceModeInputDTO extends CommonDTO {
 
     @NotNull
+    @JsonProperty("conversation_id")
+    private String conversationId;
+
     @Min(1)
     @Max(4)
-    @JsonProperty("mode")
+    @JsonProperty(value = "mode")
     private Integer mode;
+
+    public String getConversationId() {
+        return conversationId;
+    }
+
+    public void setConversationId(String conversationId) {
+        this.conversationId = conversationId;
+    }
 
     public Integer getMode() {
         return mode;

@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 public class AgentCallAgentInputDTO extends CommonDTO {
 
     @NotNull
-    @JsonProperty("to")
+    @JsonProperty("enqueue")
     private String enqueue;
 
     public String getEnqueue() {

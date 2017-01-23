@@ -15,4 +15,9 @@ public interface AgentOps {
 
     public boolean callAgent(String ip,String appId,String name,String from,String enqueueXml,Integer maxDialSeconds,Integer maxAnswerSeconds) throws YunhuniApiException;
 
+    public boolean setVoiceMode(String appId,String ip,String name,String conversationId,Integer mode) throws YunhuniApiException;
+
+    public boolean enter(String appId,String ip,String name,String conversationId,Integer mode,Boolean holding) throws YunhuniApiException;
+
+    public boolean exit(String appId,String ip,String name,String conversationId) throws YunhuniApiException;
 }
