@@ -1,6 +1,9 @@
 package com.lsxy.call.center.api.service;
 
+import com.lsxy.call.center.api.model.CallCenterConversationDetail;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
+
+import java.util.List;
 
 /**
  * Created by liuws on 2017/1/9.
@@ -20,4 +23,6 @@ public interface AgentOps {
     public boolean enter(String appId,String ip,String name,String conversationId,Integer mode,Boolean holding) throws YunhuniApiException;
 
     public boolean exit(String appId,String ip,String name,String conversationId) throws YunhuniApiException;
+
+    public List<CallCenterConversationDetail> conversations(String appId, String ip, String name) throws YunhuniApiException;
 }

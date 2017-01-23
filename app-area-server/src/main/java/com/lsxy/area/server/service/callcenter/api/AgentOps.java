@@ -6,14 +6,12 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.callcenter.AgentIdCallReference;
+import com.lsxy.area.server.service.callcenter.CallConversationService;
 import com.lsxy.area.server.service.callcenter.ConversationCallVoiceModeReference;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.PlayFileUtil;
-import com.lsxy.call.center.api.model.AppExtension;
-import com.lsxy.call.center.api.model.CallCenterAgent;
-import com.lsxy.call.center.api.model.CallCenterConversationMember;
-import com.lsxy.call.center.api.model.CallCenterQueue;
+import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.api.states.lock.AgentLock;
 import com.lsxy.call.center.api.states.state.AgentState;
@@ -43,7 +41,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by liuws on 2017/1/9.
@@ -62,6 +60,9 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
 
     @Autowired
     private ConversationService conversationService;
+
+    @Autowired
+    private CallConversationService callConversationService;
 
     @Autowired
     private RPCCaller rpcCaller;
@@ -590,5 +591,61 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         }
         conversationService.exit(conversationId,callId);
         return true;
+    }
+
+    @Override
+    public List<CallCenterConversationDetail> conversations(String appId,String ip,String name) throws YunhuniApiException{
+        if(StringUtils.isBlank(name)){
+            throw new RequestIllegalArgumentException();
+        }
+        App app = appService.findById(appId);
+        if(app == null){
+            throw new AppNotFoundException();
+        }
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList)){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
+            throw new AppServiceInvalidException();
+        }
+
+        String agentId = callCenterAgentService.getId(appId,name);
+        if(agentId == null){
+            throw new AgentNotExistException();
+        }
+
+        List<CallCenterConversationDetail> result = null;
+
+        String callId = agentIdCallReference.get(agentId);
+        if(callId == null){
+            return result;
+        }
+        BusinessState state = businessStateService.get(callId);
+        if(state == null || (state.getClosed() !=null && state.getClosed())){
+            return result;
+        }
+
+        Set<String> ids = callConversationService.getConversations(callId);
+        Iterable<CallCenterConversation> list = callCenterConversationService.findAll(ids);
+
+        if(list != null){
+            result = new ArrayList<>();
+            for (CallCenterConversation conversation : list) {
+                CallCenterConversationDetail detail = new CallCenterConversationDetail();
+                detail.setId(conversation.getId());
+                detail.setType(conversation.getType());
+                detail.setState(conversation.getState());
+                detail.setChannelId(conversation.getChannelId());
+                detail.setQueueId(conversation.getQueueId());
+                detail.setStartTime(conversation.getStartTime());//发起时间
+                detail.setEndTime(conversation.getEndTime());//结束时间
+                detail.setEndReason(conversation.getEndReason());
+                result.add(detail);
+            }
+        }
+        return result;
     }
 }
