@@ -3,8 +3,12 @@ package com.lsxy.app.portal.console.app;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
+import com.lsxy.app.portal.console.app.vo.AgentVO;
+import com.lsxy.app.portal.console.app.vo.ExtensionVO;
 import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -13,13 +17,11 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -229,4 +231,49 @@ public class AppController extends AbstractPortalController {
         String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/app/count/{1}";
         return RestRequest.buildSecurityRequest(token).get(uri, Long.class,name);
     }
+
+
+    @RequestMapping("/{appId}/app_extension/page")
+    @ResponseBody
+    public RestResponse listExtensions(HttpServletRequest request, @PathVariable String appId,
+                                       @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
+                                       @RequestParam(defaultValue = "20",required = false)  Integer pageSize) throws YunhuniApiException {
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/{1}/app_extension/page";
+        RestResponse<Page<AppExtension>> response = RestRequest.buildSecurityRequest(token).getPage(uri, AppExtension.class, appId);
+        if(response.isSuccess()){
+            Page<AppExtension> page = response.getData();
+            if(page != null){
+                List<ExtensionVO> returnResult = new ArrayList<>();
+                List<AppExtension> result = page.getResult();
+                if(result != null){
+                    result.stream().forEach(extension -> returnResult.add(ExtensionVO.changeAppExtensionToExtensionVO(extension)));
+                    page.setResult(returnResult);
+                }
+            }
+        }
+        return response;
+    }
+
+    @RequestMapping(value = "/{appId}/agent/page",method = RequestMethod.GET)
+    public RestResponse page(HttpServletRequest request, @PathVariable String appId,
+                             @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
+                             @RequestParam(defaultValue = "20",required = false)  Integer pageSize) throws YunhuniApiException {
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/{1}/agent/page";
+        RestResponse<Page<CallCenterAgent>> response = RestRequest.buildSecurityRequest(token).getPage(uri, CallCenterAgent.class, appId);
+        if(response.isSuccess()){
+            Page page = response.getData();
+            if(page != null){
+                List<AgentVO> returnResult = new ArrayList<>();
+                List<CallCenterAgent> result = page.getResult();
+                if(result != null){
+                    result.stream().forEach(agent -> returnResult.add(AgentVO.changeCallCenterAgentToAgentVO(agent)));
+                    page.setResult(returnResult);
+                }
+            }
+        }
+        return response;
+    }
+
 }
