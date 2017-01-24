@@ -670,6 +670,9 @@ public class ConversationService {
             return;
         }
 
+        if(!sismember(conversationId, callId)){
+            return;
+        }
         try {
             Map<String,Object> params = new MapBuilder<String,Object>()
                     .putIfNotEmpty("res_id",call_state.getResId())
