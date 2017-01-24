@@ -1,10 +1,7 @@
 package com.lsxy.app.api.gateway.rest.callcenter;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.lsxy.app.api.gateway.dto.callcenter.AgentCallAgentInputDTO;
-import com.lsxy.app.api.gateway.dto.callcenter.AgentCallOutInputDTO;
-import com.lsxy.app.api.gateway.dto.callcenter.RejectTaskInputDTO;
-import com.lsxy.app.api.gateway.dto.callcenter.SetAgentVoiceModeInputDTO;
+import com.lsxy.app.api.gateway.dto.callcenter.*;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.app.api.gateway.rest.AbstractAPIController;
 import com.lsxy.call.center.api.service.AgentOps;
@@ -94,5 +91,37 @@ public class AgentOpsController extends AbstractAPIController {
         }
         String ip = WebUtils.getRemoteAddress(request);
         return ApiGatewayResponse.success(agentOps.setVoiceMode(appId,ip,name,dto.getConversationId(),dto.getMode()));
+    }
+
+    @RequestMapping(value = "/{accountId}/callcenter/agent/{name}/enter",method = RequestMethod.POST)
+    public ApiGatewayResponse enter(HttpServletRequest request, @PathVariable String accountId,
+                                  @PathVariable String name, @RequestHeader(value = "AppID") String appId,
+                                  @Valid @RequestBody AgentEnterConversationInputDTO dto) throws YunhuniApiException {
+        if(logger.isDebugEnabled()){
+            logger.debug("AGENT ENTER CONVERSATION API参数,accountId={},appId={},name={},dto={}",accountId,appId,name,dto);
+        }
+        String ip = WebUtils.getRemoteAddress(request);
+        return ApiGatewayResponse.success(agentOps.enter(appId,ip,name,dto.getConversationId(),dto.getMode(),dto.getHolding()));
+    }
+
+    @RequestMapping(value = "/{accountId}/callcenter/agent/{name}/exit",method = RequestMethod.POST)
+    public ApiGatewayResponse exit(HttpServletRequest request, @PathVariable String accountId,
+                                  @PathVariable String name, @RequestHeader(value = "AppID") String appId,
+                                  @Valid @RequestBody AgentExitConversationInputDTO dto) throws YunhuniApiException {
+        if(logger.isDebugEnabled()){
+            logger.debug("AGENT EXIT CONVERSATION API参数,accountId={},appId={},name={},dto={}",accountId,appId,name,dto);
+        }
+        String ip = WebUtils.getRemoteAddress(request);
+        return ApiGatewayResponse.success(agentOps.exit(appId,ip,name,dto.getConversationId()));
+    }
+
+    @RequestMapping(value = "/{accountId}/callcenter/agent/{name}/conversation",method = RequestMethod.GET)
+    public ApiGatewayResponse conversations(HttpServletRequest request, @PathVariable String accountId,
+                                   @PathVariable String name, @RequestHeader(value = "AppID") String appId) throws YunhuniApiException {
+        if(logger.isDebugEnabled()){
+            logger.debug("AGENT CONVERSATION API参数,accountId={},appId={},name={}",accountId,appId,name);
+        }
+        String ip = WebUtils.getRemoteAddress(request);
+        return ApiGatewayResponse.success(agentOps.conversations(appId,ip,name));
     }
 }
