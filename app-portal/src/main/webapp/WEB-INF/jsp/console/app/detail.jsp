@@ -282,11 +282,11 @@
                                                 配置存储周期
                                             </div>
                                             <div class="col-md-10 font14">
-                                                <input type="radio" name="cycle" value="7" <c:if test="${cycle==7}">checked</c:if> />7天免费存储
-                                                &nbsp;<input type="radio" name="cycle" value="30"<c:if test="${cycle==30}">checked</c:if> />1个月
-                                                &nbsp;<input type="radio" name="cycle" value="60"<c:if test="${cycle==60}">checked</c:if> />2个月
-                                                &nbsp;<input type="radio" name="cycle" value="90"<c:if test="${cycle==90}">checked</c:if> />3个月
-                                                &nbsp;<input type="radio" name="cycle" value="180"<c:if test="${cycle==180}">checked</c:if> />6个月
+                                                <input type="radio" name="cycle" value="7" <c:if test="${cycle==7}">checked</c:if> />&nbsp;7天免费存储
+                                                &nbsp;<input type="radio" name="cycle" value="30"<c:if test="${cycle==30}">checked</c:if> />&nbsp;1个月
+                                                &nbsp;<input type="radio" name="cycle" value="60"<c:if test="${cycle==60}">checked</c:if> />&nbsp;2个月
+                                                &nbsp;<input type="radio" name="cycle" value="90"<c:if test="${cycle==90}">checked</c:if> />&nbsp;3个月
+                                                &nbsp;<input type="radio" name="cycle" value="180"<c:if test="${cycle==180}">checked</c:if> />&nbsp;6个月
                                             </div>
                                         </div>
                                         <div class="row margin-bottom-20">
