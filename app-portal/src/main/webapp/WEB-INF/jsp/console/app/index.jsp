@@ -31,12 +31,12 @@
                                 <nav class="hidden-xs">
                                     <ul class="nav">
                                         <li>
-                                            <div class="aside-li-a">
+                                            <div class="aside-li-a <c:if test="${app.id!=null}">active</c:if> ">
                                                 <a href="${ctx}/console/app/list">应用列表</a>
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="aside-li-a active">
+                                            <div class="aside-li-a <c:if test="${app.id==null}">active</c:if> ">
                                                 <a href="${ctx}/console/app/index">创建应用</a>
                                             </div>
                                         </li>
