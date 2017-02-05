@@ -454,10 +454,16 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
         for(int i=0;i<tenants.size();i++){
             List<App> apps = appService.getAppsByTenantId(tenants.get(i).getId());
             for(int j=0;j<apps.size();j++){
-                long sum =  sumAgentNum(tenants.get(i).getId(),apps.get(j).getId(),startTime,endTime);
+                App app = apps.get(j);
+                if(app == null || !App.PRODUCT_CALL_CENTER.equals(app.getIsCallCenter())){
+                    continue;
+                }
+                long sum =  sumAgentNum(tenants.get(i).getId(),app.getId(),startTime,endTime);
                 BigDecimal cost = calCostService.calCost(ProductCode.call_center_month.name(),tenants.get(i).getId());
-                Consume consume = new Consume(new Date(), ConsumeCode.call_center_month.name(),cost.multiply(new BigDecimal(sum)),"应用id["+apps.get(j).getId()+"]总共有"+sum+"个坐席",apps.get(j).getId(),tenants.get(i).getId(),null);
-                consumeService.consume(consume);
+                if(cost != null && cost.compareTo(BigDecimal.ZERO) == 1){
+                    Consume consume = new Consume(new Date(), ConsumeCode.call_center_month.name(),cost.multiply(new BigDecimal(sum)),"应用id["+app.getId()+"]总共有"+sum+"个坐席",app.getId(),tenants.get(i).getId(),null);
+                    consumeService.consume(consume);
+                }
             }
         }
 
