@@ -20,7 +20,7 @@ public class HttpClientHelper {
 
     private static SSLContext createSSLContext() {
         try {
-            SSLContext context = SSLContext.getInstance("SSL");
+            SSLContext context = SSLContext.getInstance("TLS");
             context.init(null,
                     new TrustManager[] { new X509TrustManager(){
                         @Override
