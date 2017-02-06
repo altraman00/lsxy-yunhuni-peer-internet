@@ -4,15 +4,37 @@ package com.lsxy.app.mc.vo;
  * Created by tandy on 16/11/21.
  */
 public class ServerVO {
-    public static final String STATUS_OK = "OK" ;
-    public static final String STATUS_FAILED = "FAILED";
+    public static final String STATUS_OK = "正常" ;           // 服务正常
+    public static final String STATUS_FAILED = "启动失败";     //服务启动失败
+    public static final String STATUS_STOPED = "已停止";    //服务停止了
+    public static final String STATUS_STARTING = "启动中";    //服务启动中
+    public static final String STATUS_UPDATING = "更新中";
     private String serverName;
-    private String appName;
+    private String appName;     //systemId
+    private String moduleName;  //模块名称
     private String serverHost;
     private String serverIp;
     private String serverPort;
-    private String status;
+    private String status = STATUS_STOPED;
+    private String version;
+    private String startDt;
 
+
+    public String getStartDt() {
+        return startDt;
+    }
+
+    public void setStartDt(String startDt) {
+        this.startDt = startDt;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
 
     public ServerVO(){}
 
@@ -23,6 +45,14 @@ public class ServerVO {
         this.serverIp = serverIp;
         this.serverPort = serverPort;
         this.status = status;
+    }
+
+    public String getModuleName() {
+        return moduleName;
+    }
+
+    public void setModuleName(String moduleName) {
+        this.moduleName = moduleName;
     }
 
     public String getServerName() {

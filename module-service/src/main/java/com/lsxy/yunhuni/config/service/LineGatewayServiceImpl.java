@@ -138,7 +138,7 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
         if(host.equals(sipIp) || host.equals(sipDomain)){
             //当是用opensip线路时，返回个id为0的线路
             LineGateway lineGateway = new LineGateway();
-            lineGateway.setId("0");
+            lineGateway.setId(LineGateway.ID_OPENSIPS);
             return lineGateway;
         }
         String host1 = host.replace(":5060","");
