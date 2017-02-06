@@ -858,7 +858,7 @@ public class ConversationService {
                 if(logger.isDebugEnabled()) {
                     logger.debug("开始挂断坐席callid={}", callId);
                 }
-                if(call_state.getResId()!=null){
+                if(call_state.getResId()!=null && !businessStateService.closed(call_state.getId())){
                     hangup(call_state.getResId(),callId,call_state.getAreaId());
                 }
             }
