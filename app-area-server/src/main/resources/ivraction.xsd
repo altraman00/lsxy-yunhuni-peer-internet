@@ -23,6 +23,13 @@
         </xsd:restriction>
     </xsd:simpleType>
 
+    <xsd:simpleType name="phonenumber">
+        <xsd:restriction base="xs:string">
+            <xsd:minLength value="1" />
+            <xsd:maxLength value="128" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
     <xs:simpleType name="playrepeat">
         <xs:restriction base="xs:int">
             <xs:minInclusive value="1"></xs:minInclusive>
@@ -146,7 +153,7 @@
     <xs:complexType name="dial">
         <xs:choice minOccurs="2" maxOccurs="3">
             <xs:element name="play" type="play" minOccurs="0" maxOccurs="1"></xs:element>
-            <xs:element name="number" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+            <xs:element name="number" type="phonenumber" minOccurs="1" maxOccurs="1"></xs:element>
             <xs:element name="connect" type="connect" minOccurs="1" maxOccurs="1"></xs:element>
         </xs:choice>
         <xs:attribute name="from" type="xs:string"></xs:attribute>
