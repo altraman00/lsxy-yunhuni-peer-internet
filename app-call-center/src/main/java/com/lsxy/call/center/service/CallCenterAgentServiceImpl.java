@@ -8,12 +8,12 @@ import com.lsxy.call.center.api.model.Condition;
 import com.lsxy.call.center.api.operations.AgentSkillOperationDTO;
 import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.dao.CallCenterAgentDao;
-import com.lsxy.call.center.states.lock.AgentLock;
-import com.lsxy.call.center.states.lock.ExtensionLock;
-import com.lsxy.call.center.states.state.AgentState;
-import com.lsxy.call.center.states.state.ExtensionState;
-import com.lsxy.call.center.states.statics.ACs;
-import com.lsxy.call.center.states.statics.CAs;
+import com.lsxy.call.center.api.states.lock.AgentLock;
+import com.lsxy.call.center.api.states.lock.ExtensionLock;
+import com.lsxy.call.center.api.states.state.AgentState;
+import com.lsxy.call.center.api.states.state.ExtensionState;
+import com.lsxy.call.center.api.states.statics.ACs;
+import com.lsxy.call.center.api.states.statics.CAs;
 import com.lsxy.call.center.utils.ExpressionUtils;
 import com.lsxy.call.center.utils.Lua;
 import com.lsxy.framework.api.base.BaseDaoInterface;
@@ -197,7 +197,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 //            agentState.setState(agentId,agent.getState());
 //            //TODO 设置分机座席
 //            extensionState.setAgent(extensionId,agentId);
-//            suitedConditions.parallelStream().forEach(condition -> {
+//            suitedConditions.stream().forEach(condition -> {
 //                //TODO 设置条件座席
 //                cAs.add(condition.getId(),agentId,conditionScore.get(condition.getId()));
 //                //TODO 设置座席条件
@@ -259,7 +259,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
      */
     private void setSuitedConditionsAndConditionScore(CallCenterAgent agent, List<Condition> suitedConditions, Map<String, Long> conditionScore, Map<String, Integer> skillScore) throws YunhuniApiException {
         List<Condition> conditions = conditionService.getAll(agent.getTenantId(), agent.getAppId(), agent.getChannel());
-        conditions.parallelStream().forEach(condition -> {
+        conditions.stream().forEach(condition -> {
             if(ExpressionUtils.execWhereExpression(condition.getWhereExpression(),skillScore)){
                 long score = ExpressionUtils.execSortExpression(condition.getSortExpression(), skillScore);
                 conditionScore.put(condition.getId(),score);
@@ -323,7 +323,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             agentState.delete(agentId);
             Set<String> conditionIds = aCs.getAll(agentId);
             if(conditionIds != null){
-                conditionIds.parallelStream().forEach(conditionId -> {
+                conditionIds.stream().forEach(conditionId -> {
                     cAs.remove(conditionId,agentId);
                 });
             }
@@ -383,6 +383,16 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
+    public String getId(String appId, String agentName) throws YunhuniApiException {
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId, agentName);
+        if(agent == null){
+            // 座席不存在
+            throw new AgentNotExistException();
+        }
+        return agent.getId();
+    }
+
+    @Override
     public Page getPage(String appId, Integer pageNo, Integer pageSize) throws YunhuniApiException{
         if(StringUtils.isBlank(appId)){
             throw new RequestIllegalArgumentException();
@@ -392,12 +402,12 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         Page page = this.pageList(hql, pageNo, pageSize, appId);
         List<CallCenterAgent> result = page.getResult();
         //将所有座席ID放入集合中
-        result.parallelStream().forEach(agent ->agentIds.add(agent.getId()));
+        result.stream().forEach(agent ->agentIds.add(agent.getId()));
         //查询这些座席的技能
         List<AgentSkill> skills = agentSkillService.findAllByAgents(agentIds);
         //分组这些技能，以座席Id为key放入Map中
-        Map<String, List<AgentSkill>> collect = skills.parallelStream().collect(Collectors.groupingBy(AgentSkill::getAgent, Collectors.toList()));
-        result.parallelStream().forEach(agent -> {
+        Map<String, List<AgentSkill>> collect = skills.stream().collect(Collectors.groupingBy(AgentSkill::getAgent, Collectors.toList()));
+        result.stream().forEach(agent -> {
             AgentState.Model model = agentState.get(agent.getId());
             agent.setState(model.getState());
             agent.setExtension(model.getExtension());
@@ -535,7 +545,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             List<AgentSkill> skills = agentSkillService.findAllByAgent(agentId);
             //将技能放到map,key是技能名
             Map<String,AgentSkill> skillMap = new HashMap<>();
-            skills.parallelStream().forEach(skill -> skillMap.put(skill.getName(),skill));
+            skills.stream().forEach(skill -> skillMap.put(skill.getName(),skill));
             int count = 0;
             for(AgentSkillOperationDTO opt :skillOpts){
                 switch (opt.getOpt()){
@@ -587,7 +597,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
             Collection<AgentSkill> newSkills = skillMap.values();
             Map<String,Integer> skillScore = new HashMap<>();
-            newSkills.parallelStream().forEach(skill -> {
+            newSkills.stream().forEach(skill -> {
                 if(skill.getEnabled()){
                     skillScore.put(skill.getName(),skill.getScore());
                 }
@@ -597,14 +607,14 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
             Set<String> oldConditionIds = aCs.getAll(agentId);
 
-            suitedConditions.parallelStream().forEach(condition -> {
+            suitedConditions.stream().forEach(condition -> {
                 oldConditionIds.remove(condition.getId());
                 //TODO 设置条件座席
                 cAs.add(condition.getId(),agentId,conditionScore.get(condition.getId()));
                 //TODO 设置座席条件
                 aCs.add(agentId,condition.getId(),condition.getPriority());
             });
-            oldConditionIds.parallelStream().forEach(cId -> {
+            oldConditionIds.stream().forEach(cId -> {
                 cAs.remove(cId,agentId);
                 aCs.remove(agentId,cId);
             });

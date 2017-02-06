@@ -12,21 +12,27 @@ public class EnqueueTimeoutEvent extends AbstractDelayMQEvent{
 
     private String queueId;
 
+    private String type;
+
     private String tenantId;
 
     private String appId;
 
     private String callId;
 
+    private String conversationId;
+
     public EnqueueTimeoutEvent(){}
 
-    public EnqueueTimeoutEvent(String conditionId, String queueId, String tenantId, String appId, String callId, Integer delay){
+    public EnqueueTimeoutEvent(String conditionId, String queueId,String type, String tenantId, String appId, String callId,String conversationId, Integer delay){
         super(delay);
         this.conditionId = conditionId;
         this.queueId = queueId;
+        this.type = type;
         this.tenantId = tenantId;
         this.appId = appId;
         this.callId = callId;
+        this.conversationId = conversationId;
     }
     @Override
     public String getTopicName() {
@@ -47,6 +53,14 @@ public class EnqueueTimeoutEvent extends AbstractDelayMQEvent{
 
     public void setQueueId(String queueId) {
         this.queueId = queueId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getTenantId() {
@@ -71,5 +85,13 @@ public class EnqueueTimeoutEvent extends AbstractDelayMQEvent{
 
     public void setCallId(String callId) {
         this.callId = callId;
+    }
+
+    public String getConversationId() {
+        return conversationId;
+    }
+
+    public void setConversationId(String conversationId) {
+        this.conversationId = conversationId;
     }
 }

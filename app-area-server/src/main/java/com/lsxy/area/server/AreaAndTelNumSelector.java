@@ -70,7 +70,7 @@ public class AreaAndTelNumSelector {
                 throw new NotAvailableLineException();
             }
             //所拥有的线路ID列表
-            List<String> lineIds = lineGateways.parallelStream().map(LineGatewayVO::getId).collect(Collectors.toList());
+            List<String> lineIds = lineGateways.stream().map(LineGatewayVO::getId).collect(Collectors.toList());
 
             List<ResourceTelenum> telnumber;
             if(isDuoCall){
@@ -133,8 +133,8 @@ public class AreaAndTelNumSelector {
     private void addToTelnumSortEntity(String to1, String to2, List<LineGatewayVO> lineGateways, List<TelnumSortEntity> to1Num, List<TelnumSortEntity> to2Num, ResourceTelenum callTelnumber) throws YunhuniApiException {
         List<TelnumToLineGateway> ttgs = telnumToLineGatewayService.getDialingLinesByNumber(callTelnumber.getTelNumber());
         //租户拥有的线路和号码能呼出的线路进行一次交集计算，并组装数据
-        lineGateways.parallelStream().forEach(lg -> {
-            Optional<TelnumToLineGateway> first = ttgs.parallelStream().filter(ttg -> ttg.getLineId().equals(lg.getId())).findFirst();
+        lineGateways.stream().forEach(lg -> {
+            Optional<TelnumToLineGateway> first = ttgs.stream().filter(ttg -> ttg.getLineId().equals(lg.getId())).findFirst();
             if(first.isPresent()){
                 TelnumToLineGateway telnumToLineGateway = first.get();
                 TelnumSortEntity entity1 = getTelnumSortEntity(to1, callTelnumber, lg, telnumToLineGateway);
@@ -154,8 +154,8 @@ public class AreaAndTelNumSelector {
     private void addToTelnumSortEntity(String to, List<LineGatewayVO> lineGateways, List<TelnumSortEntity> toNum, ResourceTelenum telenum) throws YunhuniApiException {
         List<TelnumToLineGateway> ttgs = telnumToLineGatewayService.getDialingLinesByNumber(telenum.getTelNumber());
         //租户拥有的线路和号码能呼出的线路进行一次交集计算，并组装数据
-        lineGateways.parallelStream().forEach(lg -> {
-            Optional<TelnumToLineGateway> first = ttgs.parallelStream().filter(ttg -> ttg.getLineId().equals(lg.getId())).findFirst();
+        lineGateways.stream().forEach(lg -> {
+            Optional<TelnumToLineGateway> first = ttgs.stream().filter(ttg -> ttg.getLineId().equals(lg.getId())).findFirst();
             if(first.isPresent()){
                 TelnumToLineGateway telnumToLineGateway = first.get();
                 TelnumSortEntity entity = getTelnumSortEntity(to, telenum, lg, telnumToLineGateway);
@@ -195,7 +195,7 @@ public class AreaAndTelNumSelector {
     //排序接口
     public static List<TelnumFormat> sortTelnumSortEntity(List<TelnumSortEntity> list){
         List<TelnumFormat> result = new ArrayList();
-        List<TelnumSortEntity> entities = list.parallelStream().sorted((s1, s2) -> s1.getPriority().compareTo(s2.getPriority())).collect(Collectors.toList());
+        List<TelnumSortEntity> entities = list.stream().sorted((s1, s2) -> s1.getPriority().compareTo(s2.getPriority())).collect(Collectors.toList());
         for(TelnumSortEntity entity:entities){
             result.add(entity.getTelnumFormat());
         }

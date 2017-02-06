@@ -2,8 +2,8 @@ package com.lsxy.call.center.test;
 
 import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.*;
-import com.lsxy.call.center.states.state.AgentState;
-import com.lsxy.call.center.states.state.ExtensionState;
+import com.lsxy.call.center.api.states.state.AgentState;
+import com.lsxy.call.center.api.states.state.ExtensionState;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import org.springframework.beans.factory.annotation.Autowired;

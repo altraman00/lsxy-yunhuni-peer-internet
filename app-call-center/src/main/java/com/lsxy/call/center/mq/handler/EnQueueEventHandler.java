@@ -2,8 +2,8 @@ package com.lsxy.call.center.mq.handler;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.call.center.api.service.DeQueueService;
-import com.lsxy.call.center.states.lock.QueueLock;
-import com.lsxy.call.center.states.statics.CQs;
+import com.lsxy.call.center.api.states.lock.QueueLock;
+import com.lsxy.call.center.api.states.statics.CQs;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.mq.events.callcenter.EnqueueTimeoutEvent;
@@ -38,7 +38,7 @@ public class EnQueueEventHandler implements MQMessageHandler<EnqueueTimeoutEvent
             if(cQs.exists(message.getConditionId(),message.getQueueId())){//排队超时
                 cQs.remove(message.getConditionId(),message.getQueueId());
                 try{
-                    deQueueService.timeout(message.getTenantId(),message.getAppId(),message.getCallId(),message.getQueueId());
+                    deQueueService.timeout(message.getTenantId(),message.getAppId(),message.getCallId(),message.getQueueId(),message.getType(),message.getConversationId());
                 }catch (Throwable t){
                     logger.info("[{}][{}]排队超时事件{}",message.getTenantId(),message.getAppId(),t);
                 }

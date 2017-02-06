@@ -419,6 +419,14 @@ public class RedisCacheService {
 			
 		}
 
+		public long zsize(String key){
+			return redisTemplate.opsForZSet().size(key);
+		}
+
+		public Set zReverseRange(final String key, final long start, final long end){
+			return redisTemplate.opsForZSet().reverseRange(key, start, end);
+		}
+
 		public Set zRange(final String key, final long start, final long end) {
 			return redisTemplate.opsForZSet().range(key, start, end);
 		}
@@ -448,6 +456,10 @@ public class RedisCacheService {
 			return set;
 		}
 
+		public boolean sismember(final String key,final String value){
+			return redisTemplate.opsForSet().isMember(key,value);
+		}
+
 		public long ssize(final String key){
 			return redisTemplate.opsForSet().size(key);
 		}
@@ -472,8 +484,8 @@ public class RedisCacheService {
 			return redisTemplate.opsForHash().putIfAbsent(key,field,value);
 		}
 
-		public void hdel(final String key,final String field){
-			redisTemplate.opsForHash().delete(key,field);
+		public void hdel(final String key,final String... fields){
+			redisTemplate.opsForHash().delete(key,fields);
 		}
 
 	public BoundHashOperations getHashOps(String key){

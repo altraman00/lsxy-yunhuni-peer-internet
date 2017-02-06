@@ -1,6 +1,7 @@
 package com.lsxy.area.server;
 
 import com.alibaba.dubbo.common.Constants;
+import com.lsxy.call.center.api.states.CallCenterStateConfig;
 import com.lsxy.framework.FrameworkServiceConfig;
 import com.lsxy.framework.api.FrameworkApiConfig;
 import com.lsxy.framework.cache.FrameworkCacheConfig;
@@ -30,7 +31,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @ComponentScan
 @Import(value={FrameworkRPCConfig.class, FrameworkMQConfig.class, FrameworkCacheConfig.class,FrameworkApiConfig.class,
         FrameworkServiceConfig.class, YunhuniApiConfig.class, YunhuniServiceConfig.class, FrameworkOSSConfig.class,
-        FrameworkJMXConfig.class, FrameworkMonitorConfig.class})
+        FrameworkJMXConfig.class, FrameworkMonitorConfig.class, CallCenterStateConfig.class})
 @EnableDubboConfiguration
 @EnableAsync
 public class AreaServerMainClass extends AbstractSpringBootStarter {
