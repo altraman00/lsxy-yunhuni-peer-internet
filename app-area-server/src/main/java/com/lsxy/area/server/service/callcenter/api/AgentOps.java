@@ -518,7 +518,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         if(state != null && (state.getClosed() == null || !state.getClosed())){
             //呼叫已经存在
             if(holding!=null && !holding){
-                //TODO 退出原有交谈,需要保证退出原交谈，改呼叫不被挂断
+                //TODO 退出原有交谈,需要保证退出原交谈，该呼叫不被挂断
             }else{
                 //TODO 保持原有交谈,设置其它交谈的收放音模式
             }
