@@ -12,6 +12,7 @@ import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.handler.ActionHandler;
 import com.lsxy.area.server.service.ivr.handler.EnqueueHandler;
 import com.lsxy.area.server.service.ivr.handler.HangupActionHandler;
+import com.lsxy.area.server.util.HttpClientHelper;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.service.CallCenterService;
@@ -194,6 +195,8 @@ public class IVRActionService {
                 .setMaxConnPerRoute(1000)
                 //禁用cookies
                 .disableCookieManagement()
+                .setSSLContext(HttpClientHelper.sslContext)
+                .setSSLHostnameVerifier(HttpClientHelper.hostnameVerifier)//设置https无证书访问
                 .build();
         client.start();
     }
