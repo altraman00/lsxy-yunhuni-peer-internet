@@ -5,10 +5,7 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
-import com.lsxy.area.server.service.callcenter.AgentIdCallReference;
-import com.lsxy.area.server.service.callcenter.CallConversationService;
-import com.lsxy.area.server.service.callcenter.ConversationCallVoiceModeReference;
-import com.lsxy.area.server.service.callcenter.ConversationService;
+import com.lsxy.area.server.service.callcenter.*;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.call.center.api.model.*;
@@ -90,9 +87,6 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
 
     @Autowired
     private CallSessionService callSessionService;
-
-    @Autowired
-    private ConversationCallVoiceModeReference conversationCallVoiceModeReference;
 
     @Autowired
     private PlayFileUtil playFileUtil;
@@ -242,7 +236,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         BusinessState state = businessStateService.get(agent);
         //有正在处理的交谈
         if(state != null && (state.getClosed() == null || !state.getClosed())){
-            //TODO 将其他交谈全部设置为保持（cti需要提供批量）
+            //TODO 将其他交谈全部设置为保持（cti需要提供批量） 这里应该是阻塞调用好点
 
             //TODO 创建新的交谈，交谈创建成功事件中将坐席加入到新的交谈， 坐席加入交谈成功事件中呼叫外线，在振铃事件中把外线加入交谈 交谈正式开始
             conversationService.create(conversationId,
@@ -357,7 +351,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         }
         //有正在处理的交谈
         if(state != null && (state.getClosed() == null || !state.getClosed())){
-            //TODO 将其他交谈全部设置为保持（cti需要提供批量）
+            //TODO 将其他交谈全部设置为保持（cti需要提供批量） 这里应该是阻塞调用好点
 
             //TODO 创建新的交谈，交谈创建成功事件中将坐席加入到新的交谈， 坐席加入交谈成功事件中进行排队，在振铃事件中把排到的坐席加入交谈 交谈正式开始
             conversationService.create(conversationId,
@@ -517,18 +511,22 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
 
         if(state != null && (state.getClosed() == null || !state.getClosed())){
             //呼叫已经存在
-            if(holding!=null && !holding){
-                //TODO 退出原有交谈,需要保证退出原交谈，该呼叫不被挂断
-            }else{
-                //TODO 保持原有交谈,设置其它交谈的收放音模式
-            }
-            //加入交谈
+            String curConversation = state.getBusinessData().get(CallCenterUtil.CONVERSATION_FIELD);//原有交谈
+            //TODO 保持原有交谈,设置其它交谈的收放音模式 这里应该是阻塞调用好点
             try {
+                //加入交谈（是否需要上一步成功后再执行加入交谈）
                 conversationService.join(conversationId,callId,null,null,null);
             } catch (YunhuniApiException e) {
                 logger.info("加入交谈失败:{}",e.getCode());
-                //TODO 是否需要调用退出
+                //--是否需要调用退出
                 conversationService.logicExit(conversationId,callId);
+            }
+            if(holding!=null && !holding){
+                //TODO 退出原有交谈
+                if(!businessStateService.closed(conversationId)
+                        && !businessStateService.closed(callId)){
+                    conversationService.exit(curConversation,callId);
+                }
             }
         }else{
             //呼叫不存在 需要呼叫坐席

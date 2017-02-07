@@ -408,10 +408,10 @@ public class RedisCacheService {
 		/**
 		 * 
 		 * @param key
-		 * @param queueid
+		 * @param value
 		 */
-		public void zrem(final String key, final String queueid) {
-			redisTemplate.opsForZSet().remove(key, queueid);
+		public void zrem(final String key, final String value) {
+			redisTemplate.opsForZSet().remove(key, value);
 		}
 
 		public void zrem(String key, Object... array) {
@@ -441,6 +441,10 @@ public class RedisCacheService {
 
 		public Double zScore(final String key,final String value) {
 			return redisTemplate.opsForZSet().score(key,value);
+		}
+
+		public Long zCount(final String key,final double score1,double score2) {
+			return redisTemplate.opsForZSet().count(key,score1,score2);
 		}
 
 		public void sremove(final String key,final String... value){

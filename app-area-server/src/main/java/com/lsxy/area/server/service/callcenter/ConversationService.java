@@ -112,9 +112,6 @@ public class ConversationService {
     private CallSessionBatchInserter callSessionBatchInserter;
 
     @Autowired
-    private ConversationCallVoiceModeReference conversationCallVoiceModeReference;
-
-    @Autowired
     private CallCenterConversationBatchInserter callCenterConversationBatchInserter;
 
     public BaseEnQueue getEnqueue(String queueId){
@@ -386,13 +383,13 @@ public class ConversationService {
                         .putIfNotEmpty(CallCenterUtil.AGENT_EXTENSION_FIELD,extension)
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(initiator))
                         .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,initiator)
+                        .putIfNotEmpty(CallCenterUtil.VOICE_MODE_FIELD,voiceMode==null?CallCenterConversationMember.MODE_DEFAULT.toString():voiceMode.toString())
                         .putIfNotEmpty("from",StringUtil.isEmpty(systemNum)?from:systemNum)
                         .putIfNotEmpty("to",to)
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
                 .build();
         businessStateService.save(callstate);
-        conversationCallVoiceModeReference.set(conversationId,callId,voiceMode);
         return callId;
     }
 
@@ -462,13 +459,13 @@ public class ConversationService {
                         .putIfNotEmpty(CallCenterUtil.AGENT_EXTENSION_FIELD,extension)
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,null)
                         .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,null)
+                        .putIfNotEmpty(CallCenterUtil.VOICE_MODE_FIELD,voiceMode==null?CallCenterConversationMember.MODE_DEFAULT.toString():voiceMode.toString())
                         .putIfNotEmpty("from",StringUtil.isEmpty(systemNum)?from:systemNum)
                         .putIfNotEmpty("to",to)
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
                 .build();
         businessStateService.save(callstate);
-        conversationCallVoiceModeReference.set(conversationId,callId,voiceMode);
         return callId;
     }
 
@@ -538,6 +535,7 @@ public class ConversationService {
                         .putIfNotEmpty(BusinessState.REF_RES_ID,ref_res_id)
                         .putIfNotEmpty(CallCenterUtil.CONVERSATION_FIELD,conversationId)
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(conversationId))
+                        .putIfNotEmpty(CallCenterUtil.VOICE_MODE_FIELD,voiceMode==null?CallCenterConversationMember.MODE_DEFAULT.toString():voiceMode.toString())
                         .putIfNotEmpty("from",oneTelnumber)
                         .putIfNotEmpty("to",to)
                         .putIfNotEmpty("play_file",playFile)//加入后在交谈中播放这个文件
@@ -545,7 +543,6 @@ public class ConversationService {
                         .build())
                 .build();
         businessStateService.save(callstate);
-        conversationCallVoiceModeReference.set(conversationId,callId,voiceMode);
         return callId;
     }
 
@@ -602,8 +599,13 @@ public class ConversationService {
         Map<String,String> conversation_business=conversation_state.getBusinessData();
 
         Integer max_seconds = maxDuration == null ? 0 : maxDuration;
-        Integer voice_mode = voiceMode == null ?
-                conversationCallVoiceModeReference.get(conversation_id,call_id) : voiceMode;
+
+        Integer voice_mode = CallCenterConversationMember.MODE_DEFAULT;
+        if(voiceMode != null){
+            voice_mode = voiceMode;
+        }else if(call_business.get(CallCenterUtil.VOICE_MODE_FIELD) != null){
+            voice_mode = Integer.parseInt(call_business.get(CallCenterUtil.VOICE_MODE_FIELD));
+        }
         String play_file = playFile == null ? "" : playFile;
 
         if(call_business != null && call_business.get("max_seconds")!=null){
@@ -635,7 +637,6 @@ public class ConversationService {
         if(call_business.get(CallCenterUtil.CONVERSATION_FIELD) == null){
             businessStateService.updateInnerField(call_id,CallCenterUtil.CONVERSATION_FIELD,conversation_id);
         }
-        conversationCallVoiceModeReference.set(conversation_id,call_id,voiceMode);
         if(logger.isDebugEnabled()){
             logger.debug("完成呼叫加入交谈call_id={},conversation_id={},maxDuration={},playFile={},voiceMode={}",
                     call_id,conversation_id,maxDuration,playFile,voice_mode);
@@ -763,7 +764,7 @@ public class ConversationService {
             throw new InvokeCallException(e);
         }
 
-        conversationCallVoiceModeReference.set(conversationId,callId,voiceMode);
+        incrPart(conversationId,callId,voiceMode);
 
         try{
             callCenterConversationMemberService.updateMode(conversationId,callId,voiceMode);
@@ -794,13 +795,12 @@ public class ConversationService {
         }catch (Throwable t){
             logger.error("设置交谈成员的结束时间失败",t);
         }
-        conversationCallVoiceModeReference.clear(conversationId, callId);
         //交谈成员递减
         this.decrPart(conversationId,callId);
 
         //TODO 成员大于1且，活动成员只剩一个了
         if(this.size(conversationId) > 1){
-            long activeTotal = 1;//TODO 需要获取活动成员
+            long activeTotal = avtiveTotal(conversationId);//TODO 需要获取活动成员
             if(activeTotal == 1){
                 //TODO 播放holdvoice
             }
@@ -818,6 +818,7 @@ public class ConversationService {
 
         if(callConversationService.size(callId) > 0){
             //TODO 回到上一次交谈
+            String curConversation = callConversationService.head(callId);
             if(logger.isDebugEnabled()) {
                 logger.debug("回到上一次交谈callid={}", callId);
             }
@@ -858,7 +859,7 @@ public class ConversationService {
                 if(logger.isDebugEnabled()) {
                     logger.debug("开始挂断坐席callid={}", callId);
                 }
-                if(call_state.getResId()!=null){
+                if(call_state.getResId()!=null && !businessStateService.closed(call_state.getId())){
                     hangup(call_state.getResId(),callId,call_state.getAreaId());
                 }
             }
@@ -880,7 +881,11 @@ public class ConversationService {
         Map<String,String> businessData = state.getBusinessData();
 
         callConversationService.incrConversation(call_id,conversation_id);
-        this.incrPart(conversation_id,call_id);
+        if(state.getBusinessData().get(CallCenterUtil.VOICE_MODE_FIELD) == null){
+            incrPart(conversation_id,call_id);
+        }else{
+            incrPart(conversation_id,call_id,Integer.parseInt(state.getBusinessData().get(CallCenterUtil.VOICE_MODE_FIELD)));
+        }
 
         CallCenterConversationMember member = new CallCenterConversationMember();
         try{
@@ -897,7 +902,7 @@ public class ConversationService {
             }else{
                 member.setIsAgent(CallCenterConversationMember.AGENT_FALSE);
             }
-            member.setMode(conversationCallVoiceModeReference.get(conversation_id, call_id));
+            member.setMode(getMode(conversation_id, call_id));
             callCenterConversationMemberService.save(member);
         }catch (Throwable t){
             logger.warn("保存交谈成员失败",t);
@@ -986,25 +991,47 @@ public class ConversationService {
      */
     public boolean outOfParts(String conversationId){
         String key = key(conversationId);
-        return redisCacheService.ssize(key) >= MAX_PARTS;
+        return redisCacheService.zsize(key) >= MAX_PARTS;
     }
 
     public long size(String conversationId){
         String key = key(conversationId);
-        long size = redisCacheService.ssize(key);
+        long size = redisCacheService.zsize(key);
         if(logger.isDebugEnabled()){
             logger.debug("{}交谈成员数={}",conversationId,size);
         }
         return size;
     }
 
+    public long avtiveTotal(String conversationId){
+        String key = key(conversationId);
+        Long total = redisCacheService.zCount(key,CallCenterConversationMember.MODE_I_O.doubleValue(),
+                CallCenterConversationMember.MODE_O.doubleValue());
+        if(total == null){
+            total = 0L;
+        }
+        if(logger.isDebugEnabled()){
+            logger.debug("{}交谈活动成员数={}",conversationId,total);
+        }
+        return total;
+    }
+
     public boolean sismember(String conversationId,String callId) {
         String key = key(conversationId);
-        boolean result = redisCacheService.sismember(key,callId);
+        Double result = redisCacheService.zScore(key,callId);
         if(logger.isDebugEnabled()){
-            logger.debug("{}是否是交谈={}的成员{}",callId,conversationId,result);
+            logger.debug("{}是否是交谈={}的成员{}",callId,conversationId,result!=null);
         }
-        return result;
+        return result!=null;
+    }
+
+    public Integer getMode(String conversationId,String callId){
+        String key = key(conversationId);
+        Double result = redisCacheService.zScore(key,callId);
+        if(result == null){
+            return null;
+        }
+        return result.intValue();
     }
 
     /**
@@ -1012,8 +1039,12 @@ public class ConversationService {
      * @param conversationId
      */
     public void incrPart(String conversationId,String callId){
+        this.incrPart(conversationId,callId,CallCenterConversationMember.MODE_DEFAULT);
+    }
+
+    public void incrPart(String conversationId,String callId,Integer mode){
         String key = key(conversationId);
-        redisCacheService.sadd(key,callId);
+        redisCacheService.zadd(key,callId,mode);
         redisCacheService.expire(key,EXPIRE);
     }
 
@@ -1023,7 +1054,7 @@ public class ConversationService {
      */
     public void decrPart(String conversationId,String callId){
         String key = key(conversationId);
-        redisCacheService.sremove(key,callId);
+        redisCacheService.zrem(key,callId);
         redisCacheService.expire(key,EXPIRE);
     }
 
@@ -1036,7 +1067,7 @@ public class ConversationService {
         String key = key(conversationId);
         Set<String> results = null;
         try{
-            results = redisCacheService.smembers(key);
+            results = redisCacheService.zRange(key,0,-1);
         }catch (Throwable t){
             logger.error("获取交谈成员失败",t);
         }
@@ -1050,7 +1081,7 @@ public class ConversationService {
         String key = key(conversationId);
         Set<String> results = null;
         try{
-            results = redisCacheService.smembers(key);
+            results = redisCacheService.zRange(key,0,-1);
         }catch (Throwable t){
             logger.error("获取交谈成员失败",t);
         }
