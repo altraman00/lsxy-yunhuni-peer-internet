@@ -83,10 +83,12 @@
                             <!--大图标 添加样子 application-tab -->
                             <section class="panel panel-default pos-rlt clearfix ">
                                 <ul id="myTab" class="nav nav-tabs" name="appId">
+                                    <li <c:if test="${empty appId }"> class="active"</c:if> >
+                                        <a href="" data-toggle="tab" onclick="appSubmit('')">全部</a>
+                                    </li>
                                     <c:forEach items="${appList}" var="app" varStatus="s">
                                         <li
                                                 <c:if test="${app.id==appId}"> class="active"</c:if>
-                                                <c:if test="${appId==null&&s.index==0}"> class="active"</c:if>
                                         >
                                             <a href="" data-toggle="tab" onclick="appSubmit('${app.id}')">${app.name}</a>
                                         </li>
@@ -100,7 +102,13 @@
                                                 日期
                                             </div>
                                             <div class="col-md-2">
-                                                <input type="text" name="time" class="form-control currentDay " value="${time}" />
+                                                <input type="text" name="start" class="form-control currentDay "  value="${start}"  />
+                                            </div>
+                                            <div class="col-md-1">
+                                                到
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input type="text" name="end" class="form-control currentDay "  value="${end}"  />
                                             </div>
                                             <div class="col-md-1">
                                                 类型

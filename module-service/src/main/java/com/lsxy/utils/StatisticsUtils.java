@@ -43,7 +43,7 @@ public class StatisticsUtils {
         return map;
     }
     /**
-     * 将租户和应用和类型对为空和非为空时进行处理成sql
+     * 将租户和应用和类型对为空和非为空时进行处理成sql,当tenantId或appId为"all"时，或types包含"all",表示该字段不做为条件查询
      * @param tenantId 租户id
      * @param appId 应用id
      * @param types 类型
@@ -59,6 +59,9 @@ public class StatisticsUtils {
             String value = entry.getValue();
             if(StringUtil.isEmpty(value)){
                 sql += " "+name+" is null and ";
+            }else if(value.equals("all")){
+                //当为all时表示该字段不做为条件查询
+                continue;
             }else{
                 sql += " "+name+"='"+value + "' and ";
             }
@@ -74,7 +77,8 @@ public class StatisticsUtils {
         }
         if(StringUtils.isEmpty(type)){
             sql += " type is null and ";
-        }else{
+        //当为all时表示该字段不做为条件查询
+        }else if(!type.contains("all")){
             sql += " type in ("+type+") and ";
         }
         return sql;

@@ -91,13 +91,15 @@ public class BillDetailController extends AbstractRestController {
         Map re = new HashMap();
         RestResponse restResponse = null;
         if(StringUtil.isNotEmpty(appId)&&StringUtil.isNotEmpty(type)){
+            Date startTime = DateUtils.parseDate(time,"yyyy-MM-dd");
+            Date endTime = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
             //获取分页数据
-            Page page = voiceCdrService.pageList(pageNo, pageSize, type, uid, time, appId);
+            Page page = voiceCdrService.pageList(pageNo, pageSize, type, uid, startTime,endTime, appId);
             re.put("page", page);
             if (CallSession.TYPE_VOICE_VOICECODE.equals(type)) {//语音验证码
                 re.put("total", page.getTotalCount());
             } else {
-                Map map = voiceCdrService.sumCost(type, uid, time, appId);
+                Map map = voiceCdrService.sumCost(type, uid, startTime,endTime, appId);
                 re.put("total", map.get("cost"));
             }
             restResponse = RestResponse.success(re);

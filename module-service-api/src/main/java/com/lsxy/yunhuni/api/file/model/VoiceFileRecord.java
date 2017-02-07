@@ -42,7 +42,7 @@ public class VoiceFileRecord extends IdEntity {
             return new String[]{"呼叫中心"};
         }else{
             //其他类型
-            return new String[]{"语音回拔","自定义IVR","语音会议","呼叫中心"};
+            return new String[]{"自定义IVR","语音会议","呼叫中心"};
         }
     }
     @Column(name="cost")
