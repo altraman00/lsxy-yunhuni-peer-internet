@@ -96,7 +96,7 @@ public class BillDetailController extends AbstractPortalController {
         mav.addAllObjects(map);
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/sum?appId={1}&type={2}&startTime={3}&endTime={4}";
-        mav.addObject("sum",RestRequest.buildSecurityRequest(token).get(uri, Map.class,appId,type,map.get("time"),map.get("time")).getData());
+        mav.addObject("sum",RestRequest.buildSecurityRequest(token).get(uri, Map.class,appId,type,map.get("start"),map.get("end")).getData());
         String uri1 = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/plist/time?pageNo={1}&pageSize={2}&appId={3}&type={4}&startTime={5}&endTime={6}";
         mav.addObject("pageObj",RestRequest.buildSecurityRequest(token).getPage(uri1,Map.class,pageNo,pageSize,map.get("appId"),type,map.get("start"),map.get("end")).getData());
         mav.setViewName("/console/statistics/billdetail/recording");

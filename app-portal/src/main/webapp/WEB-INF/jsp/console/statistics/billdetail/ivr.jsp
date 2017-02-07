@@ -162,7 +162,7 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <c:set var="extraParam" value="&time=${time}&appId=${appId}"></c:set>
+                                    <c:set var="extraParam" value="&start=${start}&end=${end}&appId=${appId}"></c:set>
                                     <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/ivr"></c:set>
                                     <%@include file="/inc/pagefooter.jsp" %>
                                 </div>

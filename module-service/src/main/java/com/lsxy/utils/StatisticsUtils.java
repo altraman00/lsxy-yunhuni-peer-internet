@@ -78,7 +78,7 @@ public class StatisticsUtils {
         if(StringUtils.isEmpty(type)){
             sql += " type is null and ";
         //当为all时表示该字段不做为条件查询
-        }else if(!type.contains("all")){
+        }else{
             sql += " type in ("+type+") and ";
         }
         return sql;
