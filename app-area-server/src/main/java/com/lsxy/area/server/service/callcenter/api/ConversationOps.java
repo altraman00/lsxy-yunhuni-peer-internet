@@ -7,7 +7,6 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.callcenter.AgentIdCallReference;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
-import com.lsxy.area.server.service.callcenter.ConversationCallVoiceModeReference;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.PlayFileUtil;
@@ -87,9 +86,6 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
 
     @Autowired
     private CallSessionService callSessionService;
-
-    @Autowired
-    private ConversationCallVoiceModeReference conversationCallVoiceModeReference;
 
     @Autowired
     private PlayFileUtil playFileUtil;

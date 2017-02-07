@@ -89,9 +89,6 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
     private CallSessionService callSessionService;
 
     @Autowired
-    private ConversationCallVoiceModeReference conversationCallVoiceModeReference;
-
-    @Autowired
     private PlayFileUtil playFileUtil;
 
     @Reference(lazy = true,check = false,timeout = 3000)

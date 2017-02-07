@@ -84,7 +84,8 @@ public class CallCenterUtil {
     /**记录排队开始时间字段**/
     public static final String ENQUEUE_START_TIME_FIELD = "ENQUEUE_START_TIME_FIELD";
 
-
+    /**交谈成员收放音模式**/
+    public static final String VOICE_MODE_FIELD = "VOICE_MODE";
 
     @Autowired
     private BusinessStateService businessStateService;
