@@ -209,7 +209,7 @@ public class ConversationService {
      * @throws YunhuniApiException
      */
     public String create(String id,String ref_res_id,String channel,
-                         BusinessState initiator,String tenantId,String appId, String areaId,String callBackUrl, Integer maxDuration) throws YunhuniApiException {
+                         BusinessState initiator,String tenantId,String appId, String areaId,String callBackUrl, Integer maxDuration,String hold_voice) throws YunhuniApiException {
         if(maxDuration == null || maxDuration > MAX_DURATION){
             maxDuration = MAX_DURATION;
         }
@@ -240,6 +240,7 @@ public class ConversationService {
                         .putIfNotEmpty(CallCenterUtil.CONVERSATION_SYSNUM_FIELD,initiator.getBusinessData().get("from"))
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(initiator))
                         .putIfNotEmpty(CallCenterUtil.CHANNEL_ID_FIELD,channel)
+                        .putIfNotEmpty(CallCenterUtil.HOLD_VOICE_FIELD,hold_voice)//TODO 如果hold_voice为null是否要默认的
                         .putIfNotEmpty("max_seconds",maxDuration.toString())//交谈最大持续时长
                         .build())
                 .build();
@@ -798,11 +799,27 @@ public class ConversationService {
         //交谈成员递减
         this.decrPart(conversationId,callId);
 
-        //TODO 成员大于1且，活动成员只剩一个了
+        //成员大于1且，活动成员只剩一个了
         if(this.size(conversationId) > 1){
-            long activeTotal = avtiveTotal(conversationId);//TODO 需要获取活动成员
+            long activeTotal = avtiveTotal(conversationId);//需要获取活动成员
             if(activeTotal == 1){
-                //TODO 播放holdvoice
+                //TODO 播放holdvoice,是否需要默认的
+                if(conversation_state.getBusinessData().get(CallCenterUtil.HOLD_VOICE_FIELD) != null){
+                    Map<String, Object> _params = new MapBuilder<String,Object>()
+                            .putIfNotEmpty("res_id",conversation_state.getResId())
+                            .putIfNotEmpty("content", JSONUtil2.objectToJson(new Object[][]{new Object[]{
+                                    conversation_state.getBusinessData().get(CallCenterUtil.HOLD_VOICE_FIELD),0,""}}))
+                            .putIfNotEmpty("user_data",conversationId)
+                            .putIfNotEmpty("is_loop",true)
+                            .put("areaId",conversation_state.getAreaId())
+                            .build();
+                    RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, _params);
+                    try {
+                        rpcCaller.invoke(sessionContext, rpcrequest,true);
+                    } catch (Throwable t) {
+                        logger.error("调用失败",t);
+                    }
+                }
             }
         }
         //退出呼叫所在的交谈

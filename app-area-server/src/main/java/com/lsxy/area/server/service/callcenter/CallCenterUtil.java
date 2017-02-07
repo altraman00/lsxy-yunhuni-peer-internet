@@ -87,6 +87,9 @@ public class CallCenterUtil {
     /**交谈成员收放音模式**/
     public static final String VOICE_MODE_FIELD = "VOICE_MODE";
 
+    /**交谈holding 提示音**/
+    public static final String HOLD_VOICE_FIELD = "HOLD_VOICE";
+
     @Autowired
     private BusinessStateService businessStateService;
 
