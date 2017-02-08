@@ -2,6 +2,7 @@ package com.lsxy.yunhuni.api.file.model;
 
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
@@ -33,16 +34,22 @@ public class VoiceFileRecord extends IdEntity {
     private BigDecimal cost;//消费金额
     private Long callTimeLong;//呼叫时长
     private Long costTimeLong;//计费时长
-    public static String[] getRecordType(String serviceType){
+    public static String[][] getRecordType(String serviceType){
         if(App.PRODUCT_VOICE.equals(serviceType)) {//"语音回拔"
             //录音类型
-            return new String[]{"自定义IVR","语音会议"};
+            return new String[][]{
+                    {ProductCode.ivr_call.name(),ProductCode.ivr_call.getRemark()},
+                    {ProductCode.sys_conf.name(),ProductCode.sys_conf.getRemark()}
+            };
         }else if(App.PRODUCT_CALL_CENTER.equals(serviceType)){
             //呼叫中心类型
-            return new String[]{"呼叫中心"};
+            return new String[][]{{ProductCode.call_center.name(),"呼叫中心"}};
         }else{
             //其他类型
-            return new String[]{"自定义IVR","语音会议","呼叫中心"};
+            return new String[][]{
+                    {ProductCode.ivr_call.name(),ProductCode.ivr_call.getRemark()},
+                    {ProductCode.sys_conf.name(),ProductCode.sys_conf.getRemark()},
+                    {ProductCode.call_center.name(),"呼叫中心"}};
         }
     }
     @Column(name="cost")
