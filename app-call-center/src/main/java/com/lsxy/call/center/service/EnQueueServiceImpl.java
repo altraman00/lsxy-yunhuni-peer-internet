@@ -161,8 +161,9 @@ public class EnQueueServiceImpl implements EnQueueService{
             } catch (Throwable e) {}
             queueId = save(num,condition,callId,conversationId,baseEnQueue,queueType).getId();
 
-            //lua脚本找坐席
-            String agent = (String)redisCacheService.eval(Lua.LOOKUPAGENT,4,
+            //lua脚本找坐席,默认排队规则为random，lru为最大空闲时长的优先
+            String agent = (String)redisCacheService.eval(EnQueue.CHOICE_LRU.equals(enQueue.getChoice())
+                    ?Lua.LOOKUPAGENTLRU:Lua.LOOKUPAGENTRANDOM,4,
                     CAs.getKey(condition.getId()),AgentState.getPrefixed(),
                     ExtensionState.getPrefixed(),AgentLock.getPrefixed(),
                     ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),

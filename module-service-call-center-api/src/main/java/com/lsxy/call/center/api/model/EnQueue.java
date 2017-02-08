@@ -10,6 +10,11 @@ import java.io.Serializable;
  */
 @XStreamAlias("enqueue")
 public class EnQueue implements Serializable{
+
+    public static final String CHOICE_LRU = "lru";
+
+    public static final String CHOICE_RANDOM = "random";
+
     @XStreamAsAttribute
     private String channel;
 

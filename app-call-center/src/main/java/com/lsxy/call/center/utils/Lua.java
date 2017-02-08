@@ -7,7 +7,9 @@ import com.lsxy.framework.core.utils.LuaUtils;
  */
 public class Lua {
 
-    public static final String LOOKUPAGENT = LuaUtils.load("/lua/lookupAgent.lua");
+    public static final String LOOKUPAGENTLRU = LuaUtils.load("/lua/lookupAgentLRU.lua");
+
+    public static final String LOOKUPAGENTRANDOM = LuaUtils.load("/lua/lookupAgentRANDOM.lua");
 
     public static final String LOOKUPAGENTFORIDLE = LuaUtils.load("/lua/lookupAgentForIdle.lua");
 
