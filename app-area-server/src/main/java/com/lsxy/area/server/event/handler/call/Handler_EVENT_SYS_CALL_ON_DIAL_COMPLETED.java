@@ -480,7 +480,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                             conversationService.create(conversationId,
                                     state.getBusinessData().get(BusinessState.REF_RES_ID),null,
                                     state,state.getTenantId(),state.getAppId(),
-                                    state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION);
+                                    state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null);
                             //坐席加入交谈成功事件中要呼叫这个号码
                             businessStateService.updateInnerField(conversationId,"invite_from",
                                     businessData.get("invite_from"),"invite_to",businessData.get("invite_to"));
@@ -493,7 +493,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                             conversationService.create(conversationId,
                                     state.getBusinessData().get(BusinessState.REF_RES_ID),null,
                                     state,state.getTenantId(),state.getAppId(),
-                                    state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION);
+                                    state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null);
                             //坐席加入交谈成功事件中要呼叫这个号码
                             businessStateService.updateInnerField(conversationId,"enqueue_xml",
                                     businessData.get("enqueue_xml"));

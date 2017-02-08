@@ -54,7 +54,7 @@ public class CallCenterUtil {
     public static final String ISCC_FIELD = "ISCC";
     public static final String ISCC_TRUE = "1";
     /**正在播放排队等待音存放的字段**/
-    public static final String PLAYWAIT_FIELD = "IS_PLAYWAIT";
+    public static final String PLAYWAIT_FIELD = "PLAYWAIT";
     /**呼叫对应的排队id存放的字段**/
     public static final String QUEUE_ID_FIELD = "QUEUE_ID";
     /**呼叫对应的排队类型存放的字段**/
@@ -86,6 +86,9 @@ public class CallCenterUtil {
 
     /**交谈成员收放音模式**/
     public static final String VOICE_MODE_FIELD = "VOICE_MODE";
+
+    /**交谈holding 提示音**/
+    public static final String HOLD_VOICE_FIELD = "HOLD_VOICE";
 
     @Autowired
     private BusinessStateService businessStateService;

@@ -155,7 +155,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         }
 
         if(state.getBusinessData().get(BusinessState.RINGING_TAG) == null){
-            //TODO 不是正在振铃
+            //不是正在振铃
             throw new SystemBusyException();
         }
 
@@ -219,15 +219,13 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         }
         //座席没有报道
         if (aState.getLastRegTime() + AgentState.REG_EXPIRE < System.currentTimeMillis()) {
-            //TODO 坐席没有报道 另外定义一个异常
-            throw new AgentNotExistException();
+            throw new AgentExpiredException();
         }
         ExtensionState.Model eState = extensionState.get(aState.getExtension());
 
         //分机不可用
         if(eState == null || !ExtensionState.Model.ENABLE_TRUE.equals(eState.getEnable())){
-            //TODO 分机不可用 另外定义一个异常
-            throw new ExtensionNotExistException();
+            throw new ExtensionUnEnableException();
         }
         AppExtension extension = appExtensionService.findById(aState.getExtension());
         if(extension == null){
@@ -241,7 +239,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             //TODO 创建新的交谈，交谈创建成功事件中将坐席加入到新的交谈， 坐席加入交谈成功事件中呼叫外线，在振铃事件中把外线加入交谈 交谈正式开始
             conversationService.create(conversationId,
                     state.getBusinessData().get(BusinessState.REF_RES_ID),null,state,
-                    state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),maxAnswerSeconds);
+                    state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),maxAnswerSeconds,null);
             //坐席加入交谈成功事件中要呼叫这个号码
             businessStateService.updateInnerField(conversationId,"invite_from",from,"invite_to",to);
         }else{
@@ -330,15 +328,13 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         }
         //座席没有报道
         if (aState.getLastRegTime() + AgentState.REG_EXPIRE < System.currentTimeMillis()) {
-            //TODO 坐席没有报道 另外定义一个异常
-            throw new AgentNotExistException();
+            throw new AgentExpiredException();
         }
         ExtensionState.Model eState = extensionState.get(aState.getExtension());
 
         //分机不可用
         if(eState == null || !ExtensionState.Model.ENABLE_TRUE.equals(eState.getEnable())){
-            //TODO 分机不可用 另外定义一个异常
-            throw new ExtensionNotExistException();
+            throw new ExtensionUnEnableException();
         }
         AppExtension extension = appExtensionService.findById(aState.getExtension());
         if(extension == null){
@@ -356,7 +352,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             //TODO 创建新的交谈，交谈创建成功事件中将坐席加入到新的交谈， 坐席加入交谈成功事件中进行排队，在振铃事件中把排到的坐席加入交谈 交谈正式开始
             conversationService.create(conversationId,
                     state.getBusinessData().get(BusinessState.REF_RES_ID),null,state,
-                    state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),maxAnswerSeconds);
+                    state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),maxAnswerSeconds,null);
             //坐席加入交谈成功事件中要排队找坐席
             businessStateService.updateInnerField(conversationId,"enqueue_xml",enqueueXml);
         }else{
@@ -489,15 +485,13 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         }
         //座席没有报道
         if (aState.getLastRegTime() + AgentState.REG_EXPIRE < System.currentTimeMillis()) {
-            //TODO 坐席没有报道 另外定义一个异常
-            throw new AgentNotExistException();
+            throw new AgentExpiredException();
         }
         ExtensionState.Model eState = extensionState.get(aState.getExtension());
 
         //分机不可用
         if(eState == null || !ExtensionState.Model.ENABLE_TRUE.equals(eState.getEnable())){
-            //TODO 分机不可用 另外定义一个异常
-            throw new ExtensionNotExistException();
+            throw new ExtensionUnEnableException();
         }
         AppExtension extension = appExtensionService.findById(aState.getExtension());
         if(extension == null){
@@ -511,22 +505,25 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
 
         if(state != null && (state.getClosed() == null || !state.getClosed())){
             //呼叫已经存在
-            String curConversation = state.getBusinessData().get(CallCenterUtil.CONVERSATION_FIELD);//原有交谈
-            //TODO 保持原有交谈,设置其它交谈的收放音模式 这里应该是阻塞调用好点
+            String curConversation = callConversationService.head(callId);//原有交谈
+
+            //TODO 设置所有交谈为保持状态，这里应该是阻塞调用好点,一次只能活动在一个交谈
+
             try {
                 //加入交谈（是否需要上一步成功后再执行加入交谈）
-                conversationService.join(conversationId,callId,null,null,null);
+                conversationService.join(conversationId,callId,null,null,mode);
+                if(holding!=null && !holding){
+                    //退出原有交谈
+                    if(!businessStateService.closed(curConversation)
+                            && !businessStateService.closed(callId)){
+                        conversationService.exit(curConversation,callId);
+                    }
+                }
             } catch (YunhuniApiException e) {
                 logger.info("加入交谈失败:{}",e.getCode());
                 //--是否需要调用退出
                 conversationService.logicExit(conversationId,callId);
-            }
-            if(holding!=null && !holding){
-                //TODO 退出原有交谈
-                if(!businessStateService.closed(conversationId)
-                        && !businessStateService.closed(callId)){
-                    conversationService.exit(curConversation,callId);
-                }
+                throw e;
             }
         }else{
             //呼叫不存在 需要呼叫坐席
