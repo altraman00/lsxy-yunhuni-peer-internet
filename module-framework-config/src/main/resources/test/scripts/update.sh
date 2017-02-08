@@ -43,7 +43,7 @@ then
     echo "ssh root@$host_name /opt/tomcat_app_portal/bin/startup.sh"
     ssh root@$host_name "/opt/tomcat_app_portal/bin/startup.sh"
 else
-    echo "ssh root@$host_name nohup /opt/yunhuni-peer-internet/bin/update_restart.sh -A $app_name -S -P development -I >> /opt/yunhuni/logs/$app_name.out 2>&1 &"
-    ssh root@$host_name "nohup /opt/yunhuni-peer-internet/bin/update_restart.sh -A $app_name -S -P development -I >> /opt/yunhuni/logs/$app_name.out 2>&1 &"
+    echo "ssh root@$host_name nohup /opt/yunhuni-peer-internet/bin/update_restart.sh -A $app_name -S -P test -I >> /opt/yunhuni/logs/$app_name.out 2>&1 &"
+    ssh root@$host_name "nohup /opt/yunhuni-peer-internet/bin/update_restart.sh -A $app_name -S -P test -I >> /opt/yunhuni/logs/$app_name.out 2>&1 &"
 fi
 

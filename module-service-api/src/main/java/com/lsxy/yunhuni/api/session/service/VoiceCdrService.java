@@ -22,7 +22,7 @@ public interface VoiceCdrService extends BaseService<VoiceCdr> {
      * 根据类型，日期，应用id来查询获取分页数据
      */
     public Page<VoiceCdr> pageList(Integer pageNo,Integer pageSize,String type,String tenantId,String time,String appId);
-
+    public Page<VoiceCdr> pageList(Integer pageNo,Integer pageSize,String type,String tenantId,String time1,String time2,String appId);
     /**
      * 根据查询类型，应用id，统计当前日期的消费额度或者验证码条数
      * @param type 类型 查看产品表code字段或枚举类ProductCode
@@ -31,6 +31,7 @@ public interface VoiceCdrService extends BaseService<VoiceCdr> {
      * @return
      */
     public Map sumCost(String type, String tenantId, String time, String appId);
+    public Map sumCost(String type, String tenantId, String time1,String time2, String appId);
     /**
      * 获取应用呼叫状况
      * @param appId

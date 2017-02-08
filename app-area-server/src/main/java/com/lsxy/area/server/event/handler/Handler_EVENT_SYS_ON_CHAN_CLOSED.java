@@ -163,7 +163,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         voiceCdr.setType(productCode.name());
         voiceCdr.setRelevanceId(businessState.getId());
         String host;
-        if(cdrSplit[11].trim().equals("0")){
+        if(cdrSplit[11].trim().equals("0")){//等于0时表示呼入，参考CTI CDR事件说明文档
             //相对平台是呼入 处理to
             voiceCdr.setFromNum(cdrSplit[7].trim());
             String toNum = cdrSplit[8].trim().split("@")[0];
@@ -209,9 +209,9 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         if(lineGateway == null){
             voiceCdr.setLineId(null);
             voiceCdr.setLineCost(BigDecimal.ZERO);
-        }else if("0".equals(lineGateway.getId())){
+        }else if(LineGateway.ID_OPENSIPS.equals(lineGateway.getId())){
             //如果线路ID是"0",则说明是opensips呼叫
-            voiceCdr.setLineId("0");
+            voiceCdr.setLineId(LineGateway.ID_OPENSIPS);
             voiceCdr.setLineCost(BigDecimal.ZERO);
             if(ProductCode.call_center.name().equals(voiceCdr.getType())){
                 //如果是opensips呼叫，且是呼叫中心类型，则将呼叫类型设为:呼叫中心-电话线路(用于计费)
@@ -257,41 +257,5 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             return null;
         }
     }
-//
-//    private VoiceCdr getVoiceCdr(String cdr) {
-//        cdr = cdr.substring(1,cdr.length()-1);
-//        String[] split = cdr.split(",");
-//        VoiceCdr voiceCdr = new VoiceCdr();
-//        voiceCdr.setCdr_id(split[0].trim());
-//        voiceCdr.setCdr_nodeid(split[1].trim());
-//        voiceCdr.setCdr_cdrid(split[2].trim());
-//        voiceCdr.setCdr_processid(split[3].trim());
-//        voiceCdr.setCdr_callid(split[4].trim());
-//        voiceCdr.setCdr_ch(split[5].trim());
-//        voiceCdr.setCdr_devno(split[6].trim());
-//        voiceCdr.setCdr_ani(split[7].trim());
-//        voiceCdr.setCdr_dnis(split[8].trim());
-//        voiceCdr.setCdr_dnis2(split[9].trim());
-//        voiceCdr.setCdr_orgcallno(split[10].trim());
-//        voiceCdr.setCdr_dir(split[11].trim());
-//        voiceCdr.setCdr_devtype(split[12].trim());
-//        voiceCdr.setCdr_busitype(split[13].trim());
-//        voiceCdr.setCdr_callstatus(split[14].trim());
-//        voiceCdr.setCdr_endtype(split[15].trim());
-//        voiceCdr.setCdr_ipscreason(split[16].trim());
-//        voiceCdr.setCdr_callfailcause(split[17].trim());
-//        voiceCdr.setCdr_callbegintime(split[18].trim());
-//        voiceCdr.setCdr_connectbegintime(split[19].trim());
-//        voiceCdr.setCdr_callendtime(split[20].trim());
-//        voiceCdr.setCdr_talkduration(split[21].trim());
-//        voiceCdr.setCdr_projectid(split[22].trim());
-//        voiceCdr.setCdr_flowid(split[23].trim());
-//        voiceCdr.setCdr_additionalinfo1(split[24].trim());
-//        voiceCdr.setCdr_additionalinfo2(split[25].trim());
-//        voiceCdr.setCdr_additionalinfo3(split[26].trim());
-//        voiceCdr.setCdr_additionalinfo4(split[27].trim());
-//        voiceCdr.setCdr_additionalinfo5(split[28].trim());
-//        return voiceCdr;
-//    }
 
 }

@@ -38,12 +38,5 @@ do
  esac
 done
 
-if [ "$app_name"x = "app-portal"x ]
-then
-    echo "ssh root@$host_name /opt/tomcat_app_portal/bin/startup.sh"
-    ssh root@$host_name "/opt/tomcat_app_portal/bin/startup.sh"
-else
-    echo "ssh root@$host_name nohup /opt/yunhuni-peer-internet/bin/update_restart.sh -A $app_name -S -P test -I >> /opt/yunhuni/logs/$app_name.out 2>&1 &"
-    ssh root@$host_name "nohup /opt/yunhuni-peer-internet/bin/update_restart.sh -A $app_name -S -P test -I >> /opt/yunhuni/logs/$app_name.out 2>&1 &"
-fi
-
+echo "/opt/lsxy_yunwei/lsxy_server_auto.sh -j mystart -a $app_name -h $host_name -r $r_name"
+nohup /opt/lsxy_yunwei/lsxy_server_auto.sh -j mystart -a $app_name -h $host_name -r $r_name >> /tmp/lsxy_server_auto.log 2>&1 &

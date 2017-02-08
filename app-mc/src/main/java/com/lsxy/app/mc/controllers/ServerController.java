@@ -18,6 +18,7 @@ import com.lsxy.framework.web.rest.RestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,6 +40,10 @@ public class ServerController extends AdminController{
     private static final Logger logger = LoggerFactory.getLogger(ServerController.class);
 
     private static List<ServerVO> servers;
+
+    @Autowired
+    private Environment environment;
+
     @Autowired
     private RedisCacheService cacheService;
 
@@ -94,9 +99,14 @@ public class ServerController extends AdminController{
 //        String script = "/opt/lsxy_yunwei/lsxy_server.sh -j start -a app-portal-api -r 1.2.0-RC3 -h p05";
 
         try {
-
-            if(isExistStartingServerInTheHost(host)){
-                return RestResponse.failed("00002","同一台主机一次只能启动一个服务");
+            //测试环境中，一台服务器只能同时启动构建一个服务，否则会出现构建冲突
+            if(environment.acceptsProfiles("test")) {
+                if(logger.isDebugEnabled()){
+                    logger.debug("startServer测试环境进来了......哈哈哈哈........");
+                }
+                if (isExistStartingServerInTheHost(host)) {
+                    return RestResponse.failed("00002", "同一台主机一次只能启动一个服务");
+                }
             }
 
             Application application = Application.getApplication(app);
@@ -128,7 +138,7 @@ public class ServerController extends AdminController{
     private boolean isExistStartingServerInTheHost(String host) {
         for(ServerVO server:servers){
             if(server.getServerHost().equals(host)){
-                if(server.getStatus().equals(ServerVO.STATUS_STARTING)){
+                if(server.getStatus() != null && server.getStatus().equals(ServerVO.STATUS_STARTING)){
                     if(cacheService.get(getServerRedisKey(host,server.getAppName())) == null){
                         return true;
                     }
@@ -140,24 +150,32 @@ public class ServerController extends AdminController{
 
     /**
      * 更新服务
-     * @param host
-     * @param app
+     * @param host  主机
+     * @param app 应用名称
+     * @param version 指定更新的版本号
      * @return
      */
     @RequestMapping("/server/update")
     @ResponseBody
-    public RestResponse<String> updateServer(String host,String app){
+    public RestResponse<String> updateServer(String host,String app,String version){
         try {
-            if(isExistStartingServerInTheHost(host)){
-                return RestResponse.failed("00002","同一台主机一次只能启动一个服务");
+            //测试环境中，一台服务器只能同时启动构建一个服务，否则会出现构建冲突
+            if(environment.acceptsProfiles("test")) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("startServer测试环境进来了.. ....哈哈哈哈........");
+                }
+                if(isExistStartingServerInTheHost(host)){
+                    return RestResponse.failed("00002","同一台主机一次只能启动一个服务");
+                }
             }
+
 
             Application application = Application.getApplication(app);
             if(application == null) {
                 throw new IllegalArgumentException(app);
             }
             String script = scriptService.prepareScript(ScriptService.SCRIPT_UPDATE);
-            String result = RunShellUtil.run("sh "+script + " -a "+application.getModuleName()+" -h "+host+"",10);
+            String result = RunShellUtil.run("sh "+script + " -a "+application.getModuleName()+" -h "+host+" -r "+version,10);
             if(logger.isDebugEnabled()){
                 logger.debug("update completed and result is :");
                 logger.debug(result);
@@ -189,6 +207,11 @@ public class ServerController extends AdminController{
         }
 
         for(ServerVO server:servers){
+            if(!server.getStatus().equals(ServerVO.STATUS_STARTING) && !server.getStatus().equals(ServerVO.STATUS_UPDATING)){
+                //重置一下服务器状态，除了过程中的状态
+                server.setStatus(ServerVO.STATUS_STOPED);
+            }
+
             String key = getServerRedisKey(server.getServerHost(),server.getAppName());
             if(logger.isDebugEnabled()){
                 logger.debug("find server connection status, key is :{}",key);

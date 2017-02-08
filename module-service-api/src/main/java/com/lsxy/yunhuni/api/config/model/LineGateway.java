@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_line_gateway")
 public class LineGateway extends IdEntity {
+    public final static String ID_OPENSIPS  = "0"; //虚拟Id，当线路是opensips时的Id
     public final static String STATUS_USABLE = "1";
     public final static String STATUS_UNUSABLE = "0";
     public final static String MOBILEAREARULE_ADD_ZERO = "0";
