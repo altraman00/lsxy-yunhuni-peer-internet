@@ -125,6 +125,39 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
     }
 
     @Override
+    public Page<VoiceCdr> pageList(Integer pageNo, Integer pageSize, String type, String tenantId, String time1, String time2, String appId) {
+        Date date1 = DateUtils.parseDate(time1,"yyyy-MM-dd");
+        Date date2 = DateUtils.parseDate(time2+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+        String[] types = null;
+        if(type!=null){
+            types = new String[]{type};
+        }
+        if(App.PRODUCT_CALL_CENTER.equals(type)){
+            types = CallSession.CALL_CENTER_PRODUCT_CODE;
+        }
+        String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull3(tenantId,appId,types)+ " deleted=0 and   call_start_dt BETWEEN ? and ?";
+        String sqlCount = "select count(1) "+sql;
+        Integer totalCount = jdbcTemplate.queryForObject(sqlCount,Integer.class,new Object[]{date1,date2});
+        sql = "select "+StringUtil.sqlName(VoiceCdr.class)+sql+" order by call_start_dt desc limit ?,?";
+        pageNo--;
+        List rows = jdbcTemplate.queryForList(sql,new Object[]{date1,date2,pageNo*pageSize,pageSize});
+        List list = new ArrayList();
+        for(int i=0;i<rows.size();i++){
+            VoiceCdr voiceCdr = new VoiceCdr();
+            try {
+                BeanUtils.copyProperties(voiceCdr,rows.get(i));
+            } catch (IllegalAccessException e) {
+                logger.error("异常",e);
+            } catch (InvocationTargetException e) {
+                logger.error("异常",e);
+            }
+            list.add(voiceCdr);
+        }
+        Page<VoiceCdr> page = new Page((pageNo)*pageSize+1,totalCount,pageSize,list);
+        return page;
+    }
+
+    @Override
     public Map sumCost( String type ,String tenantId, String time, String appId) {
         Date date1 = DateUtils.parseDate(time,"yyyy-MM-dd");
         Date date2 = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
@@ -137,6 +170,23 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         }
         String costType = " SUM(cost) as cost";
         String sql = "select "+costType+" from db_lsxy_bi_yunhuni.tb_bi_voice_cdr  where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,types)+ " deleted=0  and call_start_dt BETWEEN ? and ? ";
+        Map result = this.jdbcTemplate.queryForMap(sql,new Object[]{date1,date2});
+        return result;
+    }
+
+    @Override
+    public Map sumCost(String type, String tenantId, String time1, String time2, String appId) {
+        Date date1 = DateUtils.parseDate(time1,"yyyy-MM-dd");
+        Date date2 = DateUtils.parseDate(time2+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+        String[] types = null;
+        if(type!=null){
+            types = new String[]{type};
+        }
+        if(App.PRODUCT_CALL_CENTER.equals(type)){
+            types = CallSession.CALL_CENTER_PRODUCT_CODE;
+        }
+        String costType = " SUM(cost) as cost";
+        String sql = "select "+costType+" from db_lsxy_bi_yunhuni.tb_bi_voice_cdr  where "+ StatisticsUtils.getSqlIsNull3(tenantId,appId,types)+ " deleted=0  and call_start_dt BETWEEN ? and ? ";
         Map result = this.jdbcTemplate.queryForMap(sql,new Object[]{date1,date2});
         return result;
     }
