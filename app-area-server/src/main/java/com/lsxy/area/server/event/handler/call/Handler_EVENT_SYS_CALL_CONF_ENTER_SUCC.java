@@ -150,6 +150,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         if(conversationState == null || (conversationState.getClosed() !=null && conversationState.getClosed())){
             return;
         }
+        conversationService.join(conversation_id,call_id);
         if(conversationState.getBusinessData().get("invite_to") != null){//邀请外线
             try{
                 conversationService.inviteOut(appId,conversationState.getBusinessData().get(BusinessState.REF_RES_ID),
