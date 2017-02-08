@@ -155,7 +155,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         }
 
         if(state.getBusinessData().get(BusinessState.RINGING_TAG) == null){
-            //TODO 不是正在振铃
+            //不是正在振铃
             throw new SystemBusyException();
         }
 
@@ -219,15 +219,13 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         }
         //座席没有报道
         if (aState.getLastRegTime() + AgentState.REG_EXPIRE < System.currentTimeMillis()) {
-            //TODO 坐席没有报道 另外定义一个异常
-            throw new AgentNotExistException();
+            throw new AgentExpiredException();
         }
         ExtensionState.Model eState = extensionState.get(aState.getExtension());
 
         //分机不可用
         if(eState == null || !ExtensionState.Model.ENABLE_TRUE.equals(eState.getEnable())){
-            //TODO 分机不可用 另外定义一个异常
-            throw new ExtensionNotExistException();
+            throw new ExtensionUnEnableException();
         }
         AppExtension extension = appExtensionService.findById(aState.getExtension());
         if(extension == null){
@@ -330,15 +328,13 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         }
         //座席没有报道
         if (aState.getLastRegTime() + AgentState.REG_EXPIRE < System.currentTimeMillis()) {
-            //TODO 坐席没有报道 另外定义一个异常
-            throw new AgentNotExistException();
+            throw new AgentExpiredException();
         }
         ExtensionState.Model eState = extensionState.get(aState.getExtension());
 
         //分机不可用
         if(eState == null || !ExtensionState.Model.ENABLE_TRUE.equals(eState.getEnable())){
-            //TODO 分机不可用 另外定义一个异常
-            throw new ExtensionNotExistException();
+            throw new ExtensionUnEnableException();
         }
         AppExtension extension = appExtensionService.findById(aState.getExtension());
         if(extension == null){
@@ -489,15 +485,13 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         }
         //座席没有报道
         if (aState.getLastRegTime() + AgentState.REG_EXPIRE < System.currentTimeMillis()) {
-            //TODO 坐席没有报道 另外定义一个异常
-            throw new AgentNotExistException();
+            throw new AgentExpiredException();
         }
         ExtensionState.Model eState = extensionState.get(aState.getExtension());
 
         //分机不可用
         if(eState == null || !ExtensionState.Model.ENABLE_TRUE.equals(eState.getEnable())){
-            //TODO 分机不可用 另外定义一个异常
-            throw new ExtensionNotExistException();
+            throw new ExtensionUnEnableException();
         }
         AppExtension extension = appExtensionService.findById(aState.getExtension());
         if(extension == null){
