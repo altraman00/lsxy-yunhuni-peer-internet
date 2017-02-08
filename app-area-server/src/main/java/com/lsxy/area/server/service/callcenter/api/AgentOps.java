@@ -505,22 +505,25 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
 
         if(state != null && (state.getClosed() == null || !state.getClosed())){
             //呼叫已经存在
-            String curConversation = state.getBusinessData().get(CallCenterUtil.CONVERSATION_FIELD);//原有交谈
-            //TODO 保持原有交谈,设置其它交谈的收放音模式 这里应该是阻塞调用好点
+            String curConversation = callConversationService.head(callId);//原有交谈
+
+            //TODO 设置所有交谈为保持状态，这里应该是阻塞调用好点,一次只能活动在一个交谈
+
             try {
                 //加入交谈（是否需要上一步成功后再执行加入交谈）
-                conversationService.join(conversationId,callId,null,null,null);
+                conversationService.join(conversationId,callId,null,null,mode);
+                if(holding!=null && !holding){
+                    //退出原有交谈
+                    if(!businessStateService.closed(curConversation)
+                            && !businessStateService.closed(callId)){
+                        conversationService.exit(curConversation,callId);
+                    }
+                }
             } catch (YunhuniApiException e) {
                 logger.info("加入交谈失败:{}",e.getCode());
                 //--是否需要调用退出
                 conversationService.logicExit(conversationId,callId);
-            }
-            if(holding!=null && !holding){
-                //TODO 退出原有交谈
-                if(!businessStateService.closed(conversationId)
-                        && !businessStateService.closed(callId)){
-                    conversationService.exit(curConversation,callId);
-                }
+                throw e;
             }
         }else{
             //呼叫不存在 需要呼叫坐席
