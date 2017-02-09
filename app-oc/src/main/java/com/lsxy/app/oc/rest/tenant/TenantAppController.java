@@ -125,18 +125,6 @@ public class TenantAppController {
         vo.setRecordingTime( temp);
         return RestResponse.success(vo);
     }
-    @ApiOperation(value = "获取租户的app信息下的分机")
-    @RequestMapping(value="/tenants/{tenant}/app/{appId}/extension",method = RequestMethod.GET)
-    public RestResponse appExtension(@PathVariable String tenant,@PathVariable String appId,
-                                     @RequestParam(defaultValue = "1")Integer pageNo,  @RequestParam(defaultValue = "10")Integer pageSize) {
-        App app = appService.findById(appId);
-        if(app == null || app.getTenant() == null ||
-                !app.getTenant().getId().equals(tenant)){
-            return RestResponse.success(null);
-        }
-        Page<AppExtension> page = appExtensionService.getPage(appId, pageNo, pageSize);
-        return RestResponse.success(page);
-    }
 
     @ApiOperation(value = "获取租户的app放音文件列表")
     @RequestMapping(value = "/tenants/{tenant}/apps/{appId}/plays",method = RequestMethod.GET)
