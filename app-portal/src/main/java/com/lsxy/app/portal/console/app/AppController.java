@@ -233,13 +233,13 @@ public class AppController extends AbstractPortalController {
     }
 
 
-    @RequestMapping("/{appId}/app_extension/page")
+    @RequestMapping(value = "/{appId}/app_extension/page",method = RequestMethod.GET)
     @ResponseBody
     public RestResponse listExtensions(HttpServletRequest request, @PathVariable String appId,
                                        @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
                                        @RequestParam(defaultValue = "20",required = false)  Integer pageSize) throws YunhuniApiException {
         String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL  +   "/{1}/app_extension/page";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/callcenter/{1}/app_extension/page";
         RestResponse<Page<AppExtension>> response = RestRequest.buildSecurityRequest(token).getPage(uri, AppExtension.class, appId);
         if(response.isSuccess()){
             Page<AppExtension> page = response.getData();
@@ -256,11 +256,12 @@ public class AppController extends AbstractPortalController {
     }
 
     @RequestMapping(value = "/{appId}/agent/page",method = RequestMethod.GET)
+    @ResponseBody
     public RestResponse page(HttpServletRequest request, @PathVariable String appId,
                              @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
                              @RequestParam(defaultValue = "20",required = false)  Integer pageSize) throws YunhuniApiException {
         String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL  +   "/{1}/agent/page";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/callcenter/{1}/agent/page";
         RestResponse<Page<CallCenterAgent>> response = RestRequest.buildSecurityRequest(token).getPage(uri, CallCenterAgent.class, appId);
         if(response.isSuccess()){
             Page page = response.getData();
