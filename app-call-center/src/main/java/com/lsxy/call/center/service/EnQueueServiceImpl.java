@@ -271,7 +271,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                 }
             }
         }catch (Throwable e){
-            logger.info("[{}][{}]callid={}排队找坐席出错:{}",tenantId,appId,callId,e.getMessage());
+            logger.error(String.format("[%s][%s]callid=%s排队找坐席出错",tenantId,appId,callId),e);
             deQueueService.fail(tenantId,appId,callId,e.getMessage(),queueId,queueType,conversationId);
         }
     }
