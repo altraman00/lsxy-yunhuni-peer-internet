@@ -1040,6 +1040,9 @@
         if(type=='play'){
             upplay();
         }
+        if(type=='number'){
+            upnumber();
+        }
         if(type=='extension'){
             extensionList();
         }
@@ -1370,16 +1373,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
     /**
      * 分机分页
      */
@@ -1433,7 +1426,7 @@
                     '<td class="text-center">'+ (data[i].type==1?'SIP 终端':(data[i].type==2?'SIP 网关':(data[i].type==3?'普通电话':'未知类型'))) +'</td>' +
                     '</tr>'
         }
-        $('#entension-table').html(html);
+        $('#extension-list').html(html);
     }
 
     /**
@@ -1499,7 +1492,7 @@
                     '<td class="text-center">' + data[i].state + '</td>' +
                     '</tr>'
         }
-        $('#agent-table').html(html);
+        $('#agent-list').html(html);
     }
 
 
