@@ -1,14 +1,16 @@
 package com.lsxy.app.oc.rest.tenant;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.lsxy.app.oc.rest.tenant.vo.AppNumBindVO;
-import com.lsxy.app.oc.rest.tenant.vo.AppNumVO;
-import com.lsxy.app.oc.rest.tenant.vo.TenantAppVO;
+import com.lsxy.app.oc.rest.tenant.vo.*;
 import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.service.AppExtensionService;
+import com.lsxy.call.center.api.service.CallCenterAgentService;
 import com.lsxy.framework.api.billing.model.Billing;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.exceptions.api.AppServiceInvalidException;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.mail.MailConfigNotEnabledException;
@@ -16,6 +18,7 @@ import com.lsxy.framework.mail.MailContentNullException;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.app.service.ServiceType;
 import com.lsxy.yunhuni.api.config.service.TenantConfigService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
@@ -37,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -70,6 +74,8 @@ public class TenantAppController {
     ResourcesRentService resourcesRentService;
     @Autowired
     ResourceTelenumService resourceTelenumService;
+    @Reference(timeout=3000,check = false,lazy = true)
+    private CallCenterAgentService callCenterAgentService;
 
     @ApiOperation(value = "租户的app列表，以及app上个月指标")
     @RequestMapping(value="/tenants/{id}/apps",method = RequestMethod.GET)
@@ -118,18 +124,6 @@ public class TenantAppController {
         }
         vo.setRecordingTime( temp);
         return RestResponse.success(vo);
-    }
-    @ApiOperation(value = "获取租户的app信息下的分机")
-    @RequestMapping(value="/tenants/{tenant}/app/{appId}/extension",method = RequestMethod.GET)
-    public RestResponse appExtension(@PathVariable String tenant,@PathVariable String appId,
-                                     @RequestParam(defaultValue = "1")Integer pageNo,  @RequestParam(defaultValue = "10")Integer pageSize) {
-        App app = appService.findById(appId);
-        if(app == null || app.getTenant() == null ||
-                !app.getTenant().getId().equals(tenant)){
-            return RestResponse.success(null);
-        }
-        Page<AppExtension> page = appExtensionService.getPage(appId, pageNo, pageSize);
-        return RestResponse.success(page);
     }
 
     @ApiOperation(value = "获取租户的app放音文件列表")
@@ -287,6 +281,37 @@ public class TenantAppController {
             resourcesRentService.bindNumToAppAndGetAreaId(app,numList,false);
         }
         return RestResponse.success();
+    }
+
+    @ApiOperation(value = "获取应用座席")
+    @RequestMapping(value = "/tenants/{tid}/app/{appId}callcenter/agent",method = RequestMethod.GET)
+    public RestResponse page(HttpServletRequest request, @PathVariable String appId,
+                                   @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
+                                   @RequestParam(defaultValue = "20",required = false)  Integer pageSize) throws YunhuniApiException {
+        Page page  = callCenterAgentService.getPage(appId,pageNo,pageSize);
+        List<AgentVO> agentVOs = new ArrayList<>();
+        List<CallCenterAgent> result = page.getResult();
+        result.stream().forEach(agent -> agentVOs.add(AgentVO.changeCallCenterAgentToAgentVO(agent)));
+        page.setResult(agentVOs);
+        return RestResponse.success(page);
+    }
+
+    @ApiOperation(value = "获取应用分机")
+    @RequestMapping(value = "/tenants/{tid}/app/{appId}callcenter/extension",method = RequestMethod.GET)
+    public RestResponse listExtensions(HttpServletRequest request,@PathVariable String appId,
+                                             @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
+                                             @RequestParam(defaultValue = "20",required = false)  Integer pageSize) throws YunhuniApiException {
+        Page page = appExtensionService.getPage(appId,pageNo,pageSize);
+        List<AppExtension> result = page.getResult();
+        List<ExtensionVO> returnResult = new ArrayList<>();
+        if(result != null){
+            result.stream().forEach(extension -> {
+                ExtensionVO vo = ExtensionVO.changeAppExtensionToExtensionVO(extension);
+                returnResult.add(vo);
+            });
+        }
+        page.setResult(returnResult);
+        return RestResponse.success(page);
     }
 
 
