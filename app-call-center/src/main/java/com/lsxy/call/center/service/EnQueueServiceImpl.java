@@ -218,7 +218,7 @@ public class EnQueueServiceImpl implements EnQueueService{
 
             agentId = (String)redisCacheService.eval(EnQueue.CHOICE_LRU.equals(enQueue.getChoice())
                             ?Lua.LOOKUPAGENTLRU:Lua.LOOKUPAGENTRANDOM,4,
-                    CAs.getKey(condition.getId()),AgentState.getPrefixed(),
+                    condition!=null?CAs.getKey(condition.getId()):"",AgentState.getPrefixed(),
                     ExtensionState.getPrefixed(),AgentLock.getPrefixed(),
                     ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
                     CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,ExtensionState.Model.ENABLE_TRUE,
