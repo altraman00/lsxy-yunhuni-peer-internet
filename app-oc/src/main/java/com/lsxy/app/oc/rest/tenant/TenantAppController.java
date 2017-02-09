@@ -283,6 +283,7 @@ public class TenantAppController {
         return RestResponse.success();
     }
 
+    @ApiOperation(value = "获取应用座席")
     @RequestMapping(value = "/tenants/{tid}/app/{appId}callcenter/agent",method = RequestMethod.GET)
     public RestResponse page(HttpServletRequest request, @PathVariable String appId,
                                    @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
@@ -295,6 +296,7 @@ public class TenantAppController {
         return RestResponse.success(page);
     }
 
+    @ApiOperation(value = "获取应用分机")
     @RequestMapping(value = "/tenants/{tid}/app/{appId}callcenter/extension",method = RequestMethod.GET)
     public RestResponse listExtensions(HttpServletRequest request,@PathVariable String appId,
                                              @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
