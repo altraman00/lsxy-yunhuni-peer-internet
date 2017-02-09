@@ -43,6 +43,12 @@
         </xs:restriction>
     </xs:simpleType>
 
+    <xs:simpleType name="nonnegativenumber">
+        <xs:restriction base="xs:int">
+            <xs:minInclusive value="0"></xs:minInclusive>
+        </xs:restriction>
+    </xs:simpleType>
+
     <xs:simpleType name="boolnumber">
         <xs:restriction base="xs:int">
             <xs:minInclusive value="0"></xs:minInclusive>
@@ -75,6 +81,13 @@
             <xs:pattern value="\s*\S+\.wav\s*"/>
         </xs:restriction>
     </xs:simpleType>
+
+    <xsd:simpleType name="agentname">
+        <xsd:restriction base="xs:string">
+            <xsd:minLength value="1" />
+            <xsd:maxLength value="128" />
+        </xsd:restriction>
+    </xsd:simpleType>
 
     <xs:complexType name="play">
         <xs:simpleContent>
@@ -166,9 +179,17 @@
         <xs:attribute name="id" type="uuid"></xs:attribute>
     </xs:complexType>
 
+    <xs:complexType name="agent">
+        <xs:attribute name="name" type="agentname" use="required"></xs:attribute>
+        <xs:attribute name="priority" type="nonnegativenumber"></xs:attribute>
+        <xs:attribute name="queue_timeout" type="positivenumber"></xs:attribute>
+        <xs:attribute name="fetch_timeout" type="positivenumber"></xs:attribute>
+    </xs:complexType>
+
     <xs:complexType name="route">
         <xs:choice minOccurs="1" maxOccurs="1">
-            <xs:element name="condition" type="condition" minOccurs="1" maxOccurs="1"></xs:element>
+            <xs:element name="condition" type="condition" minOccurs="0" maxOccurs="1"></xs:element>
+            <xs:element name="agent" type="agent" minOccurs="0" maxOccurs="1"></xs:element>
         </xs:choice>
     </xs:complexType>
 

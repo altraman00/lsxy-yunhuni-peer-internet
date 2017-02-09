@@ -9,16 +9,8 @@ local cur_time = tonumber(ARGV[2])
 local idle = ARGV[3]
 local fetching = ARGV[4]
 local extension_enable = ARGV[5]
+local target_agent_id = ARGV[6]
 local result
-
-local cas = redis.call('ZREVRANGE',cAs_key,0,-1,'WITHSCORES')
-local cas_size = #cas
-redis.log(redis.LOG_WARNING,cAs_key)
-redis.log(redis.LOG_WARNING,extension_state_key_prefix)
-redis.log(redis.LOG_WARNING,extension_state_key_prefix)
-redis.log(redis.LOG_WARNING,agent_lock_key_prefix)
-redis.log(redis.LOG_WARNING,'cur_time'..cur_time)
-redis.log(redis.LOG_WARNING,'cas_size'..cas_size)
 
 local array_to_map = function(_array)
 	local _map ={}
@@ -30,6 +22,41 @@ local array_to_map = function(_array)
 	end
 	return _map;
 end
+
+--指定坐席ID查找
+if(target_agent_id)
+then
+	local agent_id = target_agent_id
+	local agent = array_to_map(redis.call('HGETALL',agent_state_key_prefix..agent_id))
+	redis.log(redis.LOG_WARNING,agent['state'])
+	redis.log(redis.LOG_WARNING,agent['extension'])
+	redis.log(redis.LOG_WARNING,agent['lastRegTime'])
+	if(agent and agent['state'] == idle
+			and agent['extension'] and agent['lastRegTime']
+			and (agent['lastRegTime'] + agent_reg_expire) >= cur_time)
+	then
+		local ok = redis.call('setnx',agent_lock_key_prefix..agent_id, '1')
+		redis.log(redis.LOG_WARNING,ok)
+		if ok == 1 then
+			redis.call('HSET',agent_state_key_prefix..agent_id,'lastTime',cur_time)
+			redis.call('HSET',agent_state_key_prefix..agent_id,'state',fetching)
+			redis.call('DEL', agent_lock_key_prefix..agent_id)
+			result = agent_id
+		end
+	end
+	return result;
+end
+
+local cas = redis.call('ZREVRANGE',cAs_key,0,-1,'WITHSCORES')
+local cas_size = #cas
+redis.log(redis.LOG_WARNING,cAs_key)
+redis.log(redis.LOG_WARNING,extension_state_key_prefix)
+redis.log(redis.LOG_WARNING,extension_state_key_prefix)
+redis.log(redis.LOG_WARNING,agent_lock_key_prefix)
+redis.log(redis.LOG_WARNING,'cur_time'..cur_time)
+redis.log(redis.LOG_WARNING,'cas_size'..cas_size)
+
+
 
 local idleAgents = {}
 

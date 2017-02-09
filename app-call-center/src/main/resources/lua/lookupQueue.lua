@@ -1,10 +1,11 @@
 --坐席找排队
 local aCs_key = KEYS[1]
 local agent_state_key = KEYS[2]
-local extension_state_key_prefix = KEYS[3]
-local agent_lock_key = KEYS[4]
-local queue_lock_key_prefix = KEYS[5]
-local cQs_key_prefix = KEYS[6]
+local aQs_key = KEYS[3]
+local extension_state_key_prefix = KEYS[4]
+local agent_lock_key = KEYS[5]
+local queue_lock_key_prefix = KEYS[6]
+local cQs_key_prefix = KEYS[7]
 
 local agent_reg_expire = tonumber(ARGV[1])
 local cur_time = tonumber(ARGV[2])
@@ -25,6 +26,7 @@ local array_to_map = function(_array)
 end
 
 local result
+local aQs = {}
 local aCs = {}
 local agent
 local agent_locked = false
@@ -54,6 +56,24 @@ end
 --坐席不可用，加锁失败
 if(agent_locked == false) then
     return result
+end
+
+--查找指定了坐席的排队aqs
+aQs = redis.call('ZREVRANGE',aQs_key,0,-1)
+local aQs_size = #aQs
+for i = 1, aQs_size do
+    local q_lock_key = queue_lock_key_prefix..aQs[i]
+    local ok = redis.call('setnx',q_lock_key, '1')
+    redis.log(redis.LOG_WARNING,ok)
+    if ok == 1 then
+        result = aQs[i]
+        redis.call('HSET',agent_state_key,'lastTime',cur_time)
+        redis.call('HSET',agent_state_key,'state',fetching)
+        redis.call('ZREM',aQs_key,result)
+        redis.call('DEL', q_lock_key)
+        redis.call('DEL',agent_lock_key)
+        return result
+    end
 end
 
 --指定了条件

@@ -195,6 +195,8 @@ public class EnQueue implements Serializable{
     public class Route  implements Serializable{
         private Condition condition;
 
+        private Agent agent;
+
         public Route(){
 
         }
@@ -204,6 +206,14 @@ public class EnQueue implements Serializable{
 
         public void setCondition(Condition condition) {
             this.condition = condition;
+        }
+
+        public Agent getAgent() {
+            return agent;
+        }
+
+        public void setAgent(Agent agent) {
+            this.agent = agent;
         }
     }
     public class Condition  implements Serializable{
@@ -219,6 +229,57 @@ public class EnQueue implements Serializable{
 
         public void setId(String id) {
             this.id = id;
+        }
+    }
+
+    public class Agent  implements Serializable{
+
+        @XStreamAsAttribute
+        private String name;
+
+        @XStreamAsAttribute
+        private Integer priority;
+
+        @XStreamAsAttribute
+        private Integer queue_timeout;
+
+        @XStreamAsAttribute
+        private Integer fetch_timeout;
+
+        public Agent(){
+
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public Integer getPriority() {
+            return priority;
+        }
+
+        public void setPriority(Integer priority) {
+            this.priority = priority;
+        }
+
+        public Integer getQueue_timeout() {
+            return queue_timeout;
+        }
+
+        public void setQueue_timeout(Integer queue_timeout) {
+            this.queue_timeout = queue_timeout;
+        }
+
+        public Integer getFetch_timeout() {
+            return fetch_timeout;
+        }
+
+        public void setFetch_timeout(Integer fetch_timeout) {
+            this.fetch_timeout = fetch_timeout;
         }
     }
 }
