@@ -1395,7 +1395,7 @@
             }else{
                 showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
             }
-        });
+        },"get");
         //每页显示数量
         var listRow = 10;
         //显示多少个分页按钮
@@ -1451,7 +1451,7 @@
             }else{
                 showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
             }
-        });
+        },"get");
         //每页显示数量
         var listRow = 10;
         //显示多少个分页按钮
