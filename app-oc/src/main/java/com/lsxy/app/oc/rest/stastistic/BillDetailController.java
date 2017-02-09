@@ -85,7 +85,7 @@ public class BillDetailController extends AbstractRestController {
             @RequestParam(required=false) String time,
             @ApiParam(name = "time2",value = "yyyy-MM-dd")
             @RequestParam(required=false) String time2,
-            @ApiParam(name = "appId",value = "应用id")
+            @ApiParam(name = "appId",value = "应用id,当应用id为all时，表示全部")
             @RequestParam(required=false)String appId,
             @RequestParam(defaultValue = "1") Integer pageNo,
             @RequestParam(defaultValue = "20") Integer pageSize
