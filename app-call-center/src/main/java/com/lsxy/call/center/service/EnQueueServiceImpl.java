@@ -208,9 +208,9 @@ public class EnQueueServiceImpl implements EnQueueService{
             } catch (Throwable e) {}
 
             if(lookupForCondition){
-                queueId = save(num,tenantId,appId,agent.getId(),null,fetchTimout,callId,conversationId,baseEnQueue,queueType).getId();
-            }else if(lookupForAgent){
                 queueId = save(num,tenantId,appId,null,conditionId,fetchTimout,callId,conversationId,baseEnQueue,queueType).getId();
+            }else if(lookupForAgent){
+                queueId = save(num,tenantId,appId,agent.getId(),null,fetchTimout,callId,conversationId,baseEnQueue,queueType).getId();
             }
 
             //lua脚本找坐席,默认排队规则为random，lru为最大空闲时长的优先
