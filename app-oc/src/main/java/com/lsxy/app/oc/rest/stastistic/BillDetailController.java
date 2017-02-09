@@ -120,6 +120,8 @@ public class BillDetailController extends AbstractRestController {
             @RequestParam(required = false) String type,
             @ApiParam(name = "time",value = "yyyy-MM-dd")
             @RequestParam(required=false) String time,
+            @ApiParam(name = "time2",value = "yyyy-MM-dd")
+            @RequestParam(required=false) String time2,
             @ApiParam(name = "appId",value = "应用id")
             @RequestParam(required=false)String appId,
             @RequestParam(defaultValue = "1") Integer pageNo,
@@ -129,7 +131,7 @@ public class BillDetailController extends AbstractRestController {
         Date end = null;
         try{
             start = DateUtils.parseDate(time+" 00:00:00","yyyy-MM-dd HH:mm:ss");
-            end = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+            end = DateUtils.parseDate(time2+" 23:59:59","yyyy-MM-dd HH:mm:ss");
         }catch (Exception e){
             return RestResponse.failed("0000","日期格式错误");
         }
