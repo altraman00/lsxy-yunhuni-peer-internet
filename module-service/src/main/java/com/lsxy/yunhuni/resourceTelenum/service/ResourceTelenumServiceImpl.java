@@ -100,7 +100,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             throw new RuntimeException("没有可用线路");
         }
         //所拥有的线路ID列表
-        List<String> lineIds = lineGateways.parallelStream().map(LineGateway::getId).collect(Collectors.toList());
+        List<String> lineIds = lineGateways.stream().map(LineGateway::getId).collect(Collectors.toList());
 
         String numSql = "SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum num WHERE num.deleted=0 AND num.status = 0 AND num.type='1' AND num.usable=1 AND tel_number <> :testNum ";
         if(StringUtils.isNotEmpty(telNum)){
