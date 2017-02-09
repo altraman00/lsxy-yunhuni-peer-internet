@@ -83,10 +83,12 @@
                             <!--大图标 添加样子 application-tab -->
                             <section class="panel panel-default pos-rlt clearfix ">
                                 <ul id="myTab" class="nav nav-tabs" name="appId">
+                                    <li <c:if test="${appId=='all'}"> class="active"</c:if> >
+                                        <a href="" data-toggle="tab" onclick="appSubmit('all')">全部</a>
+                                    </li>
                                     <c:forEach items="${appList}" var="app" varStatus="s">
                                         <li
-                                                <c:if test="${app.id==appId}"> class="active"</c:if>
-                                                <c:if test="${appId==null&&s.index==0}"> class="active"</c:if>
+                                            <c:if test="${app.id==appId}"> class="active"</c:if>
                                         >
                                             <a href="" data-toggle="tab" onclick="appSubmit('${app.id}')">${app.name}</a>
                                         </li>
@@ -100,7 +102,13 @@
                                                 日期
                                             </div>
                                             <div class="col-md-2">
-                                                <input type="text" name="time" class="form-control currentDay "  value="${time}"  />
+                                                <input type="text" name="start" class="form-control currentDay "  value="${start}"  />
+                                            </div>
+                                            <div class="col-md-1">
+                                                到
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input type="text" name="end" class="form-control currentDay "  value="${end}"  />
                                             </div>
                                             <div class="col-md-2">
                                                 <button class="btn btn-primary" type="submit"> 查询</button>
@@ -145,7 +153,7 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <c:set var="extraParam" value="&time=${time}&appId=${appId}"></c:set>
+                                    <c:set var="extraParam" value="&start=${start}&end=${end}&appId=${appId}"></c:set>
                                     <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/callback"></c:set>
                                     <%@include file="/inc/pagefooter.jsp" %>
                                 </div>
