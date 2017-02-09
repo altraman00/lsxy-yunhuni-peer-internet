@@ -8,6 +8,8 @@ import com.lsxy.framework.mq.topic.MQTopicConstants;
  */
 public class EnqueueTimeoutEvent extends AbstractDelayMQEvent{
 
+    private String agentId;
+
     private String conditionId;
 
     private String queueId;
@@ -24,8 +26,9 @@ public class EnqueueTimeoutEvent extends AbstractDelayMQEvent{
 
     public EnqueueTimeoutEvent(){}
 
-    public EnqueueTimeoutEvent(String conditionId, String queueId,String type, String tenantId, String appId, String callId,String conversationId, Integer delay){
+    public EnqueueTimeoutEvent(String agentId,String conditionId, String queueId,String type, String tenantId, String appId, String callId,String conversationId, Integer delay){
         super(delay);
+        this.agentId = agentId;
         this.conditionId = conditionId;
         this.queueId = queueId;
         this.type = type;
@@ -37,6 +40,14 @@ public class EnqueueTimeoutEvent extends AbstractDelayMQEvent{
     @Override
     public String getTopicName() {
         return MQTopicConstants.TOPIC_CALL_CENTER;
+    }
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
     }
 
     public String getConditionId() {

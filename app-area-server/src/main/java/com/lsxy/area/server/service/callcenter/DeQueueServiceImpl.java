@@ -102,6 +102,12 @@ public class DeQueueServiceImpl implements DeQueueService {
         conversationService.stopPlayWait(state);
         String conversation = conversationId;
 
+        if(conversationId!=null){//判断交谈是否已关闭
+            if(businessStateService.closed(conversationId)){
+                throw new IllegalStateException("交谈已结束");
+            }
+        }
+
         if(conversation == null){
             conversation = UUIDGenerator.uuid();
         }

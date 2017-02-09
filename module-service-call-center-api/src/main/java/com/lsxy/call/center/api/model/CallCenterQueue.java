@@ -36,6 +36,7 @@ public class CallCenterQueue extends IdEntity {
     private String originCallId;
     private String agentCallId;
     private String conversation;
+    private Integer fetchTimeOut;
     private String enqueue;//存放排队的json
 
     @Column(name = "tenant_id")
@@ -181,6 +182,15 @@ public class CallCenterQueue extends IdEntity {
 
     public void setConversation(String conversation) {
         this.conversation = conversation;
+    }
+
+    @Column(name = "fetch_timeout")
+    public Integer getFetchTimeOut() {
+        return fetchTimeOut;
+    }
+
+    public void setFetchTimeOut(Integer fetchTimeOut) {
+        this.fetchTimeOut = fetchTimeOut;
     }
 
     @Column(name = "enqueue")
