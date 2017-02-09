@@ -539,7 +539,7 @@ public class IVRActionService {
             }
             return h.handle(call_id,state,actionEle,nextUrl);
         } catch(DocumentException e){
-            logger.info("[{}][{}]callId={}处理ivr动作指令出错:{}",state.getTenantId(),state.getAppId(),call_id,e.getMessage());
+            logger.error(String.format("[%s][%s]callid=%s处理ivr动作指令出错",state.getTenantId(),state.getAppId(),call_id),e);
             //发送ivr格式错误通知
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","ivr.format_error")
@@ -550,7 +550,7 @@ public class IVRActionService {
             hangup(state.getResId(),call_id,state.getAreaId());
             return false;
         } catch (Throwable e) {
-            logger.info("[{}][{}]callId={}处理ivr动作指令出错:{}",state.getTenantId(),state.getAppId(),call_id,e.getMessage());
+            logger.error(String.format("[%s][%s]callid=%s处理ivr动作指令出错",state.getTenantId(),state.getAppId(),call_id),e);
             return false;
         }
     }
