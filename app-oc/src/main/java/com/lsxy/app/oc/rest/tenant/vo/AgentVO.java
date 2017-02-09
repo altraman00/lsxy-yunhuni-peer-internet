@@ -2,6 +2,7 @@ package com.lsxy.app.oc.rest.tenant.vo;
 
 import com.lsxy.call.center.api.model.AgentSkill;
 import com.lsxy.call.center.api.model.CallCenterAgent;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,11 +11,17 @@ import java.util.List;
  * Created by liups on 2016/11/18.
  */
 public class AgentVO {
+    @ApiModelProperty(name="name",value = "座席名称（ID）")
     private String name;
+    @ApiModelProperty(name="channel",value = "通道ID")
     private String channel;
+    @ApiModelProperty(name="num",value = "座席工号")
     private String num;
+    @ApiModelProperty(name="state",value = "座席状态")
     private String state;
+    @ApiModelProperty(name="extension",value = "绑定分机Id")
     private String extension;
+    @ApiModelProperty(name="skills",value = "技能组")
     private List skills;
 
     public AgentVO() {
