@@ -216,7 +216,7 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,conversation_state.getBusinessData().get(CallCenterUtil.CALLCENTER_FIELD))
                         .putIfNotEmpty(CallCenterUtil.ENQUEUE_START_TIME_FIELD,""+new Date().getTime())
                         .putIfNotEmpty(CallCenterUtil.CHANNEL_ID_FIELD,enQueue.getChannel())
-                        .putIfNotEmpty(CallCenterUtil.CONDITION_ID_FIELD,enQueue.getRoute().getCondition().getId())
+                        .putIfNotEmpty(CallCenterUtil.CONDITION_ID_FIELD,enQueue.getRoute().getCondition()!=null?enQueue.getRoute().getCondition().getId():null)
                         .putIfNotEmpty("user_data",enQueue.getData())
                         .build())
                 .build();
