@@ -71,6 +71,7 @@ public class CallCenterQueueServiceImpl extends AbstractService<CallCenterQueue>
                     getValue(queue.getId(),String.class),
                     getValue(queue.getTenantId(),String.class),
                     getValue(queue.getAppId(),String.class),
+                    getValue(queue.getType(),String.class),
                     getValue(queue.getRelevanceId(),String.class),
                     getValue(queue.getStartTime(),String.class),
                     getValue(queue.getInviteTime(),String.class),
