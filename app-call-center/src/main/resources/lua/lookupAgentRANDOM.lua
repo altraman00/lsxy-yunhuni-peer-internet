@@ -35,13 +35,18 @@ then
 			and agent['extension'] and agent['lastRegTime']
 			and (agent['lastRegTime'] + agent_reg_expire) >= cur_time)
 	then
-		local ok = redis.call('setnx',agent_lock_key_prefix..agent_id, '1')
-		redis.log(redis.LOG_WARNING,ok)
-		if ok == 1 then
-			redis.call('HSET',agent_state_key_prefix..agent_id,'lastTime',cur_time)
-			redis.call('HSET',agent_state_key_prefix..agent_id,'state',fetching)
-			redis.call('DEL', agent_lock_key_prefix..agent_id)
-			result = agent_id
+		local extension = array_to_map(redis.call('HGETALL',extension_state_key_prefix..agent['extension']))
+		redis.log(redis.LOG_WARNING,extension['enable'])
+		if(extension and extension['enable'] and extension['enable'] == extension_enable)
+		then
+			local ok = redis.call('setnx',agent_lock_key_prefix..agent_id, '1')
+			redis.log(redis.LOG_WARNING,ok)
+			if ok == 1 then
+				redis.call('HSET',agent_state_key_prefix..agent_id,'lastTime',cur_time)
+				redis.call('HSET',agent_state_key_prefix..agent_id,'state',fetching)
+				redis.call('DEL', agent_lock_key_prefix..agent_id)
+				result = agent_id
+			end
 		end
 	end
 	return result;
