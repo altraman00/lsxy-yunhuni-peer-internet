@@ -285,7 +285,7 @@ public class TenantAppController {
 
     @ApiOperation(value = "获取应用座席")
     @RequestMapping(value = "/tenants/{tid}/app/{appId}callcenter/agent",method = RequestMethod.GET)
-    public RestResponse page(HttpServletRequest request, @PathVariable String appId,
+    public RestResponse<Page<AgentVO>> page(HttpServletRequest request, @PathVariable String appId,
                                    @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
                                    @RequestParam(defaultValue = "20",required = false)  Integer pageSize) throws YunhuniApiException {
         Page page  = callCenterAgentService.getPage(appId,pageNo,pageSize);
@@ -298,7 +298,7 @@ public class TenantAppController {
 
     @ApiOperation(value = "获取应用分机")
     @RequestMapping(value = "/tenants/{tid}/app/{appId}callcenter/extension",method = RequestMethod.GET)
-    public RestResponse listExtensions(HttpServletRequest request,@PathVariable String appId,
+    public RestResponse<Page<ExtensionVO>> listExtensions(HttpServletRequest request,@PathVariable String appId,
                                              @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
                                              @RequestParam(defaultValue = "20",required = false)  Integer pageSize) throws YunhuniApiException {
         Page page = appExtensionService.getPage(appId,pageNo,pageSize);
