@@ -57,7 +57,7 @@ public abstract class AsyncBatchInserter<T> extends Thread{
                 }
                 if(queue.size() == 0){
                     try {
-                        this.sleep(100);
+                        this.sleep(30);
                     } catch (InterruptedException e1) {
                         logger.error("异步批量入库线程被中断",e1);
                         Thread.currentThread().interrupt();
