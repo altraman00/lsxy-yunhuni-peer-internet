@@ -365,11 +365,11 @@
                                         <table class="table table-striped cost-table-history tablelist" id="extension-table">
                                             <thead>
                                             <tr>
-                                                <th class="text-center">ID</th>
-                                                <th class="text-center">账号</th>
-                                                <th class="text-center">密码</th>
-                                                <th class="text-center">状态</th>
-                                                <th class="text-center">鉴权方式</th>
+                                                <th class="">ID</th>
+                                                <th class="">账号</th>
+                                                <th class="">密码</th>
+                                                <th class="">状态</th>
+                                                <th class="">鉴权方式</th>
                                             </tr>
                                             </thead>
                                             <tbody id="extension-list">
@@ -1419,11 +1419,11 @@
         // $('#playtable').find(".playtr").remove();["✔", "✘"],
         for(var i =0 ; i<data.length; i++){
             html +='<tr id="extension-'+ data[i].id +'">' +
-                    '<td class="text-center">'+ data[i].id +'</td>' +
-                    '<td class="text-center">' + data[i].user + '</td>' +
-                    '<td class="text-center">'+ data[i].password +'</td>' +
-                    '<td class="text-center">'+ (data[i].enable?'可用':'不可用') +'</td>' +
-                    '<td class="text-center">'+ (data[i].type==1?'SIP 终端':(data[i].type==2?'SIP 网关':(data[i].type==3?'普通电话':'未知类型'))) +'</td>' +
+                    '<td class="">'+ data[i].id +'</td>' +
+                    '<td class="">' + data[i].user + '</td>' +
+                    '<td class="">'+ data[i].password +'</td>' +
+                    '<td class="">'+ (data[i].enable?'可用':'不可用') +'</td>' +
+                    '<td class="">'+ (data[i].type==1?'SIP 终端':(data[i].type==2?'SIP 网关':(data[i].type==3?'普通电话':'未知类型'))) +'</td>' +
                     '</tr>'
         }
         $('#extension-list').html(html);
