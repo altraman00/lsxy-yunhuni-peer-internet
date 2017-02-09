@@ -79,10 +79,12 @@ public class BillDetailController extends AbstractRestController {
     public RestResponse call(
             @ApiParam(name = "uid",value = "用户id")
             @PathVariable String uid,
-            @ApiParam(name = "type",value = "voice_call.语音通知,duo_call.双向回拨,sys_conf.会议服务,ivr_call.IVR定制服务,captcha_call.语音验证码,voice_recording.录音服务call_center呼叫中心类型")
+            @ApiParam(name = "type",value = "notify_call.语音通知,duo_call.双向回拨,sys_conf.会议服务,ivr_call.IVR定制服务,captcha_call.语音验证码,voice_recording.录音服务call_center呼叫中心类型")
             @RequestParam String type,
             @ApiParam(name = "time",value = "yyyy-MM-dd")
             @RequestParam(required=false) String time,
+            @ApiParam(name = "time2",value = "yyyy-MM-dd")
+            @RequestParam(required=false) String time2,
             @ApiParam(name = "appId",value = "应用id")
             @RequestParam(required=false)String appId,
             @RequestParam(defaultValue = "1") Integer pageNo,
@@ -92,7 +94,7 @@ public class BillDetailController extends AbstractRestController {
         RestResponse restResponse = null;
         if(StringUtil.isNotEmpty(appId)&&StringUtil.isNotEmpty(type)){
             Date startTime = DateUtils.parseDate(time,"yyyy-MM-dd");
-            Date endTime = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+            Date endTime = DateUtils.parseDate(time2+" 23:59:59","yyyy-MM-dd HH:mm:ss");
             //获取分页数据
             Page page = voiceCdrService.pageList(pageNo, pageSize, type, uid, startTime,endTime, appId);
             re.put("page", page);

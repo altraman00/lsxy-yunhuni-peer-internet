@@ -250,12 +250,4 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
             consumeService.consume(consume);
         }
     }
-
 }
-
-
-
-
-
-
-
