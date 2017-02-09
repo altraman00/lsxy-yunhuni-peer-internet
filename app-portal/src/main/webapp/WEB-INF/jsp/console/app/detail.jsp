@@ -238,8 +238,10 @@
                                     <li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>
                                     <!--号码绑定-->
                                     <li data-id="number"><a href="#number" data-toggle="tab">号码绑定</a></li>
-                                    <li data-id="extension"><a href="#extension" data-toggle="tab">分机列表</a></li>
-                                    <li data-id="agent"><a href="#agent" data-toggle="tab">座席列表</a></li>
+                                    <c:if test="${app.serviceType=='call_center'}">
+                                        <li data-id="extension"><a href="#extension" data-toggle="tab">分机列表</a></li>
+                                        <li data-id="agent"><a href="#agent" data-toggle="tab">座席列表</a></li>
+                                    </c:if>
 
                                     <li class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
                                 </ul>
@@ -1487,7 +1489,7 @@
 
             html +='<tr id="agent-'+ data[i].name +'">' +
                     '<td class="text-center">'+ data[i].name +'</td>' +
-                    '<td class="text-center">'+ data[i].skillStr +'</td>' +
+                    '<td class="text-center">'+ skillStr +'</td>' +
                     '<td class="text-center">'+ data[i].extension +'</td>' +
                     '<td class="text-center">' + data[i].state + '</td>' +
                     '</tr>'
