@@ -83,6 +83,33 @@ public class StatisticsUtils {
         }
         return sql;
     }
+    public static String getSqlIsNull3(String tenantId,String appId,String[] types){
+        String sql = "";
+        if(StringUtil.isEmpty(tenantId)){
+            sql += " tenant_id  is null and ";
+        }else{
+            sql += " tenant_id ='"+tenantId + "' and ";
+        }
+        if(StringUtil.isEmpty(appId)){
+        }else{
+            sql += " app_id ='"+appId + "' and ";
+        }
+        String type = "";
+        if(types!=null) {
+            for (int i = 0; i < types.length; i++) {
+                type += " '" + types[i] + "' ";
+                if (i != types.length - 1) {
+                    type += " , ";
+                }
+            }
+        }
+        if(StringUtils.isEmpty(type)){
+            sql += " type is null and ";
+        }else{
+            sql += " type in ("+type+") and ";
+        }
+        return sql;
+    }
     /**
      * 将租户和应用和类型对为空和非为空时进行处理成sql
      * @param tenantId 租户id
