@@ -43,7 +43,7 @@ public class StatisticsUtils {
         return map;
     }
     /**
-     * 将租户和应用和类型对为空和非为空时进行处理成sql
+     * 将租户和应用和类型对为空和非为空时进行处理成sql,当tenantId或appId为"all"时，或types包含"all",表示该字段不做为条件查询
      * @param tenantId 租户id
      * @param appId 应用id
      * @param types 类型
@@ -59,9 +59,40 @@ public class StatisticsUtils {
             String value = entry.getValue();
             if(StringUtil.isEmpty(value)){
                 sql += " "+name+" is null and ";
+            }else if(value.equals("all")){
+                //当为all时表示该字段不做为条件查询
+                continue;
             }else{
                 sql += " "+name+"='"+value + "' and ";
             }
+        }
+        String type = "";
+        if(types!=null) {
+            for (int i = 0; i < types.length; i++) {
+                type += " '" + types[i] + "' ";
+                if (i != types.length - 1) {
+                    type += " , ";
+                }
+            }
+        }
+        if(StringUtils.isEmpty(type)){
+            sql += " type is null and ";
+        //当为all时表示该字段不做为条件查询
+        }else{
+            sql += " type in ("+type+") and ";
+        }
+        return sql;
+    }
+    public static String getSqlIsNull3(String tenantId,String appId,String[] types){
+        String sql = "";
+        if(StringUtil.isEmpty(tenantId)){
+            sql += " tenant_id  is null and ";
+        }else{
+            sql += " tenant_id ='"+tenantId + "' and ";
+        }
+        if(StringUtil.isEmpty(appId)){
+        }else{
+            sql += " app_id ='"+appId + "' and ";
         }
         String type = "";
         if(types!=null) {
