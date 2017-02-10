@@ -1,17 +1,25 @@
-package com.lsxy.app.api.gateway.rest.callcenter.vo;
+package com.lsxy.app.oc.rest.tenant.vo;
 
 import com.lsxy.call.center.api.model.AppExtension;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Created by liups on 2016/11/18.
  */
 public class ExtensionVO {
+    @ApiModelProperty(name="id",value = "id")
     private String id;
+    @ApiModelProperty(name="type",value = "类型：1:SIP 终端;2:SIP 网关;3:普通电话")
     private String type;//    type                 varchar(30),
+    @ApiModelProperty(name="user",value = "用户名")
     private String user;//    user                 varchar(50) comment 'SIP注册用户名，全局唯一。格式是6到12位数字',
+    @ApiModelProperty(name="password",value = "密码")
     private String password;//    password             varchar(50) comment 'SIP注册密码',
+    @ApiModelProperty(name="ipaddr",value = "sip网关IP地址与端口")
     private String ipaddr;  //SIP 网关IP地址与端口，默认5060，仅用于 type==2的情况
+    @ApiModelProperty(name="telnum",value = "电话号码")
     private String telnum;//    telenum              varchar(32) comment '如果是电话分机，该属性记录电话号码（保留，不用）',
+    @ApiModelProperty(name="enable",value = "是否可用")
     private Boolean enable; //分机是否可用（不存到数据库）;
 
     public ExtensionVO() {

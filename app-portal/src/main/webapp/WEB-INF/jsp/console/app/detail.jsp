@@ -237,8 +237,12 @@
                                     </li>
                                     <li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>
                                     <!--号码绑定-->
-
                                     <li data-id="number"><a href="#number" data-toggle="tab">号码绑定</a></li>
+                                    <c:if test="${app.serviceType=='call_center'}">
+                                        <li data-id="extension"><a href="#extension" data-toggle="tab">分机列表</a></li>
+                                        <li data-id="agent"><a href="#agent" data-toggle="tab">座席列表</a></li>
+                                    </c:if>
+
                                     <li class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
@@ -357,6 +361,49 @@
                                         </section>
                                     </div>
                                     <!--号码绑定end-->
+
+                                    <!--分机列表-->
+                                    <div class="tab-pane fade" id="extension">
+                                        <table class="table table-striped cost-table-history tablelist" id="extension-table">
+                                            <thead>
+                                            <tr>
+                                                <th class="">ID</th>
+                                                <th class="">账号</th>
+                                                <th class="">密码</th>
+                                                <th class="">状态</th>
+                                                <th class="">鉴权方式</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="extension-list">
+
+                                            </tbody>
+                                        </table>
+                                        <section class="panel panel-default yunhuni-personal">
+                                            <div id="extension-page"></div>
+                                        </section>
+                                    </div>
+                                    <!--分机列表end-->
+                                    <!--座席列表-->
+                                    <div class="tab-pane fade" id="agent">
+
+                                        <table class="table table-striped cost-table-history tablelist" id="agent-table">
+                                            <thead>
+                                            <tr>
+                                                <th class="text-center">座席名称（ID）</th>
+                                                <th class="text-center">技能组</th>
+                                                <th class="text-center">绑定分机</th>
+                                                <th class="text-center">状态</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="agent-list">
+
+                                            </tbody>
+                                        </table>
+                                        <section class="panel panel-default yunhuni-personal">
+                                            <div id="agent-page"></div>
+                                        </section>
+                                    </div>
+                                    <!--座席列表end-->
 
                                 </div>
                             </section>
@@ -998,6 +1045,12 @@
         if(type=='number'){
             upnumber();
         }
+        if(type=='extension'){
+            extensionList();
+        }
+        if(type=='agent'){
+            agentList();
+        }
     });
 
 //    fileTotalSoze();
@@ -1319,6 +1372,131 @@
                 }
         );
     }
+
+
+
+    /**
+     * 分机分页
+     */
+    var extensionPage;
+    function extensionList(){
+        $('#uploadButton').hide();
+        //获取数据总数
+        var count = 0;
+        var params = {"pageNo":1,"pageSize":10};
+        ajaxsync(ctx + "/console/app/" + appId + "/app_extension/page" ,params,function(response) {
+            if(response.success){
+                count = response.data.totalCount;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+            }
+        },"get");
+        //每页显示数量
+        var listRow = 10;
+        //显示多少个分页按钮
+        var showPageCount = 5;
+        //指定id，创建分页标签
+        var pageId = 'extension-page';
+        //searchTable 为方法名
+        extensionPage = new Page(count,listRow,showPageCount,pageId,extensionTable);
+        extensionPage.show();
+    }
+
+    /**
+     * 分机分页回调方法
+     * @param nowPage 当前页数
+     * @param listRows 每页显示多少条数据
+     * */
+    var extensionTable = function(nowPage,listRows){
+        var html = '';
+        var data = [];
+        ajaxsync(ctx + "/console/app/" + appId + "/app_extension/page" ,{pageNo:nowPage,pageSize:listRows},function(response){
+            if(response.success){
+                data = response.data.result;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
+            }
+        },"get");
+
+        // $('#playtable').find(".playtr").remove();["✔", "✘"],
+        for(var i =0 ; i<data.length; i++){
+            html +='<tr id="extension-'+ data[i].id +'">' +
+                    '<td class="">'+ data[i].id +'</td>' +
+                    '<td class="">' + data[i].user + '</td>' +
+                    '<td class="">'+ data[i].password +'</td>' +
+                    '<td class="">'+ (data[i].enable?'可用':'不可用') +'</td>' +
+                    '<td class="">'+ (data[i].type==1?'SIP 终端':(data[i].type==2?'SIP 网关':(data[i].type==3?'普通电话':'未知类型'))) +'</td>' +
+                    '</tr>'
+        }
+        $('#extension-list').html(html);
+    }
+
+    /**
+     * 座席分页
+     */
+    var agentPage;
+    function agentList(){
+        $('#uploadButton').hide();
+        //获取数据总数
+        var count = 0;
+        var params = {"pageNo":1,"pageSize":10};
+        ajaxsync(ctx + "/console/app/" + appId + "/agent/page" ,params,function(response) {
+            if(response.success){
+                count = response.data.totalCount;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+            }
+        },"get");
+        //每页显示数量
+        var listRow = 10;
+        //显示多少个分页按钮
+        var showPageCount = 5;
+        //指定id，创建分页标签
+        var pageId = 'agent-page';
+        //searchTable 为方法名
+        agentPage = new Page(count,listRow,showPageCount,pageId,agentTable);
+        agentPage.show();
+    }
+
+    /**
+     * 座席分机分页回调方法
+     * @param nowPage 当前页数
+     * @param listRows 每页显示多少条数据
+     * */
+    var agentTable = function(nowPage,listRows){
+        var html = '';
+        var data = [];
+        ajaxsync(ctx + "/console/app/" + appId + "/agent/page" ,{pageNo:nowPage,pageSize:listRows},function(response){
+            if(response.success){
+                data = response.data.result;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
+            }
+        },"get");
+
+        // $('#playtable').find(".playtr").remove();["✔", "✘"],
+        for(var i =0 ; i<data.length; i++){
+            var skillStr = '';
+            var skills = data[i].skills;
+            if(skills != null){
+                for(var j =0 ; j<skills.length; j++){
+                    skillStr += skills[j].name;
+                    if(j != (skills.length-1)){
+                        skillStr += ',';
+                    }
+                }
+            }
+
+            html +='<tr id="agent-'+ data[i].name +'">' +
+                    '<td class="text-center">'+ data[i].name +'</td>' +
+                    '<td class="text-center">'+ skillStr +'</td>' +
+                    '<td class="text-center">'+ data[i].extension +'</td>' +
+                    '<td class="text-center">' + data[i].state + '</td>' +
+                    '</tr>'
+        }
+        $('#agent-list').html(html);
+    }
+
 
 </script>
 
