@@ -387,7 +387,11 @@ public class SapiSdk extends SapiSdkConfig {
         params.put("channel",channel);
         params.put("num",num);
         params.put("state",state);
-        params.put("skills",skills.toArray());
+        if(skills != null) {
+            params.put("skills", skills.toArray());
+        }else{
+            params.put("skills", null);
+        }
         params.put("extension",extension);
         return HttpClientUtils.doPost(getUrl(SapiConstants.CALLCENTER_AGENT),getSecretKey(),getCertId(),appId,params);
     }
@@ -471,7 +475,11 @@ public class SapiSdk extends SapiSdkConfig {
      */
     public String  CallcenterAgentSkills(String appId, String agentName,List<AgentSkillOperation> opts) throws IOException, NoSuchAlgorithmException, InvalidKeyException, KeyManagementException {
         Map<String,Object> params = new HashMap<String,Object>();
-        params.put("opts",opts.toArray());
+        if(opts == null ){
+            params.put("opts",null);
+        }else{
+            params.put("opts",opts.toArray());
+        }
         return HttpClientUtils.doPost(getUrl(SapiConstants.CALLCENTER_AGENT_SKILLS,agentName),getSecretKey(),getCertId(),appId,params);
     }
 
@@ -579,7 +587,7 @@ public class SapiSdk extends SapiSdkConfig {
         return HttpClientUtils.doDelete(getUrl(SapiConstants.CALLCENTER_CONDITION+"/"+conditionId),getSecretKey(),getCertId(),appId,params);
     }
     /**
-     * 新建排队条件
+     * 修改排队条件
      * @param appId 应用id
      * @param conditionId 排队条件id
      * @param channel 条件所属的工作通道ID
