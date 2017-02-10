@@ -427,9 +427,9 @@
     //应用下线
     function offline(id,type){
         bootbox.setLocale("zh_CN");
-        var h1="下线应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响";
+        var h1="应用下线后，选择的功能服务将终止，请确认此处操作";
         if(type==1){
-            h1 = "应用下线后，选择的功能服务将终止，IVR号码关联将解除，应用上线后需要重新选择绑定（应用下线不影响IVR号码的月租费的收取）";
+            h1 = "应用下线后，选择的功能服务将终止，请确认此处操作";
         }
         bootbox.confirm(h1, function(result){
             if(result){
