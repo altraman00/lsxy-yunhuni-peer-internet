@@ -203,6 +203,8 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
         if(!appId.equals(extension.getAppId())){
             throw new RequestIllegalArgumentException();
         }
+        boolean enable = extensionState.getEnable(extension.getId());
+        extension.setEnable(enable);
         return extension;
     }
 
