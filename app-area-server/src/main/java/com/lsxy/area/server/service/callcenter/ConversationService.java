@@ -803,7 +803,7 @@ public class ConversationService {
         if(this.size(conversationId) > 1){
             long activeTotal = avtiveTotal(conversationId);//需要获取活动成员
             if(activeTotal == 1){
-                //TODO 播放holdvoice,是否需要默认的
+                //TODO 播放holdvoice,是否需要默认的,(什么时候停止播放holdvoice)
                 if(conversation_state.getBusinessData().get(CallCenterUtil.HOLD_VOICE_FIELD) != null){
                     Map<String, Object> _params = new MapBuilder<String,Object>()
                             .putIfNotEmpty("res_id",conversation_state.getResId())
