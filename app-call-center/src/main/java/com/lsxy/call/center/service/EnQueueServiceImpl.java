@@ -214,9 +214,7 @@ public class EnQueueServiceImpl implements EnQueueService{
             }
 
             //lua脚本找坐席,默认排队规则为random，lru为最大空闲时长的优先
-            String agentId = null;
-
-            agentId = (String)redisCacheService.eval(EnQueue.CHOICE_LRU.equals(enQueue.getChoice())
+            String agentId = (String)redisCacheService.eval(EnQueue.CHOICE_LRU.equals(enQueue.getChoice())
                             ?Lua.LOOKUPAGENTLRU:Lua.LOOKUPAGENTRANDOM,4,
                     condition!=null?CAs.getKey(condition.getId()):"",AgentState.getPrefixed(),
                     ExtensionState.getPrefixed(),AgentLock.getPrefixed(),

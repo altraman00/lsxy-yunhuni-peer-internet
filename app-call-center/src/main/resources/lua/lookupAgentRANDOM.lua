@@ -26,6 +26,7 @@ end
 --指定坐席ID查找
 if(target_agent_id)
 then
+	redis.log(redis.LOG_WARNING,'target_agent_id='..target_agent_id)
 	local agent_id = target_agent_id
 	local agent = array_to_map(redis.call('HGETALL',agent_state_key_prefix..agent_id))
 	redis.log(redis.LOG_WARNING,agent['state'])
@@ -86,8 +87,10 @@ end
 
 math.randomseed(tostring(cur_time):reverse():sub(1, 7))
 local adleAgentTotal = #idleAgents
+redis.log(redis.LOG_WARNING,'adleAgentTotal='..adleAgentTotal)
 for i=1,adleAgentTotal do
 	local id = idleAgents[math.random(1,adleAgentTotal)]
+	redis.log(redis.LOG_WARNING,'randomid='..id)
 	local ok = redis.call('setnx',agent_lock_key_prefix..id, '1')
 	redis.log(redis.LOG_WARNING,ok)
 	if ok == 1 then
