@@ -26,6 +26,7 @@ end
 --指定坐席ID查找
 if(target_agent_id)
 then
+	redis.log(redis.LOG_WARNING,'target_agent_id='..target_agent_id)
 	local agent_id = target_agent_id
 	local agent = array_to_map(redis.call('HGETALL',agent_state_key_prefix..agent_id))
 	redis.log(redis.LOG_WARNING,agent['state'])
