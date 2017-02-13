@@ -196,7 +196,7 @@
                             <thead style=" width: calc( 100% - 1em )">
                             <tr style="display:table;width:100%;table-layout:fixed;">
                                 <th ></th>
-                                <th >手机号码</th>
+                                <th >号码</th>
                                 <th class="text-center">可呼入</th>
                                 <th class="text-center">可呼出</th>
                                 <th  class="text-left-fixed"><span class="">归属地</span></th>
