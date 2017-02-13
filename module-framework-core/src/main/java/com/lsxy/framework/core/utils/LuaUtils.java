@@ -1,5 +1,6 @@
 package com.lsxy.framework.core.utils;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,9 @@ public class LuaUtils {
             }
             String read;
             reader = new BufferedReader(new InputStreamReader(input, Charset.forName("UTF-8")));
+            int linenum = 0;
             while ((read = reader.readLine()) != null) {
+                linenum++;
                 if(read.trim().startsWith("--") && !read.trim().startsWith("--[[") && !read.trim().startsWith("--]]")){
                     //忽略单行注释 节省网络io
                     continue;
@@ -43,6 +46,14 @@ public class LuaUtils {
                 //非调试模式下不需要redis.log
                 if(read.trim().startsWith("redis.log(") && !logger.isDebugEnabled()){
                     continue;
+                }
+                if(read.trim().startsWith("redis.log(")){
+                    //追加行号
+                    String[] line = read.split(",");
+                    if(line!=null && line.length>=1){
+                        line[1] = "'line"+linenum+"='.."+(line[1].trim());
+                        read = StringUtils.join(line,",");
+                    }
                 }
                 lua.append(read).append("\n");
             }
