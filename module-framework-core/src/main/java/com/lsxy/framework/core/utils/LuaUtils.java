@@ -48,7 +48,7 @@ public class LuaUtils {
                         continue;
                     }
                     //追加行号
-                    lua.append("redis.log(redis.LOG_WARNING,'line"+linenum+":')").append("\n");
+                    lua.append("redis.log(redis.LOG_WARNING,'"+path+linenum+":')").append("\n");
                 }
                 lua.append(read).append("\n");
             }
