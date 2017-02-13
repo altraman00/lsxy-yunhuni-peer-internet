@@ -24,7 +24,7 @@ local array_to_map = function(_array)
 end
 
 --指定坐席ID查找
-if(target_agent_id)
+if(target_agent_id and string.len(target_agent_id) > 0)
 then
 	redis.log(redis.LOG_WARNING,'target_agent_id='..target_agent_id)
 	local agent_id = target_agent_id
