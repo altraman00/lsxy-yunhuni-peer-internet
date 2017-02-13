@@ -805,19 +805,26 @@ public class ConversationService {
             if(activeTotal == 1){
                 //TODO 播放holdvoice,是否需要默认的,(什么时候停止播放holdvoice)
                 if(conversation_state.getBusinessData().get(CallCenterUtil.HOLD_VOICE_FIELD) != null){
-                    Map<String, Object> _params = new MapBuilder<String,Object>()
-                            .putIfNotEmpty("res_id",conversation_state.getResId())
-                            .putIfNotEmpty("content", JSONUtil2.objectToJson(new Object[][]{new Object[]{
-                                    conversation_state.getBusinessData().get(CallCenterUtil.HOLD_VOICE_FIELD),0,""}}))
-                            .putIfNotEmpty("user_data",conversationId)
-                            .putIfNotEmpty("is_loop",true)
-                            .put("areaId",conversation_state.getAreaId())
-                            .build();
-                    RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, _params);
+                    String holdvoice = conversation_state.getBusinessData().get(CallCenterUtil.HOLD_VOICE_FIELD);
                     try {
-                        rpcCaller.invoke(sessionContext, rpcrequest,true);
-                    } catch (Throwable t) {
-                        logger.error("调用失败",t);
+                        holdvoice = playFileUtil.convert(conversation_state.getTenantId(),conversation_state.getAppId(),holdvoice);
+                    } catch (Throwable e) {
+                        logger.error("调用失败",e);
+                    }
+                    if(StringUtil.isNotBlank(holdvoice)){
+                        Map<String, Object> _params = new MapBuilder<String,Object>()
+                                .putIfNotEmpty("res_id",conversation_state.getResId())
+                                .putIfNotEmpty("content", JSONUtil2.objectToJson(new Object[][]{new Object[]{holdvoice,0,""}}))
+                                .putIfNotEmpty("user_data",conversationId)
+                                .putIfNotEmpty("is_loop",true)
+                                .put("areaId",conversation_state.getAreaId())
+                                .build();
+                        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, _params);
+                        try {
+                            rpcCaller.invoke(sessionContext, rpcrequest,true);
+                        } catch (Throwable t) {
+                            logger.error("调用失败",t);
+                        }
                     }
                 }
             }
