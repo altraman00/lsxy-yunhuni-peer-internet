@@ -240,6 +240,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                     publishTimeoutEvent(tenantId,appId,null,condition.getId(),queueTimout,
                             queueId,queueType,callId,conversationId);
                     addCQS(conditionId,queueId);
+
                     String agent_idle = (String)redisCacheService.eval(Lua.LOOKUPAGENTFORIDLE,3,
                             CAs.getKey(condition.getId()),AgentState.getPrefixed(),
                             ExtensionState.getPrefixed(),

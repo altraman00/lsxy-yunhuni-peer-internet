@@ -236,7 +236,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         if(state != null && (state.getClosed() == null || !state.getClosed())){
             //TODO 将其他交谈全部设置为保持（cti需要提供批量） 这里应该是阻塞调用好点
 
-            //TODO 创建新的交谈，交谈创建成功事件中将坐席加入到新的交谈， 坐席加入交谈成功事件中呼叫外线，在振铃事件中把外线加入交谈 交谈正式开始
+            //创建新的交谈，交谈创建成功事件中将坐席加入到新的交谈， 坐席加入交谈成功事件中呼叫外线，在振铃事件中把外线加入交谈 交谈正式开始
             conversationService.create(conversationId,
                     state.getBusinessData().get(BusinessState.REF_RES_ID),null,state,
                     state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),maxAnswerSeconds,null);
@@ -247,9 +247,9 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             if(!agentLock.lock()){
                 throw new SystemBusyException();
             }
-            //TODO 坐席加锁
-            //TODO 呼叫坐席接通后,创建新的交谈,交谈创建成功事件中将坐席加入到交谈， 坐席加入交谈成功事件中呼叫外线，在振铃事件中把外线加入交谈 交谈正式开始
-            //TODO FINALLY 坐席解锁
+            //坐席加锁
+            //呼叫坐席接通后,创建新的交谈,交谈创建成功事件中将坐席加入到交谈， 坐席加入交谈成功事件中呼叫外线，在振铃事件中把外线加入交谈 交谈正式开始
+            //FINALLY 坐席解锁
             try {
                 if(!CallCenterAgent.STATE_IDLE.equals(agentState.getState(agent))){
                     throw new SystemBusyException();
@@ -349,7 +349,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         if(state != null && (state.getClosed() == null || !state.getClosed())){
             //TODO 将其他交谈全部设置为保持（cti需要提供批量） 这里应该是阻塞调用好点
 
-            //TODO 创建新的交谈，交谈创建成功事件中将坐席加入到新的交谈， 坐席加入交谈成功事件中进行排队，在振铃事件中把排到的坐席加入交谈 交谈正式开始
+            //创建新的交谈，交谈创建成功事件中将坐席加入到新的交谈， 坐席加入交谈成功事件中进行排队，在振铃事件中把排到的坐席加入交谈 交谈正式开始
             conversationService.create(conversationId,
                     state.getBusinessData().get(BusinessState.REF_RES_ID),null,state,
                     state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),maxAnswerSeconds,null);
@@ -360,9 +360,9 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             if(!agentLock.lock()){
                 throw new SystemBusyException();
             }
-            //TODO 坐席加锁
-            //TODO 呼叫坐席接通后,创建新的交谈,交谈创建成功事件中将坐席加入到交谈， 坐席加入交谈成功事件中进行排队，在振铃事件中把排到的坐席加入交谈 交谈正式开始
-            //TODO FINALLY 坐席解锁
+            //坐席加锁
+            //呼叫坐席接通后,创建新的交谈,交谈创建成功事件中将坐席加入到交谈， 坐席加入交谈成功事件中进行排队，在振铃事件中把排到的坐席加入交谈 交谈正式开始
+            //FINALLY 坐席解锁
             try {
                 if(!CallCenterAgent.STATE_IDLE.equals(agentState.getState(agent))){
                     throw new SystemBusyException();
@@ -531,9 +531,9 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             if(!agentLock.lock()){
                 throw new SystemBusyException();
             }
-            //TODO 坐席加锁
-            //TODO 呼叫坐席接通后,将坐席加入到交谈
-            //TODO FINALLY 坐席解锁
+            //坐席加锁
+            //呼叫坐席接通后,将坐席加入到交谈
+            //FINALLY 坐席解锁
             try {
                 if(!CallCenterAgent.STATE_IDLE.equals(agentState.getState(agent))){
                     throw new SystemBusyException();
