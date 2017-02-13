@@ -43,17 +43,12 @@ public class LuaUtils {
                     //忽略空行
                     continue;
                 }
-                //非调试模式下不需要redis.log
-                if(read.trim().startsWith("redis.log(") && !logger.isDebugEnabled()){
-                    continue;
-                }
                 if(read.trim().startsWith("redis.log(")){
-                    //追加行号
-                    String[] line = read.split(",");
-                    if(line!=null && line.length>=1){
-                        line[1] = "'line"+linenum+"='.."+(line[1].trim());
-                        read = StringUtils.join(line,",");
+                    if(!logger.isDebugEnabled()){//非调试模式下不需要redis.log
+                        continue;
                     }
+                    //追加行号
+                    lua.append("redis.log(redis.LOG_WARNING,'line"+linenum+":')").append("\n");
                 }
                 lua.append(read).append("\n");
             }
