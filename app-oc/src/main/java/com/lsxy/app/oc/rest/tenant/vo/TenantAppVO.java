@@ -31,6 +31,7 @@ public class TenantAppVO implements Serializable {
     private Integer isVoiceValidate;//是否语音验证码0否，1是
     private Integer isIvrService;//是否IVR定制服务0否，1是
     private String serviceType;//服务类型
+    private Integer isCallCenter;//是否启用呼叫中心服务 是否呼叫中心0否，1是',
     private BigDecimal consume;
     private Long sessionCount;
     private Long amongDuration;
@@ -46,6 +47,14 @@ public class TenantAppVO implements Serializable {
         } catch (InvocationTargetException e) {
             logger.error("复制类属性异常",e);
         }
+    }
+
+    public Integer getIsCallCenter() {
+        return isCallCenter;
+    }
+
+    public void setIsCallCenter(Integer isCallCenter) {
+        this.isCallCenter = isCallCenter;
     }
 
     public String getRecordingTime() {
