@@ -190,19 +190,20 @@
                         ">
                             若您选择开通自定义IVR或者呼叫中心功能，则需要从我的号码列表中选择一个可呼入的号码与该应用绑定</div>
                     </div>
-                    <div class="phone-table">
-                        <table class="table table-striped">
-                            <thead>
-                            <tr>
-                                <th></th>
-                                <th>手机号码</th>
+                    <div class="phone-table"
+                    >
+                        <table class="table ">
+                            <thead style=" width: calc( 100% - 1em )">
+                            <tr style="display:table;width:100%;table-layout:fixed;">
+                                <th ></th>
+                                <th >手机号码</th>
                                 <th class="text-center">可呼入</th>
                                 <th class="text-center">可呼出</th>
-                                <th class="text-left-fixed"><span class="">归属地</span></th>
+                                <th  class="text-left-fixed"><span class="">归属地</span></th>
                             </tr>
                             </thead>
-                            <tbody id="phonelist">
-                            <tr>
+                            <tbody id="phonelist" style="  height:300px;overflow:auto; display:block;  ">
+                            <tr style="display:table;width:100%;table-layout:fixed;">
                                 <td><input type="checkbox" name="" /></td>
                                 <td>13611460866</td>
                                 <td class="text-center" >✔</td>
@@ -362,19 +363,25 @@
         }else{
             $('#selectNewIvr').show();
             if(ownIvr.length>0){
-                for (var i = 0 ; i< ownIvr.length ; i ++){
-                    html += '<tr><td><input type="checkbox" name="phonelist" value="'+ownIvr[i].phone+'" /></td>'
+                var len =ownIvr.length;
+                if(len <= 10){
+                    $('#phonelist').css("height",len*31);
+                }
+                for (var i = 0 ; i< len ; i ++){
+                    html += '<tr  style="display:table;width:100%;table-layout:fixed;"><td   ><input type="checkbox" name="phonelist" value="'+ownIvr[i].phone+'" /></td>'
                     //特殊判断 <i class="fa fa-exclamation-triangle"></i>
                     if(ownIvr[i].lastUsed){
-                        html += '<td data-toggle="tooltip" data-placement="right"  title="此号码为该应用上一次进行号码绑定时选择的号码">'+ownIvr[i].phone+'<i class="fa fa-exclamation-triangle cursor orange" ></i> </td>'
+                        html += '<td   data-toggle="tooltip" data-placement="right"  title="此号码为该应用上一次进行号码绑定时选择的号码">'+ownIvr[i].phone+'<i class="fa fa-exclamation-triangle cursor orange" ></i> </td>'
                     }else{
                         //普通号码
-                        html +='<td>'+ownIvr[i].phone+'</td>'
+                        html +='<td  >'+ownIvr[i].phone+'</td>'
                     }
-                    html +='<td class="text-center" >'+isCall[ownIvr[i].isCalled]+'</td><td class="text-center" >'+isCall[ownIvr[i].isDialing]+'</td><td class="text-left-fixed" >'+ownIvr[i].areaCode+'</td></tr>'
+                    html +='<td  class="text-center" >'+isCall[ownIvr[i].isCalled]+'</td><td   class="text-center" >'+isCall[ownIvr[i].isDialing]+'</td><td    class="text-left-fixed" >'+ownIvr[i].areaCode+'</td></tr>'
                 }
                 $('#phonelist').html(html);
+
             }
+
         }
 
         return result;
