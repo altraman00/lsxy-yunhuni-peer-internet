@@ -41,7 +41,7 @@ public class LuaUtils {
                     continue;
                 }
                 //非调试模式下不需要redis.log
-                if(read.trim().startsWith("redis.log(") /*&& !logger.isDebugEnabled()*/){
+                if(read.trim().startsWith("redis.log(") && !logger.isDebugEnabled()){
                     continue;
                 }
                 lua.append(read).append("\n");

@@ -8,7 +8,9 @@ import com.lsxy.call.center.api.service.CallCenterQueueService;
 import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.call.center.api.service.EnQueueService;
 import com.lsxy.call.center.api.utils.EnQueueDecoder;
+import com.lsxy.call.center.batch.QueueBatchInserter;
 import com.lsxy.framework.config.Constants;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +43,9 @@ public class EnqueueServiceTest {
 
     @Autowired
     private CallCenterService callCenterService;
+
+    @Autowired
+    private QueueBatchInserter queueBatchInserter;
 
     @Test
     public void test() throws InterruptedException {
@@ -181,6 +186,27 @@ public class EnqueueServiceTest {
     @Test
     public  void test6(){
         callCenterService.incrCost("222",new BigDecimal(1));
+    }
+
+
+    @Test
+    public void test7() throws InterruptedException {
+        CallCenterQueue queue = new CallCenterQueue();
+        queue.setId(UUIDGenerator.uuid());
+        queue.setTenantId("11111111");
+        queue.setAppId("2222222");
+        queue.setRelevanceId("");
+        queue.setType("222");
+        queue.setCondition("2222222");
+        queue.setStartTime(new Date());
+        queue.setNum("1111111");
+        queue.setOriginCallId("3333333");
+        queue.setAgent("4444");
+        queue.setFetchTimeOut(111);
+        queue.setConversation("1111111");
+        queue.setEnqueue(null);
+        queueBatchInserter.put(queue);
+        Thread.currentThread().join();
     }
 }
 
