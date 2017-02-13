@@ -138,6 +138,7 @@ public class ConfServiceImpl implements ConfService {
         Map<String, Object> map = new MapBuilder<String,Object>()
                                 .putIfNotEmpty("user_data",confId)
                                 .put("max_seconds",maxDuration,MAX_DURATION)
+                                .put("parts_threshold",-1)
                                 .putIfNotEmpty("bg_file",bgmFile)
                                 .putIfNotEmpty("areaId",areaId)
                                 .build();

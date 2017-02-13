@@ -223,7 +223,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                     agent == null?"":agent.getId());
 
             if(logger.isDebugEnabled()){
-                logger.debug("[{}][{}]排队结果:agent={},queueid={}",tenantId,appId,agent,queueId);
+                logger.debug("[{}][{}]排队结果:agent={},queueid={}",tenantId,appId,agentId,queueId);
             }
             if(StringUtil.isEmpty(agentId)){//没找到坐席
                 //没有找到可用坐席
