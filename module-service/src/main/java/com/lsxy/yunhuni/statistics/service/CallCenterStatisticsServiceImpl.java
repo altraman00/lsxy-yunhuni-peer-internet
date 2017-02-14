@@ -455,7 +455,7 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
             List<App> apps = appService.getAppsByTenantId(tenants.get(i).getId());
             for(int j=0;j<apps.size();j++){
                 App app = apps.get(j);
-                if(app == null || !App.PRODUCT_CALL_CENTER.equals(app.getIsCallCenter())){
+                if(app == null || !App.PRODUCT_CALL_CENTER.equals(app.getServiceType())){
                     continue;
                 }
                 long sum =  sumAgentNum(tenants.get(i).getId(),app.getId(),startTime,endTime);
