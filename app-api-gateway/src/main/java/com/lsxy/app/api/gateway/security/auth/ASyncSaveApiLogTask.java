@@ -24,7 +24,7 @@ import java.util.Set;
 @Component
 public class ASyncSaveApiLogTask {
     private static final Logger logger = LoggerFactory.getLogger(ASyncSaveApiLogTask.class);
-
+    private AntPathMatcher antPathMatcher = new AntPathMatcher();
     private static Set<String> requestMappingPatternList = null;
 
     @Autowired
@@ -56,7 +56,6 @@ public class ASyncSaveApiLogTask {
         for(String pattern : patterns){
             if(StringUtils.isNotBlank(pattern)){
                 //匹配路径
-                AntPathMatcher antPathMatcher = new AntPathMatcher();
                 String matchingPattern =  antPathMatcher.match(pattern, uri)?pattern:( !pattern.endsWith("/") && antPathMatcher.match(pattern + "/", uri)? pattern:null);
                 if(StringUtils.isNotBlank(matchingPattern)){
                     type = matchingPattern;
@@ -66,7 +65,7 @@ public class ASyncSaveApiLogTask {
         }
         //由于{}里面的是变量名称，如：/v1/account/{account_id}/call/duo_callback，同样的接口可能会改变，所以变成*
         if(StringUtils.isNotBlank(type)){
-            type = type.replaceAll("\\{\\w*\\}", "*");
+            type = type.replaceAll("\\{[^/]+?\\}", "*");
         }
         log.setType(type);
         apiInvokeLogService.save(log);
@@ -81,24 +80,21 @@ public class ASyncSaveApiLogTask {
      * @return
      */
     public Set<String> getRequestMappingPatternList(){
-        if(requestMappingPatternList != null){
-            return requestMappingPatternList;
-        }else{
+        if(requestMappingPatternList == null){
             synchronized(ASyncSaveApiLogTask.class){
-                if(requestMappingPatternList != null){
-                    return requestMappingPatternList;
-                }else{
-                    requestMappingPatternList = new HashSet<>();
+                if(requestMappingPatternList == null){
+                    Set<String> set = new HashSet<>();
                     Map<RequestMappingInfo, HandlerMethod> map = requestMappingHandlerMapping.getHandlerMethods();
                     for (Iterator<RequestMappingInfo> iterator = map.keySet().iterator(); iterator.hasNext();) {
                         RequestMappingInfo info = iterator.next();
                         Set<String> patterns = info.getPatternsCondition().getPatterns();
-                        requestMappingPatternList.addAll(patterns);
+                        set.addAll(patterns);
                     }
-                    return requestMappingPatternList;
+                    requestMappingPatternList = set;
                 }
             }
         }
+        return requestMappingPatternList;
     }
 
 }

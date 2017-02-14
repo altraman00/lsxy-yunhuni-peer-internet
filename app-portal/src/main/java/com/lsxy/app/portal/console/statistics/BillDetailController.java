@@ -40,17 +40,18 @@ public class BillDetailController extends AbstractPortalController {
      * @param request
      * @param pageNo 第几页
      * @param pageSize 每页记录数
-     * @param time 时间
+     * @param start 开始时间
+     * @param end 结束时间
      * @param appId 应用id
      * @return
      */
     @RequestMapping("/notify")
-    public ModelAndView notify(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String time, String appId){
+    public ModelAndView notify(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String start,String end, String appId){
         ModelAndView mav = new ModelAndView();
-        Map<String,String> map = init(request,time,appId,App.PRODUCT_VOICE);
+        Map<String,String> map = init(request,start,end,appId,App.PRODUCT_VOICE);
         mav.addAllObjects(map);
-        Page pageObj = (Page)getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_NOTIFY,map.get("time"),map.get("appId")).getData();
-        mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_NOTIFY,map.get("time"),map.get("appId")).getData());
+        Page pageObj = (Page)getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_NOTIFY,map.get("start"),map.get("end"),map.get("appId")).getData();
+        mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_NOTIFY,map.get("start"),map.get("end"),map.get("appId")).getData());
         mav.addObject("pageObj",pageObj);
         mav.setViewName("/console/statistics/billdetail/notify");
         return mav;
@@ -60,17 +61,18 @@ public class BillDetailController extends AbstractPortalController {
      * @param request
      * @param pageNo 第几页
      * @param pageSize 每页记录数
-     * @param time 时间
+     * @param start 开始时间
+     * @param end 结束时间
      * @param appId 应用id
      * @return
      */
     @RequestMapping("/code")
-    public ModelAndView code(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String time, String appId){
+    public ModelAndView code(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String start,String end, String appId){
         ModelAndView mav = new ModelAndView();
-        Map<String,String> map = init(request,time,appId,App.PRODUCT_VOICE);
+        Map<String,String> map = init(request,start,end,appId,App.PRODUCT_VOICE);
         mav.addAllObjects(map);
-        mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_VOICECODE,map.get("time"),map.get("appId")).getData());
-        mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_VOICECODE,map.get("time"),map.get("appId")).getData());
+        mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_VOICECODE,map.get("start"),map.get("end"),map.get("appId")).getData());
+        mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_VOICECODE,map.get("start"),map.get("end"),map.get("appId")).getData());
         mav.setViewName("/console/statistics/billdetail/code");
         return mav;
     }
@@ -79,23 +81,24 @@ public class BillDetailController extends AbstractPortalController {
      * @param request
      * @param pageNo 第几页
      * @param pageSize 每页记录数
-     * @param time 时间
+     * @param start 开始时间
+     * @param end 结束时间
      * @param appId 应用id
      * @return
      */
     @RequestMapping("/recording")
     public ModelAndView recording(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize,
-                                  String time, String appId,String type){
+                                  String start,String end,  String appId,String type){
         ModelAndView mav = new ModelAndView();
-        Map map = init(request,time,appId);
+        Map map = init(request,start,end,appId);
         map.put("type",type);
         map.put("types", VoiceFileRecord.getRecordType((String )map.get("serviceType")));
         mav.addAllObjects(map);
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/sum?appId={1}&type={2}&startTime={3}&endTime={4}";
-        mav.addObject("sum",RestRequest.buildSecurityRequest(token).get(uri, Map.class,appId,type,map.get("time"),map.get("time")).getData());
+        mav.addObject("sum",RestRequest.buildSecurityRequest(token).get(uri, Map.class,appId,type,map.get("start"),map.get("end")).getData());
         String uri1 = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/plist/time?pageNo={1}&pageSize={2}&appId={3}&type={4}&startTime={5}&endTime={6}";
-        mav.addObject("pageObj",RestRequest.buildSecurityRequest(token).getPage(uri1,Map.class,pageNo,pageSize,map.get("appId"),type,map.get("time"),map.get("time")).getData());
+        mav.addObject("pageObj",RestRequest.buildSecurityRequest(token).getPage(uri1,Map.class,pageNo,pageSize,map.get("appId"),type,map.get("start"),map.get("end")).getData());
         mav.setViewName("/console/statistics/billdetail/recording");
         return mav;
     }
@@ -104,17 +107,18 @@ public class BillDetailController extends AbstractPortalController {
      * @param request
      * @param pageNo 第几页
      * @param pageSize 每页记录数
-     * @param time 时间
+     * @param start 开始时间
+     * @param end 结束时间
      * @param appId 应用id
      * @return
      */
     @RequestMapping("/ivr")
-    public ModelAndView ivr(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String time, String appId){
+    public ModelAndView ivr(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String start,String end, String appId){
         ModelAndView mav = new ModelAndView();
-        Map<String,String> map = init(request,time,appId,App.PRODUCT_VOICE);
+        Map<String,String> map = init(request,start,end,appId,App.PRODUCT_VOICE);
         mav.addAllObjects(map);
-        mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_IVR,map.get("time"),map.get("appId")).getData());
-        mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_IVR,map.get("time"),map.get("appId")).getData());
+        mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_IVR,map.get("start"),map.get("end"),map.get("appId")).getData());
+        mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_IVR,map.get("start"),map.get("end"),map.get("appId")).getData());
         mav.setViewName("/console/statistics/billdetail/ivr");
         return mav;
     }
@@ -123,17 +127,18 @@ public class BillDetailController extends AbstractPortalController {
      * @param request
      * @param pageNo 第几页
      * @param pageSize 每页记录数
-     * @param time 时间
+     * @param start 开始时间
+     * @param end 结束时间
      * @param appId 应用id
      * @return
      */
     @RequestMapping("/metting")
-    public ModelAndView metting(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String time, String appId){
+    public ModelAndView metting(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String start,String end,String appId){
         ModelAndView mav = new ModelAndView();
-        Map<String,String> map = init(request,time,appId,App.PRODUCT_VOICE);
+        Map<String,String> map = init(request,start,end,appId,App.PRODUCT_VOICE);
         mav.addAllObjects(map);
-        mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_MEETING,map.get("time"),map.get("appId")).getData());
-        mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_MEETING,map.get("time"),map.get("appId")).getData());
+        mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_MEETING,map.get("start"),map.get("end"),map.get("appId")).getData());
+        mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_MEETING,map.get("start"),map.get("end"),map.get("appId")).getData());
         mav.setViewName("/console/statistics/billdetail/metting");
         return mav;
     }
@@ -142,17 +147,18 @@ public class BillDetailController extends AbstractPortalController {
      * @param request
      * @param pageNo 第几页
      * @param pageSize 每页记录数
-     * @param time 时间
+     * @param start 开始时间
+     * @param end 结束时间
      * @param appId 应用id
      * @return
      */
     @RequestMapping("/callback")
-    public ModelAndView callback(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String time, String appId){
+    public ModelAndView callback(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String start,String end,String appId){
         ModelAndView mav = new ModelAndView();
-        Map<String,String> map = init(request,time,appId,App.PRODUCT_VOICE);
+        Map<String,String> map = init(request,start,end,appId,App.PRODUCT_VOICE);
         mav.addAllObjects(map);
-        mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_CALLBACK,map.get("time"),map.get("appId")).getData());
-        mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_CALLBACK,map.get("time"),map.get("appId")).getData());
+        mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_CALLBACK,map.get("start"),map.get("end"),map.get("appId")).getData());
+        mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_CALLBACK,map.get("start"),map.get("end"),map.get("appId")).getData());
         mav.setViewName("/console/statistics/billdetail/callback");
         return mav;
     }
@@ -162,25 +168,26 @@ public class BillDetailController extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/callcenter")
-    public ModelAndView callcenter(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String time, String appId){
+    public ModelAndView callcenter(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String start,String end, String appId){
         ModelAndView mav = new ModelAndView();
-        Map<String,String> map = init(request,time,appId,App.PRODUCT_CALL_CENTER);
+        Map<String,String> map = init(request,start,end,appId,App.PRODUCT_CALL_CENTER);
         mav.addAllObjects(map);
-        mav.addObject("sum",sum(request,App.PRODUCT_CALL_CENTER,map.get("time"),map.get("appId")).getData());
-        mav.addObject("pageObj",getPageList(request,pageNo,pageSize, App.PRODUCT_CALL_CENTER,map.get("time"),map.get("appId")).getData());
+        mav.addObject("sum",sum(request,App.PRODUCT_CALL_CENTER,map.get("start"),map.get("end"),map.get("appId")).getData());
+        mav.addObject("pageObj",getPageList(request,pageNo,pageSize, App.PRODUCT_CALL_CENTER,map.get("start"),map.get("end"),map.get("appId")).getData());
         mav.setViewName("/console/statistics/billdetail/callcenter");
         return mav;
     }
     /**
      * 下载
      * @param request
-     * @param time 时间
+     * @param start 开始时间
+     * @param end 结束时间
      * @param appId 应用id
      * @return
      */
     @RequestMapping("{path}/download")
     @ResponseBody
-    public WebAsyncTask download(HttpServletRequest request, HttpServletResponse response, @PathVariable String path, String time, String appId){
+    public WebAsyncTask download(HttpServletRequest request, HttpServletResponse response, @PathVariable String path, String start,String end, String appId){
         Callable<String> callable = new Callable<String>() {
             public String call() throws Exception {
                 String oType = "";
@@ -235,8 +242,8 @@ public class BillDetailController extends AbstractPortalController {
                 }
                 List list = null;
                 if(StringUtils.isNotEmpty(oType)){
-                    Map<String,String> map = init(request,time,appId,serviceType);
-                    list = (List)getList(request,oType,map.get("time"),map.get("appId")).getData();
+                    Map<String,String> map = init(request,start,end,appId,serviceType);
+                    list = (List)getList(request,oType,map.get("start"),map.get("end"),map.get("appId")).getData();
                 }
                 String appName = "";
                 if(StringUtils.isNotEmpty(appId)){
@@ -244,7 +251,7 @@ public class BillDetailController extends AbstractPortalController {
                 }else{
                     appName = "全部";
                 }
-                one = title+" 时间："+time+" 应用："+appName;
+                one = title+" 时间："+ start + "到" + end +",应用："+appName;
                 downloadExcel(title,one,headers,values,list,null,"cost",response);
                 return "";
             }
@@ -255,27 +262,29 @@ public class BillDetailController extends AbstractPortalController {
      * 统计
      * @param request
      * @param type 类型
-     * @param time 时间
+     * @param start 开始时间
+     * @param end 结束时间
      * @param appId 应用id
      * @return
      */
-    private RestResponse sum(HttpServletRequest request,String type,String time,String appId){
+    private RestResponse sum(HttpServletRequest request,String type,String start,String end,String appId){
         String token = getSecurityToken(request);
-        String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/voice_cdr/sum?type={1}&time={2}&appId={3}";
-        return RestRequest.buildSecurityRequest(token).get(uri, Map.class,type,time,appId);
+        String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/voice_cdr/sum?type={1}&start={2}&end={3}&appId={4}";
+        return RestRequest.buildSecurityRequest(token).get(uri, Map.class,type,start,end,appId);
     }
     /**
      * 获取页面数据
      * @param request
      * @param type 类型
-     * @param time 时间
+     * @param start 开始时间
+     * @param end 结束时间
      * @param appId 应用
      * @return
      */
-    private RestResponse getList(HttpServletRequest request,String type,String time,String appId){
+    private RestResponse getList(HttpServletRequest request,String type,String start,String end,String appId){
         String token = getSecurityToken(request);
-        String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/voice_cdr/list?type={1}&time={2}&appId={3}";
-        RestResponse<List<VoiceCdr>> result = RestRequest.buildSecurityRequest(token).getList(uri, VoiceCdr.class, type, time, appId);
+        String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/voice_cdr/list?type={1}&start={2}&end={3}&appId={4}";
+        RestResponse<List<VoiceCdr>> result = RestRequest.buildSecurityRequest(token).getList(uri, VoiceCdr.class, type, start,end, appId);
         if(result.isSuccess() && result.getData() != null){
             List<VoiceCdr> voiceCdrs = result.getData();
             formatNum(voiceCdrs);
@@ -310,14 +319,15 @@ public class BillDetailController extends AbstractPortalController {
      * @param pageNo 第几页
      * @param pageSize 每页记录数
      * @param type 类型
-     * @param time 时间
+     * @param start 开始时间
+     * @param end 结束时间
      * @param appId 应用
      * @return
      */
-    private RestResponse getPageList(HttpServletRequest request,Integer pageNo,Integer pageSize,String type,String time,String appId){
+    private RestResponse getPageList(HttpServletRequest request,Integer pageNo,Integer pageSize,String type,String start,String end,String appId){
         String token = getSecurityToken(request);
-        String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/voice_cdr/plist?pageNo={1}&pageSize={2}&type={3}&time={4}&appId={5}";
-        RestResponse<Page<VoiceCdr>> result = RestRequest.buildSecurityRequest(token).getPage(uri, VoiceCdr.class, pageNo, pageSize, type, time, appId);
+        String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/voice_cdr/plist?pageNo={1}&pageSize={2}&type={3}&start={4}&end={5}&appId={6}";
+        RestResponse<Page<VoiceCdr>> result = RestRequest.buildSecurityRequest(token).getPage(uri, VoiceCdr.class, pageNo, pageSize, type, start,end, appId);
         if(result.isSuccess() && result.getData() != null){
             List<VoiceCdr> voiceCdrs = result.getData().getResult();
             formatNum(voiceCdrs);
@@ -327,46 +337,49 @@ public class BillDetailController extends AbstractPortalController {
     /**
      * 处理初始条件
      * @param request
-     * @param time
+     * @param start
+     * @param end
      * @param appId
      * @return
      */
-    public Map init(HttpServletRequest request, String time, String appId,String serviceType){
+    public Map init(HttpServletRequest request, String start,String end, String appId,String serviceType){
         Map map = new HashMap();
         List<App> appList = (List<App>)getBillAppList(request,serviceType).getData();
         map.put("appList",appList);
         if(StringUtil.isEmpty(appId)){
-            if(StringUtils.isEmpty(appId)){
-                if(appList.size()>0) {
-                    appId = appList.get(0).getId();
-                }
-            }
+            appId = "all";
         }
         map.put("appId",appId);
-        if(StringUtils.isEmpty(time)){
-            time = DateUtils.formatDate(new Date(),"yyyy-MM-dd");
+        if(StringUtils.isEmpty(start)){
+            start = DateUtils.formatDate(new Date(),"yyyy-MM-dd");
         }
-        map.put("time",time);
+        map.put("start",start);
+
+        if(StringUtils.isEmpty(end)){
+            end = DateUtils.formatDate(new Date(),"yyyy-MM-dd");
+        }
+        map.put("end",end);
+
         return map;
     }
-    public Map init(HttpServletRequest request, String time, String appId){
+    public Map init(HttpServletRequest request, String start,String end, String appId){
         Map map = new HashMap();
         List<App> appList = (List<App>)getAppList(request).getData();
         map.put("appList",appList);
-        if(StringUtils.isEmpty(appId)){
-            if(appList.size()>0) {
-                appId = appList.get(0).getId();
-                map.put("serviceType",appList.get(0).getServiceType());
-            }
-        }else{
+        if(StringUtils.isNotEmpty(appId)){
             App app = (App)getAppById(request,appId).getData();
             map.put("serviceType",app.getServiceType());
         }
         map.put("appId",appId);
-        if(StringUtils.isEmpty(time)){
-            time = DateUtils.formatDate(new Date(),"yyyy-MM-dd");
+        if(StringUtils.isEmpty(start)){
+            start = DateUtils.formatDate(new Date(),"yyyy-MM-dd");
         }
-        map.put("time",time);
+        map.put("start",start);
+
+        if(StringUtils.isEmpty(end)){
+            end = DateUtils.formatDate(new Date(),"yyyy-MM-dd");
+        }
+        map.put("end",end);
         return map;
     }
 

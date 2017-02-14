@@ -1,6 +1,7 @@
 package com.lsxy.app.portal.rest.stastistic;
 
 import com.lsxy.app.portal.base.AbstractRestController;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
@@ -25,13 +26,16 @@ public class VoiceCdrController extends AbstractRestController {
     /**
      * 获取数据
      * @param type 类型
-     * @param time 时间
+     * @param start 开始时间
+     * @param end 结束时间
      * @param appId 应用id
      * @return
      */
     @RequestMapping("/list")
-    public RestResponse list(String type,String time,String appId){
-        List<VoiceCdr> list = voiceCdrService.listCdr(type,getCurrentAccount().getTenant().getId(),time,appId);
+    public RestResponse list(String type,String start,String end,String appId){
+        Date startTime = DateUtils.parseDate(start,"yyyy-MM-dd");
+        Date endTime = DateUtils.parseDate(end + " 23:59:59","yyyy-MM-dd HH:mm:ss");
+        List<VoiceCdr> list = voiceCdrService.listCdr(type,getCurrentAccount().getTenant().getId(),startTime,endTime,appId);
         return RestResponse.success(list);
     }
     /**
@@ -39,26 +43,32 @@ public class VoiceCdrController extends AbstractRestController {
      * @param pageNo 当前页
      * @param pageSize 每页记录数
      * @param type 类型
-     * @param time 时间
+     * @param start 开始时间
+     * @param end 结束时间
      * @param appId 应用id
      * @return
      */
     @RequestMapping("/plist")
-    public RestResponse pageList(Integer pageNo,Integer pageSize,String type,String time,String appId){
-        Page<VoiceCdr> page = voiceCdrService.pageList(pageNo,pageSize,type,getCurrentAccount().getTenant().getId(),time,appId);
+    public RestResponse pageList(Integer pageNo,Integer pageSize,String type,String start,String end,String appId){
+        Date startTime = DateUtils.parseDate(start,"yyyy-MM-dd");
+        Date endTime = DateUtils.parseDate(end+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+        Page<VoiceCdr> page = voiceCdrService.pageList(pageNo,pageSize,type,getCurrentAccount().getTenant().getId(),startTime,endTime,appId);
         return RestResponse.success(page);
     }
 
     /**
      * 根据查询类型，应用id，统计当前日期的消费额度或者验证码条数
      * @param type 类型 查看产品表code字段或枚举类ProductCode
-     * @param time 时间格式 yyyy-MM-dd
+     * @param start 开始时间
+     * @param end 结束时间
      * @param appId 应用id
      * @return
      */
     @RequestMapping("/sum")
-    public RestResponse sumCdr(String type,String time,String appId){
-        Map map = voiceCdrService.sumCost(type,getCurrentAccount().getTenant().getId(),time,appId);
+    public RestResponse sumCdr(String type,String start,String end,String appId){
+        Date startTime = DateUtils.parseDate(start,"yyyy-MM-dd");
+        Date endTime = DateUtils.parseDate(end+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+        Map map = voiceCdrService.sumCost(type,getCurrentAccount().getTenant().getId(),startTime,endTime,appId);
         return RestResponse.success(map);
     }
 

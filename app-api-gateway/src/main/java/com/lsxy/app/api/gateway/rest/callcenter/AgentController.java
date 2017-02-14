@@ -53,7 +53,7 @@ public class AgentController extends AbstractAPIController {
 
     @RequestMapping(value = "/{account_id}/callcenter/agent/{agent_name}",method = RequestMethod.DELETE)
     public ApiGatewayResponse logout(HttpServletRequest request, @RequestHeader("AppID") String appId,
-                                          @PathVariable("agent_name") String agentName,@RequestParam(value = "force",required = false) boolean force) throws YunhuniApiException {
+                                          @PathVariable("agent_name") String agentName,@RequestParam(value = "force",defaultValue = "false",required = false) Boolean force) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("开始注销座席：{}",agentName);
         }

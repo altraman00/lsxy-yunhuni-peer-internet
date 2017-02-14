@@ -38,5 +38,5 @@ do
  esac
 done
 
-echo "/opt/lsxy_yunwei/lsxy_server_auto.sh -j start -a $app_name -h $host_name"
-/opt/lsxy_yunwei/lsxy_server_auto.sh -j mystart -a $app_name -h $host_name -r $r_name
+echo "/opt/lsxy_yunwei/lsxy_server_auto.sh -j mystart -a $app_name -h $host_name -r $r_name"
+nohup /opt/lsxy_yunwei/lsxy_server_auto.sh -j mystart -a $app_name -h $host_name -r $r_name >> /tmp/lsxy_server_auto.log 2>&1 &
