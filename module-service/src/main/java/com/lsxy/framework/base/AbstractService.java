@@ -397,6 +397,12 @@ public abstract class AbstractService<T extends IdEntity> implements BaseService
         return fields;
     }
 
+    public Iterable<T> findAll(Collection<String> ids){
+        if(ids == null || ids.size() == 0){
+            return null;
+        }
+        return this.getDao().findAll(new ArrayList<Serializable>(ids));
+    }
     /*public static void main(String[] args) {
         System.out.println(getFields(Tenant.class));
     }*/

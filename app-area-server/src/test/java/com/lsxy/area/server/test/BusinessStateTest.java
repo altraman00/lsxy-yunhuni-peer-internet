@@ -1,10 +1,8 @@
 package com.lsxy.area.server.test;
 
-import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaServerMainClass;
-import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.config.Constants;
 import com.lsxy.framework.core.utils.MapBuilder;
 import org.junit.Test;
@@ -33,7 +31,7 @@ public class BusinessStateTest {
                 .setTenantId("11111111111")
                 .setAppId("222222222")
                 .setId("xxxxxxxxx1")
-                .setType(BusinessState.TYPE_CC_OUT_CALL)
+                .setType(BusinessState.TYPE_CC_INVITE_OUT_CALL)
                 .setUserdata("fwqfqwfqw")
                 .setCallBackUrl("wegwegwegw")
                 .setAreaId("gwegwegwegweg")

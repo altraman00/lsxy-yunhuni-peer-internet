@@ -146,7 +146,7 @@ public class CallcenterTest {
                 "        </condition>\n" +
                 "    </filter>\n" +
                 "</enqueue>");
-        enQueueService.lookupAgent("40288ac9575612a30157561c7ff50004","40288ac957e1812e0157e18a994e0000","","",enQueue);
+        enQueueService.lookupAgent("40288ac9575612a30157561c7ff50004","40288ac957e1812e0157e18a994e0000","","",enQueue,null,null);
     }
 
     @Test

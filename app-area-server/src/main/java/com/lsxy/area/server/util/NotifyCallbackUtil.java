@@ -49,6 +49,8 @@ public class NotifyCallbackUtil {
                 .setMaxConnPerRoute(1000)
                 //禁用cookies
                 .disableCookieManagement()
+                .setSSLContext(HttpClientHelper.sslContext)
+                .setSSLHostnameVerifier(HttpClientHelper.hostnameVerifier)//设置https无证书访问
                 .build();
         client.start();
     }

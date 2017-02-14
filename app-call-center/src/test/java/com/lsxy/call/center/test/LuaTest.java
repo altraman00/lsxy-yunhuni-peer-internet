@@ -4,13 +4,13 @@ import com.lsxy.call.center.CallCenterMainClass;
 import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.model.Condition;
 import com.lsxy.call.center.api.service.ConditionService;
-import com.lsxy.call.center.states.lock.AgentLock;
-import com.lsxy.call.center.states.lock.QueueLock;
-import com.lsxy.call.center.states.state.AgentState;
-import com.lsxy.call.center.states.state.ExtensionState;
-import com.lsxy.call.center.states.statics.ACs;
-import com.lsxy.call.center.states.statics.CAs;
-import com.lsxy.call.center.states.statics.CQs;
+import com.lsxy.call.center.api.states.lock.AgentLock;
+import com.lsxy.call.center.api.states.lock.QueueLock;
+import com.lsxy.call.center.api.states.state.AgentState;
+import com.lsxy.call.center.api.states.state.ExtensionState;
+import com.lsxy.call.center.api.states.statics.ACs;
+import com.lsxy.call.center.api.states.statics.CAs;
+import com.lsxy.call.center.api.states.statics.CQs;
 import com.lsxy.call.center.utils.Lua;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.Constants;
@@ -72,7 +72,7 @@ public class LuaTest {
                 @Override
                 public void run() {
                     long start = System.currentTimeMillis();
-                    System.out.println(redisCacheService.eval(Lua.LOOKUPAGENT,4,
+                    System.out.println(redisCacheService.eval(Lua.LOOKUPAGENTLRU,4,
                             CAs.getKey(condition.getId()),AgentState.getPrefixed(),
                             ExtensionState.getPrefixed(),AgentLock.getPrefixed(),
                             ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
@@ -104,7 +104,7 @@ public class LuaTest {
 
     @Test
     public void  test2() throws InterruptedException {
-        System.out.println(redisCacheService.eval(Lua.LOOKUPAGENT,1,"1","1111","10"));;
+        System.out.println(redisCacheService.eval(Lua.LOOKUPAGENTLRU,1,"1","1111","10"));;
         /*for (int i = 0; i < 5000; i++) {
             new Thread(new Runnable() {
                 @Override
@@ -116,7 +116,7 @@ public class LuaTest {
         Thread.currentThread().join();*/
         long start = System.currentTimeMillis();
         for (int i = 0; i < 1000; i++) {
-            System.out.println(redisCacheService.eval(Lua.LOOKUPAGENT,1,"1","1111","10"));;
+            System.out.println(redisCacheService.eval(Lua.LOOKUPAGENTLRU,1,"1","1111","10"));;
         }
 
         System.out.println("好事="+(System.currentTimeMillis()-start));

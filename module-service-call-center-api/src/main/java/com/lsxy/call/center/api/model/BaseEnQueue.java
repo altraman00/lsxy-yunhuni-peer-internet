@@ -23,6 +23,8 @@ public class BaseEnQueue implements Serializable{
 
     private Integer ring_mode;
 
+    private Integer voice_mode;
+
     private String ring_voice;
 
     private String hold_voice;
@@ -101,6 +103,14 @@ public class BaseEnQueue implements Serializable{
 
     public String getRing_voice() {
         return ring_voice;
+    }
+
+    public Integer getVoice_mode() {
+        return voice_mode;
+    }
+
+    public void setVoice_mode(Integer voice_mode) {
+        this.voice_mode = voice_mode;
     }
 
     public void setRing_voice(String ring_voice) {
