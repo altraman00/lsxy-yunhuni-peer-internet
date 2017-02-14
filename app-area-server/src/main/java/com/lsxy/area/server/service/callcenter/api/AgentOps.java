@@ -630,16 +630,17 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         if(list != null){
             result = new ArrayList<>();
             for (CallCenterConversation conversation : list) {
-                CallCenterConversationDetail detail = new CallCenterConversationDetail();
-                detail.setId(conversation.getId());
-                detail.setType(conversation.getType());
-                detail.setState(conversation.getState());
-                detail.setChannelId(conversation.getChannelId());
-                detail.setQueueId(conversation.getQueueId());
-                detail.setStartTime(conversation.getStartTime());//发起时间
-                detail.setEndTime(conversation.getEndTime());//结束时间
-                detail.setEndReason(conversation.getEndReason());
-                result.add(detail);
+                if(CallCenterConversation.STATE_READY.equals(conversation.getState())){
+                    CallCenterConversationDetail detail = new CallCenterConversationDetail();
+                    detail.setId(conversation.getId());
+                    detail.setType(conversation.getType());
+                    detail.setChannelId(conversation.getChannelId());
+                    detail.setQueueId(conversation.getQueueId());
+                    detail.setStartTime(conversation.getStartTime());//发起时间
+                    detail.setEndTime(conversation.getEndTime());//结束时间
+                    detail.setEndReason(conversation.getEndReason());
+                    result.add(detail);
+                }
             }
         }
         return result;
