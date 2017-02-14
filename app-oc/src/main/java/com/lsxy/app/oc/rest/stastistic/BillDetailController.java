@@ -79,11 +79,13 @@ public class BillDetailController extends AbstractRestController {
     public RestResponse call(
             @ApiParam(name = "uid",value = "用户id")
             @PathVariable String uid,
-            @ApiParam(name = "type",value = "voice_call.语音通知,duo_call.双向回拨,sys_conf.会议服务,ivr_call.IVR定制服务,captcha_call.语音验证码,voice_recording.录音服务call_center呼叫中心类型")
+            @ApiParam(name = "type",value = "notify_call.语音通知,duo_call.双向回拨,sys_conf.会议服务,ivr_call.IVR定制服务,captcha_call.语音验证码,voice_recording.录音服务call_center呼叫中心类型")
             @RequestParam String type,
             @ApiParam(name = "time",value = "yyyy-MM-dd")
             @RequestParam(required=false) String time,
-            @ApiParam(name = "appId",value = "应用id")
+            @ApiParam(name = "time2",value = "yyyy-MM-dd")
+            @RequestParam(required=false) String time2,
+            @ApiParam(name = "appId",value = "应用id,当应用id为all时，表示全部")
             @RequestParam(required=false)String appId,
             @RequestParam(defaultValue = "1") Integer pageNo,
             @RequestParam(defaultValue = "20") Integer pageSize
@@ -91,13 +93,15 @@ public class BillDetailController extends AbstractRestController {
         Map re = new HashMap();
         RestResponse restResponse = null;
         if(StringUtil.isNotEmpty(appId)&&StringUtil.isNotEmpty(type)){
+            Date startTime = DateUtils.parseDate(time,"yyyy-MM-dd");
+            Date endTime = DateUtils.parseDate(time2+" 23:59:59","yyyy-MM-dd HH:mm:ss");
             //获取分页数据
-            Page page = voiceCdrService.pageList(pageNo, pageSize, type, uid, time, appId);
+            Page page = voiceCdrService.pageList(pageNo, pageSize, type, uid, startTime,endTime, appId);
             re.put("page", page);
             if (CallSession.TYPE_VOICE_VOICECODE.equals(type)) {//语音验证码
                 re.put("total", page.getTotalCount());
             } else {
-                Map map = voiceCdrService.sumCost(type, uid, time, appId);
+                Map map = voiceCdrService.sumCost(type, uid, startTime,endTime, appId);
                 re.put("total", map.get("cost"));
             }
             restResponse = RestResponse.success(re);
@@ -116,7 +120,9 @@ public class BillDetailController extends AbstractRestController {
             @RequestParam(required = false) String type,
             @ApiParam(name = "time",value = "yyyy-MM-dd")
             @RequestParam(required=false) String time,
-            @ApiParam(name = "appId",value = "应用id")
+            @ApiParam(name = "time2",value = "yyyy-MM-dd")
+            @RequestParam(required=false) String time2,
+            @ApiParam(name = "appId",value = "应用id,当应用id为空时，表示全部")
             @RequestParam(required=false)String appId,
             @RequestParam(defaultValue = "1") Integer pageNo,
             @RequestParam(defaultValue = "20") Integer pageSize
@@ -125,7 +131,7 @@ public class BillDetailController extends AbstractRestController {
         Date end = null;
         try{
             start = DateUtils.parseDate(time+" 00:00:00","yyyy-MM-dd HH:mm:ss");
-            end = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+            end = DateUtils.parseDate(time2+" 23:59:59","yyyy-MM-dd HH:mm:ss");
         }catch (Exception e){
             return RestResponse.failed("0000","日期格式错误");
         }

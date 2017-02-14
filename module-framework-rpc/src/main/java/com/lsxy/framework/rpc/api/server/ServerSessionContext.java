@@ -125,8 +125,13 @@ public class ServerSessionContext extends SessionContext{
 		StringBuffer sb = new StringBuffer();
 		sb.append("[");
 		for (Object key:areaSessionMap.keySet()) {
-			Session session = (Session) areaSessionMap.get(key);
-			sb.append("{\"nodeId\":\""+key + "\",\"host\":\"" + session.getRemoteAddress().getHostName() + "\"},");
+			ServerSession session = (ServerSession) areaSessionMap.get(key);
+			sb.append("{" +
+					"\"nodeId\":\""+key + "\"," +
+					"\"host\":\"" + session.getRemoteAddress().getHostName() + "\"," +
+					"\"startTimestamp\":\""+session.getClientStartTimestamp()+"\"," +
+					"\"version\":\""+session.getClientVersion()+"\"" +
+					"},");
 		}
 		if(sb.length() > 1){
 			sb.deleteCharAt(sb.length()-1);

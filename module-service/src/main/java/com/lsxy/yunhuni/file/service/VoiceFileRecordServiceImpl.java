@@ -91,10 +91,9 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
             sql+=" AND tenant_id='"+tenantId+"'";
         }
         if(StringUtils.isNotEmpty(type)){
-            String typeName = ProductCode.getApiCmdByRemark(type.trim());
-            if(StringUtils.isNotBlank(tenantId)){
-                sql+=" AND session_code = '"+typeName+"'";
-            }
+            //查看传进来的type是否合法
+            ProductCode.valueOf(type);
+            sql+="AND session_code = '"+type+"'";
         }
         if(start!=null&&end!=null){
             sql+=" AND create_time BETWEEN ? AND ? ";
@@ -150,10 +149,9 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
             sql+=" AND tenant_id='"+tenantId+"'";
         }
         if(StringUtils.isNotEmpty(type)){
-            String typeName = ProductCode.getApiCmdByRemark(type);
-            if(StringUtils.isNotBlank(typeName)){
-                sql+="AND session_code = '"+typeName+"'";
-            }
+            //查看传进来的type是否合法
+            ProductCode.valueOf(type);
+            sql+="AND session_code = '"+type+"'";
         }
         if(start!=null&&end!=null){
             sql+=" AND create_time BETWEEN ? AND ? ";
