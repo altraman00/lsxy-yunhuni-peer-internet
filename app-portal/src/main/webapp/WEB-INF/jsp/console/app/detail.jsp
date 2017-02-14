@@ -115,8 +115,14 @@
                                                             选择服务：
                                                         </div>
                                                         <div class="col-md-6">
-                                                            <p><c:if test="${app.serviceType=='call_center'}">呼叫中心</c:if>
-                                                                <c:if test="${app.serviceType=='voice'}">语音</c:if></p>
+                                                            <p>
+                                                                <c:if test="${app.isVoiceDirectly=='1'}">语音通知&nbsp;</c:if>
+                                                                <c:if test="${app.isVoiceCallback=='1'}">语音回拨&nbsp;</c:if>
+                                                                <c:if test="${app.isSessionService=='1'}">语音会议&nbsp;</c:if>
+                                                                <c:if test="${app.isVoiceValidate=='1'}">语音验证码&nbsp;</c:if>
+                                                                <c:if test="${app.isIvrService=='1'}">自定义IVR&nbsp;</c:if>
+                                                                <c:if test="${app.isCallCenter==1}">呼叫中心&nbsp;</c:if>
+                                                            </p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -240,7 +246,7 @@
                                     <li data-id="number"><a href="#number" data-toggle="tab">号码绑定</a></li>
                                     <c:if test="${app.serviceType=='call_center'}">
                                         <li data-id="extension"><a href="#extension" data-toggle="tab">分机列表</a></li>
-                                        <li data-id="agent"><a href="#agent" data-toggle="tab">座席列表</a></li>
+                                        <li data-id="agent"><a href="#agent" data-toggle="tab">坐席列表</a></li>
                                     </c:if>
 
                                     <li class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
@@ -383,13 +389,13 @@
                                         </section>
                                     </div>
                                     <!--分机列表end-->
-                                    <!--座席列表-->
+                                    <!--坐席列表-->
                                     <div class="tab-pane fade" id="agent">
 
                                         <table class="table table-striped cost-table-history tablelist" id="agent-table">
                                             <thead>
                                             <tr>
-                                                <th class="text-center">座席名称（ID）</th>
+                                                <th class="text-center">坐席名称（ID）</th>
                                                 <th class="text-center">技能组</th>
                                                 <th class="text-center">绑定分机</th>
                                                 <th class="text-center">状态</th>
@@ -403,7 +409,7 @@
                                             <div id="agent-page"></div>
                                         </section>
                                     </div>
-                                    <!--座席列表end-->
+                                    <!--坐席列表end-->
 
                                 </div>
                             </section>
@@ -1432,7 +1438,7 @@
     }
 
     /**
-     * 座席分页
+     * 坐席分页
      */
     var agentPage;
     function agentList(){
@@ -1459,7 +1465,7 @@
     }
 
     /**
-     * 座席分机分页回调方法
+     * 坐席分机分页回调方法
      * @param nowPage 当前页数
      * @param listRows 每页显示多少条数据
      * */
