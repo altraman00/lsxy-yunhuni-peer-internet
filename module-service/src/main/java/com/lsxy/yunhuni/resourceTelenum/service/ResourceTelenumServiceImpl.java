@@ -451,6 +451,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             //修改号码租用关系
             resourceTelenum.setTenantId(tenant.getId());
             resourceTelenum.setAppId(null);
+            resourceTelenum.setCertSubaccountId(null);
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
             this.save(resourceTelenum);
         }else if(tenantType==0&& isEditNum){//只更改手机号码
@@ -482,6 +483,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             //修改号码租用关系
             resourceTelenum.setTenantId(tenant.getId());
             resourceTelenum.setAppId(null);
+            resourceTelenum.setCertSubaccountId(null);
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
             this.save(resourceTelenum);
         }
@@ -499,6 +501,8 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_RELEASE);
         resourcesRentService.save(resourcesRent);
         resourceTelenum.setTenantId(null);
+        resourceTelenum.setAppId(null);
+        resourceTelenum.setCertSubaccountId(null);
         resourceTelenum.setStatus(0);
         this.save(resourceTelenum);
     }
