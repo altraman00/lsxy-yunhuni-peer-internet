@@ -50,6 +50,7 @@ public class ResourceTelenum extends IdEntity{
     private String type;//1采购线路0租户自带
     private String appId;
     private String tenantId;
+    private String certSubaccountId;
 
     @Transient
     private LineGateway line;
@@ -219,6 +220,15 @@ public class ResourceTelenum extends IdEntity{
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+
+    @Column(name = "cert_subaccount_id")
+    public String getCertSubaccountId() {
+        return certSubaccountId;
+    }
+
+    public void setCertSubaccountId(String certSubaccountId) {
+        this.certSubaccountId = certSubaccountId;
     }
 
     public ResourceTelenum(String telNumber, String callUri, String operator, String areaCode, String lineId, String amount) {
