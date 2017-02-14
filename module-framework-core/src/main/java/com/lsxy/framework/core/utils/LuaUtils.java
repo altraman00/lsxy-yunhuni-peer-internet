@@ -44,11 +44,12 @@ public class LuaUtils {
                     continue;
                 }
                 if(read.trim().startsWith("redis.log(")){
-                    if(!logger.isDebugEnabled()){//非调试模式下不需要redis.log
+                    /*if(!logger.isDebugEnabled()){//非调试模式下不需要redis.log
                         continue;
                     }
                     //追加行号
-                    lua.append("redis.log(redis.LOG_WARNING,'"+path+linenum+":')").append("\n");
+                    lua.append("redis.log(redis.LOG_WARNING,'"+path+linenum+":')").append("\n");*/
+                    continue;
                 }
                 lua.append(read).append("\n");
             }
