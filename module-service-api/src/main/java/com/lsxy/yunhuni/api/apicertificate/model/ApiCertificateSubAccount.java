@@ -16,6 +16,7 @@ import javax.persistence.Table;
 @PrimaryKeyJoinColumn(name = "id")
 public class ApiCertificateSubAccount extends ApiCertificate{
     private String appId;
+    private String parentId;
     private String callbackUrl;
 
     @Column(name = "app_id")
@@ -25,6 +26,15 @@ public class ApiCertificateSubAccount extends ApiCertificate{
 
     public void setAppId(String appId) {
         this.appId = appId;
+    }
+
+    @Column(name = "parent_id")
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
     }
 
     @Column(name = "callback_url")
