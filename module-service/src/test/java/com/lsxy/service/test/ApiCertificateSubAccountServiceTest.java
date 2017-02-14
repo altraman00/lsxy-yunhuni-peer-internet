@@ -7,7 +7,9 @@ import com.lsxy.framework.config.Constants;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
 import com.lsxy.yunhuni.api.YunhuniApiConfig;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,6 +38,8 @@ public class ApiCertificateSubAccountServiceTest {
 
     @Autowired
     private ApiCertificateSubAccountService apiCertificateSubAccountService;
+    @Autowired
+    private ApiCertificateService apiCertificateService;
 
     @Test
     public void testSave(){
@@ -49,8 +53,11 @@ public class ApiCertificateSubAccountServiceTest {
 
     @Test
     public void testFind(){
-        ApiCertificateSubAccount account = apiCertificateSubAccountService.findById("40288aca5a3b5560015a3b5571de0000");
-        System.out.println(JSONUtil.objectToJson(account));
+        ApiCertificate saccount = apiCertificateService.findById("40288aca5a3bce03015a3bce14070000");
+        ApiCertificate account = apiCertificateService.findById("40288ac957e0afc80157e0b24aee0001");
+        System.out.println(saccount);
+        System.out.println(account);
+
     }
 
 
