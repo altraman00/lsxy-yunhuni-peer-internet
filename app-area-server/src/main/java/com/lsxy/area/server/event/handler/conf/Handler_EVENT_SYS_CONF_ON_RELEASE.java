@@ -120,7 +120,6 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
             if(conversation != null){
                 CallCenterConversation updateCallCenterConversation = new CallCenterConversation();
                 updateCallCenterConversation.setEndTime(new Date());
-                updateCallCenterConversation.setState(CallCenterConversation.STATE_COMPLETED);
                 callCenterConversationService.update(conversation.getId(),updateCallCenterConversation);
             }
 
