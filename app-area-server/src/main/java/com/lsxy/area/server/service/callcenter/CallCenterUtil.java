@@ -48,13 +48,17 @@ public class CallCenterUtil {
     public static final String CALLCENTER_FIELD = "CALLCENTER_ID";
     /**呼叫所属的交谈的id的存放属性**/
     public static final String CONVERSATION_FIELD = "CONVERSATION_ID";
+    /**交谈中所使用的平台号码**/
+    public static final String CONVERSATION_SYSNUM_FIELD = "CONVERSATION_SYSNUM";
     /**ivr呼叫是否呼叫中心标记存放的字段**/
     public static final String ISCC_FIELD = "ISCC";
     public static final String ISCC_TRUE = "1";
     /**正在播放排队等待音存放的字段**/
-    public static final String PLAYWAIT_FIELD = "IS_PLAYWAIT";
+    public static final String PLAYWAIT_FIELD = "PLAYWAIT";
     /**呼叫对应的排队id存放的字段**/
     public static final String QUEUE_ID_FIELD = "QUEUE_ID";
+    /**呼叫对应的排队类型存放的字段**/
+    public static final String QUEUE_TYPE_FIELD = "QUEUE_TYPE";
     /**坐席挂机后的状态存放的字段**/
     public static final String RESERVE_STATE_FIELD = "RESERVE_STATE";
     /**坐席呼叫对应的坐席id存放的字段**/
@@ -69,8 +73,6 @@ public class CallCenterUtil {
     public static final String AGENT_PRENUMVOICE_FIELD = "AGENT_PRENUMVOICE";
     /**坐席播放工号后的音存放的字段**/
     public static final String AGENT_POSTNUMVOICE_FIELD = "AGENT_POSTNUMVOICE";
-    /**交谈成员收放音模式存放的字段**/
-    public static final String PARTNER_VOICE_MODE_FIELD = "PARTNER_VOICE_MODE";
     /**通道id存放的字段**/
     public static final String CHANNEL_ID_FIELD = "CHANNEL_ID";
     /**条件id存放的字段**/
@@ -82,7 +84,11 @@ public class CallCenterUtil {
     /**记录排队开始时间字段**/
     public static final String ENQUEUE_START_TIME_FIELD = "ENQUEUE_START_TIME_FIELD";
 
+    /**交谈成员收放音模式**/
+    public static final String VOICE_MODE_FIELD = "VOICE_MODE";
 
+    /**交谈holding 提示音**/
+    public static final String HOLD_VOICE_FIELD = "HOLD_VOICE";
 
     @Autowired
     private BusinessStateService businessStateService;

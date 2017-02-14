@@ -1,4 +1,4 @@
-package com.lsxy.call.center.states.statics;
+package com.lsxy.call.center.api.states.statics;
 
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import org.slf4j.Logger;

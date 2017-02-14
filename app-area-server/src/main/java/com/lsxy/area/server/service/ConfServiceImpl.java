@@ -138,6 +138,7 @@ public class ConfServiceImpl implements ConfService {
         Map<String, Object> map = new MapBuilder<String,Object>()
                                 .putIfNotEmpty("user_data",confId)
                                 .put("max_seconds",maxDuration,MAX_DURATION)
+                                .put("parts_threshold",-1)
                                 .putIfNotEmpty("bg_file",bgmFile)
                                 .putIfNotEmpty("areaId",areaId)
                                 .build();
@@ -260,7 +261,7 @@ public class ConfServiceImpl implements ConfService {
         }
 
         if(state.getClosed()!= null && state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConfNotExistsException();
         }
 
         if(!appId.equals(state.getAppId())){
@@ -460,11 +461,6 @@ public class ConfServiceImpl implements ConfService {
             throw new AppServiceInvalidException();
         }
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
-        if(!isAmountEnough){
-            throw new BalanceNotEnoughException();
-        }
-
         BusinessState conf_state = businessStateService.get(confId);
 
         if(conf_state == null || conf_state.getResId() == null){
@@ -551,11 +547,6 @@ public class ConfServiceImpl implements ConfService {
 
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
-        }
-
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
-        if(!isAmountEnough){
-            throw new BalanceNotEnoughException();
         }
 
         BusinessState conf_state = businessStateService.get(confId);
@@ -652,11 +643,6 @@ public class ConfServiceImpl implements ConfService {
             throw new AppServiceInvalidException();
         }
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
-        if(!isAmountEnough){
-            throw new BalanceNotEnoughException();
-        }
-
         BusinessState call_state = businessStateService.get(callId);
         BusinessState conf_state = businessStateService.get(confId);
         if(call_state ==null || call_state.getResId() == null){
@@ -678,13 +664,12 @@ public class ConfServiceImpl implements ConfService {
         if(!call_state.getAppId().equals(conf_state.getAppId())){
             throw new IllegalArgumentException();
         }
-        String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
                 .putIfNotEmpty("call_res_id",call_state.getResId())
                 .putIfNotEmpty("mode",voiceMode)
                 .putIfNotEmpty("user_data",callId)
-                .putIfNotEmpty("areaId",areaId)
+                .putIfNotEmpty("areaId",call_state.getAreaId())
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_SET_PART_VOICE_MODE, params);

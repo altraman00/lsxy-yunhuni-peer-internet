@@ -10,6 +10,11 @@ import java.io.Serializable;
  */
 @XStreamAlias("enqueue")
 public class EnQueue implements Serializable{
+
+    public static final String CHOICE_LRU = "lru";
+
+    public static final String CHOICE_RANDOM = "random";
+
     @XStreamAsAttribute
     private String channel;
 
@@ -33,6 +38,8 @@ public class EnQueue implements Serializable{
 
     @XStreamAsAttribute
     private Integer ring_mode;
+
+    private Integer voice_mode;
 
     @XStreamAsAttribute
     private String ring_voice;
@@ -121,6 +128,14 @@ public class EnQueue implements Serializable{
         this.ring_mode = ring_mode;
     }
 
+    public Integer getVoice_mode() {
+        return voice_mode;
+    }
+
+    public void setVoice_mode(Integer voice_mode) {
+        this.voice_mode = voice_mode;
+    }
+
     public String getRing_voice() {
         return ring_voice;
     }
@@ -180,6 +195,8 @@ public class EnQueue implements Serializable{
     public class Route  implements Serializable{
         private Condition condition;
 
+        private Agent agent;
+
         public Route(){
 
         }
@@ -189,6 +206,14 @@ public class EnQueue implements Serializable{
 
         public void setCondition(Condition condition) {
             this.condition = condition;
+        }
+
+        public Agent getAgent() {
+            return agent;
+        }
+
+        public void setAgent(Agent agent) {
+            this.agent = agent;
         }
     }
     public class Condition  implements Serializable{
@@ -204,6 +229,57 @@ public class EnQueue implements Serializable{
 
         public void setId(String id) {
             this.id = id;
+        }
+    }
+
+    public class Agent  implements Serializable{
+
+        @XStreamAsAttribute
+        private String name;
+
+        @XStreamAsAttribute
+        private Integer priority;
+
+        @XStreamAsAttribute
+        private Integer queue_timeout;
+
+        @XStreamAsAttribute
+        private Integer fetch_timeout;
+
+        public Agent(){
+
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public Integer getPriority() {
+            return priority;
+        }
+
+        public void setPriority(Integer priority) {
+            this.priority = priority;
+        }
+
+        public Integer getQueue_timeout() {
+            return queue_timeout;
+        }
+
+        public void setQueue_timeout(Integer queue_timeout) {
+            this.queue_timeout = queue_timeout;
+        }
+
+        public Integer getFetch_timeout() {
+            return fetch_timeout;
+        }
+
+        public void setFetch_timeout(Integer fetch_timeout) {
+            this.fetch_timeout = fetch_timeout;
         }
     }
 }

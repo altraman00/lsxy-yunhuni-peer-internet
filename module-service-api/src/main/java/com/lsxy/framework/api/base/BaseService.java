@@ -5,6 +5,7 @@ import com.lsxy.framework.core.utils.Page;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 
 @SuppressWarnings("rawtypes")
 public interface BaseService<T>{
@@ -32,5 +33,7 @@ public interface BaseService<T>{
 	public Iterable<T> save(Iterable<T> list);
 
 	public void update(String id,T obj);
+
+	public Iterable<T> findAll(Collection<String> ids);
 	
 }

@@ -20,8 +20,16 @@ public class BusinessState implements Serializable{
     public static final String TYPE_CC_CONVERSATION = "conversation";
 
     public static final String TYPE_CC_INCOMING = "cc_incoming";
+    public static final String TYPE_CC_INVITE_AGENT_CALL = "invite_agent_call";
+    public static final String TYPE_CC_INVITE_OUT_CALL = "invite_out_call";
     public static final String TYPE_CC_AGENT_CALL = "agent_call";
     public static final String TYPE_CC_OUT_CALL = "out_call";
+    /**交谈中的虚拟呼叫(逻辑上的，实际上不存在呼叫资源)**/
+    public static final String TYPE_CC_CONVERSATION_SHADOW_CALL = "conversation_shadow_call";
+
+    /**振铃标记  表示呼叫正在振铃，拨号结束事件中移除该标记**/
+    public static final String RINGING_TRUE = "1";
+    public static final String RINGING_TAG ="RINGING_TAG";
 
     public static final String SESSIONID = "sessionid";
 
