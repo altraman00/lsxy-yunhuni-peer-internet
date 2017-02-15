@@ -18,7 +18,8 @@ public class CertAccountQuota extends IdEntity {
     private String tenantId;
     private String appId;
     private String subaccountId;
-    private Integer type; //'配额类型：1，按时长；2，按个数',
+    private String type;  // 配额类型
+    private Integer calType; // 配额计算类型：1，按时长；2，按个数
     private String name;
     private Long period;
     private Long sum;
@@ -55,12 +56,21 @@ public class CertAccountQuota extends IdEntity {
     }
 
     @Column(name = "type")
-    public Integer getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(Integer type) {
+    public void setType(String type) {
         this.type = type;
+    }
+
+    @Column(name = "cal_type")
+    public Integer getCalType() {
+        return calType;
+    }
+
+    public void setCalType(Integer calType) {
+        this.calType = calType;
     }
 
     @Column(name = "name")
