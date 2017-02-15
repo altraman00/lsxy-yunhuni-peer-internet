@@ -27,7 +27,6 @@ public class ConversationCompletedEventHandler implements MQMessageHandler<Conve
         }
         CallCenterConversation updateCallCenterConversation = new CallCenterConversation();
         updateCallCenterConversation.setEndTime(new Date(message.getTimestamp()));
-        updateCallCenterConversation.setState(CallCenterConversation.STATE_COMPLETED);
         callCenterConversationService.update(message.getConversationId(),updateCallCenterConversation);
     }
 }

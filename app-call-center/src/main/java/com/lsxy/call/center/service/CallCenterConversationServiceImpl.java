@@ -72,7 +72,6 @@ public class CallCenterConversationServiceImpl extends AbstractService<CallCente
 
         detail.setId(conversation.getId());
         detail.setType(conversation.getType());
-        detail.setState(conversation.getState());
         detail.setChannelId(conversation.getChannelId());
         detail.setQueueId(conversation.getQueueId());
         detail.setStartTime(conversation.getStartTime());
@@ -86,6 +85,7 @@ public class CallCenterConversationServiceImpl extends AbstractService<CallCente
                 CallCenterConversationDetail.MemberDetail member = new CallCenterConversationDetail.MemberDetail();
                 member.setAgentName(cm.getAgentName());
                 member.setExtensionId(cm.getExtensionId());
+                member.setTelnumber(cm.getJoinNum());
                 member.setCallId(cm.getCallId());
                 member.setStartTime(cm.getStartTime());
                 member.setEndTime(cm.getEndTime());
@@ -112,7 +112,8 @@ public class CallCenterConversationServiceImpl extends AbstractService<CallCente
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
-        Page<CallCenterConversation> queryResult = pageList(page,size);
+        Page<CallCenterConversation> queryResult = pageList("from CallCenterConversation obj where obj.appId=?1 and obj.state=?2",
+                page,size,appId,CallCenterConversation.STATE_READY);
 
         Page<CallCenterConversationDetail> result = new Page<>(queryResult.getStartIndex(),queryResult.getTotalCount(),queryResult.getPageSize(),null);
 
@@ -123,7 +124,6 @@ public class CallCenterConversationServiceImpl extends AbstractService<CallCente
                 CallCenterConversationDetail detail = new CallCenterConversationDetail();
                 detail.setId(conversation.getId());
                 detail.setType(conversation.getType());
-                detail.setState(conversation.getState());
                 detail.setChannelId(conversation.getChannelId());
                 detail.setQueueId(conversation.getQueueId());
                 detail.setStartTime(conversation.getStartTime());//发起时间
