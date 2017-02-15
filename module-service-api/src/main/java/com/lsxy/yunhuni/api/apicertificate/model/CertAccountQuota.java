@@ -18,11 +18,11 @@ public class CertAccountQuota extends IdEntity {
     private String tenantId;
     private String appId;
     private String subaccountId;
-    private String type;  // 配额类型
+    private String type;  // 配额类型 参考CertAccountQuotaType
     private Integer calType; // 配额计算类型：1，按时长；2，按个数
     private String name;
     private Long period;
-    private Long sum;
+    private Long sum;   //-1表示无限制
     private Long used;
     private Date balanceDt;
     private String remark;
