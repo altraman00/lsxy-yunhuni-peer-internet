@@ -2,6 +2,7 @@ package com.lsxy.call.center.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -9,16 +10,13 @@ import java.util.List;
  * 呼叫中心交谈
  * Created by zhangxb on 2016/11/11.
  */
-public class CallCenterConversationDetail{
+public class CallCenterConversationDetail implements Serializable{
 
     @JsonProperty("id")
     private String id;
 
     @JsonProperty("type")
     private String type;
-
-    @JsonProperty("state")
-    private String state;
 
     @JsonProperty("channel")
     private String channelId;
@@ -52,14 +50,6 @@ public class CallCenterConversationDetail{
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
     }
 
     public String getChannelId() {
@@ -110,13 +100,16 @@ public class CallCenterConversationDetail{
         this.members = members;
     }
 
-    public static class MemberDetail{
+    public static class MemberDetail implements Serializable{
 
         @JsonProperty("name")
         private String agentName;
 
         @JsonProperty("extension_id")
         private String extensionId;
+
+        @JsonProperty("telnumber")
+        private String telnumber;
 
         @JsonProperty("call_id")
         private String callId;
@@ -144,6 +137,14 @@ public class CallCenterConversationDetail{
 
         public void setExtensionId(String extensionId) {
             this.extensionId = extensionId;
+        }
+
+        public String getTelnumber() {
+            return telnumber;
+        }
+
+        public void setTelnumber(String telnumber) {
+            this.telnumber = telnumber;
         }
 
         public String getCallId() {

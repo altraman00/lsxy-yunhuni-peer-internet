@@ -13,8 +13,10 @@ import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.model.CallCenterAgent;
+import com.lsxy.call.center.api.model.CallCenterConversation;
 import com.lsxy.call.center.api.model.CallCenterQueue;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
+import com.lsxy.call.center.api.service.CallCenterConversationService;
 import com.lsxy.call.center.api.service.CallCenterQueueService;
 import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.api.tenant.service.TenantService;
@@ -23,6 +25,7 @@ import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.framework.mq.events.callcenter.ConversationCompletedEvent;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -104,6 +107,9 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
 
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterService callCenterService;
+
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterConversationService callCenterConversationService;
 
     @Autowired
     private CallCenterStatisticsService callCenterStatisticsService;
@@ -380,6 +386,13 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                     agent_num,prevoice,postvoice,e);
                         }catch(Throwable e) {
                             logger.warn("调用失败 ",e);
+                        }
+                        try{
+                            CallCenterConversation updateCallCenterConversation = new CallCenterConversation();
+                            updateCallCenterConversation.setState(CallCenterConversation.STATE_READY);
+                            callCenterConversationService.update(conversation_id,updateCallCenterConversation);
+                        }catch (Throwable t){
+                            logger.warn("更新交谈记录失败",t);
                         }
                     }
 

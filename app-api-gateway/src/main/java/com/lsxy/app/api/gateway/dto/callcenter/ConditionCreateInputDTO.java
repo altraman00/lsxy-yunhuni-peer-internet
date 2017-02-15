@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
 public class ConditionCreateInputDTO extends CommonDTO {
 
     @NotNull
-    @Size(max = 32)
+    @Size(min = 1,max = 128)
     @JsonProperty("channel")
     private String channelId;
 

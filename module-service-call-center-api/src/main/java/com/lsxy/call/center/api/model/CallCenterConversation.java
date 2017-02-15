@@ -17,8 +17,8 @@ import java.util.Date;
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_call_center_conversation")
 public class CallCenterConversation extends IdEntity {
 
-    public static final String STATE_RUNNING = "running";
-    public static final String STATE_COMPLETED= "completed";
+    public static final String STATE_UNREADY = "unready";
+    public static final String STATE_READY = "ready";
 
     private String tenantId;//所属租户
     private String appId;//所属应用
