@@ -14,6 +14,9 @@ import javax.persistence.*;
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_api_cert")
 public class ApiCertificate extends IdEntity {
+    public static int TYPE_PRIMARY_ACCOUNT = 1;
+    public static int TYPE_SUBACCOUNT = 2;
+
     private String tenantId;      //租户
     private Integer type;   //类型：1、主账号，2、子账号
     private String certId;      //凭证ID

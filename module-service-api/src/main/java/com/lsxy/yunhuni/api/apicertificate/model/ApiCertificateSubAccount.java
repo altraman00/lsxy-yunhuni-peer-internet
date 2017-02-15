@@ -18,6 +18,7 @@ public class ApiCertificateSubAccount extends ApiCertificate{
     private String appId;
     private String parentId;
     private String callbackUrl;
+    private String remark;
 
     @Column(name = "app_id")
     public String getAppId() {
@@ -44,5 +45,14 @@ public class ApiCertificateSubAccount extends ApiCertificate{
 
     public void setCallbackUrl(String callbackUrl) {
         this.callbackUrl = callbackUrl;
+    }
+
+    @Column(name = "remark")
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }
