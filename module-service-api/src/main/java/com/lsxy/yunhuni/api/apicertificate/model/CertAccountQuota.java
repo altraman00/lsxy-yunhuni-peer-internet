@@ -24,7 +24,6 @@ public class CertAccountQuota extends IdEntity {
     private Long period;
     private Long sum;
     private Long used;
-    private String product;
     private Date balanceDt;
     private String remark;
 
@@ -107,15 +106,6 @@ public class CertAccountQuota extends IdEntity {
 
     public void setUsed(Long used) {
         this.used = used;
-    }
-
-    @Column(name = "product")
-    public String getProduct() {
-        return product;
-    }
-
-    public void setProduct(String product) {
-        this.product = product;
     }
 
     @Column(name = "balance_dt")
