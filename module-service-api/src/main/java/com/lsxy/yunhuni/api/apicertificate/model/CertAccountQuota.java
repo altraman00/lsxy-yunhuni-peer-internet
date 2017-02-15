@@ -17,7 +17,7 @@ import java.util.Date;
 public class CertAccountQuota extends IdEntity {
     private String tenantId;
     private String appId;
-    private String subaccountId;
+    private String certAccountId;
     private String type;  // 配额类型 参考CertAccountQuotaType
     private Integer calType; // 配额计算类型：1，按时长；2，按个数
     private String name;
@@ -45,13 +45,13 @@ public class CertAccountQuota extends IdEntity {
         this.appId = appId;
     }
 
-    @Column(name = "subaccount_id")
-    public String getSubaccountId() {
-        return subaccountId;
+    @Column(name = "cert_account_id")
+    public String getCertAccountId() {
+        return certAccountId;
     }
 
-    public void setSubaccountId(String subaccountId) {
-        this.subaccountId = subaccountId;
+    public void setCertAccountId(String certAccountId) {
+        this.certAccountId = certAccountId;
     }
 
     @Column(name = "type")
