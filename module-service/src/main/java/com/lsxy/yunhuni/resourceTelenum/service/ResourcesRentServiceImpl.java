@@ -218,7 +218,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
         ResourceTelenum resourceTelenum =  resourcesRent.getResourceTelenum();
         resourceTelenum.setTenantId(null);
         resourceTelenum.setAppId(null);
-        resourceTelenum.setCertSubaccountId(null);
+        resourceTelenum.setSubaccountId(null);
         resourceTelenum.setStatus(ResourceTelenum.STATUS_FREE);
         resourceTelenumService.save(resourceTelenum);
     }
@@ -317,7 +317,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
         ResourcesRent rent = this.findById(rentId);
         ResourceTelenum resourceTelenum = rent.getResourceTelenum();
         resourceTelenum.setAppId(null);
-        resourceTelenum.setCertSubaccountId(null);
+        resourceTelenum.setSubaccountId(null);
         resourceTelenumService.save(resourceTelenum);
         rent.setApp(null);
         rent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
@@ -327,6 +327,23 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
 
     @Override
     public String bindNumToAppAndGetAreaId(App app, List<String> nums , boolean isNeedCalled) {
+        return bindNumToAppOrSubAccountAndGetAreaId(app,nums,null,isNeedCalled);
+    }
+
+    @Override
+    public void bindNumToSubaccount(App app, List<String> nums, String subAccountId) {
+        bindNumToAppOrSubAccountAndGetAreaId(app,nums,subAccountId,false);
+    }
+
+    /**
+     * 绑定号码到app或子账号
+     * @param app
+     * @param nums
+     * @param subAccountId
+     * @param isNeedCalled
+     * @return
+     */
+    private String bindNumToAppOrSubAccountAndGetAreaId(App app, List<String> nums ,String subAccountId, boolean isNeedCalled) {
         String areaId = app.getOnlineAreaId();
         String tenantId = app.getTenant().getId();
         boolean isCalled = false;
@@ -342,7 +359,17 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                         }else if(!resourcesRent.getTenant().getId().equals(tenantId)){
                             throw new RuntimeException("号码租用记录数据出错：" + resourceTelenum.getTelNumber());
                         }else if(resourcesRent.getApp() != null){
-                            throw new TeleNumberBeOccupiedException("号码已经被应用占用：" + resourceTelenum.getTelNumber());
+                            //如果subAccountId子账号不为空，则，判断号码是否绑定了子账号
+                            if(resourcesRent.getApp().getId().equals(app.getId())){
+                                if(StringUtils.isBlank(resourceTelenum.getSubaccountId())){
+                                    if(StringUtils.isNotBlank(subAccountId)){
+                                        resourceTelenum.setSubaccountId(subAccountId);
+                                        resourceTelenumService.save( resourceTelenum);
+                                    }
+                                }
+                            }else{
+                                throw new TeleNumberBeOccupiedException("号码已经被应用占用：" + resourceTelenum.getTelNumber());
+                            }
                         }else{
                             if(StringUtils.isBlank(areaId)){
                                 // 将区域存到一个变量
@@ -360,6 +387,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                             this.save(resourcesRent);
                             //更新号码信息，设置应用
                             resourceTelenum.setAppId(app.getId());
+                            resourceTelenum.setSubaccountId(subAccountId);
                             resourceTelenumService.save( resourceTelenum);
                         }
                     }else{

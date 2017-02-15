@@ -6,9 +6,11 @@ import org.hibernate.annotations.Where;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.Date;
 
 /**
+ * 鉴权账号配额
  * Created by liups on 2017/2/15.
  */
 @Entity
@@ -20,12 +22,13 @@ public class CertAccountQuota extends IdEntity {
     private String certAccountId;
     private String type;  // 配额类型 参考CertAccountQuotaType
     private Integer calType; // 配额计算类型：1，按时长；2，按个数
-    private String name;
-    private Long period;
-    private Long sum;   //-1表示无限制
+    private Long period; //默认-1，表示周期无限长
+    private Long sum;   //默认-1，表示无限制
     private Long used;
     private Date balanceDt;
     private String remark;
+    @Transient
+    private String name;
 
     @Column(name = "tenant_id")
     public String getTenantId() {
@@ -72,15 +75,6 @@ public class CertAccountQuota extends IdEntity {
         this.calType = calType;
     }
 
-    @Column(name = "name")
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     @Column(name = "period")
     public Long getPeriod() {
         return period;
@@ -124,5 +118,14 @@ public class CertAccountQuota extends IdEntity {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    @Transient
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

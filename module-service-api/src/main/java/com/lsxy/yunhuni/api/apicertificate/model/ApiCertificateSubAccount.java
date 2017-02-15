@@ -8,6 +8,7 @@ import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 /**
+ * 鉴权子账号
  * Created by liups on 2017/2/14.
  */
 @Entity
@@ -18,6 +19,7 @@ public class ApiCertificateSubAccount extends ApiCertificate{
     private String appId;
     private String parentId;
     private String callbackUrl;
+    private Integer status;     //状态：1，可用0，不可用
     private String remark;
 
     @Column(name = "app_id")
@@ -45,6 +47,15 @@ public class ApiCertificateSubAccount extends ApiCertificate{
 
     public void setCallbackUrl(String callbackUrl) {
         this.callbackUrl = callbackUrl;
+    }
+
+    @Column(name = "status ")
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     @Column(name = "remark")

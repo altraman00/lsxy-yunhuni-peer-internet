@@ -118,4 +118,13 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
     void appUnbindAll(String tenantId,String appId);
 
     Page<ResourceTelenum> findOwnUnusedNum(String tenantId, String areaId, int pageNo, int pageSize);
+
+    /**
+     * 子账号解除所有号码
+     * @param appId
+     * @param subaccountId
+     */
+    void subaccountUnbindAll(String tenantId,String appId,String subaccountId);
+
+    void subaccountUnbindNum(String tenantId,String appId,String subaccountId,String numId);
 }
