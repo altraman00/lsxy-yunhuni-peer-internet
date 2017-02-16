@@ -10,5 +10,7 @@ import java.util.List;
  * Created by liups on 2017/2/14.
  */
 public interface ApiCertificateSubAccountService extends BaseService<ApiCertificateSubAccount> {
-    ApiCertificateSubAccount createSubAccount(String appId,String callbackUrl, List<CertAccountQuota> quotas);
+    ApiCertificateSubAccount createSubAccount(String appId, String callbackUrl ,String remark);
+
+    ApiCertificateSubAccount createSubAccount(String appId,String callbackUrl, String remark, List<CertAccountQuota> quotas);
 }

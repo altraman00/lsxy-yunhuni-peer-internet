@@ -40,7 +40,12 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
     }
 
     @Override
-    public ApiCertificateSubAccount createSubAccount(String appId, String callbackUrl, List<CertAccountQuota> quotas) {
+    public ApiCertificateSubAccount createSubAccount(String appId, String callbackUrl ,String remark){
+        return createSubAccount(appId, callbackUrl,remark,null);
+    }
+
+    @Override
+    public ApiCertificateSubAccount createSubAccount(String appId, String callbackUrl, String remark,List<CertAccountQuota> quotas) {
         App app = appService.findById(appId);
         if(app == null){
             //TODO
@@ -56,6 +61,7 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
         subAccount.setAppId(appId);
         subAccount.setCallbackUrl(callbackUrl);
         subAccount.setParentId(cert.getId());
+        subAccount.setRemark(remark);
         this.save(subAccount);
         List<CertAccountQuota> subQuotas = new ArrayList<>();
         for(CertAccountQuota quota : quotas){
@@ -67,6 +73,12 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
         return subAccount;
     }
 
+    public void deleteSubAccount(String tenantId,String appId,String subAccountId){
+        ApiCertificateSubAccount subAccount = this.findById(subAccountId);
+        if(subAccount.getTenantId().equals(tenantId) && subAccount.getAppId().equals(appId)){
+
+        }
+    }
 
 
 }
