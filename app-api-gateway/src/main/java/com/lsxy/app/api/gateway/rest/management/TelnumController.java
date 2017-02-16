@@ -53,7 +53,7 @@ public class TelnumController extends AbstractAPIController {
                                          @RequestParam(defaultValue = "1") String subaccountId
     ) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
-            logger.debug("号码列表API参数,accountId={},appId={},subaccountId={}",accountId,appId,subaccountId);
+            logger.debug("号码解绑子账号API参数,accountId={},appId={},subaccountId={}",accountId,appId,subaccountId);
         }
         //TODO 解绑子账号
         return ApiGatewayResponse.success(null);
