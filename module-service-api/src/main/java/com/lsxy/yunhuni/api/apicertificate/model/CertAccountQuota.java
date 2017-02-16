@@ -26,7 +26,7 @@ public class CertAccountQuota extends IdEntity {
     private String type;  // 配额类型 参考CertAccountQuotaType
     private Integer calType; // 配额计算类型：1，按总数；2，按次数
     private Long period; //默认-1，表示周期无限长
-    private Long sum;   //默认-1，表示无限制
+    private Long value;   //配额默认-1，表示无限制
     private Long used;
     private Date balanceDt;
     private String remark;
@@ -39,14 +39,14 @@ public class CertAccountQuota extends IdEntity {
     /**
      * 仅限新建配额
      */
-    public CertAccountQuota(String tenantId, String appId, String certAccountId, String type, Long sum, String remark) {
-        new CertAccountQuota(tenantId,appId,certAccountId,type,-1L,sum,remark);
+    public CertAccountQuota(String tenantId, String appId, String certAccountId, String type, Long value, String remark) {
+        new CertAccountQuota(tenantId,appId,certAccountId,type,-1L,value,remark);
     }
 
     /**
      * 仅限新建配额
      */
-    public CertAccountQuota(String tenantId, String appId, String certAccountId, String type, Long period, Long sum, String remark) {
+    public CertAccountQuota(String tenantId, String appId, String certAccountId, String type, Long period, Long value, String remark) {
         try{
             CertAccountQuotaType quotaType = CertAccountQuotaType.valueOf(type);
             this.calType = quotaType.getCalType();
@@ -58,7 +58,7 @@ public class CertAccountQuota extends IdEntity {
         this.certAccountId = certAccountId;
         this.type = type;
         this.period = period;
-        this.sum = (sum == null ? -1L : sum);
+        this.value = (value == null ? -1L : value);
         this.used = 0L;
         this.balanceDt = DateUtils.getPreDate(new Date());
         this.remark = remark;
@@ -118,13 +118,13 @@ public class CertAccountQuota extends IdEntity {
         this.period = period;
     }
 
-    @Column(name = "sum")
-    public Long getSum() {
-        return sum;
+    @Column(name = "value")
+    public Long getValue() {
+        return value;
     }
 
-    public void setSum(Long sum) {
-        this.sum = sum;
+    public void setValue(Long value) {
+        this.value = value;
     }
 
     @Column(name = "used")
