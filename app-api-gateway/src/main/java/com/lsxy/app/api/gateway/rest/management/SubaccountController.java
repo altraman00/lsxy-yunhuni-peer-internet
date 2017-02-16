@@ -137,13 +137,12 @@ public class SubaccountController extends AbstractAPIController {
             List<QuotaDTO> qs = dto.getQuotas();
             for(QuotaDTO q : qs){
                 CertAccountQuota quota = new CertAccountQuota();
-                quota.setCertAccountId(id);
                 quota.setType(q.getType());
                 quota.setValue(q.getValue());
                 quotas.add(quota);
             }
         }
-        certAccountQuotaService.updateQuotas(appId,quotas);
+        certAccountQuotaService.updateQuotas(id,quotas);
         return ApiGatewayResponse.success(true);
     }
 }
