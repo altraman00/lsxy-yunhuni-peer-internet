@@ -168,10 +168,22 @@ public class SubaccountController extends AbstractAPIController {
                 throw new IPNotInWhiteListException();
             }
         }
+
         Page<ApiCertificateSubAccount> pageDatas = apiCertificateSubAccountService
                 .pageListWithNotQuota(appId,pageNo.intValue(),pageSize.intValue());
 
-        return ApiGatewayResponse.success(null);
+        List<ApiCertificateSubAccountOutput> data = new ArrayList<ApiCertificateSubAccountOutput>(pageDatas.getPageSize());
+
+        Page<ApiCertificateSubAccountOutput> result = new Page<ApiCertificateSubAccountOutput>(pageDatas.getStartIndex()
+                ,pageDatas.getTotalPageCount(),pageDatas.getPageSize(),data);
+
+        if(pageDatas.getResult()!=null && pageDatas.getResult().size()>0){
+            List<ApiCertificateSubAccount> accounts= pageDatas.getResult();
+            for (ApiCertificateSubAccount account:accounts) {
+                data.add(createOutput(account));
+            }
+        }
+        return ApiGatewayResponse.success(result);
     }
 
     @RequestMapping(value = "/{accountId}/management/subaccount/{id}",method = RequestMethod.GET)
@@ -192,10 +204,33 @@ public class SubaccountController extends AbstractAPIController {
             }
         }
         ApiCertificateSubAccount subAccount = apiCertificateSubAccountService.findByIdWithQuota(id);
-
-        return ApiGatewayResponse.success(null);
+        return ApiGatewayResponse.success(createOutput(subAccount));
     }
 
-
+    private ApiCertificateSubAccountOutput createOutput(ApiCertificateSubAccount subAccount){
+        ApiCertificateSubAccountOutput output = null;
+        if(subAccount!=null){
+            output = new ApiCertificateSubAccountOutput();
+            output.setAppId(subAccount.getAppId());
+            output.setParentId(subAccount.getParentId());
+            output.setCallbackUrl(subAccount.getCallbackUrl());
+            output.setEnabled(subAccount.getEnabled());
+            output.setRemark(subAccount.getRemark());
+            output.setCertId(subAccount.getCertId());
+            output.setSecretKey(subAccount.getSecretKey());
+            if(subAccount.getQuotas()!=null && subAccount.getQuotas().size()>0){
+                List<QuotaDTO> quotas = new ArrayList<>();
+                List<CertAccountQuota> qs = subAccount.getQuotas();
+                for(CertAccountQuota q : qs){
+                    QuotaDTO quota = new QuotaDTO();
+                    quota.setType(q.getType());
+                    quota.setValue(q.getValue());
+                    quotas.add(quota);
+                }
+                output.setQuotas(quotas);
+            }
+        }
+        return output;
+    }
 }
 
