@@ -24,6 +24,10 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
 
     @Override
     public void updateQuotas(String subAccountId, List<CertAccountQuota> quotas) {
-
+        if(quotas != null){
+            for(CertAccountQuota quota : quotas){
+                certAccountQuotaDao.updateQuota(subAccountId,quota.getType(),quota.getValue());
+            }
+        }
     }
 }

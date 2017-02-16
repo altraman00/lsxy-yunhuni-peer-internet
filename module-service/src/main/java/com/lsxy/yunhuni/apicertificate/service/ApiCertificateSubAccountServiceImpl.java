@@ -114,7 +114,12 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
             saveAccount.setRemark(saveAccount.getRemark());
             this.save(saveAccount);
         }
-//        certAccountQuotaService.updateQuotas();
+        certAccountQuotaService.updateQuotas(subAccount.getId(),subAccount.getQuotas());
+    }
+
+    @Override
+    public ApiCertificateSubAccount findByIdWithQuota(String subAccountId) {
+        return null;
     }
 
     @Override

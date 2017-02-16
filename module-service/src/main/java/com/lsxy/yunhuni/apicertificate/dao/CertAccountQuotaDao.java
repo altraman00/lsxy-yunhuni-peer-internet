@@ -9,4 +9,5 @@ import java.io.Serializable;
  * Created by liups on 2017/2/15.
  */
 public interface CertAccountQuotaDao extends BaseDaoInterface<CertAccountQuota, Serializable> {
+    void updateQuota(String subAccountId, String type, Long value);
 }

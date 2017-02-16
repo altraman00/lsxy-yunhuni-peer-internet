@@ -17,6 +17,8 @@ public interface ApiCertificateSubAccountService extends BaseService<ApiCertific
 
     void updateSubAccount(ApiCertificateSubAccount subAccount);
 
+    ApiCertificateSubAccount findByIdWithQuota(String subAccountId);
+
     Page<ApiCertificateSubAccount> pageListWithQuota(String appId,int pageNo, int pageSize);
 
     Page<ApiCertificateSubAccount> pageListWithNotQuota(String appId,int pageNo, int pageSize);
