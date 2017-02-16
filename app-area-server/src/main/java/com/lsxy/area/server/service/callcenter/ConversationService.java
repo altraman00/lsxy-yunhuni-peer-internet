@@ -448,7 +448,7 @@ public class ConversationService {
                 .setTenantId(app.getTenant().getId())
                 .setAppId(app.getId())
                 .setId(callId)
-                .setType(BusinessState.TYPE_CC_INVITE_AGENT_CALL)
+                .setType(BusinessState.TYPE_CC_AGENT_CALL)
                 .setCallBackUrl(app.getUrl())
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)

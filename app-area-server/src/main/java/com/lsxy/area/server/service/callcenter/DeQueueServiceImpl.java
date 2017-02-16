@@ -87,8 +87,7 @@ public class DeQueueServiceImpl implements DeQueueService {
      * @throws Exception
      */
     @Override
-    public void success(String tenantId, String appId, String callId,String queueType,
-                        String queueId, EnQueueResult result,String conversationId) throws Exception{
+    public void success(String tenantId, String appId, String callId,String queueId,String queueType, EnQueueResult result,String conversationId) throws Exception{
         if(logger.isDebugEnabled()){
             logger.debug("排队成功，tenantId={},appId={},callId={},queueId={},result={}",
                     tenantId,appId,callId,queueId,result);
