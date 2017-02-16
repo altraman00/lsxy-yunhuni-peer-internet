@@ -19,7 +19,7 @@ public class ApiCertificateSubAccount extends ApiCertificate{
     private String appId;
     private String parentId;
     private String callbackUrl;
-    private Integer status;     //状态：1，可用0，不可用
+    private Integer enabled;     //状态：1，可用0，不可用
     private String remark;
 
     @Column(name = "app_id")
@@ -49,14 +49,16 @@ public class ApiCertificateSubAccount extends ApiCertificate{
         this.callbackUrl = callbackUrl;
     }
 
-    @Column(name = "status ")
-    public Integer getStatus() {
-        return status;
+    @Column(name = "enabled")
+    public Integer getEnabled() {
+        return enabled;
     }
 
-    public void setStatus(Integer status) {
-        this.status = status;
+    public void setEnabled(Integer enabled) {
+        this.enabled = enabled;
     }
+
+
 
     @Column(name = "remark")
     public String getRemark() {

@@ -5,12 +5,15 @@ import com.lsxy.framework.api.FrameworkApiConfig;
 import com.lsxy.framework.cache.FrameworkCacheConfig;
 import com.lsxy.framework.config.Constants;
 import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
 import com.lsxy.yunhuni.api.YunhuniApiConfig;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
+import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 /**
  * Created by liups on 2017/2/14.
@@ -64,6 +68,20 @@ public class ApiCertificateSubAccountServiceTest {
     @Test
     public void testDelete() throws InvocationTargetException, IllegalAccessException {
         apiCertificateSubAccountService.delete("40288aca5a3b5560015a3b5571de0000");
+    }
+
+    @Autowired
+    ResourcesRentService resourcesRentService;
+
+    @Test
+    public void testPage(){
+        long start = System.currentTimeMillis();
+        Page<ResourcesRent> page = resourcesRentService.findByAppId("40288aca574060400157406427f20005", 1, 20);
+        System.out.println(System.currentTimeMillis() - start);
+        List<ResourcesRent> result = page.getResult();
+        for(ResourcesRent rent:result){
+            System.out.println(rent.getResourceTelenum().getTelNumber());
+        }
     }
 
 }

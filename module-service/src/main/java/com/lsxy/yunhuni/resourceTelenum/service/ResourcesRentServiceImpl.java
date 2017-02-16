@@ -83,29 +83,21 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     @Autowired
     JdbcTemplate jdbcTemplate;
     @Override
-    public Page<ResourcesRent> pageListByTenantId(String userName,int pageNo, int pageSize)   {
-        Tenant tenant = null;
-        tenant = tenantService.findById(userName);
-        if(tenant==null){
-            tenant = tenantService.findTenantByUserName(userName);
-        }
-        if(tenant==null){
-            throw new RuntimeException("租户不存在");
-        }
-        String hql = "from ResourcesRent obj where obj.tenant.id=?1 and obj.rentStatus<>3 order by obj.createTime desc";
-        Page<ResourcesRent> page =  this.pageList(hql,pageNo,pageSize,tenant.getId());
+    public Page<ResourcesRent> pageListByTenantId(String tenantId,int pageNo, int pageSize)   {
+        String hql = "from ResourcesRent obj inner join fetch obj.resourceTelenum where obj.tenant.id=?1 and obj.rentStatus<>3 order by obj.createTime desc";
+        Page<ResourcesRent> page =  this.pageList(hql,pageNo,pageSize,tenantId);
         return page;
     }
 
     @Override
     public Page<ResourcesRent> findByAppId(String appId,int pageNo, int pageSize) {
-        String hql = "from ResourcesRent obj where obj.app.id=?1 and obj.rentStatus = 1 order by obj.lastTime desc";
-        return  this.pageList(hql,pageNo,pageSize,appId);
+        String hql = "from ResourcesRent obj inner join fetch obj.resourceTelenum where obj.app.id=?1 and obj.rentStatus = 1 order by obj.lastTime desc";
+        return  pageList(hql,pageNo,pageSize,appId);
     }
 
     @Override
     public List<ResourcesRent> findByAppId(String appId) {
-        String hql = "from ResourcesRent obj where obj.app.id=?1 and obj.rentStatus = 1 order by obj.lastTime desc";
+        String hql = "from ResourcesRent obj inner join fetch obj.resourceTelenum where obj.app.id=?1 and obj.rentStatus = 1 order by obj.lastTime desc";
         return this.list(hql,appId);
     }
 
