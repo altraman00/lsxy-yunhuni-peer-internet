@@ -1,6 +1,7 @@
 package com.lsxy.yunhuni.api.apicertificate.service;
 
 import com.lsxy.framework.api.base.BaseService;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
 import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuota;
 
@@ -14,7 +15,9 @@ public interface ApiCertificateSubAccountService extends BaseService<ApiCertific
 
     void deleteSubAccount(String tenantId,String appId,String subAccountId);
 
-    ApiCertificateSubAccount updateSubAccount(ApiCertificateSubAccount subAccount);
+    void updateSubAccount(ApiCertificateSubAccount subAccount);
 
+    Page<ApiCertificateSubAccount> pageListWithQuota(String appId,int pageNo, int pageSize);
 
+    Page<ApiCertificateSubAccount> pageListWithNotQuota(String appId,int pageNo, int pageSize);
 }

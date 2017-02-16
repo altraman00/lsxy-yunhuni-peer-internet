@@ -9,5 +9,5 @@ import java.util.List;
  * Created by liups on 2017/2/15.
  */
 public interface CertAccountQuotaService extends BaseService<CertAccountQuota> {
-    void updateQuotas(String appId,List<CertAccountQuota> quotas);
+    void updateQuotas(String subAccountId,List<CertAccountQuota> quotas);
 }

@@ -36,15 +36,19 @@ public class CertAccountQuota extends IdEntity {
     public CertAccountQuota() {
     }
 
+    public CertAccountQuota(String type) {
+        this.type = type;
+    }
+
     /**
-     * 仅限新建配额
+     * 仅限服务层新建初始化配额
      */
     public CertAccountQuota(String tenantId, String appId, String certAccountId, String type, Long value, String remark) {
         new CertAccountQuota(tenantId,appId,certAccountId,type,-1L,value,remark);
     }
 
     /**
-     * 仅限新建配额
+     * 仅限服务层新建初始化配额
      */
     public CertAccountQuota(String tenantId, String appId, String certAccountId, String type, Long period, Long value, String remark) {
         try{

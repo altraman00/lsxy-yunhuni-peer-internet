@@ -6,6 +6,7 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 
 import java.util.*;
 
@@ -127,4 +128,5 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
     void subaccountUnbindAll(String tenantId,String appId,String subaccountId);
 
     void subaccountUnbindNum(String tenantId,String appId,String subaccountId,String numId);
+
 }

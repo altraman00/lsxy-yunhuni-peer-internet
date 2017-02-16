@@ -23,7 +23,7 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
     }
 
     @Override
-    public void updateQuotas(String appId, List<CertAccountQuota> quotas) {
+    public void updateQuotas(String subAccountId, List<CertAccountQuota> quotas) {
 
     }
 }

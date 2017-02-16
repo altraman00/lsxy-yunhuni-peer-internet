@@ -211,6 +211,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
                 //更新号码信息，清除应用
                 ResourceTelenum resourceTelenum = rent.getResourceTelenum();
                 resourceTelenum.setAppId(null);
+                resourceTelenum.setSubaccountId(null);
                 resourceTelenumService.save( resourceTelenum);
             }
         }
