@@ -1,49 +1,96 @@
 package com.lsxy.app.api.gateway.rest.management;
 
-import com.lsxy.app.api.gateway.dto.TelnumBindSubaccountInputDTO;
+import com.lsxy.app.api.gateway.dto.*;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.app.api.gateway.rest.AbstractAPIController;
+import com.lsxy.framework.core.exceptions.api.AppServiceInvalidException;
+import com.lsxy.framework.core.exceptions.api.IPNotInWhiteListException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
+import com.lsxy.framework.web.utils.WebUtils;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
+import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuota;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
+import com.lsxy.yunhuni.api.apicertificate.service.CertAccountQuotaService;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import sun.security.x509.CertificateSubjectName;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Created by Administrator on 2017/2/15.
+ * Created by liuws on 2017/2/15.
  */
 @RestController
 public class SubaccountController extends AbstractAPIController {
 
     private static final Logger logger = LoggerFactory.getLogger(SubaccountController.class);
 
+    @Autowired
+    private ApiCertificateSubAccountService apiCertificateSubAccountService;
+
+    @Autowired
+    private AppService appService;
+
+    @Autowired
+    private CertAccountQuotaService certAccountQuotaService;
 
     @RequestMapping(value = "/{accountId}/management/subaccount",method = RequestMethod.POST)
     public ApiGatewayResponse add(HttpServletRequest request,
-                                       @PathVariable String accountId,
-                                       @RequestHeader(value = "AppID") String appId,
-                                       @RequestParam(defaultValue = "1") Long pageNo,
-                                       @RequestParam(defaultValue = "10") Long pageSize
-                                       ) throws YunhuniApiException {
+                                  @PathVariable String accountId,
+                                  @RequestHeader(value = "AppID") String appId,
+                                  @Valid @RequestBody AddSubaccountInputDTO dto
+                                  ) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
-            logger.debug("号码列表API参数,accountId={},appId={},pageNo={},pageSize={}",accountId,appId,pageNo,pageSize);
+            logger.debug("新增子账号API参数,accountId={},appId={},dto{}",accountId,appId,dto);
         }
-        //TODO 新增
-        return ApiGatewayResponse.success(null);
+        String ip = WebUtils.getRemoteAddress(request);
+        App app = appService.findById(appId);
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList)){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
+        ApiCertificateSubAccount subAccount = new ApiCertificateSubAccount();
+        subAccount.setAppId(appId);
+        subAccount.setEnabled(1);
+        subAccount.setCallbackUrl(dto.getCallbackUrl());
+        subAccount.setRemark(dto.getRemark());
+        subAccount = apiCertificateSubAccountService.createSubAccount(subAccount);
+        return ApiGatewayResponse.success(subAccount);
     }
 
     @RequestMapping(value = "/{accountId}/management/subaccount/{id}",method = RequestMethod.PUT)
     public ApiGatewayResponse update(HttpServletRequest request,
                                          @PathVariable String accountId,
                                          @RequestHeader(value = "AppID") String appId,
-                                         @Valid @RequestBody TelnumBindSubaccountInputDTO dto) throws YunhuniApiException {
+                                        @PathVariable String id,
+                                         @Valid @RequestBody UpdateSubaccountInputDTO dto) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
-            logger.debug("号码绑定子账号API参数,accountId={},appId={},dto={}",accountId,appId,dto);
+            logger.debug("修改子账号API参数,accountId={},appId={},dto={}",accountId,appId,dto);
         }
-        //TODO 更新子账号
-        return ApiGatewayResponse.success(null);
+        String ip = WebUtils.getRemoteAddress(request);
+        App app = appService.findById(appId);
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList)){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
+        ApiCertificateSubAccount subAccount = apiCertificateSubAccountService.findById(id);
+        subAccount.setEnabled(dto.getEnabled());
+        subAccount.setCallbackUrl(dto.getCallbackUrl());
+        subAccount.setRemark(dto.getRemark());
+        subAccount = apiCertificateSubAccountService.updateSubAccount(subAccount);
+        return ApiGatewayResponse.success(subAccount);
     }
 
     @RequestMapping(value = "/{accountId}/management/subaccount/{id}",method = RequestMethod.DELETE)
@@ -53,10 +100,51 @@ public class SubaccountController extends AbstractAPIController {
                                          @RequestParam(defaultValue = "1") String subaccountId
     ) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
-            logger.debug("号码列表API参数,accountId={},appId={},subaccountId={}",accountId,appId,subaccountId);
+            logger.debug("删除子账号API参数,accountId={},appId={},subaccountId={}",accountId,appId,subaccountId);
         }
-        //TODO 删除子账号
-        return ApiGatewayResponse.success(null);
+        String ip = WebUtils.getRemoteAddress(request);
+        App app = appService.findById(appId);
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList)){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
+        apiCertificateSubAccountService.deleteSubAccount(app.getTenant().getId(),appId,subaccountId);
+        return ApiGatewayResponse.success(true);
+    }
+
+    @RequestMapping(value = "/{accountId}/management/subaccount/{id}/quotas",method = RequestMethod.PUT)
+    public ApiGatewayResponse setQuota(HttpServletRequest request,
+                                       @PathVariable String accountId,
+                                       @RequestHeader(value = "AppID") String appId,
+                                       @PathVariable String id,
+                                       @Valid @RequestBody SetSubaccountQuotaInputDTO dto
+                                       ) throws YunhuniApiException {
+        if(logger.isDebugEnabled()){
+            logger.debug("设置子账号配额API参数,accountId={},appId={},subaccountId={}，dto={}",accountId,appId,id,dto);
+        }
+        String ip = WebUtils.getRemoteAddress(request);
+        App app = appService.findById(appId);
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList)){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
+        List<CertAccountQuota> quotas = new ArrayList<>();
+        if(dto.getQuotas()!=null && dto.getQuotas().size()>0){
+            List<QuotaDTO> qs = dto.getQuotas();
+            for(QuotaDTO q : qs){
+                CertAccountQuota quota = new CertAccountQuota();
+                quota.setCertAccountId(id);
+                quota.setType(q.getType());
+                quota.setValue(q.getValue());
+                quotas.add(quota);
+            }
+        }
+        certAccountQuotaService.updateQuotas(appId,quotas);
+        return ApiGatewayResponse.success(true);
     }
 }
 

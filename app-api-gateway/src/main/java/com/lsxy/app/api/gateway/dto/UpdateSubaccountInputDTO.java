@@ -1,5 +1,6 @@
 package com.lsxy.app.api.gateway.dto;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -7,18 +8,20 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 新增子账号
+ * 修改子账号
  * Created by liuws on 2016/8/24.
  */
-public class AddSubaccountInputDTO extends CommonDTO{
+public class UpdateSubaccountInputDTO extends CommonDTO{
 
     @NotNull
     private String callbackUrl;
 
+    @Min(0)
+    @Max(1)
+    private Integer enabled;
+
     @Size(max = 128)
     private String remark;
-
-    private List<QuotaDTO> quotas;
 
     public String getCallbackUrl() {
         return callbackUrl;
@@ -28,6 +31,14 @@ public class AddSubaccountInputDTO extends CommonDTO{
         this.callbackUrl = callbackUrl;
     }
 
+    public Integer getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Integer enabled) {
+        this.enabled = enabled;
+    }
+
     public String getRemark() {
         return remark;
     }
@@ -35,13 +46,4 @@ public class AddSubaccountInputDTO extends CommonDTO{
     public void setRemark(String remark) {
         this.remark = remark;
     }
-
-    public List<QuotaDTO> getQuotas() {
-        return quotas;
-    }
-
-    public void setQuotas(List<QuotaDTO> quotas) {
-        this.quotas = quotas;
-    }
-
 }
