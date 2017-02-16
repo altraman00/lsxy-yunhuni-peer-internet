@@ -112,8 +112,8 @@ public class CallCenterConversationServiceImpl extends AbstractService<CallCente
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
-        Page<CallCenterConversation> queryResult = pageList("from CallCenterConversation obj where obj.state=?1",
-                page,size,CallCenterConversation.STATE_READY);
+        Page<CallCenterConversation> queryResult = pageList("from CallCenterConversation obj where obj.appId=?1 and obj.state=?2",
+                page,size,appId,CallCenterConversation.STATE_READY);
 
         Page<CallCenterConversationDetail> result = new Page<>(queryResult.getStartIndex(),queryResult.getTotalCount(),queryResult.getPageSize(),null);
 
