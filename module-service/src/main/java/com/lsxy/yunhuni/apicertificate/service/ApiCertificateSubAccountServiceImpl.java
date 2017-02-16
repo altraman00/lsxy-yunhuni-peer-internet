@@ -59,7 +59,7 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
         this.save(subAccount);
         List<CertAccountQuota> subQuotas = new ArrayList<>();
         for(CertAccountQuota quota : quotas){
-            CertAccountQuota saveQ = new CertAccountQuota(tenantId,appId,subAccount.getId(),quota.getType(),quota.getSum(),quota.getRemark());
+            CertAccountQuota saveQ = new CertAccountQuota(tenantId,appId,subAccount.getId(),quota.getType(),quota.getValue(),quota.getRemark());
             certAccountQuotaService.save(saveQ);
             subQuotas.add(saveQ);
         }
