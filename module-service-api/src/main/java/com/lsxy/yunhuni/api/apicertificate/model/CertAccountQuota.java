@@ -1,6 +1,7 @@
 package com.lsxy.yunhuni.api.apicertificate.model;
 
 import com.lsxy.framework.api.base.IdEntity;
+import com.lsxy.framework.core.utils.DateUtils;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
@@ -17,11 +18,13 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_cert_account_quota")
 public class CertAccountQuota extends IdEntity {
+    public static int CALTYPE_SUM = 1;
+    public static int CALTYPE_COUNT = 2;
     private String tenantId;
     private String appId;
     private String certAccountId;
     private String type;  // 配额类型 参考CertAccountQuotaType
-    private Integer calType; // 配额计算类型：1，按时长；2，按个数
+    private Integer calType; // 配额计算类型：1，按总数；2，按次数
     private Long period; //默认-1，表示周期无限长
     private Long sum;   //默认-1，表示无限制
     private Long used;
@@ -29,6 +32,37 @@ public class CertAccountQuota extends IdEntity {
     private String remark;
     @Transient
     private String name;
+
+    public CertAccountQuota() {
+    }
+
+    /**
+     * 仅限新建配额
+     */
+    public CertAccountQuota(String tenantId, String appId, String certAccountId, String type, Long sum, String remark) {
+        new CertAccountQuota(tenantId,appId,certAccountId,type,-1L,sum,remark);
+    }
+
+    /**
+     * 仅限新建配额
+     */
+    public CertAccountQuota(String tenantId, String appId, String certAccountId, String type, Long period, Long sum, String remark) {
+        try{
+            CertAccountQuotaType quotaType = CertAccountQuotaType.valueOf(type);
+            this.calType = quotaType.getCalType();
+        }catch (Exception e){
+            throw new RuntimeException("参数错误");
+        }
+        this.tenantId = tenantId;
+        this.appId = appId;
+        this.certAccountId = certAccountId;
+        this.type = type;
+        this.period = period;
+        this.sum = (sum == null ? -1L : sum);
+        this.used = 0L;
+        this.balanceDt = DateUtils.getPreDate(new Date());
+        this.remark = remark;
+    }
 
     @Column(name = "tenant_id")
     public String getTenantId() {

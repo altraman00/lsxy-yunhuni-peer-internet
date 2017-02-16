@@ -4,6 +4,7 @@ import com.lsxy.framework.api.base.IdEntity;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * api凭证
@@ -21,6 +22,8 @@ public class ApiCertificate extends IdEntity {
     private Integer type;   //类型：1、主账号，2、子账号
     private String certId;      //凭证ID
     private String secretKey;   //凭证密钥
+    @Transient
+    private List<CertAccountQuota> quotas;
 
     @Column(name = "tenant_id")
     public String getTenantId() {
@@ -56,5 +59,13 @@ public class ApiCertificate extends IdEntity {
 
     public void setType(Integer type) {
         this.type = type;
+    }
+    @Transient
+    public List<CertAccountQuota> getQuotas() {
+        return quotas;
+    }
+
+    public void setQuotas(List<CertAccountQuota> quotas) {
+        this.quotas = quotas;
     }
 }

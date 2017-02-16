@@ -5,19 +5,21 @@ package com.lsxy.yunhuni.api.apicertificate.model;
  * Created by liups on 2017/2/15.
  */
 public enum  CertAccountQuotaType {
-    CallQuota("通话时长配额"),
-    AgentQuota("坐席在线个数配额");
+    CallQuota("通话时长配额",CertAccountQuota.CALTYPE_SUM),
+    AgentQuota("坐席在线个数配额",CertAccountQuota.CALTYPE_COUNT);
 
     private String name;
-    CertAccountQuotaType(String name){
+    private Integer calType;
+    CertAccountQuotaType(String name,Integer calType){
         this.name = name;
+        this.calType = calType;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public Integer getCalType() {
+        return calType;
     }
 }
