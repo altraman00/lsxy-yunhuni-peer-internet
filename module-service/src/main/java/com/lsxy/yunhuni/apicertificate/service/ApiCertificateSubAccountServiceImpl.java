@@ -40,44 +40,48 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
     }
 
     @Override
-    public ApiCertificateSubAccount createSubAccount(String appId, String callbackUrl ,String remark){
-        return createSubAccount(appId, callbackUrl,remark,null);
-    }
-
-    @Override
-    public ApiCertificateSubAccount createSubAccount(String appId, String callbackUrl, String remark,List<CertAccountQuota> quotas) {
-        App app = appService.findById(appId);
+    public ApiCertificateSubAccount createSubAccount(ApiCertificateSubAccount subAccount) {
+        App app = appService.findById(subAccount.getAppId());
         if(app == null){
             //TODO
             throw new RuntimeException("应用不存在");
         }
         String tenantId = app.getTenant().getId();
         ApiCertificate cert = apiCertificateService.findApiCertificateByTenantId(tenantId);
-        ApiCertificateSubAccount subAccount = new ApiCertificateSubAccount();
         subAccount.setTenantId(tenantId);
         subAccount.setType(ApiCertificate.TYPE_SUBACCOUNT);
         subAccount.setCertId(UUIDGenerator.uuid());
         subAccount.setSecretKey(UUIDGenerator.uuid());
-        subAccount.setAppId(appId);
-        subAccount.setCallbackUrl(callbackUrl);
+        subAccount.setAppId(subAccount.getAppId());
+        subAccount.setCallbackUrl(subAccount.getCallbackUrl());
         subAccount.setParentId(cert.getId());
-        subAccount.setRemark(remark);
+        subAccount.setRemark(subAccount.getRemark());
         this.save(subAccount);
         List<CertAccountQuota> subQuotas = new ArrayList<>();
-        for(CertAccountQuota quota : quotas){
-            CertAccountQuota saveQ = new CertAccountQuota(tenantId,appId,subAccount.getId(),quota.getType(),quota.getValue(),quota.getRemark());
-            certAccountQuotaService.save(saveQ);
-            subQuotas.add(saveQ);
+        if(subAccount.getQuotas() != null){
+            for(CertAccountQuota quota : subAccount.getQuotas() ){
+                CertAccountQuota saveQ = new CertAccountQuota(tenantId,subAccount.getAppId(),subAccount.getId(),quota.getType(),quota.getValue(),quota.getRemark());
+                certAccountQuotaService.save(saveQ);
+                subQuotas.add(saveQ);
+            }
+        }else{
+
         }
         subAccount.setQuotas(subQuotas);
         return subAccount;
     }
 
+    @Override
     public void deleteSubAccount(String tenantId,String appId,String subAccountId){
         ApiCertificateSubAccount subAccount = this.findById(subAccountId);
         if(subAccount.getTenantId().equals(tenantId) && subAccount.getAppId().equals(appId)){
 
         }
+    }
+
+    @Override
+    public ApiCertificateSubAccount updateSubAccount(ApiCertificateSubAccount subAccount) {
+        return null;
     }
 
 

@@ -8,6 +8,7 @@ import com.lsxy.yunhuni.apicertificate.dao.CertAccountQuotaDao;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by liups on 2017/2/15.
@@ -19,5 +20,10 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
     @Override
     public BaseDaoInterface<CertAccountQuota, Serializable> getDao() {
         return null;
+    }
+
+    @Override
+    public void updateQuotas(String appId, List<CertAccountQuota> quotas) {
+
     }
 }
