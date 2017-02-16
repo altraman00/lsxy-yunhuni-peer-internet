@@ -23,11 +23,21 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
     }
 
     @Override
-    public void updateQuotas(String subAccountId, List<CertAccountQuota> quotas) {
+    public void updateQuotas(String certAccountId, List<CertAccountQuota> quotas) {
         if(quotas != null){
             for(CertAccountQuota quota : quotas){
-                certAccountQuotaDao.updateQuota(subAccountId,quota.getType(),quota.getValue());
+                certAccountQuotaDao.updateQuota(certAccountId,quota.getType(),quota.getValue());
             }
         }
+    }
+
+    @Override
+    public List<CertAccountQuota> findByCertAccountId(String id) {
+        return certAccountQuotaDao.findByCertAccountId(id);
+    }
+
+    @Override
+    public List<CertAccountQuota> findByAppId(String appId) {
+        return certAccountQuotaDao.findByCertAccountId(appId);
     }
 }

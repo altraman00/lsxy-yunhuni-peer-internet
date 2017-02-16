@@ -119,17 +119,41 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
 
     @Override
     public ApiCertificateSubAccount findByIdWithQuota(String subAccountId) {
-        return null;
+        ApiCertificateSubAccount subAccount = this.findById(subAccountId);
+        List<CertAccountQuota> quotas = certAccountQuotaService.findByCertAccountId(subAccount.getId());
+        subAccount.setQuotas(quotas);
+        return subAccount;
     }
 
     @Override
     public Page<ApiCertificateSubAccount> pageListWithQuota(String appId, int pageNo, int pageSize) {
-        return null;
+        String hql = "from ApiCertificateSubAccount obj where obj.appId = ?1";
+        Page<ApiCertificateSubAccount> page = this.pageList(hql, pageNo, pageSize, appId);
+        List<CertAccountQuota> quotas = certAccountQuotaService.findByAppId(appId);
+        Map<String,List<CertAccountQuota>> map = new HashMap();
+        for(CertAccountQuota quota : quotas){
+            String certAccountId = quota.getCertAccountId();
+            List<CertAccountQuota> quotaList = map.get(certAccountId);
+            if(quotaList == null){
+                quotaList = new ArrayList<>();
+                map.put(certAccountId,quotaList);
+            }
+            quotaList.add(quota);
+        }
+        List<ApiCertificateSubAccount> result = page.getResult();
+        if(result != null){
+            for(ApiCertificateSubAccount subAccount: result){
+                subAccount.setQuotas(map.get(subAccount.getId()));
+            }
+        }
+        return page;
     }
 
     @Override
     public Page<ApiCertificateSubAccount> pageListWithNotQuota(String appId, int pageNo, int pageSize) {
-        return null;
+        String hql = "from ApiCertificateSubAccount obj where obj.appId = ?1";
+        Page<ApiCertificateSubAccount> page = this.pageList(hql, pageNo, pageSize, appId);
+        return page;
     }
 
 
