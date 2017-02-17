@@ -12,6 +12,7 @@ import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.handler.ActionHandler;
 import com.lsxy.area.server.service.ivr.handler.EnqueueHandler;
 import com.lsxy.area.server.service.ivr.handler.HangupActionHandler;
+import com.lsxy.area.server.util.HttpClientHelper;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.service.CallCenterService;
@@ -194,6 +195,8 @@ public class IVRActionService {
                 .setMaxConnPerRoute(1000)
                 //禁用cookies
                 .disableCookieManagement()
+                .setSSLContext(HttpClientHelper.sslContext)
+                .setSSLHostnameVerifier(HttpClientHelper.hostnameVerifier)//设置https无证书访问
                 .build();
         client.start();
     }
@@ -536,7 +539,7 @@ public class IVRActionService {
             }
             return h.handle(call_id,state,actionEle,nextUrl);
         } catch(DocumentException e){
-            logger.info("[{}][{}]callId={}处理ivr动作指令出错:{}",state.getTenantId(),state.getAppId(),call_id,e.getMessage());
+            logger.error(String.format("[%s][%s]callid=%s处理ivr动作指令出错",state.getTenantId(),state.getAppId(),call_id),e);
             //发送ivr格式错误通知
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","ivr.format_error")
@@ -547,7 +550,7 @@ public class IVRActionService {
             hangup(state.getResId(),call_id,state.getAreaId());
             return false;
         } catch (Throwable e) {
-            logger.info("[{}][{}]callId={}处理ivr动作指令出错:{}",state.getTenantId(),state.getAppId(),call_id,e.getMessage());
+            logger.error(String.format("[%s][%s]callid=%s处理ivr动作指令出错",state.getTenantId(),state.getAppId(),call_id),e);
             return false;
         }
     }

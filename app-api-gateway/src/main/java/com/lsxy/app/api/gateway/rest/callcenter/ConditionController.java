@@ -29,7 +29,7 @@ import java.util.Map;
 @RestController
 public class ConditionController extends AbstractAPIController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConfController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConditionController.class);
 
     @Reference(timeout=3000,check = false,lazy = true)
     private ConditionService conditionService;

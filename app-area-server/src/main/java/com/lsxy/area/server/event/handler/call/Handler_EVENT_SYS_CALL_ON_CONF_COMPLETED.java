@@ -17,7 +17,6 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
-import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
@@ -89,7 +88,9 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
         if(logger.isDebugEnabled()){
             logger.info("call_id={},state={}",call_id,state);
         }
-        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) ||
+        if(BusinessState.TYPE_CC_INVITE_AGENT_CALL.equals(state.getType()) ||
+                BusinessState.TYPE_CC_INVITE_OUT_CALL.equals(state.getType()) ||
+                BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) ||
                 BusinessState.TYPE_CC_OUT_CALL.equals(state.getType()) ||
                 conversationService.isCC(state)){
             conversation(state,params,call_id);

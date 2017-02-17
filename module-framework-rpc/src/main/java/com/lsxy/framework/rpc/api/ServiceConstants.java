@@ -20,6 +20,7 @@ public class ServiceConstants {
 	public static final String MN_CH_SYS_CALL_DROP = "MN_CH_SYS_CALL_DROP";//挂断
 	public static final String MN_CH_SYS_CALL_REJECT = "MN_CH_SYS_CALL_REJECT";//拒接
 	public static final String MN_CH_SYS_CALL_CONNECT_START = "MN_CH_SYS_CALL_CONNECT_START";//双通道拨号
+	public static final String MN_CH_SYS_CALL_BATECH_SET_CONF_VOICE_MODE = "MN_CH_SYS_CALL_BATECH_SET_CONF_VOICE_MODE";//批量设置呼叫所在会议的收放音模式
 
 	public static final String MN_CH_SYS_CALL_CONF_ENTER = "MN_CH_SYS_CALL_CONF_ENTER";//将呼叫加入会议
 	public static final String MN_CH_SYS_CALL_CONF_EXIT = "MN_CH_SYS_CALL_CONF_EXIT";//将呼叫退出会议
@@ -30,6 +31,8 @@ public class ServiceConstants {
 	public static final String MN_CH_SYS_CONF_RECORD = "MN_CH_SYS_CONF_RECORD";//会议录音
 	public static final String MN_CH_SYS_CONF_RECORD_STOP = "MN_CH_SYS_CONF_RECORD_STOP";//停止会议录音
 	public static final String MN_CH_SYS_CONF_SET_PART_VOICE_MODE = "MN_CH_SYS_CONF_SET_PART_VOICE_MODE";//设置与会者的声音收放模式
+	public static final String MN_CH_SYS_CONF_BATECH_SET_PART_VOICE_MODE = "MN_CH_SYS_CONF_BATECH_SET_PART_VOICE_MODE";//批量设置与会者的声音收放模式
+
 
 	public static final String MN_CH_EXT_DUO_CALLBACK = "MN_CH_EXT_DUO_CALLBACK";  //双向回拔
 	public static final String MN_CH_EXT_DUO_CALLBACK_CANCEL = "MN_CH_EXT_DUO_CALLBACK_CANCEL";  //取消双向回拔

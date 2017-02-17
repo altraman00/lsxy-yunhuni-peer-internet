@@ -183,7 +183,7 @@ public class RPCCaller {
 	}
 	
 	/**
-	 * 调用指定的服务，发出请求
+	 * 调用指定的服务，发出请求,自动重试
 	 * 
 	 * @param session
 	 * @return
@@ -193,11 +193,28 @@ public class RPCCaller {
 	@SuppressWarnings("static-access")
 	public RPCResponse invokeWithReturn(Session session, RPCRequest request)
 			throws InterruptedException, RequestTimeOutException, HaveNoExpectedRPCResponseException {
-//		Session session = sessionContext.getRightSession();
+			return invokeWithReturn(session, request,true);
+	}
+
+	/**
+	 * 调用指定的服务，发出请求
+	 *
+	 * @param session
+	 * @param retry 是否重试
+	 * @return
+	 * @throws InterruptedException
+	 * @throws RequestTimeOutException
+	 */
+	@SuppressWarnings("static-access")
+	public RPCResponse invokeWithReturn(Session session, RPCRequest request,boolean retry)
+			throws InterruptedException, RequestTimeOutException, HaveNoExpectedRPCResponseException {
+		//		Session session = sessionContext.getRightSession();
 		//如果session为空
 		if(session == null){
-			logger.error("RPC连接会话不存在,无法发送请求,请求消息丢入修正队列:{}",request);
-			fixQueue.fix(request);
+			if(retry){
+				logger.error("RPC连接会话不存在,无法发送请求,请求消息丢入修正队列:{}",request);
+				fixQueue.fix(request);
+			}
 			return null;
 		}
 
@@ -207,8 +224,10 @@ public class RPCCaller {
 		try {
 			session.write(request);
 		} catch (SessionWriteException e) {
-			logger.error("RPC请求发送失败,请求消息丢入修正队列:"+request,e);
-			fixQueue.fix(request);
+			if(retry){
+				logger.error("RPC请求发送失败,请求消息丢入修正队列:"+request,e);
+				fixQueue.fix(request);
+			}
 			return null;
 		}
 		//写入成功,等待返回值
@@ -231,11 +250,9 @@ public class RPCCaller {
 		if(response == null || !request.getSessionid().equals(request.getSessionid())){
 			throw new HaveNoExpectedRPCResponseException(request,response);
 		}
-
 		responseMap.remove(request.getSessionid());
 		requestMap.remove(request.getSessionid());
 		return response;
 	}
-
 
 }
