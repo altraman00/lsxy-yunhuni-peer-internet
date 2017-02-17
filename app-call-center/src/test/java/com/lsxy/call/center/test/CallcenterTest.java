@@ -3,12 +3,10 @@ package com.lsxy.call.center.test;
 import com.lsxy.call.center.CallCenterMainClass;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.model.EnQueue;
-import com.lsxy.call.center.api.service.AppExtensionService;
-import com.lsxy.call.center.api.service.CallCenterAgentService;
-import com.lsxy.call.center.api.service.CallCenterService;
-import com.lsxy.call.center.api.service.EnQueueService;
+import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.api.utils.EnQueueDecoder;
 import com.lsxy.framework.config.Constants;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +35,9 @@ public class CallcenterTest {
 
     @Autowired
     private CallCenterService callCenterService;
+
+    @Autowired
+    private CallCenterConversationService callCenterConversationService;
 
     static {
         //将 spring boot 的默认配置文件设置为系统配置文件
@@ -146,7 +147,7 @@ public class CallcenterTest {
                 "        </condition>\n" +
                 "    </filter>\n" +
                 "</enqueue>");
-        enQueueService.lookupAgent("40288ac9575612a30157561c7ff50004","40288ac957e1812e0157e18a994e0000","","",enQueue);
+        enQueueService.lookupAgent("40288ac9575612a30157561c7ff50004","40288ac957e1812e0157e18a994e0000","","",enQueue,null,null);
     }
 
     @Test
@@ -156,5 +157,10 @@ public class CallcenterTest {
         c.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_AGENT_FAIL);
         c.setId("fwfw");//不会被修改
         callCenterService.update("40288ae258f7d97d0158f7d9adc3000a",c);
+    }
+
+    @Test
+    public void test7() throws YunhuniApiException {
+        System.out.println(callCenterConversationService.pageList(null,"8a2a6a4a58b9c19d0158bd76a9310000",1,10).getTotalCount());;
     }
 }

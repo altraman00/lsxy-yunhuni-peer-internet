@@ -2,7 +2,7 @@ package com.lsxy.call.center.test;
 
 import com.lsxy.call.center.CallCenterMainClass;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
-import com.lsxy.call.center.states.statics.ACs;
+import com.lsxy.call.center.api.states.statics.ACs;
 import com.lsxy.framework.config.Constants;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,7 +11,6 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Set;
 
 /**
  * Created by liups on 2016/11/17.

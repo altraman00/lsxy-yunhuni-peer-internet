@@ -57,6 +57,7 @@ public interface CallCenterAgentService extends BaseService<CallCenterAgent> {
      */
     CallCenterAgent get(String appId, String agentName) throws YunhuniApiException;
 
+    String getId(String appId, String agentName) throws YunhuniApiException;
     /**
      * 获取应用下所有的座席
      * @param appId
@@ -88,6 +89,7 @@ public interface CallCenterAgentService extends BaseService<CallCenterAgent> {
     String state(String tenantId,String appId,String agentId, String state,boolean force) throws YunhuniApiException;
 
     String getState(String agentId) throws YunhuniApiException;
+
 
     /**
      * 修改座席技能
