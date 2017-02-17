@@ -7,6 +7,7 @@ import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.batch.CallCenterConversationBatchInserter;
 import com.lsxy.area.server.batch.CallSessionBatchInserter;
 import com.lsxy.area.server.service.ivr.IVRActionService;
+import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.call.center.api.model.*;
@@ -114,6 +115,9 @@ public class ConversationService {
     @Autowired
     private CallCenterConversationBatchInserter callCenterConversationBatchInserter;
 
+    @Autowired
+    private CallbackUrlUtil callbackUrlUtil;
+
     public BaseEnQueue getEnqueue(String queueId){
         BaseEnQueue enqueue = null;
         try{
@@ -208,7 +212,7 @@ public class ConversationService {
      * @return
      * @throws YunhuniApiException
      */
-    public String create(String id,String ref_res_id,String channel,
+    public String create(String subaccountId,String id,String ref_res_id,String channel,
                          BusinessState initiator,String tenantId,String appId, String areaId,String callBackUrl, Integer maxDuration,String hold_voice) throws YunhuniApiException {
         if(maxDuration == null || maxDuration > MAX_DURATION){
             maxDuration = MAX_DURATION;
@@ -230,6 +234,7 @@ public class ConversationService {
         BusinessState state = new BusinessState.Builder()
                 .setTenantId(tenantId)
                 .setAppId(appId)
+                .setSubaccountId(subaccountId)
                 .setId(id)
                 .setType(BusinessState.TYPE_CC_CONVERSATION)
                 .setCallBackUrl(callBackUrl)
@@ -318,7 +323,7 @@ public class ConversationService {
      * @return
      * @throws YunhuniApiException
      */
-    public String inviteAgent(String appId,String ref_res_id,String initiator, String conversationId,String agentId,String agentName,String extension,
+    public String inviteAgent(String subaccountId,String appId,String ref_res_id,String initiator, String conversationId,String agentId,String agentName,String extension,
                          String systemNum,String diaplyNum,String agentPhone,String type,String user,
                           Integer maxDuration, Integer maxDialDuration,Integer voiceMode) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
@@ -330,7 +335,7 @@ public class ConversationService {
 
         if(AppExtension.TYPE_TELPHONE.equals(type)){
             AreaAndTelNumSelector.Selector selector =
-                    areaAndTelNumSelector.getTelnumberAndAreaId(app,systemNum,agentPhone);
+                    areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app,systemNum,agentPhone);
             areaId = selector.getAreaId();
             lineId = selector.getLineId();
             from = selector.getOneTelnumber();
@@ -371,9 +376,10 @@ public class ConversationService {
         BusinessState callstate = new BusinessState.Builder()
                 .setTenantId(app.getTenant().getId())
                 .setAppId(app.getId())
+                .setSubaccountId(subaccountId)
                 .setId(callId)
                 .setType(BusinessState.TYPE_CC_INVITE_AGENT_CALL)
-                .setCallBackUrl(app.getUrl())
+                .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
@@ -394,7 +400,7 @@ public class ConversationService {
         return callId;
     }
 
-    public String agentCall(String appId,String conversationId,String agentId,String agentName,String extension,
+    public String agentCall(String subaccountId,String appId,String conversationId,String agentId,String agentName,String extension,
                               String systemNum,String agentPhone,String type,String user,
                               Integer maxDuration, Integer maxDialDuration,Integer voiceMode) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
@@ -406,7 +412,7 @@ public class ConversationService {
 
         if(AppExtension.TYPE_TELPHONE.equals(type)){
             AreaAndTelNumSelector.Selector selector =
-                    areaAndTelNumSelector.getTelnumberAndAreaId(app,systemNum,agentPhone);
+                    areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app,systemNum,agentPhone);
             areaId = selector.getAreaId();
             lineId = selector.getLineId();
             from = selector.getOneTelnumber();
@@ -447,9 +453,10 @@ public class ConversationService {
         BusinessState callstate = new BusinessState.Builder()
                 .setTenantId(app.getTenant().getId())
                 .setAppId(app.getId())
+                .setSubaccountId(subaccountId)
                 .setId(callId)
                 .setType(BusinessState.TYPE_CC_AGENT_CALL)
-                .setCallBackUrl(app.getUrl())
+                .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
@@ -483,12 +490,12 @@ public class ConversationService {
      * @return
      * @throws YunhuniApiException
      */
-    public String inviteOut(String appId,String ref_res_id, String conversationId,
+    public String inviteOut(String subaccountId,String appId,String ref_res_id, String conversationId,
                               String from, String to, Integer maxDuration, Integer maxDialDuration,
                               String playFile, Integer voiceMode) throws YunhuniApiException{
         App app = appService.findById(appId);
         AreaAndTelNumSelector.Selector selector =
-                areaAndTelNumSelector.getTelnumberAndAreaId(app,from,to);
+                areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app,from,to);
 
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber();
@@ -527,9 +534,10 @@ public class ConversationService {
         BusinessState callstate = new BusinessState.Builder()
                 .setTenantId(app.getTenant().getId())
                 .setAppId(app.getId())
+                .setSubaccountId(subaccountId)
                 .setId(callId)
                 .setType(BusinessState.TYPE_CC_INVITE_OUT_CALL)
-                .setCallBackUrl(app.getUrl())
+                .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()

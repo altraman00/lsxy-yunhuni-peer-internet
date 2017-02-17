@@ -47,7 +47,7 @@ public class CallCenterConversationServiceImpl extends AbstractService<CallCente
     }
 
     @Override
-    public CallCenterConversationDetail detail(String ip, String appId, String conversationId) throws YunhuniApiException {
+    public CallCenterConversationDetail detail(String subaccountId, String ip, String appId, String conversationId) throws YunhuniApiException {
         if(StringUtils.isBlank(conversationId)){
             throw new RequestIllegalArgumentException();
         }
@@ -98,7 +98,7 @@ public class CallCenterConversationServiceImpl extends AbstractService<CallCente
     }
 
     @Override
-    public Page<CallCenterConversationDetail> pageList(String ip, String appId, int page, int size) throws YunhuniApiException {
+    public Page<CallCenterConversationDetail> conversationPageList(String subaccountId,String ip, String appId, int page, int size) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();

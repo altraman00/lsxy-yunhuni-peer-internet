@@ -11,7 +11,7 @@ import com.lsxy.framework.core.utils.Page;
  */
 public interface CallCenterConversationService extends BaseService<CallCenterConversation> {
 
-    public CallCenterConversationDetail detail(String ip, String appId, String conversationId) throws YunhuniApiException;
+    public CallCenterConversationDetail detail(String subaccountId, String ip, String appId, String conversationId) throws YunhuniApiException;
 
-    public Page<CallCenterConversationDetail> pageList(String ip, String appId, int page, int size) throws YunhuniApiException;
+    public Page<CallCenterConversationDetail> conversationPageList(String subaccountId,String ip, String appId, int page, int size) throws YunhuniApiException;
 }

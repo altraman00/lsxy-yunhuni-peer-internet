@@ -33,13 +33,12 @@ public class BusinessState implements Serializable{
 
     public static final String SESSIONID = "sessionid";
 
-    public static final String SUBACCOUNTID="SUBACCOUNTID";
-
     /**引用的res_id，同一个会议的所有会话资源的ref_res_id要一样，如果没有ref_res_id，那么ref_res_id等于自身的res_id**/
     public static final String REF_RES_ID = "ref_res_id";
 
     private String tenantId;
     private String appId;
+    private String subaccountId;
     private String id;
     private String type;
     private String userdata;
@@ -53,9 +52,10 @@ public class BusinessState implements Serializable{
     private BusinessState() {
     }
 
-    private BusinessState(String tenantId, String appId, String id, String type, String userdata, String resId, String callBackUrl, String areaId, String lineGatewayId,Boolean closed, Map<String, String> businessData) {
+    private BusinessState(String tenantId, String appId,String subaccountId, String id, String type, String userdata, String resId, String callBackUrl, String areaId, String lineGatewayId,Boolean closed, Map<String, String> businessData) {
         this.tenantId = tenantId;
         this.appId = appId;
+        this.subaccountId = subaccountId;
         this.id = id;
         this.type = type;
         this.userdata = userdata;
@@ -94,6 +94,10 @@ public class BusinessState implements Serializable{
         return appId;
     }
 
+    public String getSubaccountId() {
+        return subaccountId;
+    }
+
     public String getCallBackUrl() {
         return callBackUrl;
     }
@@ -123,6 +127,7 @@ public class BusinessState implements Serializable{
 
         private String tenantId;
         private String appId;
+        private String subaccountId;
         private String id;
         private String type;
         private String userdata;
@@ -148,6 +153,11 @@ public class BusinessState implements Serializable{
 
         public Builder setAppId(String appId) {
             this.appId = appId;
+            return this;
+        }
+
+        public Builder setSubaccountId(String subaccountId) {
+            this.subaccountId = subaccountId;
             return this;
         }
 
@@ -192,7 +202,7 @@ public class BusinessState implements Serializable{
         }
 
         public BusinessState build(){
-            return new BusinessState(tenantId,appId,id,type,userdata,resId,callBackUrl,areaId,lineGatewayId,closed,businessData);
+            return new BusinessState(tenantId,appId,subaccountId,id,type,userdata,resId,callBackUrl,areaId,lineGatewayId,closed,businessData);
         }
     }
 }

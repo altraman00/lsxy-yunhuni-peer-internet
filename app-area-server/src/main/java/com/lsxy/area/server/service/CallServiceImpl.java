@@ -7,6 +7,7 @@ import com.lsxy.area.api.CallService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
+import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
@@ -102,6 +103,9 @@ public class CallServiceImpl implements CallService {
     @Autowired
     private AreaAndTelNumSelector areaAndTelNumSelector;
 
+    @Autowired
+    private CallbackUrlUtil callbackUrlUtil;
+
     @Override
     public String call(String subaccountId,String from, String to, int maxAnswerSec, int maxRingSec) throws YunhuniApiException {
 
@@ -164,7 +168,7 @@ public class CallServiceImpl implements CallService {
         }
 
         //TODO 获取号码
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app,true, from1,to1,from2, to2);
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app,true, from1,to1,from2, to2);
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber();
 
@@ -220,10 +224,11 @@ public class CallServiceImpl implements CallService {
             BusinessState cache = new BusinessState.Builder()
                                     .setTenantId(app.getTenant().getId())
                                     .setAppId(appId)
+                                    .setSubaccountId(subaccountId)
                                     .setId(duocCallId)
                                     .setType(apiCmd)
                                     .setUserdata(user_data)
-                                    .setCallBackUrl(app.getUrl())
+                                    .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                                     .setAreaId(areaId)
                                     .setLineGatewayId(lineId)
                                     .setBusinessData(data)
@@ -310,7 +315,7 @@ public class CallServiceImpl implements CallService {
             throw new BalanceNotEnoughException();
         }
 
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app, from,to);
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber();
 
@@ -349,10 +354,11 @@ public class CallServiceImpl implements CallService {
             BusinessState cache = new BusinessState.Builder()
                                     .setTenantId(app.getTenant().getId())
                                     .setAppId(app.getId())
+                                    .setSubaccountId(subaccountId)
                                     .setId(callId)
                                     .setType(apiCmd)
                                     .setUserdata(user_data)
-                                    .setCallBackUrl(app.getUrl())
+                                    .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                                     .setAreaId(areaId)
                                     .setLineGatewayId(lineId)
                                     .setBusinessData(data)
@@ -394,7 +400,7 @@ public class CallServiceImpl implements CallService {
             throw new BalanceNotEnoughException();
         }
 
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app, from,to);
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber();
         String lineId = selector.getLineId();
@@ -452,9 +458,10 @@ public class CallServiceImpl implements CallService {
             BusinessState cache = new BusinessState.Builder()
                     .setTenantId(app.getTenant().getId())
                     .setAppId(app.getId())
+                    .setSubaccountId(subaccountId)
                     .setId(callId)
                     .setType(BusinessState.TYPE_VERIFY_CALL)
-                    .setCallBackUrl(app.getUrl())
+                    .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                     .setUserdata(userData)
                     .setAreaId(areaId)
                     .setLineGatewayId(lineId)

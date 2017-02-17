@@ -62,6 +62,7 @@ public class BusinessStateServiceImpl implements BusinessStateService {
             Map<String,String> datas = new MapBuilder<String,String>()
                     .putIfNotEmpty("tenantId",state.getTenantId())
                     .putIfNotEmpty("appId",state.getAppId())
+                    .putIfNotEmpty("subaccountId",state.getSubaccountId())
                     .putIfNotEmpty("id",state.getId())
                     .putIfNotEmpty("type",state.getType())
                     .putIfNotEmpty("userdata",state.getUserdata())
@@ -108,6 +109,9 @@ public class BusinessStateServiceImpl implements BusinessStateService {
                             break;
                         case "appId":
                             builder.setAppId(value);
+                            break;
+                        case "subaccountId":
+                            builder.setSubaccountId(value);
                             break;
                         case "id":
                             builder.setId(value);

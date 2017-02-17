@@ -48,11 +48,32 @@ public class AreaAndTelNumSelector {
     @Autowired
     LineGatewayToPublicService lineGatewayToPublicService;
 
-    public Selector getTelnumberAndAreaId(App app, String from,String to)throws YunhuniApiException{
-        return getTelnumberAndAreaId(app,false,from,to,null,null);
+    /**
+     *
+     * @param app
+     * @param subaccountId 子账号ID,为null表示为主账号
+     * @param from
+     * @param to
+     * @return
+     * @throws YunhuniApiException
+     */
+    public Selector getTelnumberAndAreaId(String subaccountId, App app,String from,String to)throws YunhuniApiException{
+        return getTelnumberAndAreaId(subaccountId,app,false,from,to,null,null);
     }
 
-    public Selector getTelnumberAndAreaId(App app,boolean isDuoCall ,String from1,String to1,String from2,String to2) throws YunhuniApiException {
+    /**
+     *
+     * @param app
+     * @param subaccountId 子账号ID,为null表示为主账号
+     * @param isDuoCall
+     * @param from1
+     * @param to1
+     * @param from2
+     * @param to2
+     * @return
+     * @throws YunhuniApiException
+     */
+    public Selector getTelnumberAndAreaId(String subaccountId,App app,boolean isDuoCall ,String from1,String to1,String from2,String to2) throws YunhuniApiException {
         Selector selector;
         //TODO 获取号码和区域ID
         List<TelnumSortEntity> toNum = new ArrayList<>();

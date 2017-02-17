@@ -490,7 +490,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 }else{
                     if(businessData.get("invite_to") != null){
                         try {
-                            conversationService.create(conversationId,
+                            conversationService.create(state.getSubaccountId(),conversationId,
                                     state.getBusinessData().get(BusinessState.REF_RES_ID),null,
                                     state,state.getTenantId(),state.getAppId(),
                                     state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null);
@@ -503,7 +503,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         }
                     }else if(businessData.get("enqueue_xml") != null){
                         try {
-                            conversationService.create(conversationId,
+                            conversationService.create(state.getSubaccountId(),conversationId,
                                     state.getBusinessData().get(BusinessState.REF_RES_ID),null,
                                     state,state.getTenantId(),state.getAppId(),
                                     state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null);
