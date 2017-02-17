@@ -125,7 +125,7 @@ public class TestController {
                     /*统计请求次数指标*/
                    if(sc != null)  sc.getCallCount().incrementAndGet();
 
-                    String xx = callService.call("1234",to,10,10);
+                    String xx = callService.call(null,"1234",to,10,10);
                     if (logger.isDebugEnabled()) {
                         logger.debug("[{}]收到返回值:{},共花费:{}ms", c , xx, System.currentTimeMillis() - startdt);
                     }

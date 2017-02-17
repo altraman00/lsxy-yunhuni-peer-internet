@@ -99,7 +99,7 @@ public class ConfServiceImpl implements ConfService {
     private AreaAndTelNumSelector areaAndTelNumSelector;
 
     @Override
-    public String create(String ip, String appId, Integer maxDuration, Integer maxParts,
+    public String create(String subaccountId,String ip, String appId, Integer maxDuration, Integer maxParts,
                          Boolean recording, Boolean autoHangup, String bgmFile, String userData) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
@@ -170,7 +170,7 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean dismiss(String ip, String appId, String confId) throws YunhuniApiException {
+    public boolean dismiss(String subaccountId,String ip, String appId, String confId) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();
@@ -223,7 +223,7 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public String invite(String ip, String appId, String confId,
+    public String invite(String subaccountId,String ip, String appId, String confId,
                          String from, String to, Integer maxDuration, Integer maxDialDuration,
                          Integer dialVoiceStopCond, String playFile, Integer voiceMode) throws YunhuniApiException{
 
@@ -339,7 +339,7 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean join(String ip, String appId, String confId, String callId, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException{
+    public boolean join(String subaccountId,String ip, String appId, String confId, String callId, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException{
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();
@@ -389,7 +389,7 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean quit(String ip, String appId, String confId, String callId) throws YunhuniApiException {
+    public boolean quit(String subaccountId,String ip, String appId, String confId, String callId) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();
@@ -445,7 +445,7 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean startPlay(String ip, String appId, String confId, List<String> playFiles) throws YunhuniApiException {
+    public boolean startPlay(String subaccountId,String ip, String appId, String confId, List<String> playFiles) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();
@@ -490,7 +490,7 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean stopPlay(String ip, String appId, String confId) throws YunhuniApiException {
+    public boolean stopPlay(String subaccountId,String ip, String appId, String confId) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();
@@ -533,7 +533,7 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean startRecord(String ip, String appId, String confId, Integer maxDuration) throws YunhuniApiException {
+    public boolean startRecord(String subaccountId,String ip, String appId, String confId, Integer maxDuration) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();
@@ -585,7 +585,7 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean stopRecord(String ip, String appId, String confId) throws YunhuniApiException {
+    public boolean stopRecord(String subaccountId,String ip, String appId, String confId) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();
@@ -627,7 +627,7 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean setVoiceMode(String ip, String appId, String confId, String callId, Integer voiceMode) throws YunhuniApiException {
+    public boolean setVoiceMode(String subaccountId,String ip, String appId, String confId, String callId, Integer voiceMode) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();

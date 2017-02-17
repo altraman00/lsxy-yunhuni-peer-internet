@@ -92,7 +92,7 @@ public class IVRTest {
 
     @Test
     public void ivrcall() throws YunhuniApiException {
-        ivrService.ivrCall("192.168.1.1","40288aca574060400157406427f20005","8675522730043","13692206627",45,900,null);
+        ivrService.ivrCall(null,"192.168.1.1","40288aca574060400157406427f20005","8675522730043","13692206627",45,900,null);
         List<VoiceIvr> lists = (List<VoiceIvr>)voiceIvrService.list("from VoiceIvr order by createTime desc");
         System.out.println(lists.get(0).getId());
         //下一步干嘛

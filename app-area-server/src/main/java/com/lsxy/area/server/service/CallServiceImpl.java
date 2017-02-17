@@ -103,7 +103,7 @@ public class CallServiceImpl implements CallService {
     private AreaAndTelNumSelector areaAndTelNumSelector;
 
     @Override
-    public String call(String from, String to, int maxAnswerSec, int maxRingSec) throws YunhuniApiException {
+    public String call(String subaccountId,String from, String to, int maxAnswerSec, int maxRingSec) throws YunhuniApiException {
 
         String callid = UUIDGenerator.uuid();
         String params = "to=%s&from=%s&maxAnswerSec=%d&maxRingSec=%d&callid=%s";
@@ -137,7 +137,7 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public String duoCallback(String ip,String appId,String from1,String to1,String from2,String to2,String ring_tone,Integer ring_tone_mode,
+    public String duoCallback(String subaccountId,String ip,String appId,String from1,String to1,String from2,String to2,String ring_tone,Integer ring_tone_mode,
                               Integer max_dial_duration,Integer max_call_duration ,Boolean recording,Integer record_mode,String user_data) throws YunhuniApiException {
         String apiCmd = BusinessState.TYPE_DUO_CALL;
         String duocCallId;
@@ -241,7 +241,7 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public void duoCallbackCancel(String ip, String appId, String callId) throws YunhuniApiException{
+    public void duoCallbackCancel(String subaccountId,String ip, String appId, String callId) throws YunhuniApiException{
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();
@@ -283,7 +283,7 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public String notifyCall(String ip, String appId, String from,String to,String play_file,List<List<Object>> play_content,
+    public String notifyCall(String subaccountId,String ip, String appId, String from,String to,String play_file,List<List<Object>> play_content,
                              Integer repeat,Integer max_dial_duration,String user_data) throws YunhuniApiException{
         String apiCmd = BusinessState.TYPE_NOTIFY_CALL;
         String callId;
@@ -368,7 +368,7 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public String verifyCall(String ip, String appId, String from, String to, Integer maxDialDuration, String verifyCode, String playFile, Integer repeat, String userData) throws YunhuniApiException {
+    public String verifyCall(String subaccountId,String ip, String appId, String from, String to, Integer maxDialDuration, String verifyCode, String playFile, Integer repeat, String userData) throws YunhuniApiException {
 
         if(apiGwRedBlankNumService.isRedNum(to)){
             throw new NumberNotAllowToCallException();
