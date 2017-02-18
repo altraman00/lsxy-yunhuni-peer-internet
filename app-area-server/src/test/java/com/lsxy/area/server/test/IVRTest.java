@@ -131,7 +131,6 @@ public class IVRTest {
         String xml ="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<response>\n" +
                 "<enqueue\n" +
-                "        channel=\"40288ae2586b014801586b0171520000\"\n" +
                 "        wait_voice=\"3.wav\"\n" +
                 "        ring_mode=\"4\"\n" +
                 "        play_num=\"true\"\n" +

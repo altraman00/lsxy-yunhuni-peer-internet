@@ -290,12 +290,11 @@ public class CallCenterUtil {
      * @param conversation
      * @param type
      * @param queue_id
-     * @param channel_id
      * @param agent_call_id
      */
     public void conversationEndEvent(String url,String conversation,String type,Long begin_time,
                                       String record_file,String record_duration,String end_reason,
-                                      String queue_id,String channel_id,String agent_call_id){
+                                      String queue_id,String agent_call_id){
         try{
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","callcenter.conversation.end")
@@ -307,7 +306,6 @@ public class CallCenterUtil {
                     .putIfNotEmpty("record_duration",record_duration)
                     .putIfNotEmpty("end_reason",end_reason)
                     .putIfNotEmpty("queue_id",queue_id)
-                    .putIfNotEmpty("channel_id",channel_id)
                     .putIfNotEmpty("agent_call_id",agent_call_id)
                     .build();
             notifyCallbackUtil.postNotify(url,notify_data,null,3);

@@ -189,6 +189,6 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
         if(appId == null){
             throw new RequestIllegalArgumentException();
         }
-        return this.conditionDao.findByTenantIdAndAppIdAndChannelId(tenantId,appId,subaccountId);
+        return this.conditionDao.findByTenantIdAndAppIdAndSubaccountId(tenantId,appId,subaccountId);
     }
 }

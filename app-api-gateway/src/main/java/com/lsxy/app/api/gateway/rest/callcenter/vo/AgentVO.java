@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class AgentVO {
     private String name;
-    private String channel;
+    private String subaccountId;
     private String num;
     private String state;
     private String extension;
@@ -20,9 +20,9 @@ public class AgentVO {
     public AgentVO() {
     }
 
-    public AgentVO(String name, String channel, String num, String state, String extension, List skills) {
+    public AgentVO(String name, String subaccountId, String num, String state, String extension, List skills) {
         this.name = name;
-        this.channel = channel;
+        this.subaccountId = subaccountId;
         this.num = num;
         this.state = state;
         this.extension = extension;
@@ -50,12 +50,12 @@ public class AgentVO {
         this.name = name;
     }
 
-    public String getChannel() {
-        return channel;
+    public String getSubaccountId() {
+        return subaccountId;
     }
 
-    public void setChannel(String channel) {
-        this.channel = channel;
+    public void setSubaccountId(String subaccountId) {
+        this.subaccountId = subaccountId;
     }
 
     public String getNum() {

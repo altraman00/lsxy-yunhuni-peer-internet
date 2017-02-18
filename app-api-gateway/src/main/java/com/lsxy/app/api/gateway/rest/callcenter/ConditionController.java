@@ -111,7 +111,7 @@ public class ConditionController extends AbstractAPIController {
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
-        return ApiGatewayResponse.success(conditionService.getAll(app.getTenant().getId(),app.getId()));
+        return ApiGatewayResponse.success(conditionService.getAll(app.getTenant().getId(),app.getId(),getSubaccountId(request)));
     }
 
     @RequestMapping(value = "/{accountId}/callcenter/condition/{id}",method = RequestMethod.GET)
