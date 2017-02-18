@@ -25,7 +25,6 @@ public class CallCenterConversation extends IdEntity {
     private String subaccountId;//子账号id
     private String type;
     private String state;
-    private String channelId;
     private String queueId;
     private String conditionId;
     private String relevanceId;//所属呼叫中心
@@ -84,15 +83,6 @@ public class CallCenterConversation extends IdEntity {
 
     public void setState(String state) {
         this.state = state;
-    }
-
-    @Column(name = "channel_id")
-    public String getChannelId() {
-        return channelId;
-    }
-
-    public void setChannelId(String channelId) {
-        this.channelId = channelId;
     }
 
     @Column(name = "queue_id")

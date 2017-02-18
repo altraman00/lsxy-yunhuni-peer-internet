@@ -75,7 +75,7 @@ public class CallCenterConversationServiceImpl extends AbstractService<CallCente
 
         detail.setId(conversation.getId());
         detail.setType(conversation.getType());
-        detail.setChannelId(conversation.getChannelId());
+        detail.setSubaccountId(conversation.getSubaccountId());
         detail.setQueueId(conversation.getQueueId());
         detail.setStartTime(conversation.getStartTime());
         detail.setEndTime(conversation.getEndTime());
@@ -127,7 +127,7 @@ public class CallCenterConversationServiceImpl extends AbstractService<CallCente
                 CallCenterConversationDetail detail = new CallCenterConversationDetail();
                 detail.setId(conversation.getId());
                 detail.setType(conversation.getType());
-                detail.setChannelId(conversation.getChannelId());
+                detail.setSubaccountId(conversation.getSubaccountId());
                 detail.setQueueId(conversation.getQueueId());
                 detail.setStartTime(conversation.getStartTime());//发起时间
                 detail.setEndTime(conversation.getEndTime());//结束时间

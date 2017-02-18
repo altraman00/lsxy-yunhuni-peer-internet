@@ -38,9 +38,6 @@ public class EnQueueServiceImpl implements EnQueueService{
     private static final Logger logger = LoggerFactory.getLogger(EnQueueServiceImpl.class);
 
     @Autowired
-    private ChannelService channelService;
-
-    @Autowired
     private ConditionService conditionService;
 
     @Autowired
@@ -142,16 +139,6 @@ public class EnQueueServiceImpl implements EnQueueService{
             if(enQueue == null){
                 throw new IllegalArgumentException("enQueue 不能为null");
             }
-            Channel channel = channelService.findById(enQueue.getChannel());
-            if(channel == null){
-                throw new ChannelNotExistException();
-            }
-            if(!tenantId.equals(channel.getTenantId())){
-                throw new ChannelNotExistException();
-            }
-            if(!appId.equals(channel.getAppId())){
-                throw new ChannelNotExistException();
-            }
             boolean lookupForCondition = enQueue.getRoute().getCondition()!=null;//指定坐席排队
             boolean lookupForAgent = enQueue.getRoute().getAgent() != null;//指定条件排队
 
@@ -176,9 +163,6 @@ public class EnQueueServiceImpl implements EnQueueService{
                 if(!appId.equals(condition.getAppId())){
                     throw new ConditionNotExistException();
                 }
-                if(!condition.getChannelId().equals(channel.getId())){
-                    throw new ConditionNotExistException();
-                }
                 fetchTimout = condition.getFetchTimeout();
                 queueTimout = condition.getQueueTimeout();
             }else if(lookupForAgent){
@@ -191,9 +175,6 @@ public class EnQueueServiceImpl implements EnQueueService{
                     throw new AgentNotExistException();
                 }
                 if(!appId.equals(agent.getAppId())){
-                    throw new AgentNotExistException();
-                }
-                if(!agent.getChannel().equals(channel.getId())){
                     throw new AgentNotExistException();
                 }
                 fetchTimout = enQueue.getRoute().getAgent().getFetch_timeout();

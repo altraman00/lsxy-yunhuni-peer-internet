@@ -20,8 +20,8 @@ public class Condition extends IdEntity{
 
     private String appId;
 
-    @JsonProperty("channel")
-    private String channelId;
+    @JsonProperty("subaccount_id")
+    private String subaccountId;
 
     @JsonProperty("where")
     private String whereExpression;
@@ -59,13 +59,13 @@ public class Condition extends IdEntity{
         this.appId = appId;
     }
 
-    @Column(name = "channel_id")
-    public String getChannelId() {
-        return channelId;
+    @Column(name = "subaccount_id")
+    public String getSubaccountId() {
+        return subaccountId;
     }
 
-    public void setChannelId(String channelId) {
-        this.channelId = channelId;
+    public void setSubaccountId(String subaccountId) {
+        this.subaccountId = subaccountId;
     }
 
     @Column(name="where_expression")

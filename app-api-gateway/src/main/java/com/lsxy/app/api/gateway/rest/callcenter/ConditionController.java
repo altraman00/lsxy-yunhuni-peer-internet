@@ -49,7 +49,7 @@ public class ConditionController extends AbstractAPIController {
             throw new AppServiceInvalidException();
         }
         Condition condition = new Condition();
-        condition.setChannelId(dto.getChannelId());
+        condition.setSubaccountId(getSubaccountId(request));
         condition.setWhereExpression(dto.getWhereExpression());
         condition.setSortExpression(dto.getSortExpression());
         condition.setPriority(dto.getPriority());

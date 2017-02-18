@@ -212,7 +212,7 @@ public class ConversationService {
      * @return
      * @throws YunhuniApiException
      */
-    public String create(String subaccountId,String id,String ref_res_id,String channel,
+    public String create(String subaccountId,String id,String ref_res_id,
                          BusinessState initiator,String tenantId,String appId, String areaId,String callBackUrl, Integer maxDuration,String hold_voice) throws YunhuniApiException {
         if(maxDuration == null || maxDuration > MAX_DURATION){
             maxDuration = MAX_DURATION;
@@ -244,7 +244,6 @@ public class ConversationService {
                         .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,initiator.getId())//交谈发起者的callid
                         .putIfNotEmpty(CallCenterUtil.CONVERSATION_SYSNUM_FIELD,initiator.getBusinessData().get("from"))
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(initiator))
-                        .putIfNotEmpty(CallCenterUtil.CHANNEL_ID_FIELD,channel)
                         .putIfNotEmpty(CallCenterUtil.HOLD_VOICE_FIELD,hold_voice)//TODO 如果hold_voice为null是否要默认的
                         .putIfNotEmpty("max_seconds",maxDuration.toString())//交谈最大持续时长
                         .build())
@@ -255,7 +254,6 @@ public class ConversationService {
             conversation.setId(id);
             conversation.setSubaccountId(subaccountId);
             conversation.setState(CallCenterConversation.STATE_UNREADY);
-            conversation.setChannelId(channel);
             conversation.setAppId(appId);
             conversation.setTenantId(tenantId);
             conversation.setRelevanceId(initiator.getId());

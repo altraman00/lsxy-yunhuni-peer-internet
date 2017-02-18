@@ -1,11 +1,9 @@
 package com.lsxy.call.center.service;
 
-import com.lsxy.call.center.api.model.Channel;
 import com.lsxy.call.center.api.model.Condition;
-import com.lsxy.call.center.api.service.ChannelService;
 import com.lsxy.call.center.api.service.ConditionService;
-import com.lsxy.call.center.dao.ConditionDao;
 import com.lsxy.call.center.api.states.lock.ModifyConditionLock;
+import com.lsxy.call.center.dao.ConditionDao;
 import com.lsxy.call.center.utils.ExpressionUtils;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
@@ -36,9 +34,6 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
 
     @Autowired
     private ConditionDao conditionDao;
-
-    @Autowired
-    private ChannelService channelService;
 
     @Autowired
     private MQService mqService;
@@ -83,11 +78,6 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
             if(!oldCondition.getAppId().equals(appId)){
                 throw new ConditionNotExistException();
             }
-            //通道是否存在
-            Channel channel = channelService.findById(oldCondition.getChannelId());
-            if(channel == null){
-                throw new ChannelNotExistException();
-            }
             ModifyConditionLock lock = new ModifyConditionLock(redisCacheService,condition.getId());
             if(!lock.lock()){
                 throw new SystemBusyException();
@@ -119,14 +109,6 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
                 throw t;
             }
         }else{
-            if(condition.getChannelId() == null){
-                throw new RequestIllegalArgumentException();
-            }
-            //通道是否存在
-            Channel channel = channelService.findById(condition.getChannelId());
-            if(channel == null){
-                throw new ChannelNotExistException();
-            }
             condition.setTenantId(tenantId);
             condition.setAppId(appId);
             condition = super.save(condition);
@@ -156,7 +138,7 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
         try {
             this.delete(conditionId);
             AbstractMQEvent event = new DeleteConditionEvent(condition.getId(),
-                    condition.getTenantId(),condition.getAppId(),condition.getChannelId());
+                    condition.getTenantId(),condition.getAppId(),condition.getSubaccountId());
             mqService.publish(event);
         } catch (Throwable t) {
             lock.unlock();
@@ -200,16 +182,13 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
     }
 
     @Override
-    public List<Condition> getAll(String tenantId, String appId,String channelId) throws YunhuniApiException{
+    public List<Condition> getAll(String tenantId, String appId,String subaccountId) throws YunhuniApiException{
         if(tenantId == null){
             throw new RequestIllegalArgumentException();
         }
         if(appId == null){
             throw new RequestIllegalArgumentException();
         }
-        if(channelId == null){
-            throw new RequestIllegalArgumentException();
-        }
-        return this.conditionDao.findByTenantIdAndAppIdAndChannelId(tenantId,appId,channelId);
+        return this.conditionDao.findByTenantIdAndAppIdAndChannelId(tenantId,appId,subaccountId);
     }
 }

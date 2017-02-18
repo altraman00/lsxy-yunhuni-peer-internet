@@ -39,7 +39,7 @@ public class AgentVO {
                 skillVos.add(skillVO);
             }
         }
-        return new AgentVO(agent.getName(),agent.getChannel(),agent.getNum(),agent.getState(),agent.getExtension(),skillVos);
+        return new AgentVO(agent.getName(),agent.getSubaccountId(),agent.getNum(),agent.getState(),agent.getExtension(),skillVos);
     }
 
     public String getName() {

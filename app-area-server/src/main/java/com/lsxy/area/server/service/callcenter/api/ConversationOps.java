@@ -199,9 +199,6 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
         if(conversation_state.getClosed()!= null && conversation_state.getClosed()){
             throw new ConversationNotExistException();
         }
-        if(!enQueue.getChannel().equals(conversation_state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD))){
-            throw new RequestIllegalArgumentException();
-        }
 
         /**排队都是在呼叫上排队，这里是在交谈上排队，所以创建一个虚拟的呼叫call，兼容排队的逻辑**/
         String callId = UUIDGenerator.uuid();
@@ -220,7 +217,6 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
                         .putIfNotEmpty("from",conversation_state.getBusinessData().get(CallCenterUtil.CONVERSATION_SYSNUM_FIELD))
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,conversation_state.getBusinessData().get(CallCenterUtil.CALLCENTER_FIELD))
                         .putIfNotEmpty(CallCenterUtil.ENQUEUE_START_TIME_FIELD,""+new Date().getTime())
-                        .putIfNotEmpty(CallCenterUtil.CHANNEL_ID_FIELD,enQueue.getChannel())
                         .putIfNotEmpty(CallCenterUtil.CONDITION_ID_FIELD,enQueue.getRoute().getCondition()!=null?enQueue.getRoute().getCondition().getId():null)
                         .putIfNotEmpty("user_data",enQueue.getData())
                         .build())
