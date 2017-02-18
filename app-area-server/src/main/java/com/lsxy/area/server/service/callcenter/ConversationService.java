@@ -253,6 +253,7 @@ public class ConversationService {
         try{
             CallCenterConversation conversation = new CallCenterConversation();
             conversation.setId(id);
+            conversation.setSubaccountId(subaccountId);
             conversation.setState(CallCenterConversation.STATE_UNREADY);
             conversation.setChannelId(channel);
             conversation.setAppId(appId);

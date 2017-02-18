@@ -68,6 +68,9 @@ public class CallCenterConversationServiceImpl extends AbstractService<CallCente
         if(conversation == null){
             return null;
         }
+        if(subaccountId != conversation.getSubaccountId()){
+            return null;
+        }
         CallCenterConversationDetail detail = new CallCenterConversationDetail();
 
         detail.setId(conversation.getId());
@@ -112,8 +115,8 @@ public class CallCenterConversationServiceImpl extends AbstractService<CallCente
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
-        Page<CallCenterConversation> queryResult = pageList("from CallCenterConversation obj where obj.appId=?1 and obj.state=?2",
-                page,size,appId,CallCenterConversation.STATE_READY);
+        Page<CallCenterConversation> queryResult = pageList("from CallCenterConversation obj where obj.appId=?1 and obj.state=?2 and obj.subaccountId=?3",
+                page,size,appId,CallCenterConversation.STATE_READY,subaccountId);
 
         Page<CallCenterConversationDetail> result = new Page<>(queryResult.getStartIndex(),queryResult.getTotalCount(),queryResult.getPageSize(),null);
 

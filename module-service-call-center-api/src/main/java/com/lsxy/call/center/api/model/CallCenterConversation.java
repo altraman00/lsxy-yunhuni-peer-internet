@@ -22,6 +22,7 @@ public class CallCenterConversation extends IdEntity {
 
     private String tenantId;//所属租户
     private String appId;//所属应用
+    private String subaccountId;//子账号id
     private String type;
     private String state;
     private String channelId;
@@ -47,6 +48,15 @@ public class CallCenterConversation extends IdEntity {
 
     public void setAppId(String appId) {
         this.appId = appId;
+    }
+
+    @Column( name = "subaccount_id")
+    public String getSubaccountId() {
+        return subaccountId;
+    }
+
+    public void setSubaccountId(String subaccountId) {
+        this.subaccountId = subaccountId;
     }
 
     @Column(name = "condition_id")

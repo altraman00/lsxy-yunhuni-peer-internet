@@ -102,6 +102,7 @@ public class VoiceCdr extends IdEntity {
         this.appId = appId;
     }
 
+    @Column( name = "subaccount_id")
     public String getSubaccountId() {
         return subaccountId;
     }
