@@ -92,7 +92,8 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
      * @param quota
      * @return
      */
-    private Long getQuotaUsed(CertAccountQuota quota) {
+    @Override
+    public Long getQuotaUsed(CertAccountQuota quota) {
         Date date = new Date();
         String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
         date = DateUtils.parseDate(dateStr,"yyyyMMdd");
