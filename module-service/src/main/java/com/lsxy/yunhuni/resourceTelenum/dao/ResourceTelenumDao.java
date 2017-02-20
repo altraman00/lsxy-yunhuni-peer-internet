@@ -71,12 +71,12 @@ public interface ResourceTelenumDao  extends BaseDaoInterface<ResourceTelenum, S
     List<ResourceTelenum> findByIdIn(Collection<String> ids);
 
     @Query(value = "SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum num WHERE num.tenant_id=:tenantId AND num.tel_number IN (:froms) AND (num.app_id = :appId OR num.app_id IS NULL)  " +
-            " AND num.usable='1' AND (num.is_dialing = '1' OR  num.is_through = '1') AND num.area_id = :areaId AND num.deleted = 0",nativeQuery = true)
-    List<ResourceTelenum> findCallingTelnumByTenantIdAndAppIdAndTelnum(@Param("tenantId") String tenantId, @Param("froms") List<String> froms, @Param("appId") String appId, @Param("areaId") String areaId);
+            " AND num.usable='1' AND (num.is_dialing = '1' OR  num.is_through = '1') AND num.area_id = :areaId AND num.subaccount_id = :subAccountId AND num.deleted = 0",nativeQuery = true)
+    List<ResourceTelenum> findCallingTelnumByTenantIdAndAppIdAndTelnum(@Param("tenantId") String tenantId, @Param("froms") List<String> froms, @Param("appId") String appId, @Param("areaId") String areaId,@Param("subAccountId")String subAccountId);
 
-    @Query(value = " SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum num WHERE num.tenant_id=:tenantId AND (num.app_id = :appId OR num.app_id IS NULL) " +
+    @Query(value = " SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum num WHERE num.tenant_id=:tenantId AND (num.subaccount_id =:subAccountId OR (num.app_id = :appId AND num.subaccount_id IS NULL) OR num.app_id IS NULL) " +
             " AND num.usable='1' AND (num.is_dialing = '1' OR  num.is_through = '1') AND num.area_id = :areaId AND num.deleted = 0 LIMIT 1",nativeQuery = true)
-    ResourceTelenum findCallingTelnumByTenantIdAndAppId(@Param("tenantId") String tenantId, @Param("appId") String appId, @Param("areaId") String areaId);
+    ResourceTelenum findCallingTelnumByTenantIdAndAppId(@Param("tenantId") String tenantId, @Param("appId") String appId, @Param("areaId") String areaId,@Param("subAccountId")String subAccountId);
 
     List<ResourceTelenum> findByTelNumberIn(Collection<String> telNumbers);
 
