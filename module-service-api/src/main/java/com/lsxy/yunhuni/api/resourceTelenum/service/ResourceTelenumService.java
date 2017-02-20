@@ -64,7 +64,7 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * @param app
      * @return
      */
-    List<ResourceTelenum> findDialingTelnumber(List<String> lineIds, App app, String... from);
+    List<ResourceTelenum> findDialingTelnumber(String subaccountId,List<String> lineIds, App app, String... from);
 
     /**
      * 根据号码获取已租户为主体的号码列表

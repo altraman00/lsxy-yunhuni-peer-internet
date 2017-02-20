@@ -96,7 +96,7 @@ public class AreaAndTelNumSelector {
             List<ResourceTelenum> telnumber;
             if(isDuoCall){
                 //获取一个可呼出的号码
-                telnumber = resourceTelenumService.findDialingTelnumber(lineIds,app,from1,from2);
+                telnumber = resourceTelenumService.findDialingTelnumber(subaccountId,lineIds,app,from1,from2);
                 if(telnumber.get(0).getTelNumber().equals(telnumber.get(1).getTelNumber())){
                     ResourceTelenum callTelnumber = telnumber.get(0);
                     //当两个呼出号码一样时，查一次线路就够了
@@ -110,7 +110,7 @@ public class AreaAndTelNumSelector {
                     addToTelnumSortEntity(to2, lineGateways, to2Num, telnumber.get(1));
                 }
             }else{
-                telnumber = resourceTelenumService.findDialingTelnumber(lineIds,app,from1);
+                telnumber = resourceTelenumService.findDialingTelnumber(subaccountId,lineIds,app,from1);
                 addToTelnumSortEntity(to1, lineGateways, toNum, telnumber.get(0));
             }
 
