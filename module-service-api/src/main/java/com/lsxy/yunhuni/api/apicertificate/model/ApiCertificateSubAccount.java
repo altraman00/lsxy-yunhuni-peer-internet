@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+import java.util.List;
 
 /**
  * 鉴权子账号
@@ -21,6 +22,17 @@ public class ApiCertificateSubAccount extends ApiCertificate{
     private String callbackUrl;
     private Integer enabled;     //状态：1，可用0，不可用
     private String remark;
+
+    public ApiCertificateSubAccount() {
+    }
+
+    public ApiCertificateSubAccount(String appId, String callbackUrl, String remark, List<CertAccountQuota> quotas) {
+        this.enabled = 0;//默认不可用
+        this.appId = appId;
+        this.callbackUrl = callbackUrl;
+        this.remark = remark;
+        super.setQuotas(quotas);
+    }
 
     @Column(name = "app_id")
     public String getAppId() {

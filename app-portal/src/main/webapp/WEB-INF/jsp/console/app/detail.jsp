@@ -248,7 +248,7 @@
                                         <li data-id="extension"><a href="#extension" data-toggle="tab">分机列表</a></li>
                                         <li data-id="agent"><a href="#agent" data-toggle="tab">坐席列表</a></li>
                                     </c:if>
-
+                                    <li data-id="subAccount"><a href="#subAccount" data-toggle="tab">子账号</a></li>
                                     <li class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
@@ -410,7 +410,146 @@
                                         </section>
                                     </div>
                                     <!--坐席列表end-->
+                                    <!--子账号-->
+                                    <div class="tab-pane fade" id="subAccount">
+                                        <div  id="subAccount_home">
+                                        <%--<p class="margin-bottom-20"></p>--%>
+                                        <p class="application_info">
+                                            1.子账号是壹耘平台提供给会员管理其客户的账号，会员可以使用子账号的各个功能，轻松地管理每一个独立的客户<br/>
+                                            2.子账号与指定的应用关联，请勿跨应用使用
+                                        </p>
+                                        <div class="row margin-bottom-20">
+                                            <div class="col-md-12">
+                                                <div class="col-md-10 font14">
+                                                    <div class="col-md-4 remove-padding"><input id="five_certId" type="text" class="form-control" placeholder="鉴权账号" /></div>
+                                                    <div class="col-md-1"><button class="btn btn-primary" type="button" onclick="subAccountList()">查询</button></div>
+                                                    <div class="col-md-1"><a href="#"  class="btn btn-primary defind modalShow" data-id="five" >创建子账户</a></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <table class="table table-striped cost-table-history tablelist" id="subAccount-table">
+                                            <thead>
+                                            <tr>
+                                                <th class="text-center">鉴权账号</th>
+                                                <th class="text-center">密钥</th>
+                                                <th class="text-center">语音用量 /总量（分钟）</th>
+<c:if test="${app.serviceType == 'call_center'}">
+                                                <th class="text-center">坐席用量 /总量（个）</th>
+</c:if>
+                                                <th class="text-center">状态</th>
+                                                <th class="text-center">备注</th>
+                                                <th class="text-center">操作</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody >
 
+                                            </tbody>
+                                        </table>
+                                        <section class="panel panel-default yunhuni-personal">
+                                            <div id="subAccountpage"></div>
+                                        </section>
+                                        </div>
+                                        <div  id="subAccount_datail" hidden>
+                                            <div class="panel-body devbox">
+                                                <div class="row ">
+                                                    <div class="col-md-1 dev">
+                                                        鉴权账号：
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p>
+                                                            {{certId}}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="row ">
+                                                    <div class="col-md-1 dev">
+                                                        密钥：
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <p>
+                                                            {{secretKey}}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="row ">
+                                                    <div class="col-md-1 dev">
+                                                        回调地址：
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p>
+                                                            <input type="text" v-model="url" value="{{url}}" placeholder=""/>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="row ">
+                                                    <div class="col-md-1 dev">
+                                                        配置额度：
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p>（负数为额度不作限制，0则表示额度为0，正数为具体的使用额度限制）</p>
+                                                    </div>
+                                                </div>
+                                                <div class="row ">
+                                                    <div class="col-md-1 dev">
+                                                        语音（分钟）：
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p>
+                                                            <input type="number" v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
+                                                        </p>
+                                                    </div>
+                                                </div>
+<c:if test="${app.serviceType == 'call_center'}">
+                                                <div class="row ">
+                                                    <div class="col-md-1 dev">
+                                                        坐席（个）：
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <input type="number" v-model="seatNum" value="{{seatNum}}" placeholder=""/>
+                                                    </div>
+                                                </div>
+</c:if>
+                                                <div class="row ">
+                                                    <div class="col-md-1 dev">
+                                                        备注：
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <input type="text" v-model="remark" value="{{remark}}" placeholder=""/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row margin-bottom-20">
+                                                <div class="col-md-12">
+                                                    <div class="col-md-10 font14">
+                                                        <div class="col-md-1"><button class="btn btn-primary" type="button" onclick="tosubAccountHome1()">返回</button></div>
+                                                        <div class="col-md-1"><button class="btn btn-primary" type="button" onclick="editSubAccount()">保存</button></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <table class="table table-striped cost-table-history tablelist" id="subAccountdetail-table">
+                                                <thead>
+                                                <tr>
+                                                    <th class="text-center">鉴权账号</th>
+                                                    <th class="text-center">密钥</th>
+                                                    <th class="text-center">语音用量 /总量（分钟）</th>
+                                                    <c:if test="${app.serviceType == 'call_center'}">
+                                                        <th class="text-center">坐席用量 /总量（个）</th>
+                                                    </c:if>
+                                                    <th class="text-center">状态</th>
+                                                    <th class="text-center">备注</th>
+                                                    <th class="text-center">操作</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody >
+
+                                                </tbody>
+                                            </table>
+                                            <section class="panel panel-default yunhuni-personal">
+                                                <div id="subAccountdetailpage"></div>
+                                            </section>
+                                        </div>
+                                    </div>
+                                    <!--子账号end-->
                                 </div>
                             </section>
 
@@ -547,7 +686,57 @@
         <a class="sure modalSureThree" data-id="three">确认</a>
     </div>
 </div>
-
+        <!---创建子账号--->
+        <div class="modal-box application-detail-box" id="modalfive" style="display:none ">
+            <div class="title">创建子账号<a class="close_a modalCancel cancelfive" data-id="five"></a></div>
+            <div class="content" id="createSubAccountFive" >
+                <p class="application_info">
+                    1.创建子账号后，系统将会自动生成一个子账号和子账号密钥<br/>
+                    2.配额是会员提供给其客户使用服务的额度
+                </p>
+                <div class="row text-center">
+                    <lable class="col-md-3 text-right">回调地址：</lable>
+                    <div class="col-md-8">
+                        <input type="text" v-model="url"  value="{{url}}" placeholder=""/>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <lable class="col-md-3 text-right"></lable>
+                    <div class="col-md-8">
+                        子账号的回调地址优先级高于应用的回调地址
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <lable class="col-md-3 text-right">配置额度</lable>
+                    <div class="col-md-8" style="height: 25px;">
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <lable class="col-md-3 text-right">语音（分钟）：</lable>
+                    <div class="col-md-8">
+                        <input type="number" v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
+                    </div>
+                </div>
+                <c:if test="${app.serviceType == 'call_center'}">
+                <div class="row text-center">
+                    <lable class="col-md-3 text-right">坐席（个）：</lable>
+                    <div class="col-md-8">
+                        <input type="number" v-model="seatNum"  value="{{seatNum}}" placeholder="" />
+                    </div>
+                </div>
+                </c:if>
+                <div class="row text-center">
+                    <lable class="col-md-3 text-right">备注：</lable>
+                    <div class="col-md-8">
+                        <input type="text" v-model="remark" value="{{remark}}" placeholder=""/>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">
+                <a class="cancel modalCancel cancelfive" data-id="five">返回</a>
+                <a class="sure modalSureFive" data-id="five">创建</a>
+            </div>
+        </div>
 <!---上传文件--->
 <div class="modal-box application-detail-box application-file-box" id="modalfour" style="display:none ">
     <div class="modal-loadding loadding"></div>
@@ -612,7 +801,14 @@
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.fileupload-process.js"></script>
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.iframe-transport.js"></script>
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.fileupload-validate.js"></script>
-
+        <script>
+            var appServiceType = '${app.serviceType}';
+            $(function () {
+                $('.modal-box .content input[type="text"]').css("height","25px").css("width","100%");
+                $('.modal-box .content input[type="number"]').css("height","25px").css("width","100%");
+                $('.modal-box, .appliation-modal-box').css("height","384px");
+            })
+        </script>
 
         <script>
             function saveCycle(){
@@ -817,8 +1013,93 @@
         },"post");
 
     });
-
-
+    function subAccountDatial(){
+        console.info("进入页面")
+    }
+    /**修改子账号**/
+    var editSubAccountFive = new Vue({
+        el:'#subAccount_datail',
+        data:{
+            id:'',
+            certId:'',
+            secretKey:'',
+            url:'',
+            remark:'',
+            voiceNum:'',
+            seatNum:''
+        },methods:{
+            initObj:function(obj){
+                console.info(obj)
+                this.id=obj.id;
+                this.certId=obj.certId;
+                this.secretKey = obj.secretKey;
+                this.url= obj.url;
+                this.remark=obj.remark;
+                this.voiceNum= obj.voiceNum;
+                this.seatNum=obj.seatNum;
+            },
+            initObj2:function(obj){
+                this.id=this.certId=this.secretKey = this.url= this.remark='';
+                this.voiceNum= this.seatNum=0;
+            }
+        }
+    });
+    function editSubAccount(){
+        var params = {
+            'id':editSubAccountFive.id,
+            'url':editSubAccountFive.url,
+            'voiceNum':new Number(editSubAccountFive.voiceNum),
+            'seatNum':new Number(editSubAccountFive.seatNum),
+            'remark':editSubAccountFive.remark,
+            csrfParameterName:csrfToken
+        }
+        ajaxsync(ctx + "/console/sub_account/edit",params,function(response){
+            if(response.success){
+                showtoast("修改子账号成功");
+            }else{
+                showtoast(response.errorMsg);
+            }
+        },"post");
+    };
+    /**
+     *新增子账号
+     */
+    var createSubAccountFive = new Vue({
+        el:'#createSubAccountFive',
+        data:{
+            url:'',
+            voiceNum:0,
+            seatNum:0,
+            remark:''
+        },
+        methods:{
+            init:function(){
+                this.url=this.remark='';
+                this.voiceNum=this.seatNum=0;
+            }
+        }
+    });
+    $('.modalSureFive').click(function(){
+        var id = $(this).attr('data-id');
+        var params = {
+            'appId':appId,
+            'url':createSubAccountFive.url,
+            'voiceNum':createSubAccountFive.voiceNum,
+            'seatNum':createSubAccountFive.seatNum,
+            'remark':createSubAccountFive.remark,
+            csrfParameterName:csrfToken
+        }
+        ajaxsync(ctx + "/console/sub_account/new",params,function(response){
+           if(response.success){
+               showtoast("新增子账号成功");
+               createSubAccountFive.init();
+               hideModal(id);
+               subAccountList();
+           }else{
+               showtoast(response.errorMsg);
+           }
+        },"post");
+    });
 
     /**
      * 批量下载处理
@@ -943,7 +1224,37 @@
         });
     }
 
+    /**
+     * 删除操作
+     */
+    function delSubAccount(id){
+        bootbox.setLocale("zh_CN");
+        bootbox.confirm("确认删除子账号", function(result) {
+            if(result){
+                ajaxsync(ctx + "/console/sub_account/delete/"+id,{csrfParameterName:csrfToken},function(response){
+                    if(response.success){
+                        showtoast("删除成功");
+                        if(subAccountPage){
+                            var currentPage;
+                            if(((subAccountPage.nowPage - 1) * subAccountPage.listRow +1) <= --subAccountPage.count){
+                                currentPage = subAccountPage.nowPage;
+                            }else {
+                                currentPage = subAccountPage.nowPage - 1;
+                            }
+                            if(currentPage> 0){
+                                $('#page' + currentPage + subAccountPage.obj).click();
+                            }else{
+                                $('#play-'+id).remove();
+                            }
+                        }
+                    }else{
+                        showtoast("删除失败");
+                    }
+                },"post");
 
+            }
+        });
+    }
 
 
     //默认加载放音文件分页
@@ -1056,6 +1367,10 @@
         }
         if(type=='agent'){
             agentList();
+        }
+        if(type=='subAccount' ){
+            tosubAccountHome();
+            subAccountList();
         }
     });
 
@@ -1436,7 +1751,29 @@
         }
         $('#extension-list').html(html);
     }
-
+    var subAccountPage;
+    function subAccountList(){
+        var certId = $('#five_certId').val();
+        //获取数据总数
+        var count = 0;
+        var params = {"pageNo":1,"pageSize":10,"appId":appId,"certId":  certId};
+        ajaxsync(ctx + "/console/sub_account/list" ,params,function(response) {
+            if(response.success){
+                count = response.data.totalCount;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+            }
+        },"get");
+        //每页显示数量
+        var listRow = 5;
+        //显示多少个分页按钮
+        var showPageCount = 5;
+        //指定id，创建分页标签
+        var pageId = 'subAccountpage';
+        //searchTable 为方法名
+        subAccountPage = new Page(count,listRow,showPageCount,pageId,subAccountTable);
+        subAccountPage.show();
+    }
     /**
      * 坐席分页
      */
@@ -1463,7 +1800,87 @@
         agentPage = new Page(count,listRow,showPageCount,pageId,agentTable);
         agentPage.show();
     }
+    var subAccountTable = function (nowPage,listRows) {
+        var certId = $('#five_certId').val();
+        var html = '';
+        var data = [];
+        ajaxsync(ctx + "/console/sub_account/list" ,{'pageNo':nowPage,'pageSize':listRows,'appId':appId,"certId":  certId},function(response){
+            if(response.success){
+                data = response.data.result;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
+            }
+        },"get");
+        for(var i =0 ; i<data.length; i++){
+            html +='<tr class="playtr">' +
+                '<td class="text-center" hidden>'+ data[i].id +'</td>' +
+                '<td class="text-center">'+ data[i].certId +'</td>' +
+                '<td class="text-center">'+ data[i].secretKey +'</td>'+
+                '<td class="text-center">' + data[i].voiceNum + '</td>' ;
+            if(appServiceType == 'call_center'){
+                html += '<td class="text-center">' + data[i].seatNum + '</td>' ;
+            }
+            var state = data[i].enabled == 1?"启用":"禁用";
+            var stateEdit = data[i].enabled == 1?"禁用":"启用";
+            html+= '<td class="text-center" id="enable_'+data[i].id+'" >' + state+ '</td>' +
+                '<td class="text-center">' + data[i].remark + '</td>' +
+                '<td class="text-center"> <a href="javascript:toSubAccountEnable(\''+data[i].id+'\')" data-state="'+data[i].enabled+'" id="enable_edit_'+data[i].id+'" >'+stateEdit+'</a>&nbsp;<a href="javascript:tosubAccountDatail(\''+data[i].id+'\')" >详情</a>&nbsp;<a href="javascript:delSubAccount(\''+data[i].id+'\')" >删除</a></td>' +
+                '</tr>'
+        }
 
+        $('#subAccount-table').find(".playtr").remove();
+        $('#subAccount-table').append(html);
+    }
+    function toSubAccountEnable(id,enabled){
+        var enabled = $('#enable_edit_'+id).attr("data-state");
+        var state ;
+        var h;
+        var h2;
+        var enabled2;
+        if(enabled==1){//当前是启用，执行禁用
+            state="disable/"+id;
+            h="禁用";
+            h2="启用";
+            enabled2=0;
+        }else{//当前是禁用，执行启用
+            state="enabled/"+id;
+            h="启用";
+            h2="禁用";
+            enabled2=1;
+        }
+        ajaxsync(ctx + "/console/sub_account/"+state,{csrfParameterName:csrfToken},function(response){
+            if(response.success){
+                showtoast(h+"成功");
+                $('#enable_'+id).html(h);
+                $('#enable_edit_'+id).html(h2);
+                $('#enable_edit_'+id).attr("data-state",enabled2);
+            }else{
+                showtoast(h+"失败："+response.errorMsg);
+            }
+        },"post");
+    }
+    function tosubAccountDatail(id){
+        ajaxsync(ctx + "/console/sub_account/get/"+id ,{},function(response){
+            if(response.success){
+                editSubAccountFive.initObj(response.data);
+                $('#subAccount_home').hide();
+                $('#subAccount_datail').show();
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
+            }
+        },"get");
+    }
+    function tosubAccountHome(){
+        $('#subAccount_datail').hide();
+        $('#subAccount_home').show();
+        editSubAccountFive.initObj2();
+    }
+    function tosubAccountHome1(){
+        $('#subAccount_datail').hide();
+        $('#subAccount_home').show();
+        editSubAccountFive.initObj2();
+        subAccountList();
+    }
     /**
      * 坐席分机分页回调方法
      * @param nowPage 当前页数

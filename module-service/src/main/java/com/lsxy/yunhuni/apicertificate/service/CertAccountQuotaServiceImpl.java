@@ -6,6 +6,7 @@ import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuota;
 import com.lsxy.yunhuni.api.apicertificate.service.CertAccountQuotaService;
 import com.lsxy.yunhuni.apicertificate.dao.CertAccountQuotaDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.List;
@@ -13,20 +14,22 @@ import java.util.List;
 /**
  * Created by liups on 2017/2/15.
  */
+@Service
 public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuota> implements CertAccountQuotaService {
     @Autowired
     CertAccountQuotaDao certAccountQuotaDao;
-
     @Override
     public BaseDaoInterface<CertAccountQuota, Serializable> getDao() {
-        return null;
+        return certAccountQuotaDao;
     }
 
     @Override
     public void updateQuotas(String certAccountId, List<CertAccountQuota> quotas) {
         if(quotas != null){
             for(CertAccountQuota quota : quotas){
-                certAccountQuotaDao.updateQuota(certAccountId,quota.getType(),quota.getValue());
+                if(quota.getValue() != null) {
+                    certAccountQuotaDao.updateQuota(certAccountId, quota.getType(), quota.getValue());
+                }
             }
         }
     }
@@ -38,6 +41,6 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
 
     @Override
     public List<CertAccountQuota> findByAppId(String appId) {
-        return certAccountQuotaDao.findByCertAccountId(appId);
+        return certAccountQuotaDao.findByAppId(appId);
     }
 }
