@@ -251,9 +251,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     }
 
     @Override
-    public List<ResourceTelenum> findDialingTelnumber(List<String> lineIds, App app, String... from) {
-        //TODO
-        String subAccountId = null;
+    public List<ResourceTelenum> findDialingTelnumber(String subaccountId,List<String> lineIds, App app, String... from) {
         //from有几个，则反回的result有几个号码
         List<ResourceTelenum> result = new ArrayList<>();
         if(from != null && from.length > 0){
@@ -265,8 +263,13 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             }
             //当用户指定了号码
             if(notBlankFrom.size() > 0){
+                List<ResourceTelenum> availableNums;
+                if(StringUtils.isNotBlank(subaccountId)){
+                    availableNums = resourceTelenumDao.findCallingTelnumByTenantIdAndAppIdAndTelnumAndSubaccountId(app.getTenant().getId(), notBlankFrom,app.getId(),app.getAreaId(),subaccountId);
+                }else{
+                    availableNums = resourceTelenumDao.findCallingTelnumByTenantIdAndAppIdAndTelnum(app.getTenant().getId(), notBlankFrom,app.getId(),app.getAreaId());
+                }
                 //查出用户指定的号码
-                List<ResourceTelenum> availableNums = resourceTelenumDao.findCallingTelnumByTenantIdAndAppIdAndTelnum(app.getTenant().getId(), notBlankFrom,app.getId(),app.getAreaId(),subAccountId);
                 //可用号码列表不为空
                 if(availableNums == null || availableNums.size() > 0){
                     for(String fr:from){
@@ -291,7 +294,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         }
         //经过以上处理后，返回号码结果还是空的话，则不根据传入的from来选号码，子账号下的号码，或选租户应用下未被绑定的号码，或者租户下不被应用绑定的号码
         if(result.size() == 0){
-            ResourceTelenum availableNum = resourceTelenumDao.findCallingTelnumByTenantIdAndAppId(app.getTenant().getId(), app.getId(), app.getAreaId(),subAccountId);
+            ResourceTelenum availableNum = resourceTelenumDao.findCallingTelnumByTenantIdAndAppId(app.getTenant().getId(), app.getId(), app.getAreaId(),subaccountId);
             if(availableNum == null){
                 availableNum = this.findOneFreeDialingNumber(lineIds);
             }
