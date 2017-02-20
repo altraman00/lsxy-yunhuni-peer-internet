@@ -181,7 +181,7 @@ public class CertAccountQuota extends IdEntity {
 
     @Transient
     public Boolean getHasRemain() {
-        if(value <= 0){
+        if(value < 0){
             return true;
         }else{
             return (value - (this.currentUsed == null ? (this.used == null ? 0L : this.used) : currentUsed)) > 0;
