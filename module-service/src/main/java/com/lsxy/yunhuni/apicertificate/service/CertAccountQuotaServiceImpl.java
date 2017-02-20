@@ -21,7 +21,7 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
 
     @Override
     public BaseDaoInterface<CertAccountQuota, Serializable> getDao() {
-        return null;
+        return certAccountQuotaDao;
     }
 
     @Override
