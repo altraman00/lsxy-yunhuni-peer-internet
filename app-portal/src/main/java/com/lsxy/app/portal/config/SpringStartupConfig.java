@@ -1,10 +1,14 @@
 package com.lsxy.app.portal.config;
 
 import com.lsxy.app.portal.security.SpringSecurityConfig;
-import com.lsxy.framework.cache.FrameworkCacheConfigNotSpringBoot;
+import com.lsxy.framework.cache.FrameworkCacheConfig;
 import com.lsxy.framework.monitor.FrameworkMonitorConfig;
 import com.lsxy.framework.oss.FrameworkOSSConfig;
-import org.springframework.context.annotation.*;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**
@@ -14,7 +18,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 @Configuration
 @PropertySource("classpath:/config.properties")
-@Import({SpringSecurityConfig.class, FrameworkCacheConfigNotSpringBoot.class, FrameworkOSSConfig.class, FrameworkMonitorConfig.class})
+@Import({SpringSecurityConfig.class, RedisAutoConfiguration.class, FrameworkCacheConfig.class, FrameworkOSSConfig.class, FrameworkMonitorConfig.class})
 public class SpringStartupConfig {
 
 }
