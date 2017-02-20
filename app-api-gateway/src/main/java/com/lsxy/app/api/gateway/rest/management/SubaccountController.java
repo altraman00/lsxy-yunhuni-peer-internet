@@ -68,7 +68,7 @@ public class SubaccountController extends AbstractAPIController {
         subAccount.setCallbackUrl(dto.getCallbackUrl());
         subAccount.setRemark(dto.getRemark());
         subAccount = apiCertificateSubAccountService.createSubAccount(subAccount);
-        return ApiGatewayResponse.success(subAccount);
+        return ApiGatewayResponse.success(createOutput(subAccount));
     }
 
     @RequestMapping(value = "/{accountId}/management/subaccount/{id}",method = RequestMethod.PUT)
@@ -93,7 +93,7 @@ public class SubaccountController extends AbstractAPIController {
         subAccount.setCallbackUrl(dto.getCallbackUrl());
         subAccount.setRemark(dto.getRemark());
         apiCertificateSubAccountService.updateSubAccount(subAccount);
-        return ApiGatewayResponse.success(subAccount);
+        return ApiGatewayResponse.success(createOutput(subAccount));
     }
 
     @RequestMapping(value = "/{accountId}/management/subaccount/{id}",method = RequestMethod.DELETE)
