@@ -52,11 +52,12 @@ public interface VoiceCdrService extends BaseService<VoiceCdr> {
      * 根据租户id，应用id，和时间区间获取接通量，不接通量，话务量（秒）
      * @param tenantId
      * @param appId
+     * @param subaccountId
      * @param startTime
      * @param endTime
      * @return
      */
-    Map getStaticCdr(String tenantId, String appId, Date startTime, Date endTime);
+    Map getStaticCdr(String tenantId, String appId,String subaccountId, Date startTime, Date endTime);
 
     void insertCdr(VoiceCdr voiceCdr);
 }

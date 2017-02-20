@@ -96,6 +96,12 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     }
 
     @Override
+    public Page<ResourcesRent> findBySubaccount(String appId,String subaccountId,int pageNo, int pageSize) {
+        String hql = "from ResourcesRent obj inner join fetch obj.resourceTelenum where obj.app.id=?1 and obj.rentStatus = 1 and obj.resourceTelenum.subaccountId = ?2 order by obj.lastTime desc";
+        return  pageList(hql,pageNo,pageSize,appId,subaccountId);
+    }
+
+    @Override
     public List<ResourcesRent> findByAppId(String appId) {
         String hql = "from ResourcesRent obj inner join fetch obj.resourceTelenum where obj.app.id=?1 and obj.rentStatus = 1 order by obj.lastTime desc";
         return this.list(hql,appId);

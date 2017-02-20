@@ -196,7 +196,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
 //    }
 
     @Override
-    public Map getStaticCdr(String tenantId, String appId, Date startTime, Date endTime) {
+    public Map getStaticCdr(String tenantId, String appId,String subaccountId, Date startTime, Date endTime) {
         String sql = "SELECT COUNT(id) AS callSum,IFNULL(SUM(cost_time_long),0) AS costTimeLong," +
                 "IFNULL(SUM(CASE  WHEN call_ack_dt IS NULL THEN 0 ELSE 1 END),0) AS askSum FROM db_lsxy_bi_yunhuni.tb_bi_voice_cdr WHERE 1=1 ";
         if(StringUtils.isNotEmpty(tenantId)){
@@ -204,6 +204,9 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         }
         if(StringUtils.isNotEmpty(appId)){
             sql += " AND app_id='"+appId+"' ";
+        }
+        if(StringUtils.isNotEmpty(subaccountId)){
+            sql += " AND subaccount_id='"+subaccountId+"' ";
         }
         if(startTime != null){
             String startTimeStr = DateUtils.getDate(startTime,"yyyy-MM-dd HH:mm:ss");
@@ -216,6 +219,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         Map map = jdbcTemplate.queryForMap(sql);
         return map;
     }
+
 
     @Override
     public VoiceCdr save(VoiceCdr voiceCdr){
