@@ -120,6 +120,8 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
 
     Page<ResourceTelenum> findOwnUnusedNum(String tenantId, String areaId, int pageNo, int pageSize);
 
+    Page<ResourceTelenum> findOwnUnusedNumOrUnbindSubaccount(String tenantId, String appId, String areaId, int pageNo, int pageSize);
+
     /**
      * 子账号解除所有号码
      * @param appId
