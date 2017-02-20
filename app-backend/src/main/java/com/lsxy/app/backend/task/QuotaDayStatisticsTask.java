@@ -5,6 +5,7 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.yunhuni.api.apicertificate.service.CertAccountQuotaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ public class QuotaDayStatisticsTask {
 
     @Autowired
     RedisCacheService redisCacheService;
+    @Autowired
+    CertAccountQuotaService certAccountQuotaService;
 
     @Scheduled(cron="0 0 4 * * ?")
     public void dayStatics(){
@@ -48,7 +51,7 @@ public class QuotaDayStatisticsTask {
                     }
                     //执行语句
                     Date preDate = DateUtils.getPreDate(date);
-//                    dayStaticsService.dayStatics(preDate);
+                    certAccountQuotaService.dayStatics(preDate);
                 }else{
                     if(logger.isDebugEnabled()){
                         logger.debug("["+cacheKey+"]标记位不一致"+currentCacheValue+"  vs "+ SystemConfig.id);

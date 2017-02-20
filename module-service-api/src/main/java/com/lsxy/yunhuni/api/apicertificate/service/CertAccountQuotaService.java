@@ -33,4 +33,6 @@ public interface CertAccountQuotaService extends BaseService<CertAccountQuota> {
      * @param type 类型（配额类型）
      */
     CertAccountQuota getQuotaRemain(String certAccountId , String type);
+
+    void dayStatics(Date date);
 }

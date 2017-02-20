@@ -2,11 +2,16 @@ package com.lsxy.yunhuni.apicertificate.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.billing.model.Billing;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
 import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuota;
+import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuotaType;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.apicertificate.service.CertAccountQuotaService;
+import com.lsxy.yunhuni.api.session.service.VoiceCdrService;
 import com.lsxy.yunhuni.apicertificate.dao.CertAccountQuotaDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +19,13 @@ import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Created by liups on 2017/2/15.
@@ -26,8 +36,10 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
     CertAccountQuotaDao certAccountQuotaDao;
     @Autowired
     RedisCacheService redisCacheService;
-
-
+    @Autowired
+    ApiCertificateSubAccountService apiCertificateSubAccountService;
+    @Autowired
+    VoiceCdrService voiceCdrService;
     @Override
     public BaseDaoInterface<CertAccountQuota, Serializable> getDao() {
         return certAccountQuotaDao;
@@ -127,6 +139,47 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
             used = Long.parseLong(incrLongStr);
         }
         return used;
+    }
+
+    @Override
+    public void dayStatics(Date date) {
+        String yyyyMMdd = DateUtils.formatDate(date, "yyyyMMdd");
+        Date staticsDate = DateUtils.parseDate(yyyyMMdd,"yyyyMMdd");
+        Iterable<ApiCertificateSubAccount> subaccounts = apiCertificateSubAccountService.list();
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        List<Future> results = new ArrayList<>();
+        for(ApiCertificateSubAccount subaccount:subaccounts){
+            results.add(executorService.submit(() -> this.staticSubaccountQuota(staticsDate, subaccount)));
+        }
+        for(Future f : results){
+            try {
+                f.get();
+            }catch (Throwable t){
+
+            }
+        }
+        executorService.shutdown();
+    }
+
+    private void staticSubaccountQuota(Date staticsDate, ApiCertificateSubAccount subaccount) {
+        List<CertAccountQuota> quotas = this.findByCertAccountId(subaccount.getId());
+        Date endDate = DateUtils.nextDate(staticsDate);
+        for(CertAccountQuota quota : quotas){
+            CertAccountQuotaType type = CertAccountQuotaType.valueOf(quota.getType());
+            Date balanceDt = quota.getBalanceDt();
+            String balanceDateStr = DateUtils.formatDate(balanceDt, "yyyyMMdd");
+            balanceDt = DateUtils.parseDate(balanceDateStr,"yyyyMMdd");
+            Date startDate = DateUtils.nextDate(balanceDt);
+            switch (type){
+                case CallQuota:{
+                    Map staticCdr = voiceCdrService.getStaticCdr(null, null, subaccount.getId(), startDate, endDate);
+                    Long costTimeLong = (Long) staticCdr.get("costTimeLong");
+                    Long oleUsed = quota.getUsed() == null ? 0L : quota.getUsed();
+                    quota.setUsed(oleUsed + costTimeLong);
+                    this.save(quota);
+                }
+            }
+        }
     }
 
 }
