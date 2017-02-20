@@ -94,9 +94,9 @@ public class RestAuthenticationProvider implements AuthenticationProvider {
 
         if(apiCertificate.getType()!=null && apiCertificate.getType().intValue() == ApiCertificate.TYPE_PRIMARY_ACCOUNT){
             //是主账号
-            restToken = new RestToken(apiKey, credentials, restToken.getTimestamp(),tenantId, roles("PRIMARY_ACCOUNT"));
+            restToken = new RestToken(apiKey, credentials, restToken.getTimestamp(),tenantId,null, roles("PRIMARY_ACCOUNT"));
         }else{
-            restToken = new RestToken(apiKey, credentials, restToken.getTimestamp(),tenantId, null);
+            restToken = new RestToken(apiKey, credentials, restToken.getTimestamp(),tenantId,apiCertificate.getId(), null);
         }
         return restToken;
     }

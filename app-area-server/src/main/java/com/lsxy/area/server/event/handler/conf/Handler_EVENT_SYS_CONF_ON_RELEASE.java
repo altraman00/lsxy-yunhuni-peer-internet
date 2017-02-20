@@ -129,7 +129,7 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
         }
         callCenterUtil.conversationEndEvent(state.getCallBackUrl(),conversation_id,
                 CallCenterUtil.CONVERSATION_TYPE_QUEUE,
-                conversation!=null?conversation.getStartTime().getTime():null,null,null,null,null,null,null);
+                conversation!=null?conversation.getStartTime().getTime():null,null,null,null,null,null);
     }
 
     private void conf(BusinessState state,Map<String,Object> params,String conf_id){

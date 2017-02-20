@@ -5,6 +5,7 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
+import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
@@ -98,8 +99,11 @@ public class ConfServiceImpl implements ConfService {
     @Autowired
     private AreaAndTelNumSelector areaAndTelNumSelector;
 
+    @Autowired
+    private CallbackUrlUtil callbackUrlUtil;
+
     @Override
-    public String create(String ip, String appId, Integer maxDuration, Integer maxParts,
+    public String create(String subaccountId,String ip, String appId, Integer maxDuration, Integer maxParts,
                          Boolean recording, Boolean autoHangup, String bgmFile, String userData) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
@@ -152,11 +156,12 @@ public class ConfServiceImpl implements ConfService {
         BusinessState state = new BusinessState.Builder()
                                 .setTenantId(tenantId)
                                 .setAppId(app.getId())
+                                .setSubaccountId(subaccountId)
                                 .setId(confId)
                                 .setType(BusinessState.TYPE_SYS_CONF)
                                 .setUserdata(userData)
                                 .setAreaId(areaId)
-                                .setCallBackUrl(app.getUrl())
+                                .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                                 .setLineGatewayId(null)
                                 .setBusinessData(new MapBuilder<String,String>()
                                         .putIfNotEmpty("max_seconds",maxDuration == null?null:maxDuration.toString())//会议最大持续时长
@@ -170,7 +175,7 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean dismiss(String ip, String appId, String confId) throws YunhuniApiException {
+    public boolean dismiss(String subaccountId,String ip, String appId, String confId) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();
@@ -223,7 +228,7 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public String invite(String ip, String appId, String confId,
+    public String invite(String subaccountId,String ip, String appId, String confId,
                          String from, String to, Integer maxDuration, Integer maxDialDuration,
                          Integer dialVoiceStopCond, String playFile, Integer voiceMode) throws YunhuniApiException{
 
@@ -279,7 +284,7 @@ public class ConfServiceImpl implements ConfService {
         String callId = UUIDGenerator.uuid();
 
         //TODO
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app, from,to);
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber();
 
@@ -316,9 +321,10 @@ public class ConfServiceImpl implements ConfService {
         BusinessState callstate = new BusinessState.Builder()
                                     .setTenantId(tenantId)
                                     .setAppId(app.getId())
+                                    .setSubaccountId(subaccountId)
                                     .setId(callId)
                                     .setType(BusinessState.TYPE_SYS_CONF)
-                                    .setCallBackUrl(app.getUrl())
+                                    .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                                     .setAreaId(areaId)
                                     .setLineGatewayId(lineId)
                                     .setBusinessData(new MapBuilder<String,String>()
@@ -339,7 +345,7 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean join(String ip, String appId, String confId, String callId, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException{
+    public boolean join(String subaccountId,String ip, String appId, String confId, String callId, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException{
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();
@@ -389,7 +395,7 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean quit(String ip, String appId, String confId, String callId) throws YunhuniApiException {
+    public boolean quit(String subaccountId,String ip, String appId, String confId, String callId) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();
@@ -445,7 +451,7 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean startPlay(String ip, String appId, String confId, List<String> playFiles) throws YunhuniApiException {
+    public boolean startPlay(String subaccountId,String ip, String appId, String confId, List<String> playFiles) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();
@@ -490,7 +496,7 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean stopPlay(String ip, String appId, String confId) throws YunhuniApiException {
+    public boolean stopPlay(String subaccountId,String ip, String appId, String confId) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();
@@ -533,7 +539,7 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean startRecord(String ip, String appId, String confId, Integer maxDuration) throws YunhuniApiException {
+    public boolean startRecord(String subaccountId,String ip, String appId, String confId, Integer maxDuration) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();
@@ -585,7 +591,7 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean stopRecord(String ip, String appId, String confId) throws YunhuniApiException {
+    public boolean stopRecord(String subaccountId,String ip, String appId, String confId) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();
@@ -627,7 +633,7 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean setVoiceMode(String ip, String appId, String confId, String callId, Integer voiceMode) throws YunhuniApiException {
+    public boolean setVoiceMode(String subaccountId,String ip, String appId, String confId, String callId, Integer voiceMode) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();

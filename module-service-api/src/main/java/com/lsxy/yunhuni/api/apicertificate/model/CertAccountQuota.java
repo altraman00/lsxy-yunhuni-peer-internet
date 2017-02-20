@@ -27,11 +27,16 @@ public class CertAccountQuota extends IdEntity {
     private Integer calType; // 配额计算类型：1，按总数；2，按次数
     private Long period; //默认-1，表示周期无限长
     private Long value;   //配额默认-1，表示无限制
-    private Long used;
+    private Long used;      //上次结算时的使用量
     private Date balanceDt;
     private String remark;
     @Transient
     private String name;
+    @Transient
+    private Long currentUsed; //实时使用
+    @Transient
+    private Boolean hasRemain;
+
     public CertAccountQuota(String type, Long value) {
         this.type = type;
         this.value = value;
@@ -169,4 +174,22 @@ public class CertAccountQuota extends IdEntity {
     public void setName(String name) {
         this.name = name;
     }
+    @Transient
+    public Long getCurrentUsed() {
+        return currentUsed;
+    }
+
+    public void setCurrentUsed(Long currentUsed) {
+        this.currentUsed = currentUsed;
+    }
+
+    @Transient
+    public Boolean getHasRemain() {
+        if(value <= 0){
+            return true;
+        }else{
+            return (value - (this.currentUsed == null ? (this.used == null ? 0L : this.used) : currentUsed)) > 0;
+        }
+    }
+
 }

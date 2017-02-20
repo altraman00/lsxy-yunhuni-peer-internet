@@ -1,14 +1,21 @@
 package com.lsxy.yunhuni.apicertificate.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.billing.model.Billing;
 import com.lsxy.framework.base.AbstractService;
+import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuota;
 import com.lsxy.yunhuni.api.apicertificate.service.CertAccountQuotaService;
 import com.lsxy.yunhuni.apicertificate.dao.CertAccountQuotaDao;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.BoundHashOperations;
+import org.springframework.stereotype.Service;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,6 +25,10 @@ import java.util.List;
 public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuota> implements CertAccountQuotaService {
     @Autowired
     CertAccountQuotaDao certAccountQuotaDao;
+    @Autowired
+    RedisCacheService redisCacheService;
+
+
     @Override
     public BaseDaoInterface<CertAccountQuota, Serializable> getDao() {
         return certAccountQuotaDao;
@@ -43,4 +54,82 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
     public List<CertAccountQuota> findByAppId(String appId) {
         return certAccountQuotaDao.findByAppId(appId);
     }
+
+    @Override
+    public void incQuotaUsed(String certAccountId, Date date, Long incV, String type){
+        if(incV == null){
+            return;
+        }
+        String dateStr = DateUtils.getTime(date,"yyyyMMdd");
+        String key = QUOTA_DAY_PREFIX + "_" + certAccountId + "_" + dateStr;
+        BoundHashOperations hashOps = redisCacheService.getHashOps(key);
+        Long result = hashOps.increment(type, incV);
+        if(result == incV){
+            redisCacheService.expire(key,3 * 24 * 60 * 60);
+        }
+    }
+
+    @Override
+    public CertAccountQuota getQuotaRemain(String certAccountId,String type) {
+        CertAccountQuota quota = certAccountQuotaDao.findByCertAccountIdAndType(certAccountId,type);
+        Long dateUsed = this.getQuotaUsed(quota);
+        Long balanceUsed = quota.getUsed() == null ? 0L : quota.getUsed();
+        quota.setCurrentUsed(balanceUsed + dateUsed);
+        return quota;
+    }
+
+    /**
+     * 获取配额使用量
+     * @param quota
+     * @return
+     */
+    private Long getQuotaUsed(CertAccountQuota quota) {
+        Date date = new Date();
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        date = DateUtils.parseDate(dateStr,"yyyyMMdd");
+        Date balanceDate = quota.getBalanceDt();
+        String balanceDateStr = DateUtils.formatDate(balanceDate, "yyyyMMdd");
+        balanceDate = DateUtils.parseDate(balanceDateStr,"yyyyMMdd");
+        Long used = quota.getUsed() == null? 0L:quota.getUsed();
+        return getQuotaUsed(quota.getCertAccountId(),date,balanceDate,used,quota.getType());
+    }
+
+    public Long getQuotaUsed(String certAccountId,Date date,Date lastBalanceDate,Long used,String type){
+        if(date.getTime() > lastBalanceDate.getTime()){
+            Date newBalanceDate = DateUtils.nextDate(lastBalanceDate);
+            Long dateUsed = getQuotaUsedFromRedis(certAccountId, date,type);
+            used = used + dateUsed;
+            return getQuotaUsed(certAccountId, date, newBalanceDate, used,type);
+        }else{
+            return used;
+        }
+    }
+
+    public Long getQuotaUsedFromRedis(String certAccountId,Date date,String type){
+        return getIncrLong(certAccountId,date, type);
+    }
+
+
+    /**
+     * 从redis中获取增量（购买或消费）
+     * @param certAccountId
+     * @param date
+     * @param type 类型（配额类型）
+     * @return 使用时长（秒）
+     */
+    private Long getIncrLong(String certAccountId, Date date,String type){
+        Long used;
+        String dateStr = DateUtils.getTime(date,"yyyyMMdd");
+        String key = QUOTA_DAY_PREFIX + "_" + certAccountId + "_" + dateStr;
+        BoundHashOperations hashOps = redisCacheService.getHashOps(key);
+        Object incrLongObj = hashOps.get(type);
+        String incrLongStr = incrLongObj == null?null:incrLongObj.toString();
+        if(StringUtils.isBlank(incrLongStr)){
+            used = 0L;
+        }else{
+            used = Long.parseLong(incrLongStr);
+        }
+        return used;
+    }
+
 }

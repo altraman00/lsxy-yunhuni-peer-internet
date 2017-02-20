@@ -55,8 +55,6 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
-    private ChannelService channelService;
-    @Autowired
     private ConditionService conditionService;
     @Autowired
     private ExtensionState extensionState;
@@ -112,10 +110,6 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         if(StringUtils.isBlank(agent.getName())){
             throw new RequestIllegalArgumentException();
         }
-        //通道不能为空
-        if(StringUtils.isBlank(agent.getChannel())){
-            throw new RequestIllegalArgumentException();
-        }
         //初始化座席状态
         if(StringUtils.isBlank(agent.getState())){
             agent.setState(CallCenterAgent.STATE_ONLINE);
@@ -123,8 +117,6 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 && !agent.getState().startsWith("busy/") && !agent.getState().startsWith("away/") && !agent.getState().equals("online")){
             throw new RequestIllegalArgumentException();
         }
-        //校验通道
-        channelService.findOne(agent.getTenantId(), agent.getAppId(), agent.getChannel());
         CallCenterAgent oldAgent = callCenterAgentDao.findByAppIdAndName(agent.getAppId(),agent.getName());
         if(oldAgent != null){
             Long lastRegTime = agentState.getLastRegTime(oldAgent.getId());
@@ -251,14 +243,14 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     /**
-     * 查询指定通道下所有条件集合，查出匹配的条件
+     * 查询指定账号下所有条件集合，查出匹配的条件
      * @param agent 座席
      * @param suitedConditions 条件集合，请传入一个空的List对象
      * @param conditionScore 条件的分数，key为条件Id，请传入一个空的Map
      * @param skillScore 技能分数，key为技能名称，请传入一个空的Map
      */
     private void setSuitedConditionsAndConditionScore(CallCenterAgent agent, List<Condition> suitedConditions, Map<String, Long> conditionScore, Map<String, Integer> skillScore) throws YunhuniApiException {
-        List<Condition> conditions = conditionService.getAll(agent.getTenantId(), agent.getAppId(), agent.getChannel());
+        List<Condition> conditions = conditionService.getAll(agent.getTenantId(), agent.getAppId(), agent.getSubaccountId());
         conditions.stream().forEach(condition -> {
             if(ExpressionUtils.execWhereExpression(condition.getWhereExpression(),skillScore)){
                 long score = ExpressionUtils.execSortExpression(condition.getSortExpression(), skillScore);
@@ -351,10 +343,9 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
-    public List<String> getAgentIdsByChannel(String tenantId,String appId,String channelId){
+    public List<String> getAgentIdsBySubaccountId(String tenantId,String appId,String subaccountId){
         String sql = "select id  from db_lsxy_bi_yunhuni.tb_bi_call_center_agent " +
-                "where tenant_id=\""+tenantId+"\" and app_id=\""+appId+"\" and channel=\""+channelId+"\" and deleted = 0";
-
+                "where tenant_id=\""+tenantId+"\" and app_id=\""+appId+"\" and subaccount_id=\""+subaccountId+"\" and deleted = 0";
         return jdbcTemplate.queryForList(sql, new Object[]{}, String.class);
     }
 

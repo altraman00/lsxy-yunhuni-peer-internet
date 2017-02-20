@@ -73,56 +73,56 @@ public class ConfTest {
 
     @Test
     public void create() throws YunhuniApiException {
-        confService.create("192.168.0.1","40288aca574060400157406427f20005",45,30,true,true,"3.wav",null);
+        confService.create(null,"192.168.0.1","40288aca574060400157406427f20005",45,30,true,true,"3.wav",null);
     }
 
     @Test
     public void dismiss() throws YunhuniApiException {
-        confService.dismiss("192.168.0.1","40288aca574060400157406427f20005",getMeeting());
+        confService.dismiss(null,"192.168.0.1","40288aca574060400157406427f20005",getMeeting());
     }
 
     @Test
     public void invite() throws YunhuniApiException {
-        confService.invite("192.168.0.1","40288aca574060400157406427f20005",getMeeting()
+        confService.invite(null,"192.168.0.1","40288aca574060400157406427f20005",getMeeting()
                 ,"8675522730043","13692206627",4500,45,0,"3.wav",1);
     }
 
     @Test
     public void join() throws YunhuniApiException {
         List<VoiceIvr> lists = (List<VoiceIvr>)voiceIvrService.list("from VoiceIvr order by createTime desc");
-        confService.join("192.168.0.1","40288aca574060400157406427f20005",getMeeting(),lists.get(0).getId()
+        confService.join(null,"192.168.0.1","40288aca574060400157406427f20005",getMeeting(),lists.get(0).getId()
                ,4500,"3.wav",1);
     }
 
     @Test
     public void quit() throws YunhuniApiException {
         List<VoiceIvr> lists = (List<VoiceIvr>)voiceIvrService.list("from VoiceIvr order by createTime desc");
-        confService.quit("192.168.0.1","40288aca574060400157406427f20005",getMeeting(),lists.get(0).getId());
+        confService.quit(null,"192.168.0.1","40288aca574060400157406427f20005",getMeeting(),lists.get(0).getId());
     }
 
     @Test
     public void play() throws YunhuniApiException {
-        confService.startPlay("192.168.0.1","40288aca574060400157406427f20005",getMeeting(), Arrays.asList(new String[]{"3.wav"}));
+        confService.startPlay(null,"192.168.0.1","40288aca574060400157406427f20005",getMeeting(), Arrays.asList(new String[]{"3.wav"}));
     }
 
     @Test
     public void stoPlay() throws YunhuniApiException {
-        confService.stopPlay("192.168.0.1","40288aca574060400157406427f20005",getMeeting());
+        confService.stopPlay(null,"192.168.0.1","40288aca574060400157406427f20005",getMeeting());
     }
 
     @Test
     public void record() throws YunhuniApiException {
-        confService.startRecord("192.168.0.1","40288aca574060400157406427f20005",getMeeting(),600);
+        confService.startRecord(null,"192.168.0.1","40288aca574060400157406427f20005",getMeeting(),600);
     }
 
     @Test
     public void stopRecord() throws YunhuniApiException {
-        confService.stopRecord("192.168.0.1","40288aca574060400157406427f20005",getMeeting());
+        confService.stopRecord(null,"192.168.0.1","40288aca574060400157406427f20005",getMeeting());
     }
 
     @Test
     public void setVoiceMode() throws YunhuniApiException {
         List<VoiceIvr> lists = (List<VoiceIvr>)voiceIvrService.list("from VoiceIvr order by createTime desc");
-        confService.setVoiceMode("192.168.0.1","40288aca574060400157406427f20005",getMeeting(),lists.get(0).getId(),2);
+        confService.setVoiceMode(null,"192.168.0.1","40288aca574060400157406427f20005",getMeeting(),lists.get(0).getId(),2);
     }
 }

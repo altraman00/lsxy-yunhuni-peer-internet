@@ -9,6 +9,7 @@ import com.lsxy.area.server.batch.CallCenterBatchInserter;
 import com.lsxy.area.server.batch.CallSessionBatchInserter;
 import com.lsxy.area.server.batch.VoiceIvrBatchInserter;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
+import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
@@ -99,8 +100,11 @@ public class IVRServiceImpl implements IVRService {
     @Autowired
     private CallCenterStatisticsService callCenterStatisticsService;
 
+    @Autowired
+    private CallbackUrlUtil callbackUrlUtil;
+
     @Override
-    public String ivrCall(String ip, String appId, String from, String to,
+    public String ivrCall(String subaccountId,String ip, String appId, String from, String to,
                           Integer maxDialDuration, Integer maxCallDuration, String userData) throws YunhuniApiException {
         if(apiGwRedBlankNumService.isRedNum(to)){
             throw new NumberNotAllowToCallException();
@@ -136,7 +140,7 @@ public class IVRServiceImpl implements IVRService {
         }
 
         //TODO
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app,from, to);
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app,from, to);
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber();
         String lineId = selector.getLineId();
@@ -201,9 +205,10 @@ public class IVRServiceImpl implements IVRService {
         BusinessState callstate = new BusinessState.Builder()
                                     .setTenantId(tenantId)
                                     .setAppId(appId)
+                                    .setSubaccountId(subaccountId)
                                     .setId(callId)
                                     .setType(BusinessState.TYPE_IVR_CALL)
-                                    .setCallBackUrl(app.getUrl())
+                                    .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                                     .setAreaId(areaId)
                                     .setLineGatewayId(lineId)
                                     .setUserdata(userData)

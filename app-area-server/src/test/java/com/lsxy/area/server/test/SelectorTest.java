@@ -69,7 +69,7 @@ public class SelectorTest {
         App app = appService.findById("40288aca574060400157406427f20005");
         AreaAndTelNumSelector.Selector selector = null;
         try {
-            selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, null, "02082241195");
+            selector = areaAndTelNumSelector.getTelnumberAndAreaId(null,app, null, "02082241195");
             System.out.println(JSONUtil.objectToJson(selector));
         } catch (YunhuniApiException e) {
             e.printStackTrace();

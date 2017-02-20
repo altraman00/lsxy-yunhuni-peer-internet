@@ -2,6 +2,7 @@ package com.lsxy.app.api.gateway.rest;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
+import com.lsxy.app.api.gateway.util.Constants;
 import com.lsxy.framework.core.exceptions.api.ApiReturnCodeEnum;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import org.slf4j.Logger;
@@ -46,5 +47,16 @@ public class AbstractAPIController {
         }
         logger.error("调用接口出现异常：",resultEx);
         return failed;
+    }
+
+    public String getSubaccountId(HttpServletRequest request){
+        Object subaccount = request.getAttribute(Constants.SUBACCOUNT);
+        if(subaccount == null){
+            return null;
+        }
+        if(subaccount instanceof String){
+            return (String)subaccount;
+        }
+        return null;
     }
 }
