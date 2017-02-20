@@ -153,7 +153,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         conversationService.join(conversation_id,call_id);
         if(conversationState.getBusinessData().get("invite_to") != null){//邀请外线
             try{
-                conversationService.inviteOut(appId,conversationState.getBusinessData().get(BusinessState.REF_RES_ID),
+                conversationService.inviteOut(state.getSubaccountId(),appId,conversationState.getBusinessData().get(BusinessState.REF_RES_ID),
                         conversation_id,conversationState.getBusinessData().get("invite_from"),
                         conversationState.getBusinessData().get("invite_to"),null,null,null,null);
                 businessStateService.deleteInnerField(conversation_id,"invite_to","invite_from");

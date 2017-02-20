@@ -75,7 +75,7 @@ public class ModifyConditionEventHandler implements MQMessageHandler<ModifyCondi
         //修改CAs ACs
         long start = System.currentTimeMillis();
         List<String> agentIds = callCenterAgentService
-                .getAgentIdsByChannel(condition.getTenantId(),condition.getAppId(),condition.getChannelId());
+                .getAgentIdsBySubaccountId(condition.getTenantId(),condition.getAppId(),condition.getSubaccountId());
         if(message.ismWhere()){//修改了where表达式才会导致cas和acs的关系发生变化，否则只是分值发生变化
             //清空cAs
             cAs.delete(condition.getId());

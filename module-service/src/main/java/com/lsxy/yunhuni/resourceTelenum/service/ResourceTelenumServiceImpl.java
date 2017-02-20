@@ -451,6 +451,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             //修改号码租用关系
             resourceTelenum.setTenantId(tenant.getId());
             resourceTelenum.setAppId(null);
+            resourceTelenum.setSubaccountId(null);
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
             this.save(resourceTelenum);
         }else if(tenantType==0&& isEditNum){//只更改手机号码
@@ -482,6 +483,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             //修改号码租用关系
             resourceTelenum.setTenantId(tenant.getId());
             resourceTelenum.setAppId(null);
+            resourceTelenum.setSubaccountId(null);
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
             this.save(resourceTelenum);
         }
@@ -499,6 +501,8 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_RELEASE);
         resourcesRentService.save(resourcesRent);
         resourceTelenum.setTenantId(null);
+        resourceTelenum.setAppId(null);
+        resourceTelenum.setSubaccountId(null);
         resourceTelenum.setStatus(0);
         this.save(resourceTelenum);
     }
@@ -533,5 +537,20 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     public Page<ResourceTelenum> findOwnUnusedNum(String tenantId,String areaId,int pageNo,int pageSize) {
         String hql = "from ResourceTelenum obj where obj.tenantId = ?1 and obj.areaId = ?2 and obj.appId is null";
         return  this.pageList(hql,pageNo,pageSize,tenantId,areaId);
+    }
+
+    @Override
+    public void subaccountUnbindAll(String tenantId,String appId, String subaccountId) {
+        resourceTelenumDao.subaccountUnbindAll(tenantId,appId, subaccountId,new Date());
+    }
+
+    @Override
+    public void subaccountUnbindNum(String tenantId,String appId, String subaccountId, String numId) {
+        ResourceTelenum num = this.findById(numId);
+        if(num.getTenantId() != null && num.getTenantId().equals(tenantId) && num.getAppId() != null && num.getAppId().equals(appId)
+                && num.getSubaccountId() != null && num.getSubaccountId().equals(subaccountId)){
+            num.setSubaccountId(null);
+            this.save(num);
+        }
     }
 }

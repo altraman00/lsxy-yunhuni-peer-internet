@@ -43,10 +43,10 @@ public interface CallCenterAgentService extends BaseService<CallCenterAgent> {
      * 获取通道下所有的座席ID
      * @param tenantId
      * @param appId
-     * @param channelId
+     * @param subaccountId 子账号id 为null 代表主账号
      * @return
      */
-    List<String> getAgentIdsByChannel(String tenantId, String appId, String channelId);
+    List<String> getAgentIdsBySubaccountId(String tenantId, String appId, String subaccountId);
 
     /**
      * 获取单个座席

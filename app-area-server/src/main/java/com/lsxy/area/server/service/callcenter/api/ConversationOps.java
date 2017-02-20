@@ -9,6 +9,7 @@ import com.lsxy.area.server.service.callcenter.AgentIdCallReference;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
+import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
@@ -96,8 +97,11 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterConversationMemberService callCenterConversationMemberService;
 
+    @Autowired
+    private CallbackUrlUtil callbackUrlUtil;
+
     @Override
-    public boolean dismiss(String ip, String appId, String conversationId) throws YunhuniApiException{
+    public boolean dismiss(String subaccountId, String ip, String appId, String conversationId) throws YunhuniApiException{
         if(StringUtils.isBlank(conversationId)){
             throw new RequestIllegalArgumentException();
         }
@@ -118,7 +122,7 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
     }
 
     @Override
-    public boolean setVoiceMode(String ip, String appId, String conversationId, String agentId, Integer voiceMode) throws YunhuniApiException {
+    public boolean setVoiceMode(String subaccountId, String ip, String appId, String conversationId, String agentId, Integer voiceMode) throws YunhuniApiException {
         if(StringUtils.isBlank(conversationId)){
             throw new RequestIllegalArgumentException();
         }
@@ -146,7 +150,7 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
     }
 
     @Override
-    public boolean inviteAgent(String ip, String appId, String conversationId, String enqueue, Integer voiceMode) throws YunhuniApiException {
+    public boolean inviteAgent(String subaccountId, String ip, String appId, String conversationId, String enqueue, Integer voiceMode) throws YunhuniApiException {
         if(StringUtils.isBlank(conversationId)){
             throw new RequestIllegalArgumentException();
         }
@@ -195,19 +199,17 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
         if(conversation_state.getClosed()!= null && conversation_state.getClosed()){
             throw new ConversationNotExistException();
         }
-        if(!enQueue.getChannel().equals(conversation_state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD))){
-            throw new RequestIllegalArgumentException();
-        }
 
         /**排队都是在呼叫上排队，这里是在交谈上排队，所以创建一个虚拟的呼叫call，兼容排队的逻辑**/
         String callId = UUIDGenerator.uuid();
         BusinessState state = new BusinessState.Builder()
                 .setTenantId(conversation_state.getTenantId())
                 .setAppId(app.getId())
+                .setSubaccountId(subaccountId)
                 .setId(callId)
                 .setResId(null)
                 .setType(BusinessState.TYPE_CC_CONVERSATION_SHADOW_CALL)
-                .setCallBackUrl(app.getUrl())
+                .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                 .setAreaId(conversation_state.getAreaId())
                 .setLineGatewayId(conversation_state.getLineGatewayId())
                 .setBusinessData(new MapBuilder<String,String>()
@@ -215,7 +217,6 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
                         .putIfNotEmpty("from",conversation_state.getBusinessData().get(CallCenterUtil.CONVERSATION_SYSNUM_FIELD))
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,conversation_state.getBusinessData().get(CallCenterUtil.CALLCENTER_FIELD))
                         .putIfNotEmpty(CallCenterUtil.ENQUEUE_START_TIME_FIELD,""+new Date().getTime())
-                        .putIfNotEmpty(CallCenterUtil.CHANNEL_ID_FIELD,enQueue.getChannel())
                         .putIfNotEmpty(CallCenterUtil.CONDITION_ID_FIELD,enQueue.getRoute().getCondition()!=null?enQueue.getRoute().getCondition().getId():null)
                         .putIfNotEmpty("user_data",enQueue.getData())
                         .build())
@@ -258,8 +259,8 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
     }
 
     @Override
-    public String inviteOut(String ip, String appId, String conversationId, String from,
-                             String to, Integer maxDial, Integer maxDuration, Integer voiceMode) throws YunhuniApiException {
+    public String inviteOut(String subaccountId, String ip, String appId, String conversationId, String from,
+                            String to, Integer maxDial, Integer maxDuration, Integer voiceMode) throws YunhuniApiException {
         if(StringUtils.isBlank(conversationId)){
             throw new RequestIllegalArgumentException();
         }
@@ -292,7 +293,7 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
         if(conversation_state.getClosed()!= null && conversation_state.getClosed()){
             throw new ConversationNotExistException();
         }
-        return conversationService.inviteOut(appId,
+        return conversationService.inviteOut(subaccountId,appId,
                     conversation_state.getBusinessData().get(BusinessState.REF_RES_ID),
                     conversationId,from,to,maxDuration,maxDial,null,voiceMode);
     }

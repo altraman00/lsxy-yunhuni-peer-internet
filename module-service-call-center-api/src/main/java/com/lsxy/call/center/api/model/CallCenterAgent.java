@@ -27,7 +27,7 @@ public class CallCenterAgent extends IdEntity {
 
     private String tenantId;
     private String appId;
-    private String channel;
+    private String subaccountId;
     private String name;//坐席id
     private String num;//坐席工号
 
@@ -55,13 +55,13 @@ public class CallCenterAgent extends IdEntity {
         this.appId = appId;
     }
 
-    @Column(name = "channel")
-    public String getChannel() {
-        return channel;
+    @Column(name = "subaccount_id")
+    public String getSubaccountId() {
+        return subaccountId;
     }
 
-    public void setChannel(String channel) {
-        this.channel = channel;
+    public void setSubaccountId(String subaccountId) {
+        this.subaccountId = subaccountId;
     }
 
     @Column(name = "name")

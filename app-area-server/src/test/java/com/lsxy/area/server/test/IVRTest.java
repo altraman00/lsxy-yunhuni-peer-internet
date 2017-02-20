@@ -79,7 +79,7 @@ public class IVRTest {
         String res_id = UUIDGenerator.uuid();
         String from = "13692206627";
         String to = "8675522730043";
-        ivrActionService.doActionIfAccept(app,tenant,res_id,from,to,null,false);
+        ivrActionService.doActionIfAccept(null,app,tenant,res_id,from,to,null,false);
 
         List<VoiceIvr> lists = (List<VoiceIvr>)voiceIvrService.list("from VoiceIvr order by createTime desc");
         System.out.println(lists.get(0).getId());
@@ -92,7 +92,7 @@ public class IVRTest {
 
     @Test
     public void ivrcall() throws YunhuniApiException {
-        ivrService.ivrCall("192.168.1.1","40288aca574060400157406427f20005","8675522730043","13692206627",45,900,null);
+        ivrService.ivrCall(null,"192.168.1.1","40288aca574060400157406427f20005","8675522730043","13692206627",45,900,null);
         List<VoiceIvr> lists = (List<VoiceIvr>)voiceIvrService.list("from VoiceIvr order by createTime desc");
         System.out.println(lists.get(0).getId());
         //下一步干嘛
@@ -131,7 +131,6 @@ public class IVRTest {
         String xml ="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<response>\n" +
                 "<enqueue\n" +
-                "        channel=\"40288ae2586b014801586b0171520000\"\n" +
                 "        wait_voice=\"3.wav\"\n" +
                 "        ring_mode=\"4\"\n" +
                 "        play_num=\"true\"\n" +

@@ -111,7 +111,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
 
         Tenant tenant = null;
         App app = null;
-
+        String subaccount = null;//TODO 根据号码找到对应的子账号(如果是子账号的号码)
         if(testNum.equals(to.getTelNumber())){
             //被叫是公共测试号,根据主叫号查出应用
             TestNumBind testNumBind = testNumBindService.findByNumber(from);
@@ -173,7 +173,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("[{}][{}]开始处理ivr",tenant.getId(),app.getId());
         }
-        ivrActionService.doActionIfAccept(app,tenant,res_id,from,to.getTelNumber(),calledLine.getId(),isCallCenter);
+        ivrActionService.doActionIfAccept(subaccount,app,tenant,res_id,from,to.getTelNumber(),calledLine.getId(),isCallCenter);
         return res;
     }
 

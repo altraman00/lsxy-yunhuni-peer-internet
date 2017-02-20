@@ -116,4 +116,12 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      */
     String bindNumToAppAndGetAreaId(App app, List<String> nums, boolean isNeedCalled);
 
+    /**
+     * 绑定号码到子账号
+     * @param app
+     * @param nums 要绑定的号码
+     * @param subAccountId 要绑定的子账号
+     */
+    void bindNumToSubaccount(App app, List<String> nums, String subAccountId);
+
 }

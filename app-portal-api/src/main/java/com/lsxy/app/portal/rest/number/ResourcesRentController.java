@@ -84,9 +84,9 @@ public class ResourcesRentController extends AbstractRestController{
      */
     @RequestMapping("/list")
     public RestResponse pageList(Integer pageNo, Integer pageSize)   {
-        String userName = getCurrentAccountUserName();
+        Account currentAccount = getCurrentAccount();
         //获取该租户下的所有号码信息
-        Page<ResourcesRent> page = resourcesRentService.pageListByTenantId(userName,pageNo,pageSize);
+        Page<ResourcesRent> page = resourcesRentService.pageListByTenantId(currentAccount.getTenant().getId(),pageNo,pageSize);
         return RestResponse.success(page);
     }
     /**

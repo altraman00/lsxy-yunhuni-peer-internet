@@ -14,16 +14,16 @@ public class DeleteConditionEvent extends AbstractMQEvent {
 
     private String appId;
 
-    private String channelId;
+    private String subaccountId;
 
     public DeleteConditionEvent(){
     }
 
-    public DeleteConditionEvent(String conditionId, String tenantId, String appId,String channelId){
+    public DeleteConditionEvent(String conditionId, String tenantId, String appId,String subaccountId){
         this.conditionId = conditionId;
         this.tenantId = tenantId;
         this.appId = appId;
-        this.channelId = channelId;
+        this.subaccountId = subaccountId;
     }
 
     @Override
@@ -55,11 +55,11 @@ public class DeleteConditionEvent extends AbstractMQEvent {
         this.appId = appId;
     }
 
-    public String getChannelId() {
-        return channelId;
+    public String getSubaccountId() {
+        return subaccountId;
     }
 
-    public void setChannelId(String channelId) {
-        this.channelId = channelId;
+    public void setSubaccountId(String subaccountId) {
+        this.subaccountId = subaccountId;
     }
 }

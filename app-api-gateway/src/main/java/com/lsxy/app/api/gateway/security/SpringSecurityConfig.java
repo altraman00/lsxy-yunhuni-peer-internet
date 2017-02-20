@@ -46,6 +46,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests().requestMatchers(apiRM).authenticated()
 //                .antMatchers("/v*/**").anonymous()
+                .antMatchers("/management/**").hasRole("PRIMARY_ACCOUNT")
                 .and().httpBasic()
                 .and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)

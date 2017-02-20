@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 public class RejectTaskInputDTO extends CommonDTO {
 
     @NotNull
-    @Size(min = 32,max = 32)
+    @Size(min = 1,max = 128)
     @JsonProperty("queue_id")
     private String queueId;
 

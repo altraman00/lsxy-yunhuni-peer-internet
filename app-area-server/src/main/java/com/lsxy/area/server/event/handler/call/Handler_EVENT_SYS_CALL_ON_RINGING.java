@@ -100,7 +100,6 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
                     callCenterUtil.sendQueueFailEvent(initiatorState.getCallBackUrl(),
                             initiatorState.getBusinessData().get(CallCenterUtil.QUEUE_ID_FIELD),
                             initiatorState.getBusinessData().get(CallCenterUtil.QUEUE_TYPE_FIELD),
-                            initiatorState.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),
                             initiatorState.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
                             CallCenterUtil.QUEUE_FAIL_HANGUP,
                             initiator,null,initiatorState.getUserdata());

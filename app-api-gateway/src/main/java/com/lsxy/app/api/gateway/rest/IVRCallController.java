@@ -34,7 +34,7 @@ public class IVRCallController extends AbstractAPIController{
             logger.debug("IVR CALL API参数,accountId={},appId={},dto={}",accountId,appId,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        String callId = ivrService.ivrCall(ip,appId,dto.getFrom(),dto.getTo(),dto.getMaxDialDuration(),dto.getMaxCallDuration(),dto.getUserData());
+        String callId = ivrService.ivrCall(getSubaccountId(request),ip,appId,dto.getFrom(),dto.getTo(),dto.getMaxDialDuration(),dto.getMaxCallDuration(),dto.getUserData());
         Map<String,Object> result = new MapBuilder<String,Object>().put("callId",callId).build();
         return ApiGatewayResponse.success(result);
     }
