@@ -80,7 +80,7 @@ public class AgentAndExtension {
         ExecutorService executorService = Executors.newFixedThreadPool(50);
         List<Future> results = new ArrayList<>();
         //建立座席
-        for(int i=0;i<150;i++){
+        for(int i=0;i<100;i++){
             Thread.sleep(20);
             String extId = extIds.get(i);
             List<AgentSkill> skills = new ArrayList<>();

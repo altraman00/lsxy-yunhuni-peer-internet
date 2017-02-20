@@ -30,6 +30,8 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
     Page<ResourcesRent> findByAppId(String appId,int pageNo, int pageSize);
 
 
+    Page<ResourcesRent> findBySubaccount(String appId, String subaccountId, int pageNo, int pageSize);
+
     /**
      * 根据ID获取租用关系
      * @param appId
