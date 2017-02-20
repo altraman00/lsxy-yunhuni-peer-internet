@@ -5,6 +5,9 @@ import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.*;
 import com.lsxy.utils.StatisticsUtils;
+import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuota;
+import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuotaType;
+import com.lsxy.yunhuni.api.apicertificate.service.CertAccountQuotaService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
@@ -61,6 +64,8 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
 
     @Autowired
     ConsumeService consumeService;
+    @Autowired
+    CertAccountQuotaService certAccountQuotaService;
 
     @Override
     public List<VoiceCdr> listCdr(String type, String tenantId, Date startTime,Date endTime, String appId) {
@@ -252,6 +257,9 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
             ProductCode productCode = ProductCode.valueOf(voiceCdr.getType());
             Consume consume = new Consume(voiceCdr.getCallEndDt(),productCode.name(),voiceCdr.getCost(),productCode.getRemark(),voiceCdr.getAppId(),voiceCdr.getTenantId(),voiceCdr.getId());
             consumeService.consume(consume);
+        }
+        if(StringUtils.isNotBlank(voiceCdr.getSubaccountId())){
+            certAccountQuotaService.incQuotaUsed(voiceCdr.getSubaccountId(),new Date(),voiceCdr.getCostTimeLong(), CertAccountQuotaType.CallQuota.name());
         }
     }
 }
