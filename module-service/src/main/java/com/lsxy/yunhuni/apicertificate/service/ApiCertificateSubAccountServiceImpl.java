@@ -80,9 +80,11 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
 
     private Collection<CertAccountQuota> getQuotasByApp(App app, List<CertAccountQuota> quotas) {
         Map<String,CertAccountQuota> map = new HashMap();
-        for(CertAccountQuota quota : quotas){
-            if(StringUtils.isNotBlank(quota.getType()) && map.get(quota.getType()) == null){
-                map.put(quota.getType(),quota);
+        if(quotas!=null){
+            for(CertAccountQuota quota : quotas){ 
+                if(StringUtils.isNotBlank(quota.getType()) && map.get(quota.getType()) == null){
+                    map.put(quota.getType(),quota);
+                }
             }
         }
         Set<String> keys = map.keySet();
