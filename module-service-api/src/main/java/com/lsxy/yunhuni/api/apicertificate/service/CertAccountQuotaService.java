@@ -30,8 +30,7 @@ public interface CertAccountQuotaService extends BaseService<CertAccountQuota> {
     /**
      * 获取配额剩余
      * @param certAccountId 鉴权账号Id
-     * @param date 日期
      * @param type 类型（配额类型）
      */
-    Long getQuotaUsed(String certAccountId, Date date, String type);
+    CertAccountQuota getQuotaRemain(String certAccountId , String type);
 }

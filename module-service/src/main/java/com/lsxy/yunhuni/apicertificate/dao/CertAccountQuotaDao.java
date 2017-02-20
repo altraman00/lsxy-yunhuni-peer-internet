@@ -17,4 +17,6 @@ public interface CertAccountQuotaDao extends BaseDaoInterface<CertAccountQuota, 
     void updateQuota(String certAccountId, String type, Long value);
 
     List<CertAccountQuota> findByCertAccountId(String id);
+
+    CertAccountQuota findByCertAccountIdAndType(String certAccountId, String type);
 }

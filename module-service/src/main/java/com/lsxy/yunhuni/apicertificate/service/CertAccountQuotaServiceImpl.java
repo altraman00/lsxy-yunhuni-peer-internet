@@ -67,17 +67,20 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
     }
 
     @Override
-    public Long getQuotaUsed(String certAccountId, Date date, String type) {
-        return null;
+    public CertAccountQuota getQuotaRemain(String certAccountId,String type) {
+        CertAccountQuota quota = certAccountQuotaDao.findByCertAccountIdAndType(certAccountId,type);
+        Long dateUsed = this.getQuotaUsed(quota);
+        Long balanceUsed = quota.getUsed() == null ? 0L : quota.getUsed();
+        quota.setCurrentUsed(balanceUsed + dateUsed);
+        return quota;
     }
 
     /**
      * 获取配额使用量
-     * @param certAccountId
      * @param quota
      * @return
      */
-    private Long getQuotaUsed(String certAccountId,CertAccountQuota quota) {
+    private Long getQuotaUsed(CertAccountQuota quota) {
         Date date = new Date();
         String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
         date = DateUtils.parseDate(dateStr,"yyyyMMdd");
@@ -85,7 +88,7 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
         String balanceDateStr = DateUtils.formatDate(balanceDate, "yyyyMMdd");
         balanceDate = DateUtils.parseDate(balanceDateStr,"yyyyMMdd");
         Long used = quota.getUsed() == null? 0L:quota.getUsed();
-        return getQuotaUsed(certAccountId,date,balanceDate,used,quota.getType());
+        return getQuotaUsed(quota.getCertAccountId(),date,balanceDate,used,quota.getType());
     }
 
     public Long getQuotaUsed(String certAccountId,Date date,Date lastBalanceDate,Long used,String type){
