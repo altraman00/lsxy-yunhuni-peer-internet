@@ -141,12 +141,12 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     }
 
     @Override
-    public void delete(String extensionId, String appId) throws YunhuniApiException{
+    public void delete(String extensionId, String appId,String subaccountId) throws YunhuniApiException{
         AppExtension extension = this.findById(extensionId);
         if(extension == null){
             throw new ExtensionNotExistException();
         }
-        if(StringUtils.isNotBlank(appId) && appId.equals(extension.getAppId())){
+        if(StringUtils.isNotBlank(appId) && appId.equals(extension.getAppId()) && (StringUtils.isBlank(subaccountId) || subaccountId.equals(extension.getSubaccountId()))){
             //获取分机锁
             ExtensionLock extensionLock = new ExtensionLock(redisCacheService,extensionId);
             boolean lock = extensionLock.lock();
@@ -182,8 +182,19 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
 
     @Override
     public Page<AppExtension> getPage(String appId, Integer pageNo, Integer pageSize) {
-        String hql = "from AppExtension obj where obj.appId=?1";
-        Page page = this.pageList(hql, pageNo, pageSize, appId);
+        return getPage(appId,null, pageNo, pageSize);
+    }
+
+    @Override
+    public Page<AppExtension> getPage(String appId,String subaccountId, Integer pageNo, Integer pageSize) {
+        Page page;
+        if(StringUtils.isBlank(subaccountId)){
+            String hql = "from AppExtension obj where obj.appId=?1";
+            page = this.pageList(hql, pageNo, pageSize, appId);
+        }else{
+            String hql = "from AppExtension obj where obj.appId=?1 and obj.subaccountId = ?2";
+            page = this.pageList(hql, pageNo, pageSize, appId,subaccountId);
+        }
         List<AppExtension> result = page.getResult();
         if(result != null && result.size() > 0){
             for(AppExtension ext : result){
@@ -195,7 +206,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     }
 
     @Override
-    public AppExtension findOne(String appId, String extensionId) throws YunhuniApiException{
+    public AppExtension findOne(String appId, String extensionId,String subaccountId) throws YunhuniApiException{
         if(StringUtils.isBlank(appId)){
             logger.error("appId 不能为空");
             throw new RequestIllegalArgumentException();
@@ -209,7 +220,10 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
             throw new ExtensionNotExistException();
         }
         if(!appId.equals(extension.getAppId())){
-            throw new RequestIllegalArgumentException();
+            throw new ExtensionNotExistException();
+        }
+        if(StringUtils.isNotBlank(subaccountId) && !subaccountId.equals(extension.getSubaccountId())){
+            throw new ExtensionNotExistException();
         }
         boolean enable = extensionState.getEnable(extension.getId());
         extension.setEnable(enable);
