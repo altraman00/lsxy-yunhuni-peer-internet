@@ -343,7 +343,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
      * @return
      */
     private String bindNumToAppOrSubAccountAndGetAreaId(App app, List<String> nums ,String subAccountId, boolean isNeedCalled) {
-        int[] status = {ResourcesRent.RENT_STATUS_UNUSED,ResourcesRent.RENT_STATUS_USING};
+        int[] statuses = {ResourcesRent.RENT_STATUS_UNUSED,ResourcesRent.RENT_STATUS_USING};
         String areaId = app.getOnlineAreaId();
         String tenantId = app.getTenant().getId();
         boolean isCalled = false;
@@ -353,7 +353,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                 if(resourceTelenum != null){
                     if(resourceTelenum.getStatus()== ResourceTelenum.STATUS_RENTED && tenantId.equals(resourceTelenum.getTenantId())){
                         //是这个租户，则查询租用记录，有没有正在用的
-                        ResourcesRent resourcesRent = resourcesRentDao.findByResourceTelenumIdAndRentStatusIn(resourceTelenum.getId(),status);
+                        ResourcesRent resourcesRent = resourcesRentDao.findByResourceTelenumIdAndRentStatusIn(resourceTelenum.getId(),statuses);
                         if(resourcesRent == null){
                             throw new RuntimeException("找不到租用记录：" + resourceTelenum.getTelNumber());
                         }else if(!resourcesRent.getTenant().getId().equals(tenantId)){
