@@ -126,6 +126,9 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
     public ApiCertificateSubAccount findByIdWithQuota(String subAccountId) {
         ApiCertificateSubAccount subAccount = this.findById(subAccountId);
         List<CertAccountQuota> quotas = certAccountQuotaService.findByCertAccountId(subAccount.getId());
+        for(CertAccountQuota quota : quotas){
+            certAccountQuotaService.getCurrentQuota(quota);
+        }
         subAccount.setQuotas(quotas);
         return subAccount;
     }
@@ -134,7 +137,14 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
     public Page<ApiCertificateSubAccount> pageListWithQuota(String appId, int pageNo, int pageSize) {
         String hql = "from ApiCertificateSubAccount obj where obj.appId = ?1";
         Page<ApiCertificateSubAccount> page = this.pageList(hql, pageNo, pageSize, appId);
-        List<CertAccountQuota> quotas = certAccountQuotaService.findByAppId(appId);
+        List<ApiCertificateSubAccount> result = page.getResult();
+        List<String> ids = new ArrayList<>();
+        if(result != null){
+            for(ApiCertificateSubAccount subAccount : result){
+                ids.add(subAccount.getId());
+            }
+        }
+        List<CertAccountQuota> quotas = certAccountQuotaService.findByCertAccountIds(ids);
         for(CertAccountQuota quota : quotas){
             //获取配额实时的数据
             certAccountQuotaService.getCurrentQuota(quota);
@@ -150,7 +160,6 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
             }
             quotaList.add(quota);
         }
-        List<ApiCertificateSubAccount> result = page.getResult();
         if(result != null){
             for(ApiCertificateSubAccount subAccount: result){
                 subAccount.setQuotas(map.get(subAccount.getId()));

@@ -17,13 +17,9 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.stereotype.Service;
-import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -94,9 +90,20 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
 
     @Override
     public CertAccountQuota getCurrentQuota(CertAccountQuota quota) {
-        Long dateUsed = this.getQuotaUsed(quota);
-        Long balanceUsed = quota.getUsed() == null ? 0L : quota.getUsed();
-        quota.setCurrentUsed(balanceUsed + dateUsed);
+        CertAccountQuotaType type = CertAccountQuotaType.valueOf(quota.getType());
+        switch (type){
+            case CallQuota:{
+                Long dateUsed = this.getQuotaUsed(quota);
+                Long balanceUsed = quota.getUsed() == null ? 0L : quota.getUsed();
+                quota.setCurrentUsed(balanceUsed + dateUsed);
+                break;
+            }
+            case AgentQuota:{
+                //TODO 座席配额待定
+                quota.setCurrentUsed(quota.getUsed() == null ? 0L : quota.getUsed());
+                break;
+            }
+        }
         return quota;
     }
 

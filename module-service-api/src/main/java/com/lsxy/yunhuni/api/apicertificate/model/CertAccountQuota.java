@@ -176,7 +176,7 @@ public class CertAccountQuota extends IdEntity {
     }
     @Transient
     public Long getCurrentUsed() {
-        return currentUsed;
+        return currentUsed == null ? (used == null ? 0: used ): currentUsed;
     }
 
     public void setCurrentUsed(Long currentUsed) {
