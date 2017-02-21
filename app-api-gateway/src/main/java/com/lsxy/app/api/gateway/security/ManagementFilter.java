@@ -38,9 +38,6 @@ public class ManagementFilter extends OncePerRequestFilter{
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws ServletException, IOException {
-        if(logger.isDebugEnabled()){
-            logger.debug("判断是否有PRIMARY_ACCOUNT");
-        }
         if(!requestMatcher.matches(req)){
             chain.doFilter(req,res);
             return;
