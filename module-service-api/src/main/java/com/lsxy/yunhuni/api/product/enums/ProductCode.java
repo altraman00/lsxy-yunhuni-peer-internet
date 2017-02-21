@@ -14,7 +14,7 @@ public enum ProductCode {
     recording_memory("recording_memory","录音文件存储策略"),
     rent_number("rent_number","号码占用费"),
     rent_number_month("rent_number_month","号码月租费"),
-    call_center("cc_incoming,conversation,agent_call,out_call","呼叫中心-IP线路"),
+    call_center("cc_incoming,conversation,invite_agent_call,invite_out_call,agent_call,out_call","呼叫中心-IP线路"),
     call_center_sip("","呼叫中心-电话线路"),
     call_center_month("call_center_month","呼叫中心-坐席月租费");
 

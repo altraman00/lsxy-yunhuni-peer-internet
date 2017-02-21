@@ -5,9 +5,9 @@ import com.lsxy.call.center.api.model.Condition;
 import com.lsxy.call.center.api.service.AgentSkillService;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
 import com.lsxy.call.center.api.service.ConditionService;
-import com.lsxy.call.center.states.lock.ModifyConditionLock;
-import com.lsxy.call.center.states.statics.ACs;
-import com.lsxy.call.center.states.statics.CAs;
+import com.lsxy.call.center.api.states.lock.ModifyConditionLock;
+import com.lsxy.call.center.api.states.statics.ACs;
+import com.lsxy.call.center.api.states.statics.CAs;
 import com.lsxy.call.center.utils.ExpressionUtils;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.mq.api.MQMessageHandler;
@@ -64,7 +64,7 @@ public class CreateConditionEventHandler implements MQMessageHandler<CreateCondi
         //初始化CAs ACs
         long start = System.currentTimeMillis();
         List<String> agentIds = callCenterAgentService
-                                        .getAgentIdsByChannel(condition.getTenantId(),condition.getAppId(),condition.getChannelId());
+                                        .getAgentIdsBySubaccountId(condition.getTenantId(),condition.getAppId(),condition.getSubaccountId());
 
         if(agentIds != null && agentIds.size() > 0){
             for (String agentId : agentIds) {

@@ -8,7 +8,9 @@ import com.lsxy.call.center.api.service.CallCenterQueueService;
 import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.call.center.api.service.EnQueueService;
 import com.lsxy.call.center.api.utils.EnQueueDecoder;
+import com.lsxy.call.center.batch.QueueBatchInserter;
 import com.lsxy.framework.config.Constants;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,6 +44,9 @@ public class EnqueueServiceTest {
     @Autowired
     private CallCenterService callCenterService;
 
+    @Autowired
+    private QueueBatchInserter queueBatchInserter;
+
     @Test
     public void test() throws InterruptedException {
         String enqueue = "<enqueue\n" +
@@ -67,7 +72,7 @@ public class EnqueueServiceTest {
                 public void run() {
                     long start = System.currentTimeMillis();
                     enQueueService.lookupAgent("40288ac9575612a30157561c7ff50004",
-                            "40288ac957e1812e0157e18a994e0000","13692206627","callid1",en);
+                            "40288ac957e1812e0157e18a994e0000","13692206627","callid1",en,null,null);
                     System.out.println("好事：="+(System.currentTimeMillis() - start));
                     countDownLatch.countDown();
                 }
@@ -181,6 +186,27 @@ public class EnqueueServiceTest {
     @Test
     public  void test6(){
         callCenterService.incrCost("222",new BigDecimal(1));
+    }
+
+
+    @Test
+    public void test7() throws InterruptedException {
+        CallCenterQueue queue = new CallCenterQueue();
+        queue.setId(UUIDGenerator.uuid());
+        queue.setTenantId("11111111");
+        queue.setAppId("2222222");
+        queue.setRelevanceId("");
+        queue.setType("222");
+        queue.setCondition("2222222");
+        queue.setStartTime(new Date());
+        queue.setNum("1111111");
+        queue.setOriginCallId("3333333");
+        queue.setAgent("4444");
+        queue.setFetchTimeOut(111);
+        queue.setConversation("1111111");
+        queue.setEnqueue(null);
+        queueBatchInserter.put(queue);
+        Thread.currentThread().join();
     }
 }
 

@@ -5,6 +5,7 @@ import com.lsxy.framework.rpc.api.RPCMessage;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.server.AbstractServerRPCHandler;
+import com.lsxy.framework.rpc.api.server.ServerSession;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.SessionWriteException;
@@ -125,6 +126,8 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
         String sessionid = (String) request.getParameter("sessionid");
         String areaid = (String) request.getParameter("aid");
         String nodeid = (String) request.getParameter("nid");
+        String clientVersion = (String) request.getParameter("v");//代理服务版本
+        String clientStartTimestamp = (String) request.getParameter("t");//代理服务启动时间
 
         String blankipList = SystemConfig.getProperty("area.server.blank.iplist","");
         String blankipEnabled = SystemConfig.getProperty("area.server.blank.iplist.enabled","false");
@@ -135,7 +138,7 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
         InetSocketAddress isa = (InetSocketAddress) ctx.channel().remoteAddress();
         String ip = isa.getAddress().getHostAddress();
 
-        Session session = null;
+        ServerSession session = null;
         //如果启用了白名单机制,并且非法连接
         if("true".equals(blankipEnabled) && !(blankipList.indexOf(ip)>=0)){
             logger.error("白名单机制启用,连接ip["+ip+"]不在白名单中["+blankipList+"],拒绝连接");
@@ -152,7 +155,7 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
             return null;
         }
         //所有条件满足,连接成功,将session放入sessioncontext
-        session = new NettyServerSession(sessionid,ctx.channel(),this);
+        session = new NettyServerSession(sessionid,ctx.channel(),this,Long.parseLong(clientStartTimestamp), clientVersion);
         getSessionContext().putSession(areaid,nodeid,session);
         ctx.channel().attr(SESSION_ID).setIfAbsent(sessionid);
         response.setMessage(RPCResponse.STATE_OK);

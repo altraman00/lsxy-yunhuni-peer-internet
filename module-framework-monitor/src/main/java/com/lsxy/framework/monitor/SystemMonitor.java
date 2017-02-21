@@ -1,11 +1,8 @@
 package com.lsxy.framework.monitor;
 
-import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.StringUtil;
 import org.springframework.stereotype.Component;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 import java.util.Date;
 
 /**
@@ -34,9 +31,4 @@ public class SystemMonitor extends AbstractMonitor {
         return "";
     }
 
-    public static void main(String[] args) {
-        RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
-        System.out.println(bean.getStartTime());
-        System.out.println(DateUtils.formatDate(new Date(bean.getStartTime())));
-    }
 }

@@ -1,5 +1,6 @@
 package com.lsxy.call.center.api.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lsxy.framework.api.base.IdEntity;
 import org.hibernate.annotations.Where;
 
@@ -19,18 +20,25 @@ public class Condition extends IdEntity{
 
     private String appId;
 
-    private String channelId;
+    @JsonProperty("subaccount_id")
+    private String subaccountId;
 
+    @JsonProperty("where")
     private String whereExpression;
 
+    @JsonProperty("sort")
     private String sortExpression;
 
+    @JsonProperty("priority")
     private Integer priority;
 
+    @JsonProperty("queue_timeout")
     private Integer queueTimeout;
 
+    @JsonProperty("fetch_timeout")
     private Integer fetchTimeout;
 
+    @JsonProperty("remark")
     private String remark;
 
     @Column(name = "tenant_id")
@@ -51,13 +59,13 @@ public class Condition extends IdEntity{
         this.appId = appId;
     }
 
-    @Column(name = "channel_id")
-    public String getChannelId() {
-        return channelId;
+    @Column(name = "subaccount_id")
+    public String getSubaccountId() {
+        return subaccountId;
     }
 
-    public void setChannelId(String channelId) {
-        this.channelId = channelId;
+    public void setSubaccountId(String subaccountId) {
+        this.subaccountId = subaccountId;
     }
 
     @Column(name="where_expression")

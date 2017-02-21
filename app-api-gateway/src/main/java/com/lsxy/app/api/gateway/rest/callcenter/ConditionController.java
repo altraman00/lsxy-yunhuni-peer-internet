@@ -29,7 +29,7 @@ import java.util.Map;
 @RestController
 public class ConditionController extends AbstractAPIController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConfController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConditionController.class);
 
     @Reference(timeout=3000,check = false,lazy = true)
     private ConditionService conditionService;
@@ -49,7 +49,7 @@ public class ConditionController extends AbstractAPIController {
             throw new AppServiceInvalidException();
         }
         Condition condition = new Condition();
-        condition.setChannelId(dto.getChannelId());
+        condition.setSubaccountId(getSubaccountId(request));
         condition.setWhereExpression(dto.getWhereExpression());
         condition.setSortExpression(dto.getSortExpression());
         condition.setPriority(dto.getPriority());
@@ -111,7 +111,7 @@ public class ConditionController extends AbstractAPIController {
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
-        return ApiGatewayResponse.success(conditionService.getAll(app.getTenant().getId(),app.getId()));
+        return ApiGatewayResponse.success(conditionService.getAll(app.getTenant().getId(),app.getId(),getSubaccountId(request)));
     }
 
     @RequestMapping(value = "/{accountId}/callcenter/condition/{id}",method = RequestMethod.GET)

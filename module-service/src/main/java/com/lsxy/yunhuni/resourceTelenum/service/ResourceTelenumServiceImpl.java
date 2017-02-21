@@ -251,7 +251,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     }
 
     @Override
-    public List<ResourceTelenum> findDialingTelnumber(List<String> lineIds, App app, String... from) {
+    public List<ResourceTelenum> findDialingTelnumber(String subaccountId,List<String> lineIds, App app, String... from) {
         //from有几个，则反回的result有几个号码
         List<ResourceTelenum> result = new ArrayList<>();
         if(from != null && from.length > 0){
@@ -263,8 +263,13 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             }
             //当用户指定了号码
             if(notBlankFrom.size() > 0){
+                List<ResourceTelenum> availableNums;
+                if(StringUtils.isNotBlank(subaccountId)){
+                    availableNums = resourceTelenumDao.findCallingTelnumByTenantIdAndAppIdAndTelnumAndSubaccountId(app.getTenant().getId(), notBlankFrom,app.getId(),app.getAreaId(),subaccountId);
+                }else{
+                    availableNums = resourceTelenumDao.findCallingTelnumByTenantIdAndAppIdAndTelnum(app.getTenant().getId(), notBlankFrom,app.getId(),app.getAreaId());
+                }
                 //查出用户指定的号码
-                List<ResourceTelenum> availableNums = resourceTelenumDao.findCallingTelnumByTenantIdAndAppIdAndTelnum(app.getTenant().getId(), notBlankFrom,app.getId(),app.getAreaId());
                 //可用号码列表不为空
                 if(availableNums == null || availableNums.size() > 0){
                     for(String fr:from){
@@ -287,9 +292,9 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 }
             }
         }
-        //经过以上处理后，返回号码结果还是空的话，则不根据传入的from来选号码，选租户应用下的号码，或者租户下不被应用绑定的号码
+        //经过以上处理后，返回号码结果还是空的话，则不根据传入的from来选号码，子账号下的号码，或选租户应用下未被绑定的号码，或者租户下不被应用绑定的号码
         if(result.size() == 0){
-            ResourceTelenum availableNum = resourceTelenumDao.findCallingTelnumByTenantIdAndAppId(app.getTenant().getId(), app.getId(), app.getAreaId());
+            ResourceTelenum availableNum = resourceTelenumDao.findCallingTelnumByTenantIdAndAppId(app.getTenant().getId(), app.getId(), app.getAreaId(),subaccountId);
             if(availableNum == null){
                 availableNum = this.findOneFreeDialingNumber(lineIds);
             }
@@ -451,6 +456,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             //修改号码租用关系
             resourceTelenum.setTenantId(tenant.getId());
             resourceTelenum.setAppId(null);
+            resourceTelenum.setSubaccountId(null);
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
             this.save(resourceTelenum);
         }else if(tenantType==0&& isEditNum){//只更改手机号码
@@ -482,6 +488,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             //修改号码租用关系
             resourceTelenum.setTenantId(tenant.getId());
             resourceTelenum.setAppId(null);
+            resourceTelenum.setSubaccountId(null);
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
             this.save(resourceTelenum);
         }
@@ -499,6 +506,8 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_RELEASE);
         resourcesRentService.save(resourcesRent);
         resourceTelenum.setTenantId(null);
+        resourceTelenum.setAppId(null);
+        resourceTelenum.setSubaccountId(null);
         resourceTelenum.setStatus(0);
         this.save(resourceTelenum);
     }
@@ -533,5 +542,26 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     public Page<ResourceTelenum> findOwnUnusedNum(String tenantId,String areaId,int pageNo,int pageSize) {
         String hql = "from ResourceTelenum obj where obj.tenantId = ?1 and obj.areaId = ?2 and obj.appId is null";
         return  this.pageList(hql,pageNo,pageSize,tenantId,areaId);
+    }
+
+    @Override
+    public Page<ResourceTelenum> findOwnUnusedNumOrUnbindSubaccount(String tenantId, String appId, String areaId, int pageNo, int pageSize) {
+        String hql = "from ResourceTelenum obj where obj.tenantId = ?1 and obj.areaId = ?2 and (obj.appId is null or (obj.appId=?3 and obj.subaccountId is null))";
+        return  this.pageList(hql,pageNo,pageSize,tenantId,areaId,appId);
+    }
+
+    @Override
+    public void subaccountUnbindAll(String tenantId,String appId, String subaccountId) {
+        resourceTelenumDao.subaccountUnbindAll(tenantId,appId, subaccountId,new Date());
+    }
+
+    @Override
+    public void subaccountUnbindNum(String tenantId,String appId, String subaccountId, String numId) {
+        ResourceTelenum num = this.findById(numId);
+        if(num.getTenantId() != null && num.getTenantId().equals(tenantId) && num.getAppId() != null && num.getAppId().equals(appId)
+                && num.getSubaccountId() != null && num.getSubaccountId().equals(subaccountId)){
+            num.setSubaccountId(null);
+            this.save(num);
+        }
     }
 }

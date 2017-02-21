@@ -111,7 +111,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
 
         Tenant tenant = null;
         App app = null;
-
+        String subaccountId = null;
         if(testNum.equals(to.getTelNumber())){
             //被叫是公共测试号,根据主叫号查出应用
             TestNumBind testNumBind = testNumBindService.findByNumber(from);
@@ -127,6 +127,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 return res;
             }
         }else{
+            subaccountId = to.getSubaccountId(); //根据号码找到对应的子账号(如果是子账号的号码)
             //不是公共测试号，从号码资源池中查出被叫号码的应用
             if(StringUtils.isBlank(to.getAppId())){
                 logger.error("呼入号码没有绑定应用：{}",params);
@@ -163,7 +164,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 return res;
             }
         }
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(isCallCenter ?
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,isCallCenter ?
                 ProductCode.call_center.getApiCmd():ProductCode.ivr_call.getApiCmd(), app.getTenant().getId());
         if(!isAmountEnough){
             logger.info("[{}][{}]欠费，不能呼入",app.getId(),tenant.getId());
@@ -173,7 +174,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("[{}][{}]开始处理ivr",tenant.getId(),app.getId());
         }
-        ivrActionService.doActionIfAccept(app,tenant,res_id,from,to.getTelNumber(),calledLine.getId(),isCallCenter);
+        ivrActionService.doActionIfAccept(subaccountId,app,tenant,res_id,from,to.getTelNumber(),calledLine.getId(),isCallCenter);
         return res;
     }
 

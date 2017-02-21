@@ -13,6 +13,7 @@ import java.util.Set;
  * 维护call和conversation的关系
  * 一个call 可以在多个 conversation中
  * Created by liuws on 2016/11/21.
+ * 后进的在前
  */
 @Component
 public class CallConversationService {
@@ -33,19 +34,36 @@ public class CallConversationService {
 
     public long size(String callId){
         String key = key(callId);
-        return redisCacheService.ssize(key);
+        return redisCacheService.zsize(key);
     }
 
     public void incrConversation(String callId,String conversation){
         String key = key(callId);
-        redisCacheService.sadd(key,conversation);
+        redisCacheService.zadd(key,conversation,System.currentTimeMillis());
         redisCacheService.expire(key,ConversationService.EXPIRE);
     }
 
     public void decrConversation(String callId,String conversation){
         String key = key(callId);
-        redisCacheService.sremove(key,conversation);
+        redisCacheService.zrem(key,conversation);
         redisCacheService.expire(key,ConversationService.EXPIRE);
+    }
+
+    /**
+     * 按时间降序获取第一个交谈
+     * @param callId
+     * @return
+     */
+    public String head(String callId){
+        String key = key(callId);
+        if(this.size(callId) <= 0){
+            return null;
+        }
+        Set<String> results = redisCacheService.zReverseRange(key,0,0);
+        if(results == null || results.size() == 0){
+            return null;
+        }
+        return results.iterator().next();
     }
 
     /**
@@ -57,7 +75,7 @@ public class CallConversationService {
         String key = key(callId);
         Set<String> results = null;
         try{
-            results = redisCacheService.smembers(key);
+            results = redisCacheService.zRange(key,0,-1);
         }catch (Throwable t){
             logger.error("获取交谈成员失败",t);
         }
@@ -71,7 +89,7 @@ public class CallConversationService {
         String key = key(callId);
         Set<String> results = null;
         try{
-            results = redisCacheService.smembers(key);
+            results = redisCacheService.zRange(key,0,-1);
         }catch (Throwable t){
             logger.error("获取交谈失败",t);
         }
