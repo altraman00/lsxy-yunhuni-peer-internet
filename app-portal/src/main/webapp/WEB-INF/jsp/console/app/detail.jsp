@@ -1932,7 +1932,7 @@
             }
         },"get");
         //每页显示数量
-        var listRow = 5;
+        var listRow = 50;
         //显示多少个分页按钮
         var showPageCount = 5;
         //指定id，创建分页标签
