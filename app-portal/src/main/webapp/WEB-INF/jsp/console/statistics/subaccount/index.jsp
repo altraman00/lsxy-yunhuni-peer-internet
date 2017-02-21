@@ -48,8 +48,8 @@
                                     <form:form action="${ctx}/console/statistics/subaccount/index" method="post" id="mainForm">
                                         <div class="row margin-bottom-20">
                                             <div class="col-md-9">
-                                                <input type="radio" name="stime" value="month" class="selectdata" <c:if test="${stime == 'month'}">checked </c:if>>日统计
-                                                <input type="radio" name="stime" value="year" <c:if test="${stime == 'year'}">checked </c:if> class="selectdata ml-15">月统计
+                                                <input type="radio" name="stime" value="day" class="selectdata" <c:if test="${stime == 'month'}">checked </c:if>>日统计
+                                                <input type="radio" name="stime" value="mondth" <c:if test="${stime == 'day'}">checked </c:if> class="selectdata ml-15">月统计
                                             </div>
                                         </div>
                                         <div class="row statistics_row" >
@@ -58,10 +58,10 @@
                                                 日期
                                             </div>
                                             <div class="col-md-2">
-                                                <div class="monthform" <c:if test="${stime == 'year'}">hidden</c:if>>
+                                                <div class="monthform" <c:if test="${stime == 'month'}">hidden</c:if>>
                                                     <input type="text" name="dayTime" class="form-control currentDay"  value="${dayTime}"  />
                                                 </div>
-                                                <div class="yearform" <c:if test="${stime == 'month'}">hidden</c:if> <c:if test="${stime == 'year'}">style="display: block;"</c:if>>
+                                                <div class="yearform" <c:if test="${stime == 'day'}">hidden</c:if> <c:if test="${stime == 'month'}">style="display: block;"</c:if>>
                                                     <input type="text" name="monthTime" class="currentMonth form-control" value="${monthTime}"  />
                                                 </div>
                                             </div>
@@ -78,7 +78,7 @@
                                             <tr>
                                                 <c:set var="sum_cost" value="0.00"></c:set>
                                                 <c:if test="${sum!=null && sum.cost!=null}">
-                                                    <c:set value="${sum.cost}" var="sum_cost"></c:set>
+                                                    <c:set value="${sum.amongAmount}" var="sum_cost"></c:set>
                                                 </c:if>
                                                 <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum_cost}" pattern="0.000"></fmt:formatNumber> 元</span></th>
                                             </tr>
@@ -95,16 +95,14 @@
                                             <tbody>
                                             <c:forEach items="${pageObj.result}" var="result" varStatus="s">
                                                 <tr>
-                                                    <td><fmt:formatDate value="${result.callStartDt}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
-                                                    <td>${result.fromNum}</td>
-                                                    <td>${result.toNum}</td>
-                                                    <td>${result.costTimeLong}</td>
-                                                    <td><span style="float:left;width: 80px" ><span style="float:right;" >￥<fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber></span></span></td>
-                                                    <%--<td>--%>
-                                                        <%--<c:if test="${result.costTimeLong != 0 && result.recording != 0}">--%>
-                                                            <%--<a id="downVoid${result.id}" onclick="downVoid('${result.id}')" data-statu="1">录音下载</a>--%>
-                                                        <%--</c:if>--%>
-                                                    <%--</td>--%>
+                                                    <%--<td><fmt:formatDate value="${result.callStartDt}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>--%>
+                                                        <td>${result.certId}</td>
+                                                    <td>${result.secretKey}</td>
+                                                    <td><a href="${result.appId}">${result.appName}</td>
+                                                        <td>${result.amongDuration}</td>
+                                                        <td><span style="float:left;width: 80px" ><span style="float:right;" >￥<fmt:formatNumber value="${result.amongAmount}" pattern="0.000"></fmt:formatNumber></span></span></td>
+                                                        <td>${result.voiceNum}</td>
+                                                        <td>${result.seatNum}</td>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>
@@ -131,7 +129,7 @@
 <script type="text/javascript" >
     $('input[name="stime"]').click(function(){
         var v = $(this).val();
-        if(v=='year'){
+        if(v=='month'){
             $('.yearform').show();
             $('.monthform').hide();
         }else{
@@ -144,31 +142,9 @@
         $('#mainForm').submit();
     }
     function download(){
-        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/callback/download");
+        $('#mainForm').attr('action',ctx+"/console/statistics/subaccount/download");
         $('#mainForm').submit();
-        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/callback");
-    }
-    function downVoid(id) {
-        var tag  = $('#downVoid'+id);
-        var ststus = tag.attr('data-statu');
-        if(ststus==1){
-            //查询录音是否下载到oss,是下载到本地，否下载到oss显示 正在下载 ,下载oss失败，显示重试
-            var params = {'${_csrf.parameterName}':'${_csrf.token}'};
-            tag.html('正在下载<span class="download"></span>').attr("data-statu","2");
-            ajaxsubmit("${ctx}/console/app/file/record/cdr/download/"+id,params,function(result) {
-                if(result.success){
-                    window.open(result.data);
-                    tag.html('录音下载').attr("data-statu","1");
-                }else{
-                    showtoast(result.errorMsg);
-                    tag.html('下载失败,请重试').attr("data-statu","1");
-                }
-            });
-        }else if(ststus==2){
-            tag.html('下载失败,请重试').attr("data-statu","1");
-        }else{
-            tag.html('录音下载').attr("data-statu","1");
-        }
+        $('#mainForm').attr('action',ctx+"/console/statistics/subaccount/index");
     }
 </script>
 </body>

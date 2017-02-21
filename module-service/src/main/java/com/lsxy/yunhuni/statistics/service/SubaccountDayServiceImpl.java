@@ -2,8 +2,8 @@ package com.lsxy.yunhuni.statistics.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.statistics.model.SubaccountDay;
 import com.lsxy.yunhuni.api.statistics.model.SubaccountStatisticalVO;
 import com.lsxy.yunhuni.api.statistics.service.SubaccountDayService;
@@ -16,15 +16,11 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.persistence.Query;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by liups on 2017/2/21.
@@ -43,17 +39,24 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
     }
 
     @Override
-    public Page<SubaccountStatisticalVO> getPageByConditions(Integer pageNo, Integer pageSize, Date startTime, Date endTime, String tenantId, String subaccountId) {
-        String sql = " FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day  WHERE deleted=0 ";
-        if(StringUtils.isNotEmpty(subaccountId)){
-            sql += " AND subaccount_id = :subaccountId ";
+    public Page<SubaccountStatisticalVO> getPageByConditions(Integer pageNo, Integer pageSize, Date startTime, Date endTime, String tenantId, String appId, String subaccountId) {
+        String sql = " FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day obj LEFT ON db_lsxy_bi_yunhuni.tb_bi_app a ON obj.appId=a.id WHERE deleted=0 ";
+        if(StringUtils.isNotEmpty(appId)){
+            sql += " AND app_id = :appId";
         }
-        sql += " AND tenant_id =:tenantId AND dt BETWEEN :startTime AND :endTime ";
+        if(StringUtils.isNotEmpty(subaccountId)){
+            sql += " AND obj.subaccount_id = :subaccountId ";
+        }
+        sql += " AND obj.tenant_id =:tenantId AND obj.dt BETWEEN :startTime AND :endTime ";
         String countSql = " SELECT COUNT(1) "+sql;
         String pageSql = " SELECT * "+sql;
         Query countQuery = em.createNativeQuery(countSql);
         pageSql +=" group by obj.dt desc";
         Query pageQuery = em.createNativeQuery(pageSql,SubaccountStatisticalVO.class);
+        if(StringUtils.isNotEmpty(appId)){
+            countQuery.setParameter("appId",appId);
+            pageQuery.setParameter("appId",appId);
+        }
         if(StringUtils.isNotEmpty(subaccountId)){
             countQuery.setParameter("subaccountId",subaccountId);
             pageQuery.setParameter("subaccountId",subaccountId);
@@ -76,10 +79,13 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
     }
 
     @Override
-    public Map sum(Date start, Date end, String tenantId, String subaccountId) {
+    public Map sum(Date start, Date end, String tenantId, String appId, String subaccountId) {
         //amongAmount
         //amongDuration
         String sql = " select sum(among_amount) as amongAmount,sum(among_duration) as amongDuration from db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day where deleted=0 ";
+        if(StringUtils.isNotEmpty(appId)){
+            sql += " AND app_id = '"+appId+"'";
+        }
         if(StringUtils.isNotEmpty(subaccountId)){
             sql += " AND subaccount_id = '"+subaccountId+"'";
         }
