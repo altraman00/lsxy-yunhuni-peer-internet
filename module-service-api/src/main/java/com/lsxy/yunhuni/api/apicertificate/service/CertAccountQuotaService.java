@@ -28,15 +28,36 @@ public interface CertAccountQuotaService extends BaseService<CertAccountQuota> {
     void incQuotaUsed(String certAccountId, Date date, Long incV, String type);
 
     /**
-     * 获取配额剩余
+     * 获取实时配额
      * @param certAccountId 鉴权账号Id
      * @param type 类型（配额类型）
      */
-    CertAccountQuota getQuotaRemain(String certAccountId , String type);
+    CertAccountQuota getCurrentQuota(String certAccountId , String type);
 
+    /**
+     * 获取实时配额
+     * @param quota
+     * @return
+     */
+    CertAccountQuota getCurrentQuota(CertAccountQuota quota);
+
+    /**
+     * 获取配额使用量
+     * @param quota
+     * @return
+     */
     Long getQuotaUsed(CertAccountQuota quota);
 
+    /**
+     * 配额使用量每天统计
+     * @return
+     */
     void dayStatics(Date date);
 
+    /**
+     * 配额是否充足
+     * @param certAccountId
+     * @return
+     */
     boolean isCallQuotaEnough(String certAccountId);
 }

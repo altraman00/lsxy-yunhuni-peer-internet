@@ -81,8 +81,16 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
     }
 
     @Override
-    public CertAccountQuota getQuotaRemain(String certAccountId,String type) {
+    public CertAccountQuota getCurrentQuota(String certAccountId, String type) {
         CertAccountQuota quota = certAccountQuotaDao.findByCertAccountIdAndType(certAccountId,type);
+        Long dateUsed = this.getQuotaUsed(quota);
+        Long balanceUsed = quota.getUsed() == null ? 0L : quota.getUsed();
+        quota.setCurrentUsed(balanceUsed + dateUsed);
+        return quota;
+    }
+
+    @Override
+    public CertAccountQuota getCurrentQuota(CertAccountQuota quota) {
         Long dateUsed = this.getQuotaUsed(quota);
         Long balanceUsed = quota.getUsed() == null ? 0L : quota.getUsed();
         quota.setCurrentUsed(balanceUsed + dateUsed);
@@ -189,7 +197,7 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
     public boolean isCallQuotaEnough(String certAccountId){
         ApiCertificate cert = apiCertificateService.findById(certAccountId);
         if(cert instanceof  ApiCertificateSubAccount){
-            CertAccountQuota quota = this.getQuotaRemain(certAccountId,CertAccountQuotaType.CallQuota.name());
+            CertAccountQuota quota = this.getCurrentQuota(certAccountId,CertAccountQuotaType.CallQuota.name());
             return quota.getHasRemain();
         }else{
             return true;
