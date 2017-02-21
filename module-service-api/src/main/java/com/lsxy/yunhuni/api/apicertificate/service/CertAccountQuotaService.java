@@ -37,4 +37,6 @@ public interface CertAccountQuotaService extends BaseService<CertAccountQuota> {
     Long getQuotaUsed(CertAccountQuota quota);
 
     void dayStatics(Date date);
+
+    boolean isCallQuotaEnough(String certAccountId);
 }

@@ -163,6 +163,7 @@ public class CallServiceImpl implements CallService {
         }
 
         boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(apiCmd, app.getTenant().getId());
+
         if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }

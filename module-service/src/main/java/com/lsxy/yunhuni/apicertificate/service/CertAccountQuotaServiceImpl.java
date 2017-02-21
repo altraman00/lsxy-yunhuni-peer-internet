@@ -1,14 +1,14 @@
 package com.lsxy.yunhuni.apicertificate.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.framework.api.billing.model.Billing;
-import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
 import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuota;
 import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuotaType;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.apicertificate.service.CertAccountQuotaService;
 import com.lsxy.yunhuni.api.session.service.VoiceCdrService;
@@ -40,6 +40,8 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
     ApiCertificateSubAccountService apiCertificateSubAccountService;
     @Autowired
     VoiceCdrService voiceCdrService;
+    @Autowired
+    ApiCertificateService apiCertificateService;
     @Override
     public BaseDaoInterface<CertAccountQuota, Serializable> getDao() {
         return certAccountQuotaDao;
@@ -180,6 +182,17 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
                     this.save(quota);
                 }
             }
+        }
+    }
+
+    @Override
+    public boolean isCallQuotaEnough(String certAccountId){
+        ApiCertificate cert = apiCertificateService.findById(certAccountId);
+        if(cert instanceof  ApiCertificateSubAccount){
+            CertAccountQuota quota = this.getQuotaRemain(certAccountId,CertAccountQuotaType.CallQuota.name());
+            return quota.getHasRemain();
+        }else{
+            return true;
         }
     }
 
