@@ -21,6 +21,7 @@ public class ApiCertificateSubAccount extends ApiCertificate{
     private String callbackUrl;
     private Integer enabled;     //状态：1，可用0，不可用
     private String remark;
+    private Long extensionPrefix;
 
     @Column(name = "app_id")
     public String getAppId() {
@@ -67,5 +68,14 @@ public class ApiCertificateSubAccount extends ApiCertificate{
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    @Column(name = "extension_prefix")
+    public Long getExtensionPrefix() {
+        return extensionPrefix;
+    }
+
+    public void setExtensionPrefix(Long extensionPrefix) {
+        this.extensionPrefix = extensionPrefix;
     }
 }
