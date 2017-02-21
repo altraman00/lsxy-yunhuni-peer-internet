@@ -5,7 +5,7 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.StringUtil;
-import com.lsxy.yunhuni.api.apicertificate.service.CertAccountQuotaService;
+import com.lsxy.yunhuni.api.statistics.service.SubaccountDayService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,19 +15,19 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 /**
- * Created by liups on 2017/2/20.
+ * Created by liups on 2017/2/21.
  */
 @Component
-public class QuotaDayStatisticsTask {
-    private static final Logger logger = LoggerFactory.getLogger(QuotaDayStatisticsTask.class);
-
+public class SubaccountStatistics {
+    private static final Logger logger = LoggerFactory.getLogger(SubaccountStatistics.class);
     @Autowired
     RedisCacheService redisCacheService;
-    @Autowired
-    CertAccountQuotaService certAccountQuotaService;
 
-    @Scheduled(cron="0 0 4 * * ?")
-    public void dayStatics(){
+    @Autowired
+    SubaccountDayService subaccountDayService;
+
+    @Scheduled(cron="0 0 5 * * ?")
+    public void dayStatistics(){
         Date date=new Date();
         String day = DateUtils.formatDate(date, "yyyy-MM-dd");
         String cacheKey = "scheduled_" + Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName() + " " + day;
@@ -53,7 +53,7 @@ public class QuotaDayStatisticsTask {
                     }
                     //执行语句
                     Date preDate = DateUtils.getPreDate(date);
-                    certAccountQuotaService.dayStatics(preDate);
+                    subaccountDayService.dayStatistics(preDate);
                 }else{
                     if(logger.isDebugEnabled()){
                         logger.debug("["+cacheKey+"]标记位不一致"+currentCacheValue+"  vs "+ SystemConfig.id);
