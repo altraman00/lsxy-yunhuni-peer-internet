@@ -11,14 +11,17 @@ import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuotaType;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import scala.actors.threadpool.Arrays;
 
@@ -133,25 +136,35 @@ public class ApiCertificateSubAccountController extends AbstractRestController {
     @RequestMapping(value = "/unbind/all/{appId}/{subId}")
     public RestResponse unbindAll(HttpServletRequest request,@PathVariable String appId,@PathVariable String subId){
         Account account = getCurrentAccount();
-        resourceTelenumService.subaccountUnbindAll(account.getId(),appId,subId);
+        resourceTelenumService.subaccountUnbindAll(account.getTenant().getId(),appId,subId);
         return RestResponse.success("删除成功");
     }
     @RequestMapping(value = "/unbind/one/{appId}/{subId}/{numId}")
     public RestResponse unbindOne(HttpServletRequest request,@PathVariable String appId,@PathVariable String subId, @PathVariable String numId){
         Account account = getCurrentAccount();
-        resourceTelenumService.subaccountUnbindNum(account.getId(),appId,subId,numId);
+        resourceTelenumService.subaccountUnbindNum(account.getTenant().getId(),appId,subId,numId);
         return RestResponse.success("删除成功");
     }
+
     @RequestMapping(value = "/bind/num/{appId}/{subId}")
-    public RestResponse bind(HttpServletRequest request,@PathVariable String appId,@PathVariable String subId, String[] nums){
+    public RestResponse bind(HttpServletRequest request,@PathVariable String appId,@PathVariable String subId, String nums){
         Account account = getCurrentAccount();
         App app = appService.findById(appId);
+        List numList = null;
+        if(StringUtils.isNotBlank(nums)){
+            numList = Arrays.asList(nums.split(","));
+        }
         ApiCertificateSubAccount apiCertificateSubAccount = apiCertificateSubAccountService.findById(subId);
-        if(app != null && apiCertificateSubAccount != null && account.getId().equals( app.getTenant().getId() ) ){
-            resourcesRentService.bindNumToSubaccount(app, Arrays.asList(nums),subId);
+        if(numList != null && numList.size() > 0&& app != null && apiCertificateSubAccount != null && account.getTenant().getId().equals( app.getTenant().getId() ) ){
+            resourcesRentService.bindNumToSubaccount(app, numList,subId);
             return RestResponse.success("绑定测试");
         }else{
-            return RestResponse.failed("","绑定失败：应用标识或子账户标识错误");
+            return RestResponse.failed("","应用标识或子账户标识错误或号码为空");
         }
+    }
+    @RequestMapping(value = "/num/list")
+    public RestResponse numList(@RequestParam String appId, @RequestParam String subId, @RequestParam(defaultValue = "0") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize){
+        Page page = resourcesRentService.findBySubaccount(appId,subId,pageNo,pageSize);
+        return RestResponse.success(page);
     }
 }
