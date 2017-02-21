@@ -36,7 +36,7 @@ public interface CalCostService {
      * @param tenantId
      * @return
      */
-    boolean isCallTimeRemainOrBalanceEnough(String apiCmd, String tenantId);
+    boolean isCallTimeRemainOrBalanceEnough(String subaccountId,String apiCmd, String tenantId);
 
     void recordConsumeCal(VoiceFileRecord record);
 }

@@ -134,7 +134,7 @@ public class IVRServiceImpl implements IVRService {
             }
         }
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.ivr_call.getApiCmd(), app.getTenant().getId());
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.ivr_call.getApiCmd(), app.getTenant().getId());
         if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }

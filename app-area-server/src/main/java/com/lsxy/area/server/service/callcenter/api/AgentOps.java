@@ -195,7 +195,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             throw new AppServiceInvalidException();
         }
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
         if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }
@@ -304,7 +304,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             throw new AppServiceInvalidException();
         }
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
         if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }
@@ -462,7 +462,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             throw new SystemBusyException();
         }
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
         if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }

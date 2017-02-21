@@ -162,7 +162,8 @@ public class CallServiceImpl implements CallService {
             throw new AppServiceInvalidException();
         }
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(apiCmd, app.getTenant().getId());
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,apiCmd, app.getTenant().getId());
+
         if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }
@@ -310,7 +311,7 @@ public class CallServiceImpl implements CallService {
             throw new AppServiceInvalidException();
         }
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(apiCmd, app.getTenant().getId());
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,apiCmd, app.getTenant().getId());
         if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }
@@ -395,7 +396,7 @@ public class CallServiceImpl implements CallService {
             throw new AppServiceInvalidException();
         }
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.captcha_call.getApiCmd(), app.getTenant().getId());
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.captcha_call.getApiCmd(), app.getTenant().getId());
         if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }

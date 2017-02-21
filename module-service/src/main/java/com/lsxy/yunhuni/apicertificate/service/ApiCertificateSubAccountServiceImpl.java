@@ -146,6 +146,11 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
         String hql = "from ApiCertificateSubAccount obj where obj.appId = ?1";
         Page<ApiCertificateSubAccount> page = this.pageList(hql, pageNo, pageSize, appId);
         List<CertAccountQuota> quotas = certAccountQuotaService.findByAppId(appId);
+        for(CertAccountQuota quota : quotas){
+            //获取配额实时的数据
+            certAccountQuotaService.getCurrentQuota(quota);
+        }
+
         Map<String,List<CertAccountQuota>> map = new HashMap();
         for(CertAccountQuota quota : quotas){
             String certAccountId = quota.getCertAccountId();
