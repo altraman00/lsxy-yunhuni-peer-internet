@@ -35,7 +35,7 @@ public interface AppExtensionService extends BaseService<AppExtension> {
      * @param appId
      * @throws YunhuniApiException
      */
-    void delete(String extensionId,String appId) throws YunhuniApiException;
+    void delete(String extensionId,String appId,String subaccountId) throws YunhuniApiException;
 
     /**
      * 获取应用下的所有分机
@@ -46,13 +46,15 @@ public interface AppExtensionService extends BaseService<AppExtension> {
      */
     Page<AppExtension> getPage(String appId, Integer pageNo, Integer pageSize);
 
+    Page<AppExtension> getPage(String appId,String subaccountId, Integer pageNo, Integer pageSize);
+
     /**
      * 获取一个分机
      * @param appId
      * @param extensionId
      * @return
      */
-    AppExtension findOne(String appId, String extensionId) throws YunhuniApiException;
+    AppExtension findOne(String appId, String extensionId,String subaccountId) throws YunhuniApiException;
 
     /**
      * 分机登录
