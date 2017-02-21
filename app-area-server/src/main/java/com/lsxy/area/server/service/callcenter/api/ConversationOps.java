@@ -185,7 +185,7 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
             throw new AppServiceInvalidException();
         }
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
         if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }
@@ -279,7 +279,7 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
             throw new AppServiceInvalidException();
         }
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
         if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }
