@@ -418,15 +418,15 @@
                                             1.子账号是壹耘平台提供给会员管理其客户的账号，会员可以使用子账号的各个功能，轻松地管理每一个独立的客户<br/>
                                             2.子账号与指定的应用关联，请勿跨应用使用
                                         </p>
-                                        <div class="row margin-bottom-20">
-                                            <div class="col-md-12">
-                                                <div class="col-md-10 font14">
-                                                    <div class="col-md-4 remove-padding"><input id="five_certId" type="text" class="form-control" placeholder="鉴权账号" /></div>
-                                                    <div class="col-md-1"><button class="btn btn-primary" type="button" onclick="subAccountList()">查询</button></div>
-                                                    <div class="col-md-1"><a href="#"  class="btn btn-primary defind modalShow" data-id="five" >创建子账户</a></div>
-                                                </div>
+                                        <div class="form-group">
+                                            <div class="col-md-4 remove-padding"><input id="five_certId" type="text" class="form-control" placeholder="鉴权账号" /></div>
+                                            <div class="col-md-8">
+                                                <button class="btn btn-primary" type="button" onclick="subAccountList()">查询</button>
+                                                <button href="#"  class="btn btn-primary defind modalShow" data-id="five" >创建子账户</button>
                                             </div>
                                         </div>
+
+
                                         <table class="table table-striped cost-table-history tablelist" id="subAccount-table">
                                             <thead>
                                             <tr>
@@ -450,7 +450,7 @@
                                         </section>
                                         </div>
                                         <div  id="subAccount_datail" hidden>
-                                            <div class="panel-body devbox">
+                                            <div class="panel-body devbox remove-padding-left">
                                                 <div class="row ">
                                                     <div class="col-md-1 dev">
                                                         鉴权账号：
@@ -477,7 +477,7 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <p>
-                                                            <input type="text" v-model="url" value="{{url}}" placeholder=""/>
+                                                            <input type="text" class="form-control" v-model="url" value="{{url}}" placeholder=""/>
                                                         </p>
                                                     </div>
                                                 </div>
@@ -495,7 +495,7 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <p>
-                                                            <input type="number" v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
+                                                            <input type="number"  class="form-control"  v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
                                                         </p>
                                                     </div>
                                                 </div>
@@ -505,7 +505,7 @@
                                                         坐席（个）：
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <input type="number" v-model="seatNum" value="{{seatNum}}" placeholder=""/>
+                                                        <input type="number"  class="form-control"  v-model="seatNum" value="{{seatNum}}" placeholder=""/>
                                                     </div>
                                                 </div>
 </c:if>
@@ -514,16 +514,14 @@
                                                         备注：
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <input type="text" v-model="remark" value="{{remark}}" placeholder=""/>
+                                                        <input type="text"  class="form-control"  v-model="remark" value="{{remark}}" placeholder=""/>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="row margin-bottom-20">
-                                                <div class="col-md-12">
-                                                    <div class="col-md-10 font14">
-                                                        <div class="col-md-1"><button class="btn btn-primary" type="button" onclick="tosubAccountHome1()">返回</button></div>
-                                                        <div class="col-md-1"><button class="btn btn-primary" type="button" onclick="editSubAccount()">保存</button></div>
-                                                    </div>
+                                                <div class="col-md-6">
+                                                    <button class="btn btn-primary" type="button" onclick="tosubAccountHome1()">返回</button>
+                                                    <button class="btn btn-primary" type="button" onclick="editSubAccount()">保存</button>
                                                 </div>
                                             </div>
                                             <p class="noticeInfo hr text-success"></p>
@@ -699,45 +697,44 @@
         <div class="modal-box application-detail-box" id="modalfive" style="display:none ">
             <div class="title">创建子账号<a class="close_a modalCancel cancelfive" data-id="five"></a></div>
             <div class="content" id="createSubAccountFive" >
-                <p class="application_info">
+                <p class="info info font14">
                     1.创建子账号后，系统将会自动生成一个子账号和子账号密钥<br/>
                     2.配额是会员提供给其客户使用服务的额度
                 </p>
                 <div class="row text-center">
                     <lable class="col-md-3 text-right">回调地址：</lable>
                     <div class="col-md-8">
-                        <input type="text" v-model="url"  value="{{url}}" placeholder=""/>
+                        <input type="text" class="form-control" v-model="url"  value="{{url}}" placeholder=""/>
                     </div>
                 </div>
-                <div class="row text-center">
-                    <lable class="col-md-3 text-right"></lable>
+                <div class="row">
+                    <span class="col-lg-offset-3 col-md-9">
+                        （子账号的回调地址优先级高于应用的回调地址）
+                    </span>
+                </div>
+                <div class="row" style="height: 25px;">
+                    <lable class="col-md-3 text-right">配置额度：</lable>
                     <div class="col-md-8">
-                        子账号的回调地址优先级高于应用的回调地址
                     </div>
                 </div>
-                <div class="row text-center">
-                    <lable class="col-md-3 text-right">配置额度</lable>
-                    <div class="col-md-8" style="height: 25px;">
-                    </div>
-                </div>
-                <div class="row text-center">
+                <div class="row margin-bottom-5">
                     <lable class="col-md-3 text-right">语音（分钟）：</lable>
                     <div class="col-md-8">
-                        <input type="number" v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
+                        <input type="number" class="form-control" v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
                     </div>
                 </div>
                 <c:if test="${app.serviceType == 'call_center'}">
-                <div class="row text-center">
+                <div class="row margin-bottom-5">
                     <lable class="col-md-3 text-right">坐席（个）：</lable>
                     <div class="col-md-8">
-                        <input type="number" v-model="seatNum"  value="{{seatNum}}" placeholder="" />
+                        <input type="number" class="form-control" v-model="seatNum"  value="{{seatNum}}" placeholder="" />
                     </div>
                 </div>
                 </c:if>
-                <div class="row text-center">
+                <div class="row">
                     <lable class="col-md-3 text-right">备注：</lable>
                     <div class="col-md-8">
-                        <input type="text" v-model="remark" value="{{remark}}" placeholder=""/>
+                        <input type="text" class="form-control" v-model="remark" value="{{remark}}" placeholder=""/>
                     </div>
                 </div>
             </div>
@@ -813,8 +810,8 @@
         <script>
             var appServiceType = '${app.serviceType}';
             $(function () {
-                $('.modal-box .content input[type="text"]').css("height","25px").css("width","100%");
-                $('.modal-box .content input[type="number"]').css("height","25px").css("width","100%");
+                $('.modal-box .content input[type="text"]').css("height","30px");
+                $('.modal-box .content input[type="number"]').css("height","30px");
                 $('.modal-box, .appliation-modal-box').css("height","384px");
             })
         </script>
