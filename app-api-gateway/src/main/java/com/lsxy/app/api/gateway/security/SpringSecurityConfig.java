@@ -27,6 +27,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private RestAuthenticationProvider restAuthenticationProvider;
+
+    public static final String PRIMARY_ACCOUNT = "PRIMARY_ACCOUNT";
 //
 
     @Override
@@ -44,17 +46,15 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
         RequestMatcher apiRM = new AntPathRequestMatcher("/v*/**");
 
-        http.authorizeRequests().requestMatchers(apiRM).authenticated()
-//                .antMatchers("/v*/**").anonymous()
-                .antMatchers("/v*/account/*/management/**").hasRole("PRIMARY_ACCOUNT")
-                .and().httpBasic()
-                .and().csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-        ;
+        http
 
-
-        http.addFilterBefore(new SignatureAuthFilter(authenticationManager(),apiRM), UsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(new BlackIpListFilter(),SignatureAuthFilter.class);
+            .addFilterBefore(new ManagementFilter(new AntPathRequestMatcher("/v*/account/*/management/**")),UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new SignatureAuthFilter(authenticationManager(),apiRM), ManagementFilter.class)
+            .addFilterBefore(new BlackIpListFilter(),SignatureAuthFilter.class)
+            .authorizeRequests().requestMatchers(apiRM).authenticated()
+            .and().httpBasic()
+            .and().csrf().disable()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
     }
 
     /**
