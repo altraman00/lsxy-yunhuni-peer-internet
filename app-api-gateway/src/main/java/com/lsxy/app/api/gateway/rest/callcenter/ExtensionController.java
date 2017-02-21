@@ -41,7 +41,7 @@ public class ExtensionController extends AbstractAPIController {
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
-        AppExtension rExtension = appExtensionService.create(appId,extension);
+        AppExtension rExtension = appExtensionService.create(appId,getSubaccountId(request),extension);
         ExtensionVO vo = ExtensionVO.changeAppExtensionToExtensionVO(rExtension);
 
         return ApiGatewayResponse.success(vo);

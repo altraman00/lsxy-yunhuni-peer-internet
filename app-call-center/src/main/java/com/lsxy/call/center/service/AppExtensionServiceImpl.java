@@ -12,6 +12,8 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import org.apache.commons.lang.StringUtils;
@@ -48,6 +50,8 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     AppService appService;
     @Autowired
     private OpensipsExtensionService opensipsExtensionService;
+    @Autowired
+    ApiCertificateSubAccountService apiCertificateSubAccountService;
 
     @Override
     public BaseDaoInterface<AppExtension, Serializable> getDao() {
@@ -63,12 +67,12 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
 
     //创建
     @Override
-    public AppExtension create(String appId,AppExtension appExtension) throws YunhuniApiException {
+    public AppExtension create(String appId,String subaccountId,AppExtension appExtension) throws YunhuniApiException {
         App app = appService.findById(appId);
 
         appExtension.setAppId(appId);
         appExtension.setTenantId(app.getTenant().getId());
-
+        appExtension.setSubaccountId(subaccountId);
         if(appExtension == null || StringUtil.isBlank(appExtension.getTenantId()) || StringUtil.isBlank(appExtension.getAppId())){
             throw new RequestIllegalArgumentException();
         }
@@ -87,9 +91,13 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
                 if(!uB || !pB){
                     throw new RequestIllegalArgumentException();
                 }
-
-                Long ccn = app.getCallCenterNum();
-                //创建分机的用户名要加上应用编号，以区分唯一性
+                Long ccn;
+                if(StringUtils.isBlank(subaccountId)){
+                    ccn = app.getCallCenterNum();
+                }else{
+                    ccn = apiCertificateSubAccountService.findById(subaccountId).getExtensionPrefix();
+                }
+                //创建分机的用户名要加上分机前缀，以区分唯一性
                 appExtension.setUser(ccn + appExtension.getUser());
                 //用户名是否已存在
                 if(this.exists(appExtension.getUser())){
