@@ -6,6 +6,7 @@ import org.hibernate.annotations.Where;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -25,6 +26,11 @@ public class SubaccountMonth extends IdEntity {
     private Long amongDuration;
     private Long voiceUsed;
     private Long msgUsed;
+
+    @Transient
+    private Long voiceQuotaValue;
+    @Transient
+    private Long msgQuotaValue;
 
 
     @Column(name = "app_id")
@@ -108,4 +114,21 @@ public class SubaccountMonth extends IdEntity {
         this.msgUsed = msgUsed;
     }
 
+    @Transient
+    public Long getVoiceQuotaValue() {
+        return voiceQuotaValue;
+    }
+
+    public void setVoiceQuotaValue(Long voiceQuotaValue) {
+        this.voiceQuotaValue = voiceQuotaValue;
+    }
+
+    @Transient
+    public Long getMsgQuotaValue() {
+        return msgQuotaValue;
+    }
+
+    public void setMsgQuotaValue(Long msgQuotaValue) {
+        this.msgQuotaValue = msgQuotaValue;
+    }
 }
