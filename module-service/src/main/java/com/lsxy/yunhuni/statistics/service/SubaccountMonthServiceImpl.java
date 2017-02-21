@@ -21,4 +21,8 @@ public class SubaccountMonthServiceImpl extends AbstractService<SubaccountMonth>
     public BaseDaoInterface<SubaccountMonth, Serializable> getDao() {
         return this.subaccountMonthDao;
     }
+
+
+
+
 }
