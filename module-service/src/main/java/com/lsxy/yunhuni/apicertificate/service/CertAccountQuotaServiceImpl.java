@@ -61,6 +61,11 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
     }
 
     @Override
+    public List<CertAccountQuota> findByCertAccountIds(Collection<String> ids) {
+        return certAccountQuotaDao.findByCertAccountIdIn(ids);
+    }
+
+    @Override
     public List<CertAccountQuota> findByAppId(String appId) {
         return certAccountQuotaDao.findByAppId(appId);
     }

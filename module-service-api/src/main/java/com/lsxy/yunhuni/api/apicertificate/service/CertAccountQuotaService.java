@@ -18,7 +18,7 @@ public interface CertAccountQuotaService extends BaseService<CertAccountQuota> {
     List<CertAccountQuota> findByCertAccountId(String id);
 
     List<CertAccountQuota> findByCertAccountIds(Collection<String> ids);
-
+    List<CertAccountQuota> findByAppId(String appId);
     /**
      * redis中的增量增加
      * @param certAccountId 鉴权账号Id
