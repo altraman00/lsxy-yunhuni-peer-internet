@@ -1,5 +1,6 @@
 package com.lsxy.app.api.gateway.security.auth;
 
+import com.lsxy.app.api.gateway.security.SpringSecurityConfig;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
@@ -94,7 +95,7 @@ public class RestAuthenticationProvider implements AuthenticationProvider {
 
         if(apiCertificate.getType()!=null && apiCertificate.getType().intValue() == ApiCertificate.TYPE_PRIMARY_ACCOUNT){
             //是主账号
-            restToken = new RestToken(apiKey, credentials, restToken.getTimestamp(),tenantId,null, roles("PRIMARY_ACCOUNT"));
+            restToken = new RestToken(apiKey, credentials, restToken.getTimestamp(),tenantId,null, roles(SpringSecurityConfig.PRIMARY_ACCOUNT));
         }else{
             restToken = new RestToken(apiKey, credentials, restToken.getTimestamp(),tenantId,apiCertificate.getId(), null);
         }

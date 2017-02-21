@@ -251,7 +251,7 @@ public class EnQueueServiceImpl implements EnQueueService{
             }
         }catch (Throwable e){
             logger.error(String.format("[%s][%s]callid=%s排队找坐席出错",tenantId,appId,callId),e);
-            deQueueService.fail(tenantId,appId,callId,e.getMessage(),queueId,queueType,conversationId);
+            deQueueService.fail(tenantId,appId,callId,queueId,queueType,e.getMessage(),conversationId);
         }
     }
 
@@ -301,7 +301,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                     logger.info("设置坐席状态失败agent={}",agent,t2);
                 }
                 if(queue != null){
-                    deQueueService.fail(tenantId,appId,queue.getOriginCallId(),t1.getMessage(),queueId,queue.getType(),queue.getConversation());
+                    deQueueService.fail(tenantId,appId,queue.getOriginCallId(),queueId,queue.getType(),t1.getMessage(),queue.getConversation());
                 }
             }
         }
