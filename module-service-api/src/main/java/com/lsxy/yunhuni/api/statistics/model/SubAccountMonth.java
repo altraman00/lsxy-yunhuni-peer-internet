@@ -26,10 +26,7 @@ public class SubaccountMonth extends IdEntity {
     private Long amongDuration;
     private Long voiceUsed;
     private Long msgUsed;
-
-    @Transient
     private Long voiceQuotaValue;
-    @Transient
     private Long msgQuotaValue;
 
 
@@ -114,7 +111,7 @@ public class SubaccountMonth extends IdEntity {
         this.msgUsed = msgUsed;
     }
 
-    @Transient
+    @Column(name = "voice_quota_value")
     public Long getVoiceQuotaValue() {
         return voiceQuotaValue;
     }
@@ -123,7 +120,7 @@ public class SubaccountMonth extends IdEntity {
         this.voiceQuotaValue = voiceQuotaValue;
     }
 
-    @Transient
+    @Column(name = "msg_quota_value")
     public Long getMsgQuotaValue() {
         return msgQuotaValue;
     }
