@@ -72,7 +72,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
 
         appExtension.setAppId(appId);
         appExtension.setTenantId(app.getTenant().getId());
-
+        appExtension.setSubaccountId(subaccountId);
         if(appExtension == null || StringUtil.isBlank(appExtension.getTenantId()) || StringUtil.isBlank(appExtension.getAppId())){
             throw new RequestIllegalArgumentException();
         }
