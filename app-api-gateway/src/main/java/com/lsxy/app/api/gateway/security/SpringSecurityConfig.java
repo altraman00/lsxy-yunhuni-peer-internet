@@ -47,7 +47,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         RequestMatcher apiRM = new AntPathRequestMatcher("/v*/**");
 
         http
-
+            //管理类API只能主账号调用
             .addFilterBefore(new ManagementFilter(new AntPathRequestMatcher("/v*/account/*/management/**")),UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(new SignatureAuthFilter(authenticationManager(),apiRM), ManagementFilter.class)
             .addFilterBefore(new BlackIpListFilter(),SignatureAuthFilter.class)
