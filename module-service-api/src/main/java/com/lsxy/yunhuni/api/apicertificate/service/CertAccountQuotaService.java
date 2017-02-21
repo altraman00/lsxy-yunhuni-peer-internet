@@ -3,6 +3,7 @@ package com.lsxy.yunhuni.api.apicertificate.service;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuota;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public interface CertAccountQuotaService extends BaseService<CertAccountQuota> {
 
     List<CertAccountQuota> findByCertAccountId(String id);
 
-    List<CertAccountQuota> findByAppId(String appId);
+    List<CertAccountQuota> findByCertAccountIds(Collection<String> ids);
 
     /**
      * redis中的增量增加

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -19,4 +20,6 @@ public interface CertAccountQuotaDao extends BaseDaoInterface<CertAccountQuota, 
     List<CertAccountQuota> findByCertAccountId(String id);
 
     CertAccountQuota findByCertAccountIdAndType(String certAccountId, String type);
+
+    List<CertAccountQuota> findByCertAccountIdIn(Collection<String> ids);
 }
