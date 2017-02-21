@@ -547,7 +547,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     @Override
     public Page<ResourceTelenum> findOwnUnusedNumOrUnbindSubaccount(String tenantId, String appId, String areaId, int pageNo, int pageSize) {
         String hql = "from ResourceTelenum obj where obj.tenantId = ?1 and obj.areaId = ?2 and (obj.appId is null or (obj.appId=?3 and obj.subaccountId is null))";
-        return  this.pageList(hql,pageNo,pageSize,tenantId,areaId);
+        return  this.pageList(hql,pageNo,pageSize,tenantId,areaId,appId);
     }
 
     @Override

@@ -125,7 +125,7 @@ public class ApiCertificateSubAccountController extends AbstractRestController {
             apiCertificateSubAccount.setRemark(remark);
             List<CertAccountQuota> quotas = new ArrayList<>();
             quotas.add( new CertAccountQuota(CertAccountQuotaType.CallQuota.name(),voiceNum) );
-            quotas.add( new CertAccountQuota(CertAccountQuotaType.CallQuota.name(),seatNum) );
+            quotas.add( new CertAccountQuota(CertAccountQuotaType.AgentQuota.name(),seatNum) );
             apiCertificateSubAccount.setQuotas(quotas);
             apiCertificateSubAccountService.updateSubAccount(apiCertificateSubAccount);
             return RestResponse.success("修改成功");

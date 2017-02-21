@@ -1431,8 +1431,6 @@
             },
             band:function () {
                 var list =  this.shop;
-                console.log(list);
-                console.log("---------------------------------------------------------------");
                 if(this.isSubAccount == 0){//应用下绑定
                     // 绑定号码
                     ajaxsync(ctx + "/console/telenum/callnum/num/bind/app/" + appId ,{nums:list.join(",")},function(response) {
@@ -1442,6 +1440,10 @@
                             showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
                         }
                     });
+                    // 成功隐藏
+                    $('#call-modal').modal('hide')
+                    //刷新号码绑定分页列表
+                    upnumber();
                 }else if (this.isSubAccount == 1){//子账号绑定
                     // 绑定号码
                     ajaxsync(ctx +this.numUrl ,{nums:list.join(",")},function(response) {
@@ -1451,11 +1453,12 @@
                             showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
                         }
                     });
+                    // 成功隐藏
+                    $('#call-modal').modal('hide')
+                    //刷新号码绑定分页列表
+                    upnumber2();
                 }
-                // 成功隐藏
-                $('#call-modal').modal('hide')
-                //刷新号码绑定分页列表
-                upnumber();
+
             },
             intersect:function () {
                 var point = Array.intersect(this.shop,this.page);

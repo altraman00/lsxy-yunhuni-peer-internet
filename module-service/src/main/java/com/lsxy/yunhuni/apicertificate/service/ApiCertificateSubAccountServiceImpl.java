@@ -3,7 +3,6 @@ package com.lsxy.yunhuni.apicertificate.service;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
@@ -113,17 +112,6 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
 
     @Override
     public void updateSubAccount(ApiCertificateSubAccount subAccount) {
-
-        String certAccountId = subAccount.getId();
-        List<CertAccountQuota> quotas = subAccount.getQuotas();
-//        certAccountQuotaService.updateQuotas(certAccountId,quotas);
-        if(quotas != null){
-            for(CertAccountQuota quota : quotas){
-                String sql = "update db_lsxy_bi_yunhuni.tb_bi_cert_account_quota q set q.value = "+quota.getValue()+" where q.cert_account_id = '"+certAccountId+"' and q.type = '"+quota.getType()+"' and q.deleted = 0";
-                int i = jdbcTemplate.update(sql);
-                System.out.println(i);
-            }
-        }
         ApiCertificateSubAccount saveAccount = this.findById(subAccount.getId());
         if(saveAccount.getAppId().equals(subAccount.getAppId())){
             saveAccount.setCallbackUrl(subAccount.getCallbackUrl());
@@ -131,6 +119,7 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
             saveAccount.setRemark(saveAccount.getRemark());
             this.save(saveAccount);
         }
+        certAccountQuotaService.updateQuotas(subAccount.getId(),subAccount.getQuotas());
     }
 
     @Override
