@@ -258,11 +258,11 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     String callId = conversationService.agentCall(appId,conversationId,agent,
                             callCenterAgent.getName(),
                             extension.getId(),from,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null);
-                    callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_FETCHING,true);
+                    agentState.setState(agent,CallCenterAgent.STATE_FETCHING);
                     //坐席加入交谈成功事件中要呼叫这个号码
                     businessStateService.updateInnerField(callId,"invite_from",from,"invite_to",to);
                 }catch (Throwable t){
-                    callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_IDLE,true);
+                    agentState.setState(agent,CallCenterAgent.STATE_IDLE);
                     throw t;
                 }
             }finally {
@@ -371,11 +371,11 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     callId = conversationService.agentCall(appId,conversationId,agent,
                             callCenterAgent.getName(),
                             extension.getId(),from,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null);
-                    callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_FETCHING,true);
+                    agentState.setState(agent,CallCenterAgent.STATE_FETCHING);
                     //坐席加入交谈成功事件中要排队找坐席
                     businessStateService.updateInnerField(conversationId,"enqueue_xml",enqueueXml);
                 }catch (Throwable t){
-                    callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_IDLE,true);
+                    agentState.setState(agent,CallCenterAgent.STATE_IDLE);
                     throw t;
                 }
             }finally {
@@ -542,10 +542,10 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     callId = conversationService.agentCall(appId,conversationId,agent,
                             callCenterAgent.getName(),
                             extension.getId(),null,extension.getTelnum(),extension.getType(),extension.getUser(),null,null,null);
-                    callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_FETCHING,true);
+                    agentState.setState(agent,CallCenterAgent.STATE_FETCHING);
                     //坐席加入交谈成功事件中要排队找坐席
                 }catch (Throwable t){
-                    callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_IDLE,true);
+                    agentState.setState(agent,CallCenterAgent.STATE_IDLE);
                     throw t;
                 }
             }finally {
