@@ -10,6 +10,8 @@ public interface BusinessStateService {
 
     public boolean closed(String id);
 
+    public String subaccountId(String id);
+
     public void updateUserdata(String id,String userdata);
 
     public void updateResId(String id,String resId);
