@@ -469,7 +469,7 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
 
     }
     public long sumAgentNum(String tenantId, String appId, Date startTime, Date endTime) {
-        String sql = " select count(1) from (select DISTINCT channel,name  from db_lsxy_bi_yunhuni.tb_bi_call_center_agent_action_log where tenant_id=? and app_id=? and  action=1 and create_time BETWEEN ? and ? ) a" ;
+        String sql = " select count(1) from (select DISTINCT subaccount_id,name  from db_lsxy_bi_yunhuni.tb_bi_call_center_agent_action_log where tenant_id=? and app_id=? and  action=1 and create_time BETWEEN ? and ? ) a" ;
         return jdbcTemplate.queryForObject(sql,Long.class,tenantId,appId,startTime,endTime);
     }
 
