@@ -399,6 +399,16 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
+    public String getId(String appId,String subaccountId, String agentName) throws YunhuniApiException {
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndSubaccountIdAndName(appId, subaccountId,agentName);
+        if(agent == null){
+            // 座席不存在
+            throw new AgentNotExistException();
+        }
+        return agent.getId();
+    }
+
+    @Override
     public Page getPage(String appId, Integer pageNo, Integer pageSize) throws YunhuniApiException{
         return getPage(appId,null, pageNo, pageSize);
     }
