@@ -294,7 +294,16 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         }
         //经过以上处理后，返回号码结果还是空的话，则不根据传入的from来选号码，子账号下的号码，或选租户应用下未被绑定的号码，或者租户下不被应用绑定的号码
         if(result.size() == 0){
-            ResourceTelenum availableNum = resourceTelenumDao.findCallingTelnumByTenantIdAndAppId(app.getTenant().getId(), app.getId(), app.getAreaId(),subaccountId);
+            ResourceTelenum availableNum = null;
+            if(StringUtils.isNotBlank(subaccountId)){
+                availableNum = resourceTelenumDao.findCallingTelnumByTenantIdAndAppIdAndSubaccountId(app.getTenant().getId(), app.getId(), app.getAreaId(),subaccountId);
+            }
+            if(availableNum == null){
+                availableNum = resourceTelenumDao.findCallingTelnumByTenantIdAndAppId(app.getTenant().getId(), app.getId(), app.getAreaId());
+            }
+            if(availableNum == null){
+                availableNum = resourceTelenumDao.findCallingTelnumByTenantIdAndAppIdIsNull(app.getTenant().getId(), app.getAreaId());
+            }
             if(availableNum == null){
                 availableNum = this.findOneFreeDialingNumber(lineIds);
             }

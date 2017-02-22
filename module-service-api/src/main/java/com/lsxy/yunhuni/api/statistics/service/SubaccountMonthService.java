@@ -17,4 +17,5 @@ public interface SubaccountMonthService extends BaseService<SubaccountMonth> {
     List<SubaccountStatisticalVO> getListByConditions(Date startTime, Date endTime, String tenantId, String appId, String subaccountId);
     //统计总消费金额和话务量
     Map sum(Date start, Date end, String tenantId, String appId, String subaccountId);
+    void monthStatistics(Date date);
 }
