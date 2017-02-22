@@ -269,7 +269,8 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
 
         //开始排队
         try {
-            enQueueService.lookupAgent(conversation_state.getTenantId(), conversation_state.getAppId(),
+            enQueueService.lookupAgent(conversation_state.getTenantId(),
+                    conversation_state.getAppId(),state.getSubaccountId(),
                     state.getBusinessData().get("from"),
                     callId, enQueue,CallCenterUtil.QUEUE_TYPE_INVITE_AGENT,conversationId);
         }catch (Throwable t){
