@@ -110,7 +110,7 @@ public class SubaccountMonthServiceImpl extends AbstractService<SubaccountMonth>
     public Map sum(Date start, Date end, String tenantId, String appId, String subaccountId) {
         //amongAmount
         //amongDuration
-        String sql = " select sum(among_amount) as amongAmount,sum(among_duration) as amongDuration from db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_month where deleted=0 ";
+        String sql = " select IFNULL(sum(among_amount),0) as amongAmount,IFNULL(sum(among_duration),0) as amongDuration from db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_month where deleted=0 ";
         if(StringUtils.isNotEmpty(appId)){
             sql += " AND app_id = '"+appId+"'";
         }
