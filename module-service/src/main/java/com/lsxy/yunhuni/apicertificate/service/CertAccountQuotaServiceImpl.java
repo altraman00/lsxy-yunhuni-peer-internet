@@ -208,6 +208,9 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
 
     @Override
     public boolean isCallQuotaEnough(String certAccountId){
+        if(StringUtils.isBlank(certAccountId)){
+            return true;
+        }
         ApiCertificate cert = apiCertificateService.findById(certAccountId);
         if(cert instanceof  ApiCertificateSubAccount){
             CertAccountQuota quota = this.getCurrentQuota(certAccountId,CertAccountQuotaType.CallQuota.name());
