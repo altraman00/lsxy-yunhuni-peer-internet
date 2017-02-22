@@ -17,6 +17,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +76,21 @@ public class SubaccountMonthServiceImpl extends AbstractService<SubaccountMonth>
         pageQuery.setFirstResult(start);
         List list = pageQuery.getResultList();
         return new Page<>(start,total,pageSize,list);
+    }
+
+    @Override
+    public List<SubaccountStatisticalVO> getListByConditions(Date startTime, Date endTime, String tenantId, String appId, String subaccountId) {
+        int pageNo = 1;
+        int pageSize = 100;
+        List list = new ArrayList();
+        Page<SubaccountStatisticalVO> page = getPageByConditions(pageNo,pageSize,startTime,  endTime,  tenantId,  appId,  subaccountId);
+        list.addAll(page.getResult());
+        if(page.getCurrentPageNo() < page.getTotalPageCount()){
+            pageNo = Long.valueOf(page.getCurrentPageNo()).intValue()+1;
+            page = getPageByConditions(pageNo,pageSize,startTime,  endTime,  tenantId,  appId,  subaccountId);
+            list.addAll(page.getResult());
+        }
+        return list;
     }
 
     @Override

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,7 +24,7 @@ public class ApiCertificateSubAccountMonthController extends AbstractRestControl
     private SubaccountMonthService subaccountMonthService;
 
     @RequestMapping("/plist")
-    public RestResponse list(int pageNo,int pageSize,String tenantId, String appId, String subId, String startTime, String endTime ){
+    public RestResponse plist(int pageNo,int pageSize,String tenantId, String appId, String subId, String startTime, String endTime ){
         Date date1 = DateUtils.parseDate(startTime,"yyyy-MM");
         if(StringUtils.isEmpty(endTime)){
             endTime = startTime;
@@ -31,6 +32,16 @@ public class ApiCertificateSubAccountMonthController extends AbstractRestControl
         Date date2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(endTime,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
         Page page = subaccountMonthService.getPageByConditions(pageNo,pageSize,date1,date2,tenantId,appId,subId);
         return RestResponse.success(page);
+    }
+    @RequestMapping("/list")
+    public RestResponse list(int pageNo,int pageSize,String tenantId, String appId, String subId, String startTime, String endTime ){
+        Date date1 = DateUtils.parseDate(startTime,"yyyy-MM");
+        if(StringUtils.isEmpty(endTime)){
+            endTime = startTime;
+        }
+        Date date2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(endTime,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
+        List list = subaccountMonthService.getListByConditions(date1,date2,tenantId,appId,subId);
+        return RestResponse.success(list);
     }
     @RequestMapping("/sum")
     public RestResponse sum(String tenantId, String appId, String subId, String startTime, String endTime ){
