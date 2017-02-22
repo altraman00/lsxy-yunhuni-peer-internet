@@ -1085,7 +1085,7 @@
         methods:{
             init:function(){
                 this.url=this.remark='';
-                this.voiceNum=this.seatNum=0;
+                this.voiceNum=this.seatNum=-1;
             }
         }
     });
@@ -1249,19 +1249,26 @@
                 ajaxsync(ctx + "/console/sub_account/delete/"+id,{csrfParameterName:csrfToken},function(response){
                     if(response.success){
                         showtoast("删除成功");
+                        console.info("进入")
                         if(subAccountPage){
+                            console.info("进入-成功");
                             var currentPage;
                             if(((subAccountPage.nowPage - 1) * subAccountPage.listRow +1) <= --subAccountPage.count){
                                 currentPage = subAccountPage.nowPage;
+                                console.info("1:"+currentPage);
                             }else {
                                 currentPage = subAccountPage.nowPage - 1;
+                                console.info("2:"+currentPage);
                             }
-                            if(currentPage> 0){
+                            if(currentPage>0){
+                                console.info("3:"+'#page' + currentPage + subAccountPage.obj);
                                 $('#page' + currentPage + subAccountPage.obj).click();
                             }else{
+                                console.info("4:"+'#play-'+id);
                                 $('#play-'+id).remove();
                             }
                         }
+                        console.info("进入-结束")
                     }else{
                         showtoast("删除失败");
                     }
@@ -1985,8 +1992,7 @@
             }
         },"get");
         for(var i =0 ; i<data.length; i++){
-            html +='<tr class="playtr">' +
-                '<td class="text-center" hidden>'+ data[i].id +'</td>' +
+            html +='<tr class="playtr" id="play-'+data[i].id+'">' +
                 '<td class="text-center">'+ data[i].certId +'</td>' +
                 '<td class="text-center">'+ data[i].secretKey +'</td>'+
                 '<td class="text-center">' + data[i].voiceNum + '</td>' ;
