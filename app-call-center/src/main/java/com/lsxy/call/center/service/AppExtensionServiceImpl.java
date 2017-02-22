@@ -147,7 +147,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
             throw new ExtensionNotExistException();
         }
         if(StringUtils.isNotBlank(appId) && appId.equals(extension.getAppId())){
-            if(!(StringUtils.isBlank(subaccountId) && StringUtils.isBlank(extension.getSubaccountId()))){
+            if(StringUtils.isBlank(subaccountId) && StringUtils.isNotBlank(extension.getSubaccountId())){
                 throw new ExtensionNotExistException();
             }
             if(StringUtils.isNotBlank(subaccountId) && !subaccountId.equals(extension.getSubaccountId())){
@@ -239,7 +239,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
         if(!appId.equals(extension.getAppId())){
             throw new ExtensionNotExistException();
         }
-        if(!(StringUtils.isBlank(subaccountId) && StringUtils.isBlank(extension.getSubaccountId()))){
+        if(StringUtils.isBlank(subaccountId) && StringUtils.isNotBlank(extension.getSubaccountId())){
             throw new ExtensionNotExistException();
         }
         if(StringUtils.isNotBlank(subaccountId) && !subaccountId.equals(extension.getSubaccountId())){
