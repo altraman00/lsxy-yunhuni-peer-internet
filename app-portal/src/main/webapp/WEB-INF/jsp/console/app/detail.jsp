@@ -1086,6 +1086,11 @@
     });
     $('.modalSureFive').click(function(){
         var id = $(this).attr('data-id');
+        if(isNaN(createSubAccountFive.voiceNum) || isNaN(createSubAccountFive.seatNum) ||
+            createSubAccountFive.voiceNum=='' || createSubAccountFive.seatNum==''){
+            showtoast("配额参数必须为数字");
+            return;
+        }
         var params = {
             'appId':appId,
             'url':createSubAccountFive.url,

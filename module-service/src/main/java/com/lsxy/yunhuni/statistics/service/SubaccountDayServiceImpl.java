@@ -60,8 +60,8 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
                 "a.name as appName," +
                 "obj.among_amount as amongAmount," +
                 "obj.among_duration as amongDuration," +
-                "concat( (CASE WHEN obj.voice_used IS NULL THEN '0'ELSE obj.voice_used END) ,'/', (CASE WHEN obj.voice_quota_value IS NULL THEN '0' WHEN obj.voice_quota_value='-1' THEN '∞' ELSE obj.voice_quota_value END) ) as voiceNum," +
-                "concat( (CASE WHEN obj.msg_used IS NULL THEN '0'ELSE obj.msg_used END)  ,'/', (CASE WHEN obj.msg_quota_value IS NULL THEN '0' WHEN obj.msg_quota_value='-1' THEN '∞' ELSE obj.msg_quota_value END)) as seatNum "+sql;
+                "concat( (CASE WHEN obj.voice_used IS NULL THEN '0'ELSE obj.voice_used END) ,'/', (CASE WHEN obj.voice_quota_value IS NULL THEN '0' WHEN obj.voice_quota_value<0 THEN '∞' ELSE obj.voice_quota_value END) ) as voiceNum," +
+                "concat( (CASE WHEN obj.msg_used IS NULL THEN '0'ELSE obj.msg_used END)  ,'/', (CASE WHEN obj.msg_quota_value IS NULL THEN '0' WHEN obj.msg_quota_value<0 THEN '∞' ELSE obj.msg_quota_value END)) as seatNum "+sql;
         Query countQuery = em.createNativeQuery(countSql);
         pageSql +=" group by obj.dt desc";
         Query pageQuery = em.createNativeQuery(pageSql,SubaccountStatisticalVO.class);
