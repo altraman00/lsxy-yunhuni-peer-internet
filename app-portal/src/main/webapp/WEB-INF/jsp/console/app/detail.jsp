@@ -493,7 +493,7 @@
                                                 </div>
                                                 <div class="row margin-bottom-10">
                                                     <div class="col-md-1 dev line-height-32">语音(分钟)：</div>
-                                                    <div class="col-md-6 remove-padding-left">
+                                                    <div class="col-md-6">
                                                         <p>
                                                             <input type="text"  class="form-control"  v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
                                                         </p>
@@ -505,7 +505,7 @@
                                                     <div class="col-md-1 dev">
                                                         坐席（个）：
                                                     </div>
-                                                    <div class="col-md-6 remove-padding-left">
+                                                    <div class="col-md-6">
                                                         <input type="text"  class="form-control"  v-model="seatNum" value="{{seatNum}}" placeholder=""/>
                                                     </div>
                                                     <span class="col-md-1 line-height-32 text-left text-danger">*</span>
