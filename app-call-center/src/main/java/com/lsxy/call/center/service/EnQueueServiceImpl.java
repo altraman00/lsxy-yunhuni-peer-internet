@@ -3,6 +3,7 @@ package com.lsxy.call.center.service;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.*;
+import com.lsxy.call.center.api.states.lock.util.LockInfo;
 import com.lsxy.call.center.api.states.statics.AQs;
 import com.lsxy.call.center.batch.QueueBatchInserter;
 import com.lsxy.call.center.api.states.lock.AgentLock;
@@ -220,7 +221,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                     ExtensionState.getPrefixed(),AgentLock.getPrefixed(),
                     ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
                     CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,ExtensionState.Model.ENABLE_TRUE,
-                    agent == null?"":agent.getId());
+                    agent == null?"":agent.getId(), LockInfo.newForCurrThread().toString());
 
             if(logger.isDebugEnabled()){
                 logger.debug("[{}][{}]排队结果:agent={},queueid={}",tenantId,appId,agentId,queueId);
@@ -293,7 +294,7 @@ public class EnQueueServiceImpl implements EnQueueService{
             QueueLock.getPrefixed(),CQs.getPrefixed(),
             ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
                 CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,
-            conditionId==null?"":conditionId,ExtensionState.Model.ENABLE_TRUE);
+            conditionId==null?"":conditionId,ExtensionState.Model.ENABLE_TRUE, LockInfo.newForCurrThread().toString());
         if(logger.isDebugEnabled()){
             logger.debug("[{}][{}]排队结果:agent={},queueid={}",tenantId,appId,agent,queueId);
         }
