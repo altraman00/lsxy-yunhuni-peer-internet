@@ -68,7 +68,7 @@
 								<a data-toggle="tooltip" data-placement='right' title='呼叫中心统计' href="${ctx}/console/statistics/callcenter/index" class="nav-router" data-router="statistics/callcenter"><i class="iconfont icon-menu-call"></i> <span>呼叫中心统计</span> </a>
 							</li>
 							<li>
-								<a data-toggle="tooltip" data-placement='right' title='子账号综合统计' href="${ctx}/console/statistics/subaccount/index" class="nav-router" data-router="statistics/subaccount"><i class="iconfont icon-menu-detail"></i> <span>子账号综合统计</span> </a>
+								<a data-toggle="tooltip" data-placement='right' title='子账号综合统计' href="${ctx}/console/statistics/subaccount/index" class="nav-router" data-router="statistics/subaccount"><i class="iconfont icon-child-account"></i> <span>子账号综合统计</span> </a>
 							</li>
 							<li>
 								<a data-toggle="tooltip" data-placement='right' title='详单查询' href="${ctx}/console/statistics/billdetail/notify" class="nav-router" data-router="statistics/billdetail"><i class="iconfont icon-menu-detail"></i> <span>详单查询</span> </a>
