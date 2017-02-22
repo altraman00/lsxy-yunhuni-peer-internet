@@ -705,39 +705,39 @@
                 </p>
                 <div class="row text-center">
                     <lable class="col-md-3 text-right line-height-32">回调地址：</lable>
-                    <div class="col-md-8 remove-padding-left">
+                    <div class="col-md-8 remove-padding-right">
                         <input type="text" class="form-control" v-model="url"  value="{{url}}" placeholder=""/>
                     </div>
 
                 </div>
                 <div class="row margin-bottom-10">
-                    <span class="col-lg-offset-3 col-md-9">（子账号的回调地址优先级高于应用的回调地址）</span>
+                    <span class="col-lg-offset-3 col-md-9 ">（子账号的回调地址优先级高于应用的回调地址）</span>
                 </div>
                 <div class="row margin-bottom-10">
                     <lable class="col-md-3 text-right">配置额度：</lable>
-                    <div class="col-md-8">
+                    <div class="col-md-8 remove-padding-right">
                         （负数为额度不作限制，0则表示额度为0，正数为具体的使用额度限制）
                     </div>
                 </div>
                 <div class="row margin-bottom-10">
                     <lable class="col-md-3 text-right line-height-32">语音（分钟）：</lable>
-                    <div class="col-md-8 remove-padding-left">
+                    <div class="col-md-8 remove-padding-right">
                         <input type="text" class="form-control" v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
                     </div>
-                    <span class="col-md-1 line-height-32 text-left text-danger">*</span>
+                    <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
                 </div>
                 <c:if test="${app.serviceType == 'call_center'}">
                 <div class="row margin-bottom-10">
                     <lable class="col-md-3 text-right line-height-32">坐席（个）：</lable>
-                    <div class="col-md-8 remove-padding-left">
+                    <div class="col-md-8 remove-padding-right">
                         <input type="text" class="form-control" v-model="seatNum"  value="{{seatNum}}" placeholder="" />
                     </div>
-                    <span class="col-md-1 line-height-32 text-left text-danger">*</span>
+                    <span class="col-md-1 line-height-32 text-left text-danger padding-left-5">*</span>
                 </div>
                 </c:if>
                 <div class="row">
                     <lable class="col-md-3 text-right line-height-32">备注：</lable>
-                    <div class="col-md-8">
+                    <div class="col-md-8 remove-padding-right">
                         <input type="text" class="form-control" v-model="remark" value="{{remark}}" placeholder=""/>
                     </div>
                 </div>
