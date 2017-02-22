@@ -14,5 +14,7 @@ public interface ConditionDao extends BaseDaoInterface<Condition, Serializable> 
 
     public List<Condition> findByTenantIdAndAppId(String tenantId,String appId);
 
-    public List<Condition> findByTenantIdAndAppIdAndChannelId(String tenantId,String appId,String channelId);
+    public List<Condition> findByTenantIdAndAppIdAndSubaccountId(String tenantId,String appId,String subaccountId);
+
+    public long countByTenantIdAndAppIdAndSubaccountId(String tenantId,String appId,String subaccountId);
 }

@@ -29,7 +29,7 @@ public interface CallCenterAgentService extends BaseService<CallCenterAgent> {
      * @param force
      * @throws YunhuniApiException
      */
-    void logout(String tenantId, String appId, String agentName, boolean force) throws YunhuniApiException;
+    void logout(String tenantId, String appId,String subaccountId, String agentName, boolean force) throws YunhuniApiException;
 
     /**
      * 座席定时注册
@@ -37,16 +37,16 @@ public interface CallCenterAgentService extends BaseService<CallCenterAgent> {
      * @param agentName
      * @throws YunhuniApiException
      */
-    void keepAlive(String appId, String agentName) throws YunhuniApiException;
+    void keepAlive(String appId,String subaccountId, String agentName) throws YunhuniApiException;
 
     /**
      * 获取通道下所有的座席ID
      * @param tenantId
      * @param appId
-     * @param channelId
+     * @param subaccountId 子账号id 为null 代表主账号
      * @return
      */
-    List<String> getAgentIdsByChannel(String tenantId, String appId, String channelId);
+    List<String> getAgentIdsBySubaccountId(String tenantId, String appId, String subaccountId);
 
     /**
      * 获取单个座席
@@ -57,6 +57,9 @@ public interface CallCenterAgentService extends BaseService<CallCenterAgent> {
      */
     CallCenterAgent get(String appId, String agentName) throws YunhuniApiException;
 
+    CallCenterAgent get(String appId,String accountId, String agentName) throws YunhuniApiException;
+
+    String getId(String appId, String agentName) throws YunhuniApiException;
     /**
      * 获取应用下所有的座席
      * @param appId
@@ -67,6 +70,8 @@ public interface CallCenterAgentService extends BaseService<CallCenterAgent> {
      */
     Page getPage(String appId, Integer pageNo, Integer pageSize) throws YunhuniApiException;
 
+    Page getPage(String appId,String subaccountId, Integer pageNo, Integer pageSize) throws YunhuniApiException;
+
     /**
      * 修改座席分机
      * @param appId
@@ -74,7 +79,7 @@ public interface CallCenterAgentService extends BaseService<CallCenterAgent> {
      * @param extensionId
      * @throws YunhuniApiException
      */
-    void extension(String appId, String agentName,String extensionId) throws YunhuniApiException;
+    void extension(String appId, String agentName,String extensionId,String subaccountId) throws YunhuniApiException;
 
     /**
      * 修改座席状态
@@ -83,11 +88,12 @@ public interface CallCenterAgentService extends BaseService<CallCenterAgent> {
      * @param state
      * @throws YunhuniApiException
      */
-    String state(String appId, String agentName, String state) throws YunhuniApiException;
+    String state(String appId,String subaccountId, String agentName, String state) throws YunhuniApiException;
 
     String state(String tenantId,String appId,String agentId, String state,boolean force) throws YunhuniApiException;
 
     String getState(String agentId) throws YunhuniApiException;
+
 
     /**
      * 修改座席技能
@@ -97,6 +103,6 @@ public interface CallCenterAgentService extends BaseService<CallCenterAgent> {
      * @param skillOpts 座席技能修改的操作类
      * @throws YunhuniApiException
      */
-    void skills(String tenantId, String appId, String agentName, List<AgentSkillOperationDTO> skillOpts) throws YunhuniApiException;
+    void skills(String tenantId, String appId,String subaccountId, String agentName, List<AgentSkillOperationDTO> skillOpts) throws YunhuniApiException;
 
 }

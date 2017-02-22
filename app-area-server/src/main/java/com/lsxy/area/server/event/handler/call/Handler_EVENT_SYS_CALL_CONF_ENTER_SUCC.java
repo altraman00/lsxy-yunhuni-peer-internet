@@ -10,8 +10,11 @@ import com.lsxy.area.server.service.callcenter.CallConversationService;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
+import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
 import com.lsxy.call.center.api.service.CallCenterConversationService;
+import com.lsxy.call.center.api.service.EnQueueService;
+import com.lsxy.call.center.api.utils.EnQueueDecoder;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -78,6 +81,9 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterConversationMemberService callCenterConversationMemberService;
 
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private EnQueueService enQueueService;
+
     @Autowired
     private RPCCaller rpcCaller;
 
@@ -114,7 +120,9 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("call_id={},state={}",call_id,state);
         }
-        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) ||
+        if(BusinessState.TYPE_CC_INVITE_AGENT_CALL.equals(state.getType()) ||
+                BusinessState.TYPE_CC_INVITE_OUT_CALL.equals(state.getType()) ||
+                BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) ||
                 BusinessState.TYPE_CC_OUT_CALL.equals(state.getType()) ||
                 conversationService.isCC(state)){
             conversation(state,call_id);
@@ -137,7 +145,30 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         if(StringUtils.isBlank(appId)){
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
+
+        BusinessState conversationState = businessStateService.get(conversation_id);
+        if(conversationState == null || (conversationState.getClosed() !=null && conversationState.getClosed())){
+            return;
+        }
         conversationService.join(conversation_id,call_id);
+        if(conversationState.getBusinessData().get("invite_to") != null){//邀请外线
+            try{
+                conversationService.inviteOut(state.getSubaccountId(),appId,conversationState.getBusinessData().get(BusinessState.REF_RES_ID),
+                        conversation_id,conversationState.getBusinessData().get("invite_from"),
+                        conversationState.getBusinessData().get("invite_to"),null,null,null,null);
+                businessStateService.deleteInnerField(conversation_id,"invite_to","invite_from");
+            }catch (Throwable t){
+                conversationService.exit(conversation_id,call_id);
+            }
+        }else if(conversationState.getBusinessData().get("enqueue_xml") != null){//排队
+            try{
+                EnQueue enqueue = EnQueueDecoder.decode(conversationState.getBusinessData().get("enqueue_xml"));
+                enQueueService.lookupAgent(state.getTenantId(),state.getAppId(),
+                        businessData.get(CallCenterUtil.AGENT_NAME_FIELD),call_id,enqueue,CallCenterUtil.QUEUE_TYPE_CALL_AGENT,conversation_id);
+            }catch (Throwable t){
+                conversationService.exit(conversation_id,call_id);
+            }
+        }
     }
 
     public void conf(BusinessState state,String call_id){

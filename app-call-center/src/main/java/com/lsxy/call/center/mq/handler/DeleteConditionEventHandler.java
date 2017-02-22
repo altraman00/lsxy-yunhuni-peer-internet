@@ -3,9 +3,9 @@ package com.lsxy.call.center.mq.handler;
 import com.lsxy.call.center.api.service.AgentSkillService;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
 import com.lsxy.call.center.api.service.ConditionService;
-import com.lsxy.call.center.states.lock.ModifyConditionLock;
-import com.lsxy.call.center.states.statics.ACs;
-import com.lsxy.call.center.states.statics.CAs;
+import com.lsxy.call.center.api.states.lock.ModifyConditionLock;
+import com.lsxy.call.center.api.states.statics.ACs;
+import com.lsxy.call.center.api.states.statics.CAs;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.mq.events.callcenter.DeleteConditionEvent;
@@ -54,7 +54,7 @@ public class DeleteConditionEventHandler implements MQMessageHandler<DeleteCondi
         }
         long start = System.currentTimeMillis();
         List<String> agentIds = callCenterAgentService
-                                        .getAgentIdsByChannel(message.getTenantId(),message.getAppId(),message.getChannelId());
+                                        .getAgentIdsBySubaccountId(message.getTenantId(),message.getAppId(),message.getSubaccountId());
         //清空cAs
         cAs.delete(message.getConditionId());
         if(agentIds != null && agentIds.size() > 0){

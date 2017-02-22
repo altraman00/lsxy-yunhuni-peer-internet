@@ -296,6 +296,7 @@ public abstract class AbstractService<T extends IdEntity> implements BaseService
         if(excludeDeleted){
             jpql = HqlUtil.addCondition(jpql, "deleted", 0,HqlUtil.LOGIC_AND,HqlUtil.TYPE_NUMBER);
         }
+        jpql = jpql.replaceAll("fetch", "");
         String countJpql = " select count(1) " + HqlUtil.removeOrders(HqlUtil.removeSelect(jpql));
         Query query = this.em.createQuery(countJpql);
         for (int i = 0; i < params.length; i++) {
@@ -397,6 +398,12 @@ public abstract class AbstractService<T extends IdEntity> implements BaseService
         return fields;
     }
 
+    public Iterable<T> findAll(Collection<String> ids){
+        if(ids == null || ids.size() == 0){
+            return null;
+        }
+        return this.getDao().findAll(new ArrayList<Serializable>(ids));
+    }
     /*public static void main(String[] args) {
         System.out.println(getFields(Tenant.class));
     }*/

@@ -48,13 +48,17 @@ public class CallCenterUtil {
     public static final String CALLCENTER_FIELD = "CALLCENTER_ID";
     /**呼叫所属的交谈的id的存放属性**/
     public static final String CONVERSATION_FIELD = "CONVERSATION_ID";
+    /**交谈中所使用的平台号码**/
+    public static final String CONVERSATION_SYSNUM_FIELD = "CONVERSATION_SYSNUM";
     /**ivr呼叫是否呼叫中心标记存放的字段**/
     public static final String ISCC_FIELD = "ISCC";
     public static final String ISCC_TRUE = "1";
     /**正在播放排队等待音存放的字段**/
-    public static final String PLAYWAIT_FIELD = "IS_PLAYWAIT";
+    public static final String PLAYWAIT_FIELD = "PLAYWAIT";
     /**呼叫对应的排队id存放的字段**/
     public static final String QUEUE_ID_FIELD = "QUEUE_ID";
+    /**呼叫对应的排队类型存放的字段**/
+    public static final String QUEUE_TYPE_FIELD = "QUEUE_TYPE";
     /**坐席挂机后的状态存放的字段**/
     public static final String RESERVE_STATE_FIELD = "RESERVE_STATE";
     /**坐席呼叫对应的坐席id存放的字段**/
@@ -69,10 +73,6 @@ public class CallCenterUtil {
     public static final String AGENT_PRENUMVOICE_FIELD = "AGENT_PRENUMVOICE";
     /**坐席播放工号后的音存放的字段**/
     public static final String AGENT_POSTNUMVOICE_FIELD = "AGENT_POSTNUMVOICE";
-    /**交谈成员收放音模式存放的字段**/
-    public static final String PARTNER_VOICE_MODE_FIELD = "PARTNER_VOICE_MODE";
-    /**通道id存放的字段**/
-    public static final String CHANNEL_ID_FIELD = "CHANNEL_ID";
     /**条件id存放的字段**/
     public static final String CONDITION_ID_FIELD = "CONDITION_ID";
 
@@ -82,7 +82,11 @@ public class CallCenterUtil {
     /**记录排队开始时间字段**/
     public static final String ENQUEUE_START_TIME_FIELD = "ENQUEUE_START_TIME_FIELD";
 
+    /**交谈成员收放音模式**/
+    public static final String VOICE_MODE_FIELD = "VOICE_MODE";
 
+    /**交谈holding 提示音**/
+    public static final String HOLD_VOICE_FIELD = "HOLD_VOICE";
 
     @Autowired
     private BusinessStateService businessStateService;
@@ -97,7 +101,7 @@ public class CallCenterUtil {
     /**
      * 排队失败事件
      */
-    public void sendQueueFailEvent(String url,String queueId,String type,String channelId,String conditionId,
+    public void sendQueueFailEvent(String url,String queueId,String type,String conditionId,
                                    String cause,String origin_call_id,String agent_call_id,
                                    String userData){
        try{
@@ -113,7 +117,6 @@ public class CallCenterUtil {
                     .putIfNotEmpty("event","callcenter.queue.fail")
                     .putIfNotEmpty("id",queueId)
                     .putIfNotEmpty("type",type)
-                    .putIfNotEmpty("channel_id",channelId)
                     .putIfNotEmpty("condition_id",conditionId)
                     .putIfNotEmpty("agent_name",agent.getName())
                     .putIfNotEmpty("cause",cause)
@@ -131,7 +134,7 @@ public class CallCenterUtil {
     /**
      * 排队成功事件
      */
-    public void sendQueueSuccessEvent(String url,String queueId,String type,String channelId,String conditionId,
+    public void sendQueueSuccessEvent(String url,String queueId,String type,String conditionId,
                                    String origin_call_id,String agent_call_id,
                                    String userData){
         try{
@@ -147,7 +150,6 @@ public class CallCenterUtil {
                     .putIfNotEmpty("event","callcenter.queue.success")
                     .putIfNotEmpty("id",queueId)
                     .putIfNotEmpty("type",type)
-                    .putIfNotEmpty("channel_id",channelId)
                     .putIfNotEmpty("condition_id",conditionId)
                     .putIfNotEmpty("agent_name",agent.getName())
                     .putIfNotEmpty("origin_call_id",origin_call_id)
@@ -164,7 +166,7 @@ public class CallCenterUtil {
     /**
      * 排队选中坐席事件
      */
-    public void sendQueueSelectedAgentEvent(String url,String queueId,String type,String channelId,String conditionId,
+    public void sendQueueSelectedAgentEvent(String url,String queueId,String type,String conditionId,
                                       String origin_call_id,String agent_call_id,
                                       String userData){
         try{
@@ -180,7 +182,6 @@ public class CallCenterUtil {
                     .putIfNotEmpty("event","callcenter.queue.select")
                     .putIfNotEmpty("id",queueId)
                     .putIfNotEmpty("type",type)
-                    .putIfNotEmpty("channel_id",channelId)
                     .putIfNotEmpty("condition_id",conditionId)
                     .putIfNotEmpty("agent_name",agent.getName())
                     .putIfNotEmpty("origin_call_id",origin_call_id)
@@ -268,14 +269,13 @@ public class CallCenterUtil {
     /**
      * 交谈开始事件
      */
-    public void conversationBeginEvent(String url,String conversation,String type,String queue_id,String channel_id,String agent_call_id){
+    public void conversationBeginEvent(String url,String conversation,String type,String queue_id,String agent_call_id){
         try{
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","callcenter.conversation.begin")
                     .putIfNotEmpty("id",conversation)
                     .putIfNotEmpty("type",type)
                     .putIfNotEmpty("queue_id",queue_id)
-                    .putIfNotEmpty("channel_id",channel_id)
                     .putIfNotEmpty("agent_call_id",agent_call_id)
                     .build();
             notifyCallbackUtil.postNotify(url,notify_data,null,3);
@@ -290,12 +290,11 @@ public class CallCenterUtil {
      * @param conversation
      * @param type
      * @param queue_id
-     * @param channel_id
      * @param agent_call_id
      */
     public void conversationEndEvent(String url,String conversation,String type,Long begin_time,
                                       String record_file,String record_duration,String end_reason,
-                                      String queue_id,String channel_id,String agent_call_id){
+                                      String queue_id,String agent_call_id){
         try{
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","callcenter.conversation.end")
@@ -307,7 +306,6 @@ public class CallCenterUtil {
                     .putIfNotEmpty("record_duration",record_duration)
                     .putIfNotEmpty("end_reason",end_reason)
                     .putIfNotEmpty("queue_id",queue_id)
-                    .putIfNotEmpty("channel_id",channel_id)
                     .putIfNotEmpty("agent_call_id",agent_call_id)
                     .build();
             notifyCallbackUtil.postNotify(url,notify_data,null,3);

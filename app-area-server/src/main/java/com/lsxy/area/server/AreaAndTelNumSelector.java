@@ -48,11 +48,32 @@ public class AreaAndTelNumSelector {
     @Autowired
     LineGatewayToPublicService lineGatewayToPublicService;
 
-    public Selector getTelnumberAndAreaId(App app, String from,String to)throws YunhuniApiException{
-        return getTelnumberAndAreaId(app,false,from,to,null,null);
+    /**
+     *
+     * @param app
+     * @param subaccountId 子账号ID,为null表示为主账号
+     * @param from
+     * @param to
+     * @return
+     * @throws YunhuniApiException
+     */
+    public Selector getTelnumberAndAreaId(String subaccountId, App app,String from,String to)throws YunhuniApiException{
+        return getTelnumberAndAreaId(subaccountId,app,false,from,to,null,null);
     }
 
-    public Selector getTelnumberAndAreaId(App app,boolean isDuoCall ,String from1,String to1,String from2,String to2) throws YunhuniApiException {
+    /**
+     *
+     * @param app
+     * @param subaccountId 子账号ID,为null表示为主账号
+     * @param isDuoCall
+     * @param from1
+     * @param to1
+     * @param from2
+     * @param to2
+     * @return
+     * @throws YunhuniApiException
+     */
+    public Selector getTelnumberAndAreaId(String subaccountId,App app,boolean isDuoCall ,String from1,String to1,String from2,String to2) throws YunhuniApiException {
         Selector selector;
         //TODO 获取号码和区域ID
         List<TelnumSortEntity> toNum = new ArrayList<>();
@@ -75,7 +96,7 @@ public class AreaAndTelNumSelector {
             List<ResourceTelenum> telnumber;
             if(isDuoCall){
                 //获取一个可呼出的号码
-                telnumber = resourceTelenumService.findDialingTelnumber(lineIds,app,from1,from2);
+                telnumber = resourceTelenumService.findDialingTelnumber(subaccountId,lineIds,app,from1,from2);
                 if(telnumber.get(0).getTelNumber().equals(telnumber.get(1).getTelNumber())){
                     ResourceTelenum callTelnumber = telnumber.get(0);
                     //当两个呼出号码一样时，查一次线路就够了
@@ -89,7 +110,7 @@ public class AreaAndTelNumSelector {
                     addToTelnumSortEntity(to2, lineGateways, to2Num, telnumber.get(1));
                 }
             }else{
-                telnumber = resourceTelenumService.findDialingTelnumber(lineIds,app,from1);
+                telnumber = resourceTelenumService.findDialingTelnumber(subaccountId,lineIds,app,from1);
                 addToTelnumSortEntity(to1, lineGateways, toNum, telnumber.get(0));
             }
 

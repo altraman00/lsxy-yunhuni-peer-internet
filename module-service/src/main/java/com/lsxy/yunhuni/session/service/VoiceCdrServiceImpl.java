@@ -5,6 +5,9 @@ import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.*;
 import com.lsxy.utils.StatisticsUtils;
+import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuota;
+import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuotaType;
+import com.lsxy.yunhuni.api.apicertificate.service.CertAccountQuotaService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
@@ -61,6 +64,8 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
 
     @Autowired
     ConsumeService consumeService;
+    @Autowired
+    CertAccountQuotaService certAccountQuotaService;
 
     @Override
     public List<VoiceCdr> listCdr(String type, String tenantId, Date startTime,Date endTime, String appId) {
@@ -196,7 +201,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
 //    }
 
     @Override
-    public Map getStaticCdr(String tenantId, String appId, Date startTime, Date endTime) {
+    public Map getStaticCdr(String tenantId, String appId,String subaccountId, Date startTime, Date endTime) {
         String sql = "SELECT COUNT(id) AS callSum,IFNULL(SUM(cost_time_long),0) AS costTimeLong," +
                 "IFNULL(SUM(CASE  WHEN call_ack_dt IS NULL THEN 0 ELSE 1 END),0) AS askSum FROM db_lsxy_bi_yunhuni.tb_bi_voice_cdr WHERE 1=1 ";
         if(StringUtils.isNotEmpty(tenantId)){
@@ -204,6 +209,9 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         }
         if(StringUtils.isNotEmpty(appId)){
             sql += " AND app_id='"+appId+"' ";
+        }
+        if(StringUtils.isNotEmpty(subaccountId)){
+            sql += " AND subaccount_id='"+subaccountId+"' ";
         }
         if(startTime != null){
             String startTimeStr = DateUtils.getDate(startTime,"yyyy-MM-dd HH:mm:ss");
@@ -216,6 +224,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         Map map = jdbcTemplate.queryForMap(sql);
         return map;
     }
+
 
     @Override
     public VoiceCdr save(VoiceCdr voiceCdr){
@@ -248,6 +257,9 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
             ProductCode productCode = ProductCode.valueOf(voiceCdr.getType());
             Consume consume = new Consume(voiceCdr.getCallEndDt(),productCode.name(),voiceCdr.getCost(),productCode.getRemark(),voiceCdr.getAppId(),voiceCdr.getTenantId(),voiceCdr.getId());
             consumeService.consume(consume);
+        }
+        if(StringUtils.isNotBlank(voiceCdr.getSubaccountId())){
+            certAccountQuotaService.incQuotaUsed(voiceCdr.getSubaccountId(),new Date(),voiceCdr.getCostTimeLong(), CertAccountQuotaType.CallQuota.name());
         }
     }
 }

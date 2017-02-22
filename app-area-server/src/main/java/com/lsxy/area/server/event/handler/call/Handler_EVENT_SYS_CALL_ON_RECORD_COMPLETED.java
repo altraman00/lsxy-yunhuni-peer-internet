@@ -89,7 +89,7 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
                 }
             }else if(BusinessState.TYPE_IVR_CALL.equals(type)){
                 if(conversationService.isCC(state)){
-                    type = BusinessState.TYPE_CC_OUT_CALL;
+                    type = BusinessState.TYPE_CC_INVITE_OUT_CALL;
                 }
             }
             mqService.publish(new RecordCompletedEvent(record_id,state.getTenantId(),state.getAppId(),state.getAreaId(),state.getId(),

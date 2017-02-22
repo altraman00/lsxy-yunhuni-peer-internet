@@ -72,7 +72,7 @@ public class EnqueueHandler extends ActionHandler{
             if(StringUtil.isNotEmpty(enQueue.getData())){
                 businessStateService.updateUserdata(callId,enQueue.getData());
             }
-            if(enQueue.getWait_voice()!= null){
+            if(StringUtil.isNotBlank(enQueue.getWait_voice())){
                 String playWait = enQueue.getWait_voice();
                 try {
                     playWait = playFileUtil.convert(state.getTenantId(),state.getAppId(),playWait);
@@ -98,11 +98,16 @@ public class EnqueueHandler extends ActionHandler{
             }
         }
 
-        businessStateService.updateInnerField(callId,
-                CallCenterUtil.ENQUEUE_START_TIME_FIELD,""+new Date().getTime(),
-                CallCenterUtil.CHANNEL_ID_FIELD,enQueue.getChannel(),
-                CallCenterUtil.CONDITION_ID_FIELD,enQueue.getRoute().getCondition().getId(),
-                IVRActionService.IVR_NEXT_FIELD,next);
+        if(enQueue.getRoute().getCondition()!=null){
+            businessStateService.updateInnerField(callId,
+                    CallCenterUtil.ENQUEUE_START_TIME_FIELD,""+new Date().getTime(),
+                    CallCenterUtil.CONDITION_ID_FIELD,enQueue.getRoute().getCondition().getId(),
+                    IVRActionService.IVR_NEXT_FIELD,next);
+        }else{
+            businessStateService.updateInnerField(callId,
+                    CallCenterUtil.ENQUEUE_START_TIME_FIELD,""+new Date().getTime(),
+                    IVRActionService.IVR_NEXT_FIELD,next);
+        }
 
         String callCenterId = conversationService.getCallCenter(state);
         if(callCenterId != null){
@@ -115,10 +120,10 @@ public class EnqueueHandler extends ActionHandler{
         }
 
         try {
-            enQueueService.lookupAgent(state.getTenantId(), state.getAppId(), businessData.get("to"), callId, enQueue);
+            enQueueService.lookupAgent(state.getTenantId(), state.getAppId(), businessData.get("to"), callId, enQueue,CallCenterUtil.QUEUE_TYPE_IVR,null);
         }catch (Throwable t){
             logger.error("调用呼叫中心排队失败",t);
-            deQueueService.fail(state.getTenantId(),state.getAppId(),callId,null,"调用呼叫中心排队失败");
+            deQueueService.fail(state.getTenantId(),state.getAppId(),callId,null,CallCenterUtil.QUEUE_TYPE_IVR,"调用呼叫中心排队失败",null);
         }
         return true;
     }

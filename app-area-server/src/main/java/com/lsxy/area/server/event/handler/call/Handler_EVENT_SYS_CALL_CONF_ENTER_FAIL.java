@@ -103,7 +103,9 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_FAIL extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("call_id={},state={}",call_id,state);
         }
-        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) ||
+        if(BusinessState.TYPE_CC_INVITE_AGENT_CALL.equals(state.getType()) ||
+            BusinessState.TYPE_CC_INVITE_OUT_CALL.equals(state.getType()) ||
+            BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) ||
             BusinessState.TYPE_CC_OUT_CALL.equals(state.getType()) ||
             conversationService.isCC(state)){
             conversation(state,call_id);

@@ -14,11 +14,6 @@ import javax.validation.constraints.Size;
 public class ConditionCreateInputDTO extends CommonDTO {
 
     @NotNull
-    @Size(max = 32)
-    @JsonProperty("channel")
-    private String channelId;
-
-    @NotNull
     @Size(max = 512)
     @JsonProperty("where")
     private String whereExpression;
@@ -28,6 +23,7 @@ public class ConditionCreateInputDTO extends CommonDTO {
     private String sortExpression;
 
     @Min(value = 0)
+    @Max(value = 99)
     @JsonProperty("priority")
     private Integer priority;
 
@@ -37,7 +33,8 @@ public class ConditionCreateInputDTO extends CommonDTO {
     @JsonProperty("queue_timeout")
     private Integer queueTimeout;
 
-    @Min(value = 0)
+    @Min(value = 1)
+    @Max(value = 60)
     @JsonProperty("fetch_timeout")
     private Integer fetchTimeout;
 
@@ -45,14 +42,6 @@ public class ConditionCreateInputDTO extends CommonDTO {
     @Size(max = 128)
     private String remark;
 
-
-    public String getChannelId() {
-        return channelId;
-    }
-
-    public void setChannelId(String channelId) {
-        this.channelId = channelId;
-    }
 
     public String getWhereExpression() {
         return whereExpression;

@@ -16,11 +16,22 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_call_center_conversation")
 public class CallCenterConversation extends IdEntity {
+
+    public static final String STATE_UNREADY = "unready";
+    public static final String STATE_READY = "ready";
+
     private String tenantId;//所属租户
     private String appId;//所属应用
+    private String subaccountId;//子账号id
+    private String type;
+    private String state;
+    private String queueId;
+    private String conditionId;
     private String relevanceId;//所属呼叫中心
     private Date startTime;//发起时间
     private Date endTime;//结束时间
+    private String endReason;
+    private String agentCallId;
     @Column(name = "tenant_id")
     public String getTenantId() {
         return tenantId;
@@ -37,6 +48,52 @@ public class CallCenterConversation extends IdEntity {
     public void setAppId(String appId) {
         this.appId = appId;
     }
+
+    @Column( name = "subaccount_id")
+    public String getSubaccountId() {
+        return subaccountId;
+    }
+
+    public void setSubaccountId(String subaccountId) {
+        this.subaccountId = subaccountId;
+    }
+
+    @Column(name = "condition_id")
+    public String getConditionId() {
+        return conditionId;
+    }
+
+    public void setConditionId(String conditionId) {
+        this.conditionId = conditionId;
+    }
+
+    @Column(name = "type")
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    @Column(name = "state")
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    @Column(name = "queue_id")
+    public String getQueueId() {
+        return queueId;
+    }
+
+    public void setQueueId(String queueId) {
+        this.queueId = queueId;
+    }
+
     @Column(name = "relevance_id")
     public String getRelevanceId() {
         return relevanceId;
@@ -62,4 +119,21 @@ public class CallCenterConversation extends IdEntity {
         this.endTime = endTime;
     }
 
+    @Column(name = "end_reason")
+    public String getEndReason() {
+        return endReason;
+    }
+
+    public void setEndReason(String endReason) {
+        this.endReason = endReason;
+    }
+
+    @Column(name = "agent_call_id")
+    public String getAgentCallId() {
+        return agentCallId;
+    }
+
+    public void setAgentCallId(String agentCallId) {
+        this.agentCallId = agentCallId;
+    }
 }

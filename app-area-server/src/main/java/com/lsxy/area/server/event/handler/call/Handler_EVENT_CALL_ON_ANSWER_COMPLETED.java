@@ -66,7 +66,7 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
         }
         String error = (String)params.get("error");
         if(StringUtils.isNotBlank(error)){
-            logger.info("应答出错:{}",error);
+            logger.error("应答出错:{},",error);
             return res;
         }
         String call_id = (String)params.get("user_data");

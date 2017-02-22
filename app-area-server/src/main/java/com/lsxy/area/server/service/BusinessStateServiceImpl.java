@@ -62,6 +62,7 @@ public class BusinessStateServiceImpl implements BusinessStateService {
             Map<String,String> datas = new MapBuilder<String,String>()
                     .putIfNotEmpty("tenantId",state.getTenantId())
                     .putIfNotEmpty("appId",state.getAppId())
+                    .putIfNotEmpty("subaccountId",state.getSubaccountId())
                     .putIfNotEmpty("id",state.getId())
                     .putIfNotEmpty("type",state.getType())
                     .putIfNotEmpty("userdata",state.getUserdata())
@@ -109,6 +110,9 @@ public class BusinessStateServiceImpl implements BusinessStateService {
                         case "appId":
                             builder.setAppId(value);
                             break;
+                        case "subaccountId":
+                            builder.setSubaccountId(value);
+                            break;
                         case "id":
                             builder.setId(value);
                             break;
@@ -148,6 +152,14 @@ public class BusinessStateServiceImpl implements BusinessStateService {
         boolean result = Boolean.parseBoolean((String)redisCacheService.hget(getKey(id),"closed"));
         if(logger.isDebugEnabled()){
             logger.debug("businessStateid={},closed={}",id,result);
+        }
+        return result;
+    }
+
+    public String subaccountId(String id){
+        String result = (String)redisCacheService.hget(getKey(id),"subaccountId");
+        if(logger.isDebugEnabled()){
+            logger.debug("businessStateid={},subaccountId={}",id,result);
         }
         return result;
     }
@@ -230,10 +242,14 @@ public class BusinessStateServiceImpl implements BusinessStateService {
         this.updateInnerField(id,params.toArray(new String[params.size()]));
     }
     @Override
-    public void deleteInnerField(String id,String field){
+    public void deleteInnerField(String id,String... fields){
         String key = getKey(id);
         try{
-            redisCacheService.hdel(key,getInnerField(field));
+            String[] fs = new String[fields.length];
+            for (int i = 0,len=fields.length; i < len; i++) {
+                fs[i] = getInnerField(fields[i]);
+            }
+            redisCacheService.hdel(key,fs);
             redisCacheService.expire(key,EXPIRE_START);
         }catch (Throwable t){
             logger.error("delete business state field失败",t);

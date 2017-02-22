@@ -2,6 +2,34 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
            elementFormDefault="unqualified">
 
+    <xsd:simpleType name="uuid">
+        <xsd:restriction base="xs:string">
+            <xsd:minLength value="32" />
+            <xsd:maxLength value="32" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="url">
+        <xsd:restriction base="xs:string">
+            <xsd:minLength value="0" />
+            <xsd:maxLength value="1024" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="userdata">
+        <xsd:restriction base="xs:string">
+            <xsd:minLength value="0" />
+            <xsd:maxLength value="128" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="phonenumber">
+        <xsd:restriction base="xs:string">
+            <xsd:minLength value="1" />
+            <xsd:maxLength value="128" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
     <xs:simpleType name="playrepeat">
         <xs:restriction base="xs:int">
             <xs:minInclusive value="1"></xs:minInclusive>
@@ -15,6 +43,12 @@
         </xs:restriction>
     </xs:simpleType>
 
+    <xs:simpleType name="nonnegativenumber">
+        <xs:restriction base="xs:int">
+            <xs:minInclusive value="0"></xs:minInclusive>
+        </xs:restriction>
+    </xs:simpleType>
+
     <xs:simpleType name="boolnumber">
         <xs:restriction base="xs:int">
             <xs:minInclusive value="0"></xs:minInclusive>
@@ -22,16 +56,23 @@
         </xs:restriction>
     </xs:simpleType>
 
-    <xs:simpleType name="modenumber">
+    <xs:simpleType name="connectmode">
         <xs:restriction base="xs:int">
             <xs:minInclusive value="1"></xs:minInclusive>
             <xs:maxInclusive value="3"></xs:maxInclusive>
         </xs:restriction>
     </xs:simpleType>
 
+    <xs:simpleType name="lsmmode">
+        <xs:restriction base="xs:int">
+            <xs:minInclusive value="1"></xs:minInclusive>
+            <xs:maxInclusive value="4"></xs:maxInclusive>
+        </xs:restriction>
+    </xs:simpleType>
+
     <xs:simpleType name="finish_keys">
         <xs:restriction base="xs:string">
-            <xs:pattern value="[0123456789*#ABCD]"/>
+            <xs:pattern value="[0123456789*#ABCD]+"/>
         </xs:restriction>
     </xs:simpleType>
 
@@ -40,6 +81,13 @@
             <xs:pattern value="\s*\S+\.wav\s*"/>
         </xs:restriction>
     </xs:simpleType>
+
+    <xsd:simpleType name="agentname">
+        <xsd:restriction base="xs:string">
+            <xsd:minLength value="1" />
+            <xsd:maxLength value="128" />
+        </xsd:restriction>
+    </xsd:simpleType>
 
     <xs:complexType name="play">
         <xs:simpleContent>
@@ -108,7 +156,7 @@
             <xs:element name="play" type="play" minOccurs="0" maxOccurs="1"></xs:element>
         </xs:choice>
         <xs:attribute name="max_duration" type="positivenumber"></xs:attribute>
-        <xs:attribute name="mode" type="modenumber"></xs:attribute>
+        <xs:attribute name="mode" type="connectmode"></xs:attribute>
         <xs:attribute name="recording" type="xs:boolean"></xs:attribute>
         <xs:attribute name="volume1" type="positivenumber"></xs:attribute>
         <xs:attribute name="volume2" type="positivenumber"></xs:attribute>
@@ -118,7 +166,7 @@
     <xs:complexType name="dial">
         <xs:choice minOccurs="2" maxOccurs="3">
             <xs:element name="play" type="play" minOccurs="0" maxOccurs="1"></xs:element>
-            <xs:element name="number" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+            <xs:element name="number" type="phonenumber" minOccurs="1" maxOccurs="1"></xs:element>
             <xs:element name="connect" type="connect" minOccurs="1" maxOccurs="1"></xs:element>
         </xs:choice>
         <xs:attribute name="from" type="xs:string"></xs:attribute>
@@ -128,12 +176,20 @@
     </xs:complexType>
 
     <xs:complexType name="condition">
-        <xs:attribute name="id" type="xs:string" use="required"></xs:attribute>
+        <xs:attribute name="id" type="uuid"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="agent">
+        <xs:attribute name="name" type="agentname" use="required"></xs:attribute>
+        <xs:attribute name="priority" type="nonnegativenumber"></xs:attribute>
+        <xs:attribute name="queue_timeout" type="positivenumber"></xs:attribute>
+        <xs:attribute name="fetch_timeout" type="positivenumber"></xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="route">
         <xs:choice minOccurs="1" maxOccurs="1">
-            <xs:element name="condition" type="condition" minOccurs="1" maxOccurs="1"></xs:element>
+            <xs:element name="condition" type="condition" minOccurs="0" maxOccurs="1"></xs:element>
+            <xs:element name="agent" type="agent" minOccurs="0" maxOccurs="1"></xs:element>
         </xs:choice>
     </xs:complexType>
 
@@ -141,20 +197,19 @@
         <xs:choice minOccurs="1" maxOccurs="1">
             <xs:element name="route" type="route" minOccurs="1" maxOccurs="1"></xs:element>
         </xs:choice>
-        <xs:attribute name="channel" type="xs:string" use="required"></xs:attribute>
         <xs:attribute name="conversation_level" type="positivenumber"></xs:attribute>
         <xs:attribute name="conversation_timeout" type="positivenumber"></xs:attribute>
         <xs:attribute name="choice" type="xs:string"></xs:attribute>
         <xs:attribute name="reserve_state" type="xs:string"></xs:attribute>
         <xs:attribute name="fail_overflow" type="xs:boolean"></xs:attribute>
-        <xs:attribute name="wait_voice" type="xs:string"></xs:attribute>
-        <xs:attribute name="ring_mode" type="positivenumber"></xs:attribute>
-        <xs:attribute name="ring_voice" type="xs:string"></xs:attribute>
-        <xs:attribute name="hold_voice" type="xs:string"></xs:attribute>
+        <xs:attribute name="wait_voice" type="playfile"></xs:attribute>
+        <xs:attribute name="ring_mode" type="lsmmode"></xs:attribute>
+        <xs:attribute name="ring_voice" type="playfile"></xs:attribute>
+        <xs:attribute name="hold_voice" type="playfile"></xs:attribute>
         <xs:attribute name="play_num" type="xs:boolean"></xs:attribute>
-        <xs:attribute name="pre_num_voice" type="xs:string"></xs:attribute>
-        <xs:attribute name="post_num_voice" type="xs:string"></xs:attribute>
-        <xs:attribute name="data" type="xs:string"></xs:attribute>
+        <xs:attribute name="pre_num_voice" type="playfile"></xs:attribute>
+        <xs:attribute name="post_num_voice" type="playfile"></xs:attribute>
+        <xs:attribute name="data" type="userdata"></xs:attribute>
     </xs:complexType>
 
     <xs:element name="response">
@@ -172,7 +227,7 @@
                     <xs:element name="enqueue" type="enqueue"/>
                 </xs:choice>
                 <xs:choice minOccurs="1" maxOccurs="1">
-                    <xs:element name="next" type="xs:string"/>
+                    <xs:element name="next" type="url"/>
                 </xs:choice>
             </xs:choice>
         </xs:complexType>

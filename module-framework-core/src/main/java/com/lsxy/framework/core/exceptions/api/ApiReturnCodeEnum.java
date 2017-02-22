@@ -41,14 +41,16 @@ public enum ApiReturnCodeEnum {
     ExtensionUserExist("040101","分机账号已存在"),
     ExtensionBindingToAgent("040102","分机已绑定座席"),
     ExtensionNotExist("040103","分机不存在"),
+    ExtensionUnEnable("040104","分机不可用"),
     AgentHasAlreadyLoggedIn("040201","座席已经登录"),
     AgentNotExist("040202","座席不存在"),
     AgentIsBusy("040203","座席正忙"),
-    ChannelNotExist("040301","通道不存在"),
+    AgentExpired("040204","坐席不可用(过期)"),
     ConditionNotExist("040401","条件不存在"),
     ConditionExpression("040402","条件表达式错误"),
     ConversationNotExist("040501","交谈不存在"),
-    OutOfConversationMaxParts("040502","超过最大交谈成员数")
+    OutOfConversationMaxParts("040502","超过最大交谈成员数"),
+    AgentNotConversationMember("040503","坐席不是交谈的成员")
     ;
 
     private String code;

@@ -10,6 +10,8 @@ public interface BusinessStateService {
 
     public boolean closed(String id);
 
+    public String subaccountId(String id);
+
     public void updateUserdata(String id,String userdata);
 
     public void updateResId(String id,String resId);
@@ -28,7 +30,7 @@ public interface BusinessStateService {
 
     public void updateInnerField(String id,List<String> params);
 
-    public void deleteInnerField(String id,String field);
+    public void deleteInnerField(String id,String... fields);
 
     public void delete(String id);
 }
