@@ -101,13 +101,11 @@ public class EnqueueHandler extends ActionHandler{
         if(enQueue.getRoute().getCondition()!=null){
             businessStateService.updateInnerField(callId,
                     CallCenterUtil.ENQUEUE_START_TIME_FIELD,""+new Date().getTime(),
-                    CallCenterUtil.CHANNEL_ID_FIELD,enQueue.getChannel(),
                     CallCenterUtil.CONDITION_ID_FIELD,enQueue.getRoute().getCondition().getId(),
                     IVRActionService.IVR_NEXT_FIELD,next);
         }else{
             businessStateService.updateInnerField(callId,
                     CallCenterUtil.ENQUEUE_START_TIME_FIELD,""+new Date().getTime(),
-                    CallCenterUtil.CHANNEL_ID_FIELD,enQueue.getChannel(),
                     IVRActionService.IVR_NEXT_FIELD,next);
         }
 

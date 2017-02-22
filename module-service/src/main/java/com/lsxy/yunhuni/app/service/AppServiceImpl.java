@@ -129,7 +129,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     @Override
     public App create(App app) {
         if(App.PRODUCT_CALL_CENTER.equals(app.getServiceType())){
-            app.setCallCenterNum(getCallCenterAppNum());
+            app.setCallCenterNum(getExtensionPrefixNum());
         }
 
         String areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
@@ -139,7 +139,8 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         return app;
     }
 
-    private Long getCallCenterAppNum(){
+    @Override
+    public Long getExtensionPrefixNum(){
         //5位编号
         Long incr5 = redisCacheService.getHashOps(APP_CC_NUM_KEY).increment(APP_CC_NUM_FIELD5, 1L);
         //初始始值是10001,因为redis的incr是从1开始的，所以都加上10000
@@ -211,6 +212,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
                 //更新号码信息，清除应用
                 ResourceTelenum resourceTelenum = rent.getResourceTelenum();
                 resourceTelenum.setAppId(null);
+                resourceTelenum.setSubaccountId(null);
                 resourceTelenumService.save( resourceTelenum);
             }
         }

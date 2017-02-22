@@ -161,6 +161,6 @@ public class CallcenterTest {
 
     @Test
     public void test7() throws YunhuniApiException {
-        System.out.println(callCenterConversationService.pageList(null,"8a2a6a4a58b9c19d0158bd76a9310000",1,10).getTotalCount());;
+        System.out.println(callCenterConversationService.conversationPageList(null,null,"8a2a6a4a58b9c19d0158bd76a9310000",1,10).getTotalCount());;
     }
 }

@@ -54,7 +54,7 @@ public class DeleteConditionEventHandler implements MQMessageHandler<DeleteCondi
         }
         long start = System.currentTimeMillis();
         List<String> agentIds = callCenterAgentService
-                                        .getAgentIdsByChannel(message.getTenantId(),message.getAppId(),message.getChannelId());
+                                        .getAgentIdsBySubaccountId(message.getTenantId(),message.getAppId(),message.getSubaccountId());
         //清空cAs
         cAs.delete(message.getConditionId());
         if(agentIds != null && agentIds.size() > 0){

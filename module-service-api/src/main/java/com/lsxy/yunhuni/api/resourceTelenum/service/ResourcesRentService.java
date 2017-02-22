@@ -30,6 +30,8 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
     Page<ResourcesRent> findByAppId(String appId,int pageNo, int pageSize);
 
 
+    Page<ResourcesRent> findBySubaccount(String appId, String subaccountId, int pageNo, int pageSize);
+
     /**
      * 根据ID获取租用关系
      * @param appId
@@ -115,5 +117,13 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @param isNeedCalled 该批次号码是否需要要检验可呼入性
      */
     String bindNumToAppAndGetAreaId(App app, List<String> nums, boolean isNeedCalled);
+
+    /**
+     * 绑定号码到子账号
+     * @param app
+     * @param nums 要绑定的号码
+     * @param subAccountId 要绑定的子账号
+     */
+    void bindNumToSubaccount(App app, List<String> nums, String subAccountId);
 
 }

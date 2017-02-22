@@ -18,8 +18,8 @@ public class CallCenterConversationDetail implements Serializable{
     @JsonProperty("type")
     private String type;
 
-    @JsonProperty("channel")
-    private String channelId;
+    @JsonProperty("subaccount_id")
+    private String subaccountId;
 
     @JsonProperty("queue_id")
     private String queueId;
@@ -52,12 +52,12 @@ public class CallCenterConversationDetail implements Serializable{
         this.type = type;
     }
 
-    public String getChannelId() {
-        return channelId;
+    public String getSubaccountId() {
+        return subaccountId;
     }
 
-    public void setChannelId(String channelId) {
-        this.channelId = channelId;
+    public void setSubaccountId(String subaccountId) {
+        this.subaccountId = subaccountId;
     }
 
     public String getQueueId() {

@@ -23,7 +23,7 @@ public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serial
      * @param status
      * @return
      */
-    ResourcesRent findByResourceTelenumIdAndRentStatus(String id, int status);
+    ResourcesRent findByResourceTelenumIdAndRentStatusIn(String id, int[] status);
 
     ResourcesRent findByResDataAndRentStatus(String resData, int status);
 
