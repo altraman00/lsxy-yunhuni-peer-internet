@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,7 +24,7 @@ public class ApiCertificateSubAccountDayController extends AbstractRestControlle
     private SubaccountDayService subaccountDayService;
 
     @RequestMapping("/plist")
-    public RestResponse list(int pageNo,int pageSize,String tenantId, String appId, String subId, String startTime, String endTime ){
+    public RestResponse plist(int pageNo,int pageSize,String tenantId, String appId, String subId, String startTime, String endTime ){
         Date date1 = DateUtils.parseDate(startTime+" 00:00:00","yyyy-MM-dd HH:mm:ss");
         if(StringUtils.isEmpty(endTime)){
             endTime = startTime;
@@ -31,6 +32,16 @@ public class ApiCertificateSubAccountDayController extends AbstractRestControlle
         Date date2 =  DateUtils.parseDate(endTime+" 23:59:59","yyyy-MM-dd HH:mm:ss");
         Page page = subaccountDayService.getPageByConditions(pageNo,pageSize,date1,date2,tenantId,appId,subId);
         return RestResponse.success(page);
+    }
+    @RequestMapping("/list")
+    public RestResponse list(String tenantId, String appId, String subId, String startTime, String endTime ){
+        Date date1 = DateUtils.parseDate(startTime+" 00:00:00","yyyy-MM-dd HH:mm:ss");
+        if(StringUtils.isEmpty(endTime)){
+            endTime = startTime;
+        }
+        Date date2 =  DateUtils.parseDate(endTime+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+        List list = subaccountDayService.getListByConditions(date1,date2,tenantId,appId,subId);
+        return RestResponse.success(list);
     }
     @RequestMapping("/sum")
     public RestResponse sum(String tenantId, String appId,String subId, String startTime, String endTime ){

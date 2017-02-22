@@ -1078,8 +1078,8 @@
         el:'#createSubAccountFive',
         data:{
             url:'',
-            voiceNum:0,
-            seatNum:0,
+            voiceNum:-1,
+            seatNum:-1,
             remark:''
         },
         methods:{
