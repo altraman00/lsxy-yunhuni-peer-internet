@@ -10,6 +10,7 @@ local idle = ARGV[3]
 local fetching = ARGV[4]
 local extension_enable = ARGV[5]
 local target_agent_id = ARGV[6]
+local lock_info = ARGV[7]
 local result
 
 local array_to_map = function(_array)
@@ -40,7 +41,7 @@ then
 		redis.log(redis.LOG_WARNING,extension['enable'])
 		if(extension and extension['enable'] and extension['enable'] == extension_enable)
 		then
-			local ok = redis.call('setnx',agent_lock_key_prefix..agent_id, '1')
+			local ok = redis.call('setnx',agent_lock_key_prefix..agent_id, lock_info)
 			redis.log(redis.LOG_WARNING,ok)
 			if ok == 1 then
 				redis.call('HSET',agent_state_key_prefix..agent_id,'lastTime',cur_time)
@@ -105,7 +106,7 @@ end )
 
 for i in pairs(idleAgents) do
 	local id = idleAgents[i].id
-	local ok = redis.call('setnx',agent_lock_key_prefix..id, '1')
+	local ok = redis.call('setnx',agent_lock_key_prefix..id, lock_info)
 	redis.log(redis.LOG_WARNING,ok)
 	if ok == 1 then
 		redis.call('HSET',agent_state_key_prefix..id,'lastTime',cur_time)

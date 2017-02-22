@@ -15,14 +15,14 @@ import java.math.BigDecimal;
                         entityClass=SubaccountStatisticalVO.class,
                         fields= {
                                 @FieldResult(name="id", column="id"),
-                                @FieldResult(name="certId", column="certId"),
-                                @FieldResult(name="secretKey", column="secretKey"),
-                                @FieldResult(name="appId", column="appId"),
-                                @FieldResult(name="appName", column="appName"),
-                                @FieldResult(name="voiceNum", column="voiceNum"),
-                                @FieldResult(name="seatNum", column="seatNum"),
-                                @FieldResult(name="amongAmount", column="amongAmount"),
-                                @FieldResult(name="amongDuration", column="amongDuration")
+                                @FieldResult(name="certId", column="cert_id"),
+                                @FieldResult(name="secretKey", column="secret_key"),
+                                @FieldResult(name="appId", column="app_Id"),
+                                @FieldResult(name="appName", column="app_name"),
+                                @FieldResult(name="voiceNum", column="voice_num"),
+                                @FieldResult(name="seatNum", column="seat_num"),
+                                @FieldResult(name="amongAmount", column="among_amount"),
+                                @FieldResult(name="amongDuration", column="among_duration")
                         })
         }
 )
@@ -94,5 +94,19 @@ public class SubaccountStatisticalVO implements Serializable {
         this.seatNum = seatNum;
     }
 
+    public BigDecimal getAmongAmount() {
+        return amongAmount;
+    }
 
+    public void setAmongAmount(BigDecimal amongAmount) {
+        this.amongAmount = amongAmount;
+    }
+
+    public Long getAmongDuration() {
+        return amongDuration;
+    }
+
+    public void setAmongDuration(Long amongDuration) {
+        this.amongDuration = amongDuration;
+    }
 }

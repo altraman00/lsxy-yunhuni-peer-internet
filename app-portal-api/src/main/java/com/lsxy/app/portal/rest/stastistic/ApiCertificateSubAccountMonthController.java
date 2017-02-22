@@ -34,7 +34,7 @@ public class ApiCertificateSubAccountMonthController extends AbstractRestControl
         return RestResponse.success(page);
     }
     @RequestMapping("/list")
-    public RestResponse list(int pageNo,int pageSize,String tenantId, String appId, String subId, String startTime, String endTime ){
+    public RestResponse list(String tenantId, String appId, String subId, String startTime, String endTime ){
         Date date1 = DateUtils.parseDate(startTime,"yyyy-MM");
         if(StringUtils.isEmpty(endTime)){
             endTime = startTime;

@@ -13,6 +13,7 @@ local idle = ARGV[3]
 local fetching = ARGV[4]
 local target_condition = ARGV[5]
 local extension_enable = ARGV[6]
+local lock_info = ARGV[7]
 
 local array_to_map = function(_array)
     local _map ={}
@@ -44,7 +45,7 @@ then
     redis.log(redis.LOG_WARNING,extension['enable'])
     if(extension and extension['enable'] and extension['enable'] == extension_enable)
     then
-        local ok = redis.call('setnx',agent_lock_key, '1')
+        local ok = redis.call('setnx',agent_lock_key, lock_info)
         redis.log(redis.LOG_WARNING,ok)
         if ok == 1 then
             redis.call('EXPIRE', agent_lock_key, '60')
@@ -63,7 +64,7 @@ aQs = redis.call('ZREVRANGE',aQs_key,0,-1)
 local aQs_size = #aQs
 for i = 1, aQs_size do
     local q_lock_key = queue_lock_key_prefix..aQs[i]
-    local ok = redis.call('setnx',q_lock_key, '1')
+    local ok = redis.call('setnx',q_lock_key, lock_info)
     redis.log(redis.LOG_WARNING,ok)
     if ok == 1 then
         result = aQs[i]
@@ -93,7 +94,7 @@ for i = 1, aCs_size do
     local cQs_size = #cQs
     for j = 1, cQs_size do
         local q_lock_key = queue_lock_key_prefix..cQs[j]
-        local ok = redis.call('setnx',q_lock_key, '1')
+        local ok = redis.call('setnx',q_lock_key, lock_info)
         redis.log(redis.LOG_WARNING,ok)
         if ok == 1 then
             result = cQs[j]
