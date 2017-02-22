@@ -422,7 +422,7 @@
                                             <div class="col-md-4 remove-padding"><input id="five_certId" type="text" class="form-control" placeholder="鉴权账号" /></div>
                                             <div class="col-md-8">
                                                 <button class="btn btn-primary" type="button" onclick="subAccountList()">查询</button>
-                                                <button href="#"  class="btn btn-primary defind modalShow" data-id="five" >创建子账户</button>
+                                                <button href="#"  class="btn btn-primary defind modalShow" data-id="five" >创建子账号</button>
                                             </div>
                                         </div>
 
@@ -451,7 +451,8 @@
                                         </div>
                                         <div  id="subAccount_datail" hidden>
                                             <div class="panel-body devbox remove-padding-left">
-                                                <div class="row ">
+                                                <h4 class="margin-bottom-20">子账号详情</h4>
+                                                <div class="row margin-bottom-10">
                                                     <div class="col-md-1 dev">
                                                         鉴权账号：
                                                     </div>
@@ -461,7 +462,7 @@
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <div class="row ">
+                                                <div class="row margin-bottom-10">
                                                     <div class="col-md-1 dev">
                                                         密钥：
                                                     </div>
@@ -471,17 +472,18 @@
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <div class="row ">
-                                                    <div class="col-md-1 dev">
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev line-height-32">
                                                         回调地址：
                                                     </div>
                                                     <div class="col-md-6">
                                                         <p>
                                                             <input type="text" class="form-control" v-model="url" value="{{url}}" placeholder=""/>
                                                         </p>
+                                                        <span>（子账号的回调地址优先级高于应用的回调地址）</span>
                                                     </div>
                                                 </div>
-                                                <div class="row ">
+                                                <div class="row margin-bottom-10">
                                                     <div class="col-md-1 dev">
                                                         配置额度：
                                                     </div>
@@ -489,28 +491,26 @@
                                                         <p>（负数为额度不作限制，0则表示额度为0，正数为具体的使用额度限制）</p>
                                                     </div>
                                                 </div>
-                                                <div class="row ">
-                                                    <div class="col-md-1 dev">
-                                                        语音（分钟）：
-                                                    </div>
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev line-height-32">语音(分钟)：</div>
                                                     <div class="col-md-6">
                                                         <p>
-                                                            <input type="number"  class="form-control"  v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
+                                                            <input type="text"  class="form-control"  v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
                                                         </p>
                                                     </div>
                                                 </div>
-<c:if test="${app.serviceType == 'call_center'}">
-                                                <div class="row ">
+                                                <c:if test="${app.serviceType == 'call_center'}">
+                                                <div class="row margin-bottom-10">
                                                     <div class="col-md-1 dev">
                                                         坐席（个）：
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <input type="number"  class="form-control"  v-model="seatNum" value="{{seatNum}}" placeholder=""/>
+                                                        <input type="text"  class="form-control"  v-model="seatNum" value="{{seatNum}}" placeholder=""/>
                                                     </div>
                                                 </div>
-</c:if>
-                                                <div class="row ">
-                                                    <div class="col-md-1 dev">
+                                                </c:if>
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev line-height-32">
                                                         备注：
                                                     </div>
                                                     <div class="col-md-6">
@@ -520,8 +520,8 @@
                                             </div>
                                             <div class="row margin-bottom-20">
                                                 <div class="col-md-6">
-                                                    <button class="btn btn-primary" type="button" onclick="tosubAccountHome1()">返回</button>
                                                     <button class="btn btn-primary" type="button" onclick="editSubAccount()">保存</button>
+                                                    <button class="btn btn-primary" type="button" onclick="tosubAccountHome1()">返回</button>
                                                 </div>
                                             </div>
                                             <p class="noticeInfo hr text-success"></p>
@@ -702,37 +702,36 @@
                     2.配额是会员提供给其客户使用服务的额度
                 </p>
                 <div class="row text-center">
-                    <lable class="col-md-3 text-right">回调地址：</lable>
+                    <lable class="col-md-3 text-right line-height-32">回调地址：</lable>
                     <div class="col-md-8">
                         <input type="text" class="form-control" v-model="url"  value="{{url}}" placeholder=""/>
                     </div>
                 </div>
-                <div class="row">
-                    <span class="col-lg-offset-3 col-md-9">
-                        （子账号的回调地址优先级高于应用的回调地址）
-                    </span>
+                <div class="row margin-bottom-10">
+                    <span class="col-lg-offset-3 col-md-9">（子账号的回调地址优先级高于应用的回调地址）</span>
                 </div>
-                <div class="row" style="height: 25px;">
+                <div class="row margin-bottom-10">
                     <lable class="col-md-3 text-right">配置额度：</lable>
                     <div class="col-md-8">
+                        （负数为额度不作限制，0则表示额度为0，正数为具体的使用额度限制）
                     </div>
                 </div>
-                <div class="row margin-bottom-5">
-                    <lable class="col-md-3 text-right">语音（分钟）：</lable>
+                <div class="row margin-bottom-10">
+                    <lable class="col-md-3 text-right line-height-32">语音（分钟）：</lable>
                     <div class="col-md-8">
-                        <input type="number" class="form-control" v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
+                        <input type="text" class="form-control" v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
                     </div>
                 </div>
                 <c:if test="${app.serviceType == 'call_center'}">
-                <div class="row margin-bottom-5">
-                    <lable class="col-md-3 text-right">坐席（个）：</lable>
+                <div class="row margin-bottom-10">
+                    <lable class="col-md-3 text-right line-height-32">坐席（个）：</lable>
                     <div class="col-md-8">
-                        <input type="number" class="form-control" v-model="seatNum"  value="{{seatNum}}" placeholder="" />
+                        <input type="text" class="form-control" v-model="seatNum"  value="{{seatNum}}" placeholder="" />
                     </div>
                 </div>
                 </c:if>
                 <div class="row">
-                    <lable class="col-md-3 text-right">备注：</lable>
+                    <lable class="col-md-3 text-right line-height-32">备注：</lable>
                     <div class="col-md-8">
                         <input type="text" class="form-control" v-model="remark" value="{{remark}}" placeholder=""/>
                     </div>
@@ -812,7 +811,7 @@
             $(function () {
                 $('.modal-box .content input[type="text"]').css("height","30px");
                 $('.modal-box .content input[type="number"]').css("height","30px");
-                $('.modal-box, .appliation-modal-box').css("height","384px");
+                $('.modal-box, .appliation-modal-box').css("height","400px");
             })
         </script>
 
@@ -1985,8 +1984,9 @@
                 html += '<td class="text-center">' + data[i].seatNum + '</td>' ;
             }
             var state = data[i].enabled == 1?"启用":"禁用";
+            var color = data[i].enabled == 1?"text-success":"text-danger";
             var stateEdit = data[i].enabled == 1?"禁用":"启用";
-            html+= '<td class="text-center" id="enable_'+data[i].id+'" >' + state+ '</td>' +
+            html+= '<td class="text-center '+color+'" id="enable_'+data[i].id+'" >' + state+ '</td>' +
                 '<td class="text-center">' + data[i].remark + '</td>' +
                 '<td class="text-center"> <a href="javascript:toSubAccountEnable(\''+data[i].id+'\')" data-state="'+data[i].enabled+'" id="enable_edit_'+data[i].id+'" >'+stateEdit+'</a>&nbsp;<a href="javascript:tosubAccountDatail(\''+data[i].id+'\')" >详情</a>&nbsp;<a href="javascript:delSubAccount(\''+data[i].id+'\')" >删除</a></td>' +
                 '</tr>'
