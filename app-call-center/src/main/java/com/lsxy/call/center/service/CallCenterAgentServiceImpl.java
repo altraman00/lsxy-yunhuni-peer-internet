@@ -400,7 +400,28 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     @Override
     public Page getPage(String appId, Integer pageNo, Integer pageSize) throws YunhuniApiException{
-        return getPage(appId,null, pageNo, pageSize);
+        if(StringUtils.isBlank(appId)){
+            throw new RequestIllegalArgumentException();
+        }
+        List<String> agentIds = new ArrayList<>();
+        Page page;
+        String hql = "from CallCenterAgent obj where obj.appId=?1";
+        page = this.pageList(hql, pageNo, pageSize, appId);
+
+        List<CallCenterAgent> result = page.getResult();
+        //将所有座席ID放入集合中
+        result.stream().forEach(agent ->agentIds.add(agent.getId()));
+        //查询这些座席的技能
+        List<AgentSkill> skills = agentSkillService.findAllByAgents(agentIds);
+        //分组这些技能，以座席Id为key放入Map中
+        Map<String, List<AgentSkill>> collect = skills.stream().collect(Collectors.groupingBy(AgentSkill::getAgent, Collectors.toList()));
+        result.stream().forEach(agent -> {
+            AgentState.Model model = agentState.get(agent.getId());
+            agent.setState(model.getState());
+            agent.setExtension(model.getExtension());
+            agent.setSkills(collect.get(agent.getId()));
+        });
+        return page;
     }
 
     @Override
@@ -414,7 +435,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             String hql = "from CallCenterAgent obj where obj.appId=?1 and obj.subaccountId=?2";
             page = this.pageList(hql, pageNo, pageSize, appId,subaccountId);
         }else{
-            String hql = "from CallCenterAgent obj where obj.appId=?1";
+            String hql = "from CallCenterAgent obj where obj.appId=?1 and obj.subaccountId is null";
             page = this.pageList(hql, pageNo, pageSize, appId);
         }
 
