@@ -10,7 +10,6 @@ import java.util.List;
  */
 public class UpdateSubaccountInputDTO extends CommonDTO{
 
-    @NotNull
     @Pattern(regexp = "[a-zA-z]+://[^\\s]*" )
     private String callbackUrl;
 
