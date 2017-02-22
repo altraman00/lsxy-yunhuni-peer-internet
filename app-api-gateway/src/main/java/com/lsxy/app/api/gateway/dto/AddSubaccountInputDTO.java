@@ -2,6 +2,7 @@ package com.lsxy.app.api.gateway.dto;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 public class AddSubaccountInputDTO extends CommonDTO{
 
     @NotNull
+    @Pattern(regexp = "[a-zA-z]+://[^\\s]*" )
     private String callbackUrl;
 
     @Size(max = 128)

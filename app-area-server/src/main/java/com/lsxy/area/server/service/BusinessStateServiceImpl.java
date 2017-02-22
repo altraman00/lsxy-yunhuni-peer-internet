@@ -156,6 +156,14 @@ public class BusinessStateServiceImpl implements BusinessStateService {
         return result;
     }
 
+    public String subaccountId(String id){
+        String result = (String)redisCacheService.hget(getKey(id),"subaccountId");
+        if(logger.isDebugEnabled()){
+            logger.debug("businessStateid={},subaccountId={}",id,result);
+        }
+        return result;
+    }
+
     private void updateField(String id,String field,String value){
         String key = getKey(id);
         try{

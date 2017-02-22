@@ -100,6 +100,19 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
     @Autowired
     private CallbackUrlUtil callbackUrlUtil;
 
+    private boolean subaccountCheck(String sub1,String sub2){
+        if(sub1 == null && sub2 == null){
+            return true;
+        }
+        if(sub1 != null && sub2 == null){
+            return false;
+        }
+        if(sub1 == null && sub2 != null){
+            return false;
+        }
+        return sub1.equals(sub2);
+    }
+
     @Override
     public boolean dismiss(String subaccountId, String ip, String appId, String conversationId) throws YunhuniApiException{
         if(StringUtils.isBlank(conversationId)){
@@ -117,6 +130,9 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
         }
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
+        }
+        if(!subaccountCheck(subaccountId,businessStateService.subaccountId(conversationId))){
+            throw new ConversationNotExistException();
         }
         return conversationService.dismiss(appId, conversationId);
     }
@@ -145,6 +161,12 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
         String callId = agentIdCallReference.get(agentId);
         if(callId == null){
             throw new CallNotExistsException();
+        }
+        if(!subaccountCheck(subaccountId,businessStateService.subaccountId(callId))){
+            throw new CallNotExistsException();
+        }
+        if(!subaccountCheck(subaccountId,businessStateService.subaccountId(conversationId))){
+            throw new ConversationNotExistException();
         }
         return conversationService.setVoiceMode(conversationId,callId,voiceMode);
     }
@@ -199,7 +221,9 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
         if(conversation_state.getClosed()!= null && conversation_state.getClosed()){
             throw new ConversationNotExistException();
         }
-
+        if(!subaccountCheck(subaccountId,conversation_state.getSubaccountId())){
+            throw new ConversationNotExistException();
+        }
         /**排队都是在呼叫上排队，这里是在交谈上排队，所以创建一个虚拟的呼叫call，兼容排队的逻辑**/
         String callId = UUIDGenerator.uuid();
         BusinessState state = new BusinessState.Builder()
@@ -291,6 +315,9 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
             throw new SystemBusyException();
         }
         if(conversation_state.getClosed()!= null && conversation_state.getClosed()){
+            throw new ConversationNotExistException();
+        }
+        if(!subaccountCheck(subaccountId,conversation_state.getSubaccountId())){
             throw new ConversationNotExistException();
         }
         return conversationService.inviteOut(subaccountId,appId,

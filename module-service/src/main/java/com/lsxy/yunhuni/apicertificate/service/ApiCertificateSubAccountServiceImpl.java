@@ -65,6 +65,7 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
         subAccount.setCallbackUrl(subAccount.getCallbackUrl());
         subAccount.setParentId(cert.getId());
         subAccount.setRemark(subAccount.getRemark());
+        subAccount.setExtensionPrefix(appService.getExtensionPrefixNum());
         this.save(subAccount);
         List<CertAccountQuota> subQuotas = new ArrayList<>();
         List<CertAccountQuota> quotas = subAccount.getQuotas();
