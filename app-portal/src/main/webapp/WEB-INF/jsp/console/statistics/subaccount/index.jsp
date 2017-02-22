@@ -77,7 +77,7 @@
                                             <thead>
                                             <tr>
                                                 <c:set var="sum_cost" value="0.00"></c:set>
-                                                <c:if test="${sum!=null && sum.cost!=null}">
+                                                <c:if test="${sum!=null && sum.amongAmount!=null}">
                                                     <c:set value="${sum.amongAmount}" var="sum_cost"></c:set>
                                                 </c:if>
                                                 <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum_cost}" pattern="0.000"></fmt:formatNumber> 元</span></th>
@@ -98,7 +98,7 @@
                                                     <%--<td><fmt:formatDate value="${result.callStartDt}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>--%>
                                                         <td>${result.certId}</td>
                                                     <td>${result.secretKey}</td>
-                                                    <td><a href="${result.appId}">${result.appName}</td>
+                                                    <td><a href="${ctx}/console/app/detail?id=${result.appId}">${result.appName}</td>
                                                         <td>${result.amongDuration}</td>
                                                         <td><span style="float:left;width: 80px" ><span style="float:right;" >￥<fmt:formatNumber value="${result.amongAmount}" pattern="0.000"></fmt:formatNumber></span></span></td>
                                                         <td>${result.voiceNum}</td>
@@ -108,8 +108,8 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <c:set var="extraParam" value="&start=${start}&end=${end}&appId=${appId}"></c:set>
-                                    <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/callback"></c:set>
+                                    <c:set var="extraParam" value="&dayTime=${dayTime}&monthTime=${monthTime}&appId=${appId}&stime=${stime}"></c:set>
+                                    <c:set var="pageUrl" value="${ctx}/console/statistics/subaccount/index"></c:set>
                                     <%@include file="/inc/pagefooter.jsp" %>
                                 </div>
                             </section>
