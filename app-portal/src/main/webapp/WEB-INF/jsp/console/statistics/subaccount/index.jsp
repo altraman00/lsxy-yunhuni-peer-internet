@@ -48,8 +48,8 @@
                                     <form:form action="${ctx}/console/statistics/subaccount/index" method="post" id="mainForm">
                                         <div class="row margin-bottom-20">
                                             <div class="col-md-9">
-                                                <input type="radio" name="stime" value="day" class="selectdata" <c:if test="${stime == 'month'}">checked </c:if>>日统计
-                                                <input type="radio" name="stime" value="mondth" <c:if test="${stime == 'day'}">checked </c:if> class="selectdata ml-15">月统计
+                                                <input type="radio" name="stime" value="day" class="selectdata" <c:if test="${stime == 'day'}">checked </c:if>>日统计
+                                                <input type="radio" name="stime" value="month" <c:if test="${stime == 'month'}">checked </c:if> class="selectdata ml-15">月统计
                                             </div>
                                         </div>
                                         <div class="row statistics_row" >
@@ -58,10 +58,10 @@
                                                 日期
                                             </div>
                                             <div class="col-md-2">
-                                                <div class="monthform" <c:if test="${stime == 'month'}">hidden</c:if>>
+                                                <div class="dayform" <c:if test="${stime != 'day'}">hidden</c:if>>
                                                     <input type="text" name="dayTime" class="form-control currentDay"  value="${dayTime}"  />
                                                 </div>
-                                                <div class="yearform" <c:if test="${stime == 'day'}">hidden</c:if> <c:if test="${stime == 'month'}">style="display: block;"</c:if>>
+                                                <div class="monthform" <c:if test="${stime != 'month'}">hidden</c:if> <c:if test="${stime == 'month'}">style="display: block;"</c:if>>
                                                     <input type="text" name="monthTime" class="currentMonth form-control" value="${monthTime}"  />
                                                 </div>
                                             </div>
@@ -130,11 +130,11 @@
     $('input[name="stime"]').click(function(){
         var v = $(this).val();
         if(v=='month'){
-            $('.yearform').show();
-            $('.monthform').hide();
-        }else{
             $('.monthform').show();
-            $('.yearform').hide();
+            $('.dayform').hide();
+        }else{
+            $('.dayform').show();
+            $('.monthform').hide();
         }
     });
     function appSubmit(appId){

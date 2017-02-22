@@ -44,6 +44,9 @@ public class SubAccountStatisticsController extends AbstractPortalController {
         if(StringUtil.isEmpty(appId)){
             appId = "all";
         }
+        if("all".equals(appId)){
+            appId1 = "";
+        }
         if(StringUtils.isEmpty(monthTime)){
             monthTime = DateUtils.formatDate(new Date(),"yyyy-MM");
         }
@@ -84,6 +87,9 @@ public class SubAccountStatisticsController extends AbstractPortalController {
         //初始化数据
         if(StringUtil.isEmpty(appId)){
             appId = "all";
+        }
+        if("all".equals(appId)){
+            appId1 = "";
         }
         if(StringUtils.isEmpty(monthTime)){
             monthTime = DateUtils.formatDate(new Date(),"yyyy-MM");
@@ -129,7 +135,7 @@ public class SubAccountStatisticsController extends AbstractPortalController {
         RestResponse<Map> result2 = RestRequest.buildSecurityRequest(token).get(uri2, Map.class, account.getTenant().getId(), appId1,subId,startTime,null);
         //amongAmount
         //amongDuration
-        String amongAmount = (String)result2.getData().get("amongAmount");
+        String amongAmount = result2.getData().get("amongAmount")==null? "": result2.getData().get("amongAmount").toString();
         if(StringUtils.isNotEmpty(amongAmount)){
             one += " 总消费："+amongAmount+"元";
         }else{
