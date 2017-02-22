@@ -133,7 +133,8 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
         String nextDateStr = DateUtils.formatDate(nextDate);
 
         String sql = "SELECT a.tenant_id,a.app_id,a.id AS subaccount_id , IFNULL(b.among_duration,0) AS among_duration, IFNULL(b.among_amount,0) AS among_amount, '"+statisticsDateStr+"' AS dt, "+ day +" AS day , 0 AS msg_used ," +
-                "IFNULL((SELECT d.voice_used FROM tb_bi_cert_subaccount_day d WHERE d.subaccount_id = a.id AND d.dt = '" + preDateStr + "'),0) + IFNULL(b.among_duration,0) AS voice_used " +
+                "IFNULL((SELECT d.voice_used FROM tb_bi_cert_subaccount_day d WHERE d.subaccount_id = a.id AND d.dt = '" + preDateStr + "'),0) + IFNULL(b.among_duration,0) AS voice_used, " +
+                "IFNULL((SELECT qu.value FROM db_lsxy_bi_yunhuni.tb_bi_cert_account_quota qu WHERE qu.type='CallQuota' AND qu.cert_account_id = a.id LIMIT 1),0) AS voice_quota_value, -1 AS msg_quota_value " +
                 "FROM (SELECT p.tenant_id ,s.app_id ,p.id FROM db_lsxy_bi_yunhuni.tb_bi_api_cert p INNER JOIN db_lsxy_bi_yunhuni.tb_bi_api_cert_subaccount s ON p.id = s.id WHERE p.deleted = 0) a " +
                 "LEFT JOIN " +
                 "(SELECT tenant_id,app_id,subaccount_id,SUM(cost_time_long) AS among_duration,SUM(cost) AS among_amount  " +
