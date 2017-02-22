@@ -55,7 +55,7 @@ public class ConversationOpsController extends AbstractAPIController {
             logger.debug("CONVERSATION setVoiceMode API参数,accountId={},appId={},id={},name={},dto={}",accountId,appId,id,name,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        String agentId = callCenterAgentService.getId(appId,name);
+        String agentId = callCenterAgentService.getId(appId,getSubaccountId(request),name);
         if(agentId == null){
             throw new AgentNotExistException();
         }

@@ -123,7 +123,7 @@ public class EnQueueServiceImpl implements EnQueueService{
      * @param enQueue
      */
     @Override
-    public void lookupAgent(String tenantId, String appId,String num, String callId, EnQueue enQueue,String queueType,String conversationId){
+    public void lookupAgent(String tenantId, String appId,String subaccountId,String num, String callId, EnQueue enQueue,String queueType,String conversationId){
         String queueId = null;
         try{
             if(tenantId == null){
@@ -166,7 +166,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                 queueTimout = condition.getQueueTimeout();
             }else if(lookupForAgent){
                 agentName = enQueue.getRoute().getAgent().getName();
-                agent = callCenterAgentService.get(appId,agentName);
+                agent = callCenterAgentService.get(appId,subaccountId,agentName);
                 if(agent == null){
                     throw new AgentNotExistException();
                 }

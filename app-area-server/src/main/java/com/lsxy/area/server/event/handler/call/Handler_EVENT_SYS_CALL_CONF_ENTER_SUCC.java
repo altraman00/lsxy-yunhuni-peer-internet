@@ -163,7 +163,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         }else if(conversationState.getBusinessData().get("enqueue_xml") != null){//排队
             try{
                 EnQueue enqueue = EnQueueDecoder.decode(conversationState.getBusinessData().get("enqueue_xml"));
-                enQueueService.lookupAgent(state.getTenantId(),state.getAppId(),
+                enQueueService.lookupAgent(state.getTenantId(),state.getAppId(),state.getSubaccountId(),
                         businessData.get(CallCenterUtil.AGENT_NAME_FIELD),call_id,enqueue,CallCenterUtil.QUEUE_TYPE_CALL_AGENT,conversation_id);
             }catch (Throwable t){
                 conversationService.exit(conversation_id,call_id);
