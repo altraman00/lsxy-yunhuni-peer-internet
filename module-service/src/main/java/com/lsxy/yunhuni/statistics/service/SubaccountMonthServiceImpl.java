@@ -61,8 +61,8 @@ public class SubaccountMonthServiceImpl extends AbstractService<SubaccountMonth>
                 "obj.among_amount as amongAmount," +
                 "obj.among_duration as amongDuration," +
                 "(CASE WHEN obj.voice_used IS NULL THEN '0'ELSE obj.voice_used END) as test1 ," +
-                "concat( (CASE WHEN obj.voice_used IS NULL THEN '0'ELSE obj.voice_used END) ,'/', (CASE WHEN obj.voice_quota_value IS NULL THEN '0' WHEN obj.voice_quota_value='-1' THEN '∞' ELSE obj.voice_quota_value END) ) as voiceNum," +
-                "concat( (CASE WHEN obj.msg_used IS NULL THEN '0'ELSE obj.msg_used END)  ,'/', (CASE WHEN obj.msg_quota_value IS NULL THEN '0' WHEN obj.msg_quota_value='-1' THEN '∞' ELSE obj.msg_quota_value END)) as seatNum "+sql;
+                "concat( (CASE WHEN obj.voice_used IS NULL THEN '0'ELSE obj.voice_used END) ,'/', (CASE WHEN obj.voice_quota_value IS NULL THEN '0' WHEN obj.voice_quota_value<0 THEN '∞' ELSE obj.voice_quota_value END) ) as voiceNum," +
+                "concat( (CASE WHEN obj.msg_used IS NULL THEN '0'ELSE obj.msg_used END)  ,'/', (CASE WHEN obj.msg_quota_value IS NULL THEN '0' WHEN obj.msg_quota_value<0 THEN '∞' ELSE obj.msg_quota_value END)) as seatNum "+sql;
         Query countQuery = em.createNativeQuery(countSql);
         pageSql +=" group by obj.dt desc";
         Query pageQuery = em.createNativeQuery(pageSql,SubaccountStatisticalVO.class);
@@ -110,7 +110,7 @@ public class SubaccountMonthServiceImpl extends AbstractService<SubaccountMonth>
     public Map sum(Date start, Date end, String tenantId, String appId, String subaccountId) {
         //amongAmount
         //amongDuration
-        String sql = " select sum(among_amount) as amongAmount,sum(among_duration) as amongDuration from db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_month where deleted=0 ";
+        String sql = " select IFNULL(sum(among_amount),0) as amongAmount,IFNULL(sum(among_duration),0) as amongDuration from db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_month where deleted=0 ";
         if(StringUtils.isNotEmpty(appId)){
             sql += " AND app_id = '"+appId+"'";
         }

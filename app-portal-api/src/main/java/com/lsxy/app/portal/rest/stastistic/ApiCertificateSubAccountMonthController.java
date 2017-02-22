@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * Created by zhangxb on 2017/2/21.
  */
-@RequestMapping("/rest/api_sub_account_mondth")
+@RequestMapping("/rest/api_sub_account_month")
 @RestController
 public class ApiCertificateSubAccountMonthController extends AbstractRestController {
     @Autowired

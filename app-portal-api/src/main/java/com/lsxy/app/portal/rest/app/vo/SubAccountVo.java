@@ -30,9 +30,9 @@ public class SubAccountVo {
             for (int i = 0; i < list.size(); i++) {
                 CertAccountQuota certAccountQuota = list.get(i);
                 if(CertAccountQuotaType.AgentQuota.name().equals( certAccountQuota.getType() )){
-                    this.seatNum = ( null == certAccountQuota.getCurrentUsed() ? "0": certAccountQuota.getCurrentUsed() ) +"/" + ( -1 == certAccountQuota.getValue() ? "∞": certAccountQuota.getValue() );
+                    this.seatNum = ( null == certAccountQuota.getCurrentUsed() ? "0": certAccountQuota.getCurrentUsed() ) +"/" + ( 0 > certAccountQuota.getValue() ? "∞": certAccountQuota.getValue() );
                 }else if(CertAccountQuotaType.CallQuota.name().equals( certAccountQuota.getType())){
-                    this.voiceNum = ( null == certAccountQuota.getCurrentUsed() ? "0": certAccountQuota.getCurrentUsed() )+"/" + ( -1 == certAccountQuota.getValue() ? "∞": certAccountQuota.getValue() );
+                    this.voiceNum = ( null == certAccountQuota.getCurrentUsed() ? "0": certAccountQuota.getCurrentUsed() )+"/" + ( 0 > certAccountQuota.getValue() ? "∞": certAccountQuota.getValue() );
                 }
             }
         }
