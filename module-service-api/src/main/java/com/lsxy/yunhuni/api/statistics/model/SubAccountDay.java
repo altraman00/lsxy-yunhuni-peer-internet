@@ -16,7 +16,7 @@ import java.util.Date;
 @Entity
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_cert_subaccount_day")
-public class SubaccountDay extends IdEntity {
+public class SubAccountDay extends IdEntity {
     private String appId;
     private String tenantId;
     private String subaccountId;
