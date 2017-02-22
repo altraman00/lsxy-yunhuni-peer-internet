@@ -15,19 +15,20 @@ import java.util.Date;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_cert_subaccount_day")
-public class SubaccountDay extends IdEntity {
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_cert_subaccount_month")
+public class SubaccountMonth extends IdEntity {
     private String appId;
     private String tenantId;
     private String subaccountId;
     private Date dt;
-    private Integer day;
+    private Integer month;
     private BigDecimal amongAmount;
     private Long amongDuration;
     private Long voiceUsed;
     private Long msgUsed;
     private Long voiceQuotaValue;
     private Long msgQuotaValue;
+
 
     @Column(name = "app_id")
     public String getAppId() {
@@ -65,13 +66,13 @@ public class SubaccountDay extends IdEntity {
         this.dt = dt;
     }
 
-    @Column(name = "day")
-    public Integer getDay() {
-        return day;
+    @Column(name = "month")
+    public Integer getMonth() {
+        return month;
     }
 
-    public void setDay(Integer day) {
-        this.day = day;
+    public void setMonth(Integer month) {
+        this.month = month;
     }
 
     @Column(name = "among_amount")
