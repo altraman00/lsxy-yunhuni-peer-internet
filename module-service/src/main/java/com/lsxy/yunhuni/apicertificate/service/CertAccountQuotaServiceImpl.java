@@ -87,9 +87,8 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
     @Override
     public CertAccountQuota getCurrentQuota(String certAccountId, String type) {
         CertAccountQuota quota = certAccountQuotaDao.findByCertAccountIdAndType(certAccountId,type);
-        Long dateUsed = this.getQuotaUsed(quota);
-        Long balanceUsed = quota.getUsed() == null ? 0L : quota.getUsed();
-        quota.setCurrentUsed(balanceUsed + dateUsed);
+        Long currentUsed = this.getQuotaUsed(quota);
+        quota.setCurrentUsed(currentUsed);
         return quota;
     }
 
@@ -98,9 +97,8 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
         CertAccountQuotaType type = CertAccountQuotaType.valueOf(quota.getType());
         switch (type){
             case CallQuota:{
-                Long dateUsed = this.getQuotaUsed(quota);
-                Long balanceUsed = quota.getUsed() == null ? 0L : quota.getUsed();
-                quota.setCurrentUsed(balanceUsed + dateUsed);
+                Long currentUsed = this.getQuotaUsed(quota);
+                quota.setCurrentUsed(currentUsed);
                 break;
             }
             case AgentQuota:{
