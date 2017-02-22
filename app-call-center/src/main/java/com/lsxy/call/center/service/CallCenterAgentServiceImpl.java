@@ -266,12 +266,9 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         if(StringUtils.isBlank(agentName)){
             throw new RequestIllegalArgumentException();
         }
-        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndSubaccountIdAndName(appId,subaccountId,agentName);
         if(agent == null ){
             // 座席不存在
-            throw new AgentNotExistException();
-        }
-        if(StringUtils.isNotBlank(subaccountId) && !subaccountId.equals(agent.getSubaccountId())){
             throw new AgentNotExistException();
         }
         AgentLock agentLock = new AgentLock(redisCacheService, agent.getId());
@@ -338,12 +335,9 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             throw new RequestIllegalArgumentException();
         }
 
-        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndSubaccountIdAndName(appId,subaccountId,agentName);
         if(agent == null){
             // 座席不存在
-            throw new AgentNotExistException();
-        }
-        if(StringUtils.isNotBlank(subaccountId) && !subaccountId.equals(agent.getSubaccountId())){
             throw new AgentNotExistException();
         }
         agentState.setLastRegTime(agent.getId(),System.currentTimeMillis());
@@ -369,12 +363,9 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         if(StringUtils.isBlank(agentName)){
             throw new RequestIllegalArgumentException();
         }
-        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId, agentName);
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndSubaccountIdAndName(appId,subaccountId, agentName);
         if(agent == null){
             // 座席不存在
-            throw new AgentNotExistException();
-        }
-        if(StringUtils.isNotBlank(subaccountId) && !subaccountId.equals(agent.getSubaccountId())){
             throw new AgentNotExistException();
         }
         AgentState.Model model = agentState.get(agent.getId());
@@ -476,7 +467,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         if(StringUtils.isBlank(extensionId)){
             throw new RequestIllegalArgumentException();
         }
-        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndSubaccountIdAndName(appId,subaccountId,agentName);
         if(agent == null){
             // 座席不存在
             throw new AgentNotExistException();
@@ -524,12 +515,9 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         if(StringUtils.isBlank(state)){
             throw new RequestIllegalArgumentException();
         }
-        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndSubaccountIdAndName(appId,subaccountId,agentName);
         if(agent == null){
             // 座席不存在
-            throw new AgentNotExistException();
-        }
-        if(StringUtils.isNotBlank(subaccountId) && !subaccountId.equals(agent.getSubaccountId())){
             throw new AgentNotExistException();
         }
         return this.state(agent.getTenantId(),agent.getAppId(),agent.getId(),state,false);
@@ -581,12 +569,9 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         if(StringUtils.isBlank(agentName)){
             throw new RequestIllegalArgumentException();
         }
-        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndSubaccountIdAndName(appId,subaccountId,agentName);
         if(agent == null){
             //座席不存在
-            throw new AgentNotExistException();
-        }
-        if(StringUtils.isNotBlank(subaccountId) && !subaccountId.equals(agent.getSubaccountId())){
             throw new AgentNotExistException();
         }
         String agentId = agent.getId();
