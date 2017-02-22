@@ -189,7 +189,20 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
             hql += " and obj.enabled = '"+enabled+"' ";
         }
         Page<ApiCertificateSubAccount> page = this.pageList(hql, pageNo, pageSize, appId);
-        List<CertAccountQuota> quotas = certAccountQuotaService.findByAppId(appId);
+//        List<CertAccountQuota> quotas = certAccountQuotaService.findByAppId(appId);
+        List<ApiCertificateSubAccount> result = page.getResult();
+        List<String> ids = new ArrayList<>();
+        if(result != null){
+            for(ApiCertificateSubAccount subAccount : result){
+                ids.add(subAccount.getId());
+            }
+        }
+        List<CertAccountQuota> quotas = certAccountQuotaService.findByCertAccountIds(ids);
+        for(CertAccountQuota quota : quotas){
+            //获取配额实时的数据
+            certAccountQuotaService.getCurrentQuota(quota);
+        }
+
         Map<String,List<CertAccountQuota>> map = new HashMap();
         for(CertAccountQuota quota : quotas){
             String certAccountId = quota.getCertAccountId();
@@ -200,7 +213,7 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
             }
             quotaList.add(quota);
         }
-        List<ApiCertificateSubAccount> result = page.getResult();
+//        List<ApiCertificateSubAccount> result = page.getResult();
         if(result != null){
             for(ApiCertificateSubAccount subAccount: result){
                 subAccount.setQuotas(map.get(subAccount.getId()));
