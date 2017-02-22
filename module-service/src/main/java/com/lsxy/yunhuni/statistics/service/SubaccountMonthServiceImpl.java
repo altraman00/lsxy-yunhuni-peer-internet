@@ -40,7 +40,10 @@ public class SubaccountMonthServiceImpl extends AbstractService<SubaccountMonth>
 
     @Override
     public Page<SubaccountStatisticalVO> getPageByConditions(Integer pageNo, Integer pageSize, Date startTime, Date endTime, String tenantId,  String appId,String subaccountId) {
-        String sql = " FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_month obj LEFT ON db_lsxy_bi_yunhuni.tb_bi_app a ON obj.appId=a.id WHERE deleted=0 ";
+        String sql = " FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_month obj " +
+                "LEFT JOIN db_lsxy_bi_yunhuni.tb_bi_app a ON obj.app_id=a.id " +
+                "LEFT JOIN db_lsxy_bi_yunhuni.tb_bi_api_cert s ON obj.subaccount_id=s.cert_id " +
+                "WHERE obj.deleted=0 ";
         if(StringUtils.isNotEmpty(appId)){
             sql += " AND app_id = :appId";
         }
@@ -49,7 +52,16 @@ public class SubaccountMonthServiceImpl extends AbstractService<SubaccountMonth>
         }
         sql += " AND obj.tenant_id =:tenantId AND obj.dt BETWEEN :startTime AND :endTime ";
         String countSql = " SELECT COUNT(1) "+sql;
-        String pageSql = " SELECT * "+sql;
+        String pageSql = " SELECT obj.id as id," +
+                "obj.subaccount_id as certId," +
+                "s.secret_key as secretKey," +
+                "obj.app_id as appId," +
+                "a.name as appName," +
+                "obj.among_amount as amongAmount," +
+                "obj.among_duration as amongDuration," +
+                "(CASE WHEN obj.voice_used IS NULL THEN '0'ELSE obj.voice_used END) as test1 ," +
+                "concat( (CASE WHEN obj.voice_used IS NULL THEN '0'ELSE obj.voice_used END) ,'/', (CASE WHEN obj.voice_quota_value IS NULL THEN '0' WHEN obj.voice_quota_value='-1' THEN '∞' ELSE obj.voice_quota_value END) ) as voiceNum," +
+                "concat( (CASE WHEN obj.msg_used IS NULL THEN '0'ELSE obj.msg_used END)  ,'/', (CASE WHEN obj.msg_quota_value IS NULL THEN '0' WHEN obj.msg_quota_value='-1' THEN '∞' ELSE obj.msg_quota_value END)) as seatNum "+sql;
         Query countQuery = em.createNativeQuery(countSql);
         pageSql +=" group by obj.dt desc";
         Query pageQuery = em.createNativeQuery(pageSql,SubaccountStatisticalVO.class);
