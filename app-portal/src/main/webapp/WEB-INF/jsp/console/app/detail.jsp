@@ -493,20 +493,22 @@
                                                 </div>
                                                 <div class="row margin-bottom-10">
                                                     <div class="col-md-1 dev line-height-32">语音(分钟)：</div>
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-6 remove-padding-left">
                                                         <p>
                                                             <input type="text"  class="form-control"  v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
                                                         </p>
                                                     </div>
+                                                    <span class="col-md-1 line-height-32 text-left text-danger">*</span>
                                                 </div>
                                                 <c:if test="${app.serviceType == 'call_center'}">
                                                 <div class="row margin-bottom-10">
                                                     <div class="col-md-1 dev">
                                                         坐席（个）：
                                                     </div>
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-6 remove-padding-left">
                                                         <input type="text"  class="form-control"  v-model="seatNum" value="{{seatNum}}" placeholder=""/>
                                                     </div>
+                                                    <span class="col-md-1 line-height-32 text-left text-danger">*</span>
                                                 </div>
                                                 </c:if>
                                                 <div class="row margin-bottom-10">
@@ -703,9 +705,10 @@
                 </p>
                 <div class="row text-center">
                     <lable class="col-md-3 text-right line-height-32">回调地址：</lable>
-                    <div class="col-md-8">
+                    <div class="col-md-8 remove-padding-left">
                         <input type="text" class="form-control" v-model="url"  value="{{url}}" placeholder=""/>
                     </div>
+
                 </div>
                 <div class="row margin-bottom-10">
                     <span class="col-lg-offset-3 col-md-9">（子账号的回调地址优先级高于应用的回调地址）</span>
@@ -718,16 +721,18 @@
                 </div>
                 <div class="row margin-bottom-10">
                     <lable class="col-md-3 text-right line-height-32">语音（分钟）：</lable>
-                    <div class="col-md-8">
+                    <div class="col-md-8 remove-padding-left">
                         <input type="text" class="form-control" v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
                     </div>
+                    <span class="col-md-1 line-height-32 text-left text-danger">*</span>
                 </div>
                 <c:if test="${app.serviceType == 'call_center'}">
                 <div class="row margin-bottom-10">
                     <lable class="col-md-3 text-right line-height-32">坐席（个）：</lable>
-                    <div class="col-md-8">
+                    <div class="col-md-8 remove-padding-left">
                         <input type="text" class="form-control" v-model="seatNum"  value="{{seatNum}}" placeholder="" />
                     </div>
+                    <span class="col-md-1 line-height-32 text-left text-danger">*</span>
                 </div>
                 </c:if>
                 <div class="row">
@@ -811,7 +816,7 @@
             $(function () {
                 $('.modal-box .content input[type="text"]').css("height","30px");
                 $('.modal-box .content input[type="number"]').css("height","30px");
-                $('.modal-box, .appliation-modal-box').css("height","400px");
+                $('.modal-box, .appliation-modal-box').css("height","450px");
             })
         </script>
 
