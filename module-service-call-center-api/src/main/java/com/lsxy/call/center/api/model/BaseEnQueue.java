@@ -35,7 +35,7 @@ public class BaseEnQueue implements Serializable{
 
     private String post_num_voice;
 
-    private String data;
+    private String user_data;
 
     public String getSubaccountId() {
         return subaccountId;
@@ -149,11 +149,11 @@ public class BaseEnQueue implements Serializable{
         this.post_num_voice = post_num_voice;
     }
 
-    public String getData() {
-        return data;
+    public String getUser_data() {
+        return user_data;
     }
 
-    public void setData(String data) {
-        this.data = data;
+    public void setUser_data(String user_data) {
+        this.user_data = user_data;
     }
 }
