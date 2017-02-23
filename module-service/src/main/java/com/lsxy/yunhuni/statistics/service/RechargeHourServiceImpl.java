@@ -12,11 +12,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Query;
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,12 +42,11 @@ public class RechargeHourServiceImpl extends AbstractService<RechargeHour> imple
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");
-        String sql = " insert into db_lsxy_bi_yunhuni.tb_bi_recharge_hour("+selects+" id,dt,hour,among_amount,among_num,create_time,last_time,deleted,sortno,version ) " +
-                " select "+selects+"  REPLACE(UUID(), '-', '') as id, ? as dt,? as day, "+
-                " IFNULL(sum(amount),0) as among_amount," +
-                " COUNT(1) as among_num, " +
-                " ? as create_time,? as last_time,? as deleted,? as sortno,? as version ";
-        sql +=  " from db_lsxy_base.tb_base_recharge a where status='PAID' and pay_time BETWEEN ? AND ? "+groupbys;
+        String sql = " select "+selects+"  REPLACE(UUID(), '-', '') as id, ? as dt,? as day, "+
+                     " IFNULL(sum(amount),0) as among_amount," +
+                     " COUNT(1) as among_num, " +
+                     " ? as create_time,? as last_time,? as deleted,? as sortno,? as version " +
+                     " from db_lsxy_base.tb_base_recharge a where status='PAID' and pay_time BETWEEN ? AND ? "+groupbys;
         //拼装条件
         Timestamp sqlDate1 = new Timestamp(date1.getTime());
         long times = new Date().getTime();
@@ -58,14 +59,27 @@ public class RechargeHourServiceImpl extends AbstractService<RechargeHour> imple
                 initDate,initDate,0,times,0,
                 sqlDate1,sqlDate3
         };
-        jdbcTemplate.update(sql,new PreparedStatementSetter(){
-            @Override
-            public void setValues(PreparedStatement ps) throws SQLException {
-                for(int i=0;i<obj.length;i++){
-                    ps.setObject(i+1,obj[i]);
-                }
+        Query query = getEm().createNativeQuery(sql);
+        for(int i=0;i<obj.length;i++){
+            query.setParameter(i+1,obj[i]);
+        }
+        List resultList = query.getResultList();
+
+        String values = selects+" id,dt,hour,among_amount,among_num,create_time,last_time,deleted,sortno,version";
+        String valuesMark = "";
+        int length = values.split(",").length;
+        for(int i = 0;i<length;i++){
+            if(i == length -1){
+                valuesMark += "?";
+            }else{
+                valuesMark += "?,";
             }
-        });
+        }
+        String insertSql = " insert into db_lsxy_bi_yunhuni.tb_bi_recharge_hour("+ values + ") values ("+valuesMark+")";
+
+        if(resultList != null && resultList.size() > 0){
+            jdbcTemplate.batchUpdate(insertSql,resultList);
+        }
     }
 
 }

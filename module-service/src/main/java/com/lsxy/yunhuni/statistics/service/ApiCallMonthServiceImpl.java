@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Query;
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -42,11 +43,10 @@ public class ApiCallMonthServiceImpl extends AbstractService<ApiCallMonth> imple
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");
-        String sql = " insert into db_lsxy_bi_yunhuni.tb_bi_api_call_month("+selects+" id,dt,month,among_api,create_time,last_time,deleted,sortno,version ) " +
-                " select "+selects+" REPLACE(UUID(), '-', '') as id, ? as dt,? as month, "+
-                " sum(among_api) as among_api, " +
-                " ? as create_time,? as last_time,? as deleted,? as sortno,? as version ";
-        sql += " from db_lsxy_bi_yunhuni.tb_bi_api_call_day a where tenant_id is not null and app_id is not null and type is not null and a.dt BETWEEN ? AND ? "+groupbys;
+        String sql = " select "+selects+" REPLACE(UUID(), '-', '') as id, ? as dt,? as month, "+
+                     " sum(among_api) as among_api, " +
+                     " ? as create_time,? as last_time,? as deleted,? as sortno,? as version " +
+                     " from db_lsxy_bi_yunhuni.tb_bi_api_call_day a where tenant_id is not null and app_id is not null and type is not null and a.dt BETWEEN ? AND ? "+groupbys;
 
         Timestamp sqlDate1 = new Timestamp(date1.getTime());
         long times = new Date().getTime();
@@ -58,14 +58,29 @@ public class ApiCallMonthServiceImpl extends AbstractService<ApiCallMonth> imple
                 initDate,initDate,0,times,0,
                 sqlDate1,sqlDate3
         };
-        jdbcTemplate.update(sql,new PreparedStatementSetter(){
-            @Override
-            public void setValues(PreparedStatement ps) throws SQLException {
-                for(int i=0;i<obj.length;i++){
-                    ps.setObject(i+1,obj[i]);
-                }
+
+        Query query = getEm().createNativeQuery(sql);
+        for(int i=0;i<obj.length;i++){
+            query.setParameter(i+1,obj[i]);
+        }
+        List resultList = query.getResultList();
+
+        String values = selects+" id,dt,month,among_api,create_time,last_time,deleted,sortno,version";
+        String valuesMark = "";
+        int length = values.split(",").length;
+        for(int i = 0;i<length;i++){
+            if(i == length -1){
+                valuesMark += "?";
+            }else{
+                valuesMark += "?,";
             }
-        });
+        }
+
+        String insertSql = " insert into db_lsxy_bi_yunhuni.tb_bi_api_call_month("+ values + ") values ("+valuesMark+")";
+
+        if(resultList != null && resultList.size() > 0){
+            jdbcTemplate.batchUpdate(insertSql,resultList);
+        }
     }
 
     @Override
