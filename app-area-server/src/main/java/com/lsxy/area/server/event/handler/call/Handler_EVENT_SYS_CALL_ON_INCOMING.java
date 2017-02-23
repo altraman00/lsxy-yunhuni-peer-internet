@@ -6,6 +6,7 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.core.exceptions.api.BalanceNotEnoughException;
 import com.lsxy.framework.core.exceptions.api.NumberNotAllowToCallException;
+import com.lsxy.framework.core.exceptions.api.QuotaNotEnoughException;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
@@ -164,10 +165,14 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 return res;
             }
         }
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,isCallCenter ?
-                ProductCode.call_center.getApiCmd():ProductCode.ivr_call.getApiCmd(), app.getTenant().getId());
-        if(!isAmountEnough){
+        try {
+            calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,isCallCenter ?
+                    ProductCode.call_center.getApiCmd():ProductCode.ivr_call.getApiCmd(), app.getTenant().getId());
+        } catch (BalanceNotEnoughException e) {
             logger.info("[{}][{}]欠费，不能呼入",app.getId(),tenant.getId());
+            return res;
+        } catch (QuotaNotEnoughException e) {
+            logger.info("[{}][{}]配额不足，不能呼入",app.getId(),tenant.getId());
             return res;
         }
 

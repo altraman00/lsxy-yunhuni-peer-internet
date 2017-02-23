@@ -161,12 +161,8 @@ public class CallServiceImpl implements CallService {
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.VoiceCallback)){
             throw new AppServiceInvalidException();
         }
-
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,apiCmd, app.getTenant().getId());
-
-        if(!isAmountEnough){
-            throw new BalanceNotEnoughException();
-        }
+        //判断余额配额是否充足
+        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,apiCmd, app.getTenant().getId());
 
         //TODO 获取号码
         AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app,true, from1,to1,from2, to2);
@@ -310,11 +306,8 @@ public class CallServiceImpl implements CallService {
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.VoiceDirectly)){
             throw new AppServiceInvalidException();
         }
-
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,apiCmd, app.getTenant().getId());
-        if(!isAmountEnough){
-            throw new BalanceNotEnoughException();
-        }
+        //判断余额配额是否充足
+        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,apiCmd, app.getTenant().getId());
 
         AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app, from,to);
         String areaId = selector.getAreaId();
@@ -395,11 +388,8 @@ public class CallServiceImpl implements CallService {
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.VoiceValidate)){
             throw new AppServiceInvalidException();
         }
-
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.captcha_call.getApiCmd(), app.getTenant().getId());
-        if(!isAmountEnough){
-            throw new BalanceNotEnoughException();
-        }
+        //判断余额配额是否充足
+        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.captcha_call.getApiCmd(), app.getTenant().getId());
 
         AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app, from,to);
         String areaId = selector.getAreaId();
