@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Query;
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -35,13 +36,12 @@ public class AppHourServiceImpl extends AbstractService<AppHour> implements AppH
     @Override
     public void hourStatistics(Date date, int hour,String[] select,String[] all) throws  SQLException{
         Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
-        String sql =" insert into db_lsxy_bi_yunhuni.tb_bi_app_hour("+map.get("selects")+"id,dt,hour,sum_on_line,sum_line,sum_app_num,create_time,last_time,deleted,sortno,version) ";
-        sql +=" select "+map.get("selects")+" REPLACE(UUID(), '-', '') as id, ? as dt,? as hour, ";
-        sql +=" (select count(1) from db_lsxy_bi_yunhuni.tb_bi_app where "+map.get("wheres")+" status=1) as sum_on_line, ";
-        sql +=" (select count(1) from db_lsxy_bi_yunhuni.tb_bi_app where "+map.get("wheres")+" status=2) as sum_line, ";
-        sql +=" COUNT(1) as sum_app_num ,";
-        sql +=" ? as create_time,? as last_time,? as deleted,? as sortno,? as version ";
-        sql +=" from db_lsxy_bi_yunhuni.tb_bi_app a "+map.get("groupbys");
+        String sql = " select "+map.get("selects")+" REPLACE(UUID(), '-', '') as id, ? as dt,? as hour, "+
+                     " (select count(1) from db_lsxy_bi_yunhuni.tb_bi_app where "+map.get("wheres")+" status=1) as sum_on_line, "+
+                     " (select count(1) from db_lsxy_bi_yunhuni.tb_bi_app where "+map.get("wheres")+" status=2) as sum_line, "+
+                     " COUNT(1) as sum_app_num ,"+
+                     " ? as create_time,? as last_time,? as deleted,? as sortno,? as version "+
+                     " from db_lsxy_bi_yunhuni.tb_bi_app a "+map.get("groupbys");
         //拼装需要的参数
         Timestamp sqlDate = new Timestamp(date.getTime());
         long times = new Date().getTime();
@@ -49,14 +49,29 @@ public class AppHourServiceImpl extends AbstractService<AppHour> implements AppH
         Object[] obj = new Object[]{
                 sqlDate,hour,initDate,initDate,0,times,0
         };
-        jdbcTemplate.update(sql,new PreparedStatementSetter(){
-            @Override
-            public void setValues(PreparedStatement ps) throws SQLException {
-                for(int i=0;i<obj.length;i++){
-                    ps.setObject(i+1,obj[i]);
-                }
+
+        Query query = getEm().createNativeQuery(sql);
+        for(int i=0;i<obj.length;i++){
+            query.setParameter(i+1,obj[i]);
+        }
+        List resultList = query.getResultList();
+
+        String values = map.get("selects")+"id,dt,hour,sum_on_line,sum_line,sum_app_num,create_time,last_time,deleted,sortno,version";
+        String valuesMark = "";
+        int length = values.split(",").length;
+        for(int i = 0;i<length;i++){
+            if(i == length -1){
+                valuesMark += "?";
+            }else{
+                valuesMark += "?,";
             }
-        });
+        }
+
+        String insertSql =" insert into db_lsxy_bi_yunhuni.tb_bi_app_hour("+ values + ") values ("+valuesMark+")";
+
+        if(resultList != null && resultList.size() > 0){
+            jdbcTemplate.batchUpdate(insertSql,resultList);
+        }
     }
 
 }
