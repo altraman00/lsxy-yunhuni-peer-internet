@@ -89,7 +89,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
                 boolean uB = Pattern.compile(reg).matcher(appExtension.getUser()).find();
                 boolean pB = Pattern.compile(reg).matcher(appExtension.getPassword()).find();
                 if(!uB || !pB){
-                    //throw new RequestIllegalArgumentException();
+                    //throw new RequestIllegalArgumentException(); 
                 }
                 Long ccn;
                 if(StringUtils.isBlank(subaccountId)){
