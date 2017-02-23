@@ -132,7 +132,7 @@ public class CallCenterRegisterImitator {
         Iterable<CallCenterAgent> list = callCenterAgentService.list();
         list.forEach(agent -> {
             try {
-                callCenterAgentService.keepAlive(agent.getAppId(),null, agent.getName());
+                callCenterAgentService.keepAlive(agent.getAppId(),agent.getSubaccountId(), agent.getName());
             } catch (Exception e) {
                 logger.error("座席保持失败",e);
             }
