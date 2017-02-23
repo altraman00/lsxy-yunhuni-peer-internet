@@ -223,7 +223,7 @@ public class IVRActionService {
      * @param url
      * @return
      */
-    public String getFirstIvr(final String call_id,final String url,String from){
+    public String getFirstIvr(final String call_id,final String type,final String url,String from,String user_data){
         String res = null;
         boolean success = false;
         int re_times = 0;
@@ -233,8 +233,10 @@ public class IVRActionService {
                 HttpPost post = new HttpPost(url);
                 Map<String,Object> data = new MapBuilder<String,Object>()
                         .putIfNotEmpty("action","ivr_start")
+                        .putIfNotEmpty("type",type)//ivr_call   ivr_incoming
                         .putIfNotEmpty("call_id",call_id)
                         .putIfNotEmpty("from",from)
+                        .putIfNotEmpty("user_data",user_data)
                         .build();
                 post.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
@@ -488,7 +490,7 @@ public class IVRActionService {
         String resXML = null;
         if(nextUrl == null){//第一次
             nextUrl = state.getCallBackUrl();
-            resXML = getFirstIvr(call_id,nextUrl,state.getBusinessData().get("to"));
+            resXML = getFirstIvr(call_id,state.getType(),nextUrl,state.getBusinessData().get("to"),state.getUserdata());
         }else{
             resXML = getNextRequest(call_id,nextUrl,businessDate.get(IVR_ACTION_FIELD),prevResults);
         }
