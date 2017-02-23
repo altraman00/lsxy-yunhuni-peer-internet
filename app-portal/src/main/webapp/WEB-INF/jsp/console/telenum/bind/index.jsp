@@ -100,7 +100,7 @@
                                             <p>应用上线前测试阶段呼入使用统一的测试号码进行IVR或呼入功能调试</p>
 
                                             <div class="number_on">
-                                                <a>${testCallNumber}</a>
+                                                <a style="text-decoration:none;cursor:default">${testCallNumber}</a>
                                             </div>
 
                                         </form>
