@@ -28,6 +28,7 @@ import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.session.model.CallSession;
@@ -117,6 +118,9 @@ public class ConversationService {
 
     @Autowired
     private CallbackUrlUtil callbackUrlUtil;
+
+    @Autowired
+    private ApiCertificateSubAccountService apiCertificateSubAccountService;
 
     public BaseEnQueue getEnqueue(String queueId){
         BaseEnQueue enqueue = null;
@@ -581,7 +585,7 @@ public class ConversationService {
         }
 
         if(call_state.getClosed()!= null && call_state.getClosed()){
-            throw new SystemBusyException();
+            throw new CallNotExistsException();
         }
 
         BusinessState conversation_state = businessStateService.get(conversation_id);
@@ -600,7 +604,11 @@ public class ConversationService {
         }
 
         if(conversation_state.getClosed()!= null && conversation_state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConversationNotExistException();
+        }
+
+        if(!apiCertificateSubAccountService.subaccountCheck(call_state.getSubaccountId(),conversation_state.getSubaccountId())){
+            throw new ConversationNotExistException();
         }
 
         Map<String,String> call_business=call_state.getBusinessData();
