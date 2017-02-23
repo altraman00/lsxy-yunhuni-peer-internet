@@ -216,7 +216,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         }
         String conversationId = UUIDGenerator.uuid();
         //根据坐席name 找到坐席
-        String agent = callCenterAgentService.getId(appId,name);
+        String agent = callCenterAgentService.getId(appId,subaccountId,name);
         if(StringUtil.isEmpty(agent)){
             throw new AgentNotExistException();
         }
@@ -328,7 +328,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         }
         String conversationId = UUIDGenerator.uuid();
         //根据坐席name 找到坐席
-        String agent = callCenterAgentService.getId(appId,name);
+        String agent = callCenterAgentService.getId(appId,subaccountId,name);
         if(StringUtil.isEmpty(agent)){
             throw new AgentNotExistException();
         }
@@ -434,7 +434,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
-        String agentId = callCenterAgentService.getId(appId,name);
+        String agentId = callCenterAgentService.getId(appId,subaccountId,name);
         if(agentId == null){
             throw new AgentNotExistException();
         }
@@ -491,7 +491,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             throw new BalanceNotEnoughException();
         }
         //根据坐席name 找到坐席
-        String agent = callCenterAgentService.getId(appId,name);
+        String agent = callCenterAgentService.getId(appId,subaccountId,name);
         if(StringUtil.isEmpty(agent)){
             throw new AgentNotExistException();
         }
@@ -604,7 +604,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             throw new AppServiceInvalidException();
         }
 
-        String agentId = callCenterAgentService.getId(appId,name);
+        String agentId = callCenterAgentService.getId(appId,subaccountId,name);
         if(agentId == null){
             throw new AgentNotExistException();
         }
@@ -641,7 +641,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             throw new AppServiceInvalidException();
         }
 
-        String agentId = callCenterAgentService.getId(appId,name);
+        String agentId = callCenterAgentService.getId(appId,subaccountId,name);
         if(agentId == null){
             throw new AgentNotExistException();
         }

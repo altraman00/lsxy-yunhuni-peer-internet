@@ -146,7 +146,14 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
         if(extension == null){
             throw new ExtensionNotExistException();
         }
-        if(StringUtils.isNotBlank(appId) && appId.equals(extension.getAppId()) && (StringUtils.isBlank(subaccountId) || subaccountId.equals(extension.getSubaccountId()))){
+        if(StringUtils.isNotBlank(appId) && appId.equals(extension.getAppId())){
+            if(StringUtils.isBlank(subaccountId) && StringUtils.isNotBlank(extension.getSubaccountId())){
+                throw new ExtensionNotExistException();
+            }
+            if(StringUtils.isNotBlank(subaccountId) && !subaccountId.equals(extension.getSubaccountId())){
+                throw new ExtensionNotExistException();
+            }
+
             //获取分机锁
             ExtensionLock extensionLock = new ExtensionLock(redisCacheService,extensionId);
             boolean lock = extensionLock.lock();
@@ -182,14 +189,24 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
 
     @Override
     public Page<AppExtension> getPage(String appId, Integer pageNo, Integer pageSize) {
-        return getPage(appId,null, pageNo, pageSize);
+        Page page;
+        String hql = "from AppExtension obj where obj.appId=?1";
+        page = this.pageList(hql, pageNo, pageSize, appId);
+        List<AppExtension> result = page.getResult();
+        if(result != null && result.size() > 0){
+            for(AppExtension ext : result){
+                boolean enable = extensionState.getEnable(ext.getId());
+                ext.setEnable(enable);
+            }
+        }
+        return page;
     }
 
     @Override
     public Page<AppExtension> getPage(String appId,String subaccountId, Integer pageNo, Integer pageSize) {
         Page page;
         if(StringUtils.isBlank(subaccountId)){
-            String hql = "from AppExtension obj where obj.appId=?1";
+            String hql = "from AppExtension obj where obj.appId=?1 and obj.subaccountId is null";
             page = this.pageList(hql, pageNo, pageSize, appId);
         }else{
             String hql = "from AppExtension obj where obj.appId=?1 and obj.subaccountId = ?2";
@@ -220,6 +237,9 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
             throw new ExtensionNotExistException();
         }
         if(!appId.equals(extension.getAppId())){
+            throw new ExtensionNotExistException();
+        }
+        if(StringUtils.isBlank(subaccountId) && StringUtils.isNotBlank(extension.getSubaccountId())){
             throw new ExtensionNotExistException();
         }
         if(StringUtils.isNotBlank(subaccountId) && !subaccountId.equals(extension.getSubaccountId())){
