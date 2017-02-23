@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -69,15 +70,15 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");
-        String sql =" insert into db_lsxy_bi_yunhuni.tb_bi_voice_cdr_day("+selects+" id,dt,day,among_cost_time,among_duration,among_connect,among_not_connect,among_call,create_time,last_time,deleted,sortno,version )" +
-                " select "+selects+"  REPLACE(UUID(), '-', '') as id, ? as dt,? as day, "+
-                " IFNULL(sum(among_cost_time),0) as among_cost_time," +
-                " IFNULL(sum(among_duration),0) as among_duration," +
-                " IFNULL(SUM(among_connect),0) as among_connect," +
-                " IFNULL(SUM(among_not_connect),0) as  among_not_connect ," +
-                " IFNULL(SUM(among_call),0) as among_call,"+
-                " ? as create_time,? as last_time,? as deleted,? as sortno,? as version "+
-                " from db_lsxy_bi_yunhuni.tb_bi_voice_cdr_hour a where tenant_id is not null and app_id is not null and type is not null and  dt BETWEEN ? AND ?"+groupbys;
+
+        String sql = " select "+selects+"  REPLACE(UUID(), '-', '') as id, ? as dt,? as day, "+
+                     " IFNULL(sum(among_cost_time),0) as among_cost_time," +
+                     " IFNULL(sum(among_duration),0) as among_duration," +
+                     " IFNULL(SUM(among_connect),0) as among_connect," +
+                     " IFNULL(SUM(among_not_connect),0) as  among_not_connect ," +
+                     " IFNULL(SUM(among_call),0) as among_call,"+
+                     " ? as create_time,? as last_time,? as deleted,? as sortno,? as version "+
+                     " from db_lsxy_bi_yunhuni.tb_bi_voice_cdr_hour a where tenant_id is not null and app_id is not null and type is not null and  dt BETWEEN ? AND ?"+groupbys;
 
         //拼装条件
         Timestamp sqlDate1 = new Timestamp(date1.getTime());
@@ -91,14 +92,28 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
                 initDate,initDate,0,times,0,
                 sqlDate1,sqlDate3
         };
-        jdbcTemplate.update(sql,new PreparedStatementSetter(){
-            @Override
-            public void setValues(PreparedStatement ps) throws SQLException {
-                for(int i=0;i<obj.length;i++){
-                    ps.setObject(i+1,obj[i]);
-                }
+        Query query = getEm().createNativeQuery(sql);
+        for(int i=0;i<obj.length;i++){
+            query.setParameter(i+1,obj[i]);
+        }
+        List resultList = query.getResultList();
+
+        String values = selects+" id,dt,day,among_cost_time,among_duration,among_connect,among_not_connect,among_call,create_time,last_time,deleted,sortno,version";
+        String valuesMark = "";
+        int length = values.split(",").length;
+        for(int i = 0;i<length;i++){
+            if(i == length -1){
+                valuesMark += "?";
+            }else{
+                valuesMark += "?,";
             }
-        });
+        }
+
+        String insertSql = " insert into db_lsxy_bi_yunhuni.tb_bi_voice_cdr_day("+ values + ") values ("+valuesMark+")";
+
+        if(resultList != null && resultList.size() > 0){
+            jdbcTemplate.batchUpdate(insertSql,resultList);
+        }
     }
 
     public long getAmongDurationBetween(Date d1,Date d2){
