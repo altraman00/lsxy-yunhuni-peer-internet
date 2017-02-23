@@ -22,6 +22,7 @@ import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.app.service.ServiceType;
@@ -115,18 +116,8 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
     @Autowired
     private ExtensionState extensionState;
 
-    private boolean subaccountCheck(String sub1,String sub2){
-        if(sub1 == null && sub2 == null){
-            return true;
-        }
-        if(sub1 != null && sub2 == null){
-            return false;
-        }
-        if(sub1 == null && sub2 != null){
-            return false;
-        }
-        return sub1.equals(sub2);
-    }
+    @Autowired
+    private ApiCertificateSubAccountService apiCertificateSubAccountService;
 
     @Override
     public void reject(String subaccountId, String ip, String appId, String name, String queueId, String userData) throws YunhuniApiException {
@@ -162,7 +153,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         if(state == null || (state.getClosed()!=null && state.getClosed())){
             throw new CallNotExistsException();
         }
-        if(!subaccountCheck(subaccountId,state.getSubaccountId())){
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,state.getSubaccountId())){
             throw new CallNotExistsException();
         }
         if(state.getResId() == null){
@@ -222,7 +213,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         if(callCenterAgent == null){
             throw new AgentNotExistException();
         }
-        if(!subaccountCheck(subaccountId,callCenterAgent.getSubaccountId())){
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,callCenterAgent.getSubaccountId())){
             throw new AgentNotExistException();
         }
         //获取坐席状态
@@ -332,7 +323,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         if(callCenterAgent == null){
             throw new AgentNotExistException();
         }
-        if(!subaccountCheck(subaccountId,callCenterAgent.getSubaccountId())){
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,callCenterAgent.getSubaccountId())){
             throw new AgentNotExistException();
         }
         //获取坐席状态
@@ -475,7 +466,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             throw new ConversationNotExistException();
         }
 
-        if(!subaccountCheck(subaccountId,conversationState.getSubaccountId())){
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,conversationState.getSubaccountId())){
             throw new ConversationNotExistException();
         }
         if(conversationState.getResId() == null){
@@ -493,7 +484,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         if(callCenterAgent == null){
             throw new AgentNotExistException();
         }
-        if(!subaccountCheck(subaccountId,callCenterAgent.getSubaccountId())){
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,callCenterAgent.getSubaccountId())){
             throw new AgentNotExistException();
         }
         //获取坐席状态
@@ -606,10 +597,10 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         if(callId == null){
             throw new CallNotExistsException();
         }
-        if(!subaccountCheck(subaccountId,businessStateService.subaccountId(callId))){
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,businessStateService.subaccountId(callId))){
             throw new CallNotExistsException();
         }
-        if(!subaccountCheck(subaccountId,businessStateService.subaccountId(conversationId))){
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,businessStateService.subaccountId(conversationId))){
             throw new ConversationNotExistException();
         }
         conversationService.exit(conversationId,callId);
@@ -650,7 +641,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         if(state == null || (state.getClosed() !=null && state.getClosed())){
             return result;
         }
-        if(!subaccountCheck(subaccountId,state.getSubaccountId())){
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,state.getSubaccountId())){
             return result;
         }
         Set<String> ids = callConversationService.getConversations(callId);

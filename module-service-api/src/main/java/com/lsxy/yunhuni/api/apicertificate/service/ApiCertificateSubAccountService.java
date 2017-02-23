@@ -24,4 +24,13 @@ public interface ApiCertificateSubAccountService extends BaseService<ApiCertific
     Page<ApiCertificateSubAccount> pageListWithNotQuota(String appId,int pageNo, int pageSize);
 
     Page<ApiCertificateSubAccount> pageListWithQuotaByCondition(String appId,int pageNo, int pageSize,String certId,String remark,Integer  enabled);
+
+    /**
+     * 判断子账号是否一致
+     * @param sub1
+     * @param sub2
+     * @return
+     */
+    boolean subaccountCheck(String sub1,String sub2);
+
 }
