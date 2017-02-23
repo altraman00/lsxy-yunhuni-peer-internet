@@ -97,7 +97,7 @@ public class SubaccountMonthServiceImpl extends AbstractService<SubaccountMonth>
         List list = new ArrayList();
         Page<SubaccountStatisticalVO> page = getPageByConditions(pageNo,pageSize,startTime,  endTime,  tenantId,  appId,  subaccountId);
         list.addAll(page.getResult());
-        if(page.getCurrentPageNo() < page.getTotalPageCount()){
+        while(page.getCurrentPageNo() < page.getTotalPageCount()){
             pageNo = Long.valueOf(page.getCurrentPageNo()).intValue()+1;
             page = getPageByConditions(pageNo,pageSize,startTime,  endTime,  tenantId,  appId,  subaccountId);
             list.addAll(page.getResult());
