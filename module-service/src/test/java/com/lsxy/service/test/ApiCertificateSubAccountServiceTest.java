@@ -4,6 +4,7 @@ import com.lsxy.framework.FrameworkServiceConfig;
 import com.lsxy.framework.api.FrameworkApiConfig;
 import com.lsxy.framework.cache.FrameworkCacheConfig;
 import com.lsxy.framework.config.Constants;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
@@ -12,8 +13,11 @@ import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
+import com.lsxy.yunhuni.api.apicertificate.service.CertAccountQuotaService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
+import com.lsxy.yunhuni.api.statistics.service.SubaccountDayService;
+import com.lsxy.yunhuni.api.statistics.service.SubaccountMonthService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +28,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -82,6 +87,26 @@ public class ApiCertificateSubAccountServiceTest {
         for(ResourcesRent rent:result){
             System.out.println(rent.getResourceTelenum().getTelNumber());
         }
+    }
+
+    @Autowired
+    CertAccountQuotaService certAccountQuotaService;
+
+    @Test
+    public void testQuotaStatistics(){
+        Date date = new Date();
+        Date preDate = DateUtils.getPreDate(date);
+        certAccountQuotaService.dayStatics(preDate);
+    }
+
+    @Autowired
+    SubaccountDayService subaccountDayService;
+    @Autowired
+    SubaccountMonthService subaccountMonthService;
+    @Test
+    public void testDayStatistics(){
+        Date prevMonth = DateUtils.getPrevMonth(new Date());
+        subaccountMonthService.monthStatistics(new Date());
     }
 
 }

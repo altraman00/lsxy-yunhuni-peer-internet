@@ -92,7 +92,7 @@ public class ReentrantLock extends DistributeLock{
             // 竞争条件只可能出现在锁超时的情况, 因为如果没有超时, 线程发现锁并不是被自己持有, 线程就不会去动value
             if (isTimeExpired(currLockInfo.getExpires())) {
                 // 锁超时了
-                LockInfo oldLockInfo = LockInfo.fromString(redis.getAndSet(lockKey, newLockInfoJson));
+                LockInfo oldLockInfo = LockInfo.fromString(redis.getAndSet(lockKey, newLockInfoJson,lockExpires));
                 if (oldLockInfo != null && isTimeExpired(oldLockInfo.getExpires())) {
                     if(logger.isDebugEnabled()){
                         logger.info("{} get lock(new), lockInfo: {}", Thread.currentThread().getName(), newLockInfoJson);
@@ -148,7 +148,7 @@ public class ReentrantLock extends DistributeLock{
         LockInfo currLockInfo = LockInfo.fromString(currLockInfoJson);
 
         if (isTimeExpired(currLockInfo.getExpires())) {
-            LockInfo oldLockInfo = LockInfo.fromString(redis.getAndSet(lockKey, newLockInfo));
+            LockInfo oldLockInfo = LockInfo.fromString(redis.getAndSet(lockKey, newLockInfo,lockExpires));
             if (oldLockInfo != null && isTimeExpired(oldLockInfo.getExpires())) {
                 locked = true;
                 return true;

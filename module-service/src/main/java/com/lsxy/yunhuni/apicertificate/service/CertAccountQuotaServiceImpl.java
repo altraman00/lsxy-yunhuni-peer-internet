@@ -19,6 +19,7 @@ import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -197,12 +198,13 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
             switch (type){
                 case CallQuota:{
                     Map staticCdr = voiceCdrService.getStaticCdr(null, null, subaccount.getId(), startDate, endDate);
-                    Long costTimeLong = (Long) staticCdr.get("costTimeLong");
+                    BigDecimal costTimeLong = (BigDecimal) staticCdr.get("costTimeLong");
                     Long oleUsed = quota.getUsed() == null ? 0L : quota.getUsed();
-                    quota.setUsed(oleUsed + costTimeLong);
-                    this.save(quota);
+                    quota.setUsed(oleUsed + costTimeLong.longValue());
                 }
             }
+            quota.setBalanceDt(staticsDate);
+            this.save(quota);
         }
     }
 
