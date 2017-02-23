@@ -69,8 +69,8 @@ public class EnqueueHandler extends ActionHandler{
         String xml = root.asXML();
         EnQueue enQueue = EnQueueDecoder.decode(xml);
         if(enQueue!=null){
-            if(StringUtil.isNotEmpty(enQueue.getData())){
-                businessStateService.updateUserdata(callId,enQueue.getData());
+            if(StringUtil.isNotEmpty(enQueue.getUser_data())){
+                businessStateService.updateUserdata(callId,enQueue.getUser_data());
             }
             if(StringUtil.isNotBlank(enQueue.getWait_voice())){
                 String playWait = enQueue.getWait_voice();
