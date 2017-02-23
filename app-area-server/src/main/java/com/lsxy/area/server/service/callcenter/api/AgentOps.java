@@ -209,11 +209,9 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
+        //判断余额配额是否充足
+        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
-        if(!isAmountEnough){
-            throw new BalanceNotEnoughException();
-        }
         String conversationId = UUIDGenerator.uuid();
         //根据坐席name 找到坐席
         String agent = callCenterAgentService.getId(appId,subaccountId,name);
@@ -321,11 +319,9 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
+        //判断余额配额是否充足
+        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
-        if(!isAmountEnough){
-            throw new BalanceNotEnoughException();
-        }
         String conversationId = UUIDGenerator.uuid();
         //根据坐席name 找到坐席
         String agent = callCenterAgentService.getId(appId,subaccountId,name);
@@ -485,11 +481,9 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         if(conversationState.getResId() == null){
             throw new SystemBusyException();
         }
+        //判断余额配额是否充足
+        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
-        if(!isAmountEnough){
-            throw new BalanceNotEnoughException();
-        }
         //根据坐席name 找到坐席
         String agent = callCenterAgentService.getId(appId,subaccountId,name);
         if(StringUtil.isEmpty(agent)){
