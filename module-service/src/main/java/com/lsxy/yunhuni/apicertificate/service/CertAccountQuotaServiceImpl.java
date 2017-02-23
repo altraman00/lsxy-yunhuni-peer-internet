@@ -123,7 +123,7 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
     public Long getQuotaUsed(String certAccountId,Date date,Date lastBalanceDate,Long used,String type){
         if(date.getTime() > lastBalanceDate.getTime()){
             Date newBalanceDate = DateUtils.nextDate(lastBalanceDate);
-            Long dateUsed = getQuotaUsedFromRedis(certAccountId, date,type);
+            Long dateUsed = getQuotaUsedFromRedis(certAccountId, newBalanceDate,type);
             used = used + dateUsed;
             return getQuotaUsed(certAccountId, date, newBalanceDate, used,type);
         }else{
