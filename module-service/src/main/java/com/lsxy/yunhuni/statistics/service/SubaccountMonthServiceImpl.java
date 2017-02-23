@@ -131,22 +131,24 @@ public class SubaccountMonthServiceImpl extends AbstractService<SubaccountMonth>
         Date preDate = DateUtils.getPrevMonth(staticsDate);
         String preDateStr = DateUtils.formatDate(preDate);
         String nextDateStr = DateUtils.getNextMonth(statisticsDateStr, "yyyy-MM-dd HH:mm:ss");
+        String currentDateStr = DateUtils.formatDate(new Date());
 
-        String sql = " SELECT a.tenant_id,a.app_id,a.id AS subaccount_id , IFNULL(b.among_duration,0) AS among_duration, IFNULL(b.among_amount,0) AS among_amount, '"+statisticsDateStr+"' AS dt, "+ month +" AS MONTH , 0 AS msg_used ," +
-                " IFNULL((SELECT d.voice_used FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day d WHERE d.subaccount_id = a.id AND d.dt = '" + preDateStr + "'),0) + IFNULL(b.among_duration,0) AS voice_used, " +
-                " IFNULL((SELECT qu.value FROM db_lsxy_bi_yunhuni.tb_bi_cert_account_quota qu WHERE qu.type='CallQuota' AND qu.cert_account_id = a.id LIMIT 1),0) AS voice_quota_value, -1 AS msg_quota_value " +
-                " FROM (SELECT p.tenant_id ,s.app_id ,p.id FROM db_lsxy_bi_yunhuni.tb_bi_api_cert p INNER JOIN db_lsxy_bi_yunhuni.tb_bi_api_cert_subaccount s ON p.id = s.id WHERE p.deleted = 0) a " +
-                " LEFT JOIN " +
-                " ( SELECT tenant_id,app_id,subaccount_id,SUM(among_duration) AS among_duration,SUM(among_amount) AS among_amount  " +
-                " FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day  WHERE dt >= '" + statisticsDateStr + "' AND  dt < '" + nextDateStr + "' GROUP BY tenant_id,app_id,subaccount_id) b " +
-                " ON a.id = b.subaccount_id ";
-        Query query = getEm().createNativeQuery(sql, SubaccountMonth.class);
-        List<SubaccountMonth> result = query.getResultList();
-        //TODO 批量保存
-        if(result != null){
-            for(SubaccountMonth monthStatics : result){
-                this.save(monthStatics);
-            }
+        String sql = "SELECT REPLACE(UUID(), '-', '') AS id,a.app_id,a.tenant_id,a.id AS subaccount_id ,'"+statisticsDateStr+"' AS dt, "+ month +" AS month , IFNULL(b.among_amount,0) AS among_amount, IFNULL(b.among_duration,0) AS among_duration," +
+                "IFNULL((SELECT d.voice_used FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_month d WHERE d.subaccount_id = a.id AND d.dt = '" + preDateStr + "'),0) + IFNULL(b.among_duration,0) AS voice_used, 0 AS msg_used ," +
+                "IFNULL((SELECT qu.value FROM db_lsxy_bi_yunhuni.tb_bi_cert_account_quota qu WHERE qu.type='CallQuota' AND qu.cert_account_id = a.id LIMIT 1),0) AS voice_quota_value, -1 AS msg_quota_value ," +
+                "'"+currentDateStr + "' AS create_time, '"+ currentDateStr + "' AS last_time," + " 0 AS deleted,0 AS sortno,0 AS version "+
+                "FROM (SELECT p.tenant_id ,s.app_id ,p.id FROM db_lsxy_bi_yunhuni.tb_bi_api_cert p INNER JOIN db_lsxy_bi_yunhuni.tb_bi_api_cert_subaccount s ON p.id = s.id WHERE p.deleted = 0) a " +
+                "LEFT JOIN " +
+                "(SELECT tenant_id,app_id,subaccount_id,SUM(among_duration) AS among_duration,SUM(among_amount) AS among_amount  " +
+                "FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day WHERE dt >= '" + statisticsDateStr + "'  AND dt < '" + nextDateStr + "' GROUP BY tenant_id,app_id,subaccount_id) b " +
+                "ON a.id = b.subaccount_id";
+        Query query = getEm().createNativeQuery(sql);
+        List result = query.getResultList();
+        if(result != null && result.size() >0){
+            String insertSql = "INSERT INTO db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_month (id,app_id,tenant_id,subaccount_id,dt,month,among_amount,among_duration,voice_used," +
+                    "msg_used,voice_quota_value,msg_quota_value,create_time,last_time,deleted,sortno,version) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+            jdbcTemplate.batchUpdate(insertSql,result);
         }
     }
 
