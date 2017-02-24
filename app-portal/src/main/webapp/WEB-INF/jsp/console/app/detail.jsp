@@ -1063,6 +1063,11 @@
             showtoast("配额参数必须为数字");
             return;
         }
+        var re = /^http[s]?:\/\/.+$/;
+        if(!re.test(editSubAccountFive.url)){
+            showtoast("回调地址格式错误");
+            return;
+        }
         if(editSubAccountFive.remark.length > 128){
             showtoast("备注信息长度不能超过128");
             return;
@@ -1106,6 +1111,11 @@
         if(isNaN(createSubAccountFive.voiceNum) || isNaN(createSubAccountFive.seatNum) ||
             createSubAccountFive.voiceNum=='' || createSubAccountFive.seatNum==''){
             showtoast("配额参数必须为数字");
+            return;
+        }
+        var re = /^http[s]?:\/\/.+$/;
+        if(!re.test(editSubAccountFive.url)){
+            showtoast("回调地址格式错误");
             return;
         }
         if(createSubAccountFive.remark.length > 128){
