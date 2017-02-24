@@ -62,6 +62,34 @@ public class AreaAndTelNumSelector {
     }
 
     /**
+     * 获取一个可用的号码
+     * @param subaccountId
+     * @param app
+     * @return
+     * @throws YunhuniApiException
+     */
+    public ResourceTelenum getTelnumber(String subaccountId, App app) throws YunhuniApiException {
+        //查找租户私有线路
+        List<LineGatewayVO> lineGateways = lineGatewayToTenantService.findByTenantIdAndAreaId(app.getTenant().getId(),app.getAreaId());
+        if(lineGateways == null || lineGateways.size() == 0){
+            //如果没有私有线路，找公共线路
+            lineGateways = lineGatewayToPublicService.findAllLineGatewayByAreaId(app.getAreaId());
+        }
+        if(lineGateways == null || lineGateways.size() == 0){
+            //TODO 没有线路，则抛出异常
+            throw new NotAvailableLineException();
+        }
+        //所拥有的线路ID列表
+        List<String> lineIds = lineGateways.stream().map(LineGatewayVO::getId).collect(Collectors.toList());
+        List<ResourceTelenum> telnumbers = resourceTelenumService.findDialingTelnumber(subaccountId,lineIds,app);
+        if(telnumbers != null && telnumbers.size() > 0){
+            return telnumbers.get(0);
+        }else{
+            return null;
+        }
+    }
+
+    /**
      *
      * @param app
      * @param subaccountId 子账号ID,为null表示为主账号
