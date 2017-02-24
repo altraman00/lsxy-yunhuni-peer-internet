@@ -580,7 +580,11 @@ public class ConversationService {
         }
         BusinessState call_state = businessStateService.get(call_id);
 
-        if(call_state ==null || call_state.getResId() == null){
+        if(call_state == null){
+            throw new CallNotExistsException();
+        }
+
+        if(call_state.getResId() == null){
             throw new SystemBusyException();
         }
 
@@ -599,7 +603,11 @@ public class ConversationService {
             return false;
         }
 
-        if(conversation_state == null || conversation_state.getResId() == null){
+        if(conversation_state == null){
+            throw new ConversationNotExistException();
+        }
+
+        if(conversation_state.getResId() == null){
             throw new SystemBusyException();
         }
 
@@ -740,7 +748,12 @@ public class ConversationService {
             throw new RequestIllegalArgumentException();
         }
         BusinessState call_state = businessStateService.get(callId);
-        if(call_state ==null || call_state.getResId() == null){
+
+        if(call_state == null){
+            throw new CallNotExistsException();
+        }
+
+        if(call_state.getResId() == null){
             throw new SystemBusyException();
         }
 
@@ -749,7 +762,12 @@ public class ConversationService {
         }
 
         BusinessState conversation_state = businessStateService.get(conversationId);
-        if(conversation_state == null || conversation_state.getResId() == null){
+
+        if(conversation_state == null){
+            throw new ConfNotExistsException();
+        }
+
+        if(conversation_state.getResId() == null){
             throw new SystemBusyException();
         }
 
