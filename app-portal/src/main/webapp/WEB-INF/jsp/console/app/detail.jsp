@@ -700,7 +700,7 @@
             <div class="title">创建子账号<a class="close_a modalCancel cancelfive" data-id="five"></a></div>
             <div class="content" id="createSubAccountFive" >
                 <p class="info info font14">
-                    1.创建子账号后，系统将会自动生成一个子账号和子账号密钥<br/>
+                    1.创建子账号后，系统将会自动生成一个鉴权账号和密钥<br/>
                     2.配额是会员提供给其客户使用服务的额度
                 </p>
                 <div class="row text-center">
@@ -812,6 +812,9 @@
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.iframe-transport.js"></script>
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.fileupload-validate.js"></script>
         <script>
+            $('.cancelfive').click(function(){
+                createSubAccountFive.init();
+            });
             var appServiceType = '${app.serviceType}';
             $(function () {
                 $('.modal-box .content input[type="text"]').css("height","30px");
@@ -1050,11 +1053,16 @@
             },
             initObj2:function(obj){
                 this.id=this.certId=this.secretKey = this.url= this.remark='';
-                this.voiceNum= this.seatNum=0;
+                this.voiceNum= this.seatNum=-1;
             }
         }
     });
     function editSubAccount(){
+        if(isNaN(editSubAccountFive.voiceNum) || isNaN(editSubAccountFive.seatNum) ||
+            editSubAccountFive.voiceNum=='' || editSubAccountFive.seatNum==''){
+            showtoast("配额参数必须为数字");
+            return;
+        }
         var params = {
             'id':editSubAccountFive.id,
             'url':editSubAccountFive.url,
@@ -1393,6 +1401,7 @@
         if(type=='subAccount' ){
             tosubAccountHome();
             subAccountList();
+            $('#uploadButton').hide();
         }
     });
 
