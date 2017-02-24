@@ -433,9 +433,9 @@
                                                 <th class="text-center">鉴权账号</th>
                                                 <th class="text-center">密钥</th>
                                                 <th class="text-center">语音用量 /总量（分钟）</th>
-<c:if test="${app.serviceType == 'call_center'}">
-                                                <th class="text-center">坐席用量 /总量（个）</th>
-</c:if>
+<%--<c:if test="${app.serviceType == 'call_center'}">--%>
+                                                <%--<th class="text-center">坐席用量 /总量（个）</th>--%>
+<%--</c:if>--%>
                                                 <th class="text-center">状态</th>
                                                 <th class="text-center">备注</th>
                                                 <th class="text-center">操作</th>
@@ -500,17 +500,17 @@
                                                     </div>
                                                     <span class="col-md-1 line-height-32 text-left text-danger">*</span>
                                                 </div>
-                                                <c:if test="${app.serviceType == 'call_center'}">
-                                                <div class="row margin-bottom-10">
-                                                    <div class="col-md-1 dev">
-                                                        坐席（个）：
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <input type="text"  class="form-control"  v-model="seatNum" value="{{seatNum}}" placeholder=""/>
-                                                    </div>
-                                                    <span class="col-md-1 line-height-32 text-left text-danger">*</span>
-                                                </div>
-                                                </c:if>
+                                                <%--<c:if test="${app.serviceType == 'call_center'}">--%>
+                                                <%--<div class="row margin-bottom-10">--%>
+                                                    <%--<div class="col-md-1 dev">--%>
+                                                        <%--坐席（个）：--%>
+                                                    <%--</div>--%>
+                                                    <%--<div class="col-md-6">--%>
+                                                        <%--<input type="text"  class="form-control"  v-model="seatNum" value="{{seatNum}}" placeholder=""/>--%>
+                                                    <%--</div>--%>
+                                                    <%--<span class="col-md-1 line-height-32 text-left text-danger">*</span>--%>
+                                                <%--</div>--%>
+                                                <%--</c:if>--%>
                                                 <div class="row margin-bottom-10">
                                                     <div class="col-md-1 dev line-height-32">
                                                         备注：
@@ -726,15 +726,15 @@
                     </div>
                     <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
                 </div>
-                <c:if test="${app.serviceType == 'call_center'}">
-                <div class="row margin-bottom-10">
-                    <lable class="col-md-3 text-right line-height-32">坐席（个）：</lable>
-                    <div class="col-md-8 remove-padding-right">
-                        <input type="text" class="form-control" v-model="seatNum"  value="{{seatNum}}" placeholder="" />
-                    </div>
-                    <span class="col-md-1 line-height-32 text-left text-danger padding-left-5">*</span>
-                </div>
-                </c:if>
+                <%--<c:if test="${app.serviceType == 'call_center'}">--%>
+                <%--<div class="row margin-bottom-10">--%>
+                    <%--<lable class="col-md-3 text-right line-height-32">坐席（个）：</lable>--%>
+                    <%--<div class="col-md-8 remove-padding-right">--%>
+                        <%--<input type="text" class="form-control" v-model="seatNum"  value="{{seatNum}}" placeholder="" />--%>
+                    <%--</div>--%>
+                    <%--<span class="col-md-1 line-height-32 text-left text-danger padding-left-5">*</span>--%>
+                <%--</div>--%>
+                <%--</c:if>--%>
                 <div class="row">
                     <lable class="col-md-3 text-right line-height-32">备注：</lable>
                     <div class="col-md-8 remove-padding-right">
@@ -1063,6 +1063,10 @@
             showtoast("配额参数必须为数字");
             return;
         }
+        if(editSubAccountFive.remark.length > 128){
+            showtoast("备注信息长度不能超过128");
+            return;
+        }
         var params = {
             'id':editSubAccountFive.id,
             'url':editSubAccountFive.url,
@@ -1102,6 +1106,10 @@
         if(isNaN(createSubAccountFive.voiceNum) || isNaN(createSubAccountFive.seatNum) ||
             createSubAccountFive.voiceNum=='' || createSubAccountFive.seatNum==''){
             showtoast("配额参数必须为数字");
+            return;
+        }
+        if(createSubAccountFive.remark.length > 128){
+            showtoast("备注信息长度不能超过128");
             return;
         }
         var params = {
@@ -1954,7 +1962,7 @@
             }
         },"get");
         //每页显示数量
-        var listRow = 50;
+        var listRow = 20;
         //显示多少个分页按钮
         var showPageCount = 5;
         //指定id，创建分页标签
@@ -2005,14 +2013,15 @@
                 '<td class="text-center">'+ data[i].certId +'</td>' +
                 '<td class="text-center">'+ data[i].secretKey +'</td>'+
                 '<td class="text-center">' + data[i].voiceNum + '</td>' ;
-            if(appServiceType == 'call_center'){
-                html += '<td class="text-center">' + data[i].seatNum + '</td>' ;
-            }
+//            if(appServiceType == 'call_center'){
+//                html += '<td class="text-center">' + data[i].seatNum + '</td>' ;
+//            }
             var state = data[i].enabled == 1?"启用":"禁用";
             var color = data[i].enabled == 1?"text-success":"text-danger";
             var stateEdit = data[i].enabled == 1?"禁用":"启用";
+            var remark1 = data[i].remark !=null && data[i].remark.length>18 ? data[i].remark.substring(0,18)+"...": data[i].remark;
             html+= '<td class="text-center '+color+'" id="enable_'+data[i].id+'" >' + state+ '</td>' +
-                '<td class="text-center">' + data[i].remark + '</td>' +
+                '<td class="text-center">' + remark1 + '</td>' +
                 '<td class="text-center"> <a href="javascript:toSubAccountEnable(\''+data[i].id+'\')" data-state="'+data[i].enabled+'" id="enable_edit_'+data[i].id+'" >'+stateEdit+'</a>&nbsp;<a href="javascript:tosubAccountDatail(\''+data[i].id+'\')" >详情</a>&nbsp;<a href="javascript:delSubAccount(\''+data[i].id+'\')" >删除</a></td>' +
                 '</tr>'
         }
