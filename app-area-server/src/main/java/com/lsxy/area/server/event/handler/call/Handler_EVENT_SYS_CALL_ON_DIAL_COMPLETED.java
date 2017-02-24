@@ -469,8 +469,20 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
         }else if(BusinessState.TYPE_CC_INVITE_OUT_CALL.equals(state.getType())){
             if(StringUtils.isNotBlank(error)){
                 logger.warn("邀请外线加入到交谈失败{}",error);
+                String conversation = businessData.get(CallCenterUtil.CONVERSATION_FIELD);
+                if(conversation!=null){
+                    conversationService.logicExit(conversation,call_id);
+                }
             }else{
-
+                String conversation = businessData.get(CallCenterUtil.CONVERSATION_FIELD);
+                if(conversation!=null){
+                    try {
+                        conversationService.join(conversation,call_id,null,null,null);
+                    } catch (Throwable e) {
+                        logger.error("将呼叫加入到会议失败",e);
+                        conversationService.logicExit(conversation,call_id);
+                    }
+                }
             }
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
             if(StringUtils.isNotBlank(error)){

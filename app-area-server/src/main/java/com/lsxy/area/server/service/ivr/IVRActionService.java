@@ -250,15 +250,13 @@ public class IVRActionService {
                 Future<HttpResponse> future = client.execute(post,null);
                 HttpResponse response = future.get();
                 if(logger.isDebugEnabled()){
-                    logger.info("url={},status={}"
-                            ,url,response.getStatusLine().getStatusCode());
+                    logger.info("url={},status={},data={}"
+                            ,url,response.getStatusLine().getStatusCode(),JSONUtil2.objectToJson(data));
+                    logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
                 }
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     res = receiveResponse(response);
                     success = true;
-                }
-                if(logger.isDebugEnabled()){
-                    logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
                 }
             }catch (Throwable t){
                 logger.error("调用{}失败,耗时={},error={}",url,(System.currentTimeMillis() - start),t);
