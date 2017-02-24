@@ -129,10 +129,11 @@ public class Handler_EVENT_EXT_CALL_ON_FAIL extends EventHandler{
         }
 
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                .put("event",event)
-                .put("id",callId)
-                .put("error","调用失败")
-                .put("user_data",state.getUserdata())
+                .putIfNotEmpty("event",event)
+                .putIfNotEmpty("id",callId)
+                .putIfNotEmpty("subaccount_id",state.getSubaccountId())
+                .putIfNotEmpty("error","调用失败")
+                .putIfNotEmpty("user_data",state.getUserdata())
                 .build();
         notifyCallbackUtil.postNotify(callBackUrl,notify_data,3);
 

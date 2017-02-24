@@ -233,6 +233,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 Map<String,Object> notify_data = new MapBuilder<String,Object>()
                         .putIfNotEmpty("event","ivr.call_end")
                         .putIfNotEmpty("id",call_id)
+                        .putIfNotEmpty("subaccount_id",state.getSubaccountId())
                         .putIfNotEmpty("begin_time",begin_time)
                         .putIfNotEmpty("answer_time",answer_time)
                         .putIfNotEmpty("end_time",end_time)
@@ -264,6 +265,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                     Map<String, Object> notify_data = new MapBuilder<String, Object>()
                             .putIfNotEmpty("event", "ivr.connect_end")
                             .putIfNotEmpty("id", ivr_call_id)
+                            .putIfNotEmpty("subaccount_id",state.getSubaccountId())
                             .putIfNotEmpty("begin_time", System.currentTimeMillis())
                             .putIfNotEmpty("end_time", System.currentTimeMillis())
                             .putIfNotEmpty("error", "dial error")
@@ -296,7 +298,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 }
                 if(preState!=null && curState != null){
                     if(!preState.equals(curState)){
-                        callCenterUtil.agentStateChangedEvent(state.getCallBackUrl(),agentId,
+                        callCenterUtil.agentStateChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),agentId,
                                 state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),preState, curState);
                     }
                 }

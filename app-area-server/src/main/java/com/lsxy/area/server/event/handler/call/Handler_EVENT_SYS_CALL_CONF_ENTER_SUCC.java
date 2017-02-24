@@ -220,6 +220,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","conf.joined")
                     .putIfNotEmpty("id",conf_id)
+                    .putIfNotEmpty("subaccount_id",state.getSubaccountId())
                     .putIfNotEmpty("join_time",System.currentTimeMillis())
                     .putIfNotEmpty("call_id",call_id)
                     .putIfNotEmpty("part_uri",null)

@@ -121,16 +121,17 @@ public class Handler_EVENT_EXT_DUO_CALLBACK_ON_RELEASED extends EventHandler {
             logger.debug("用户回调结束事件");
         }
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                .put("event","duo_callback.end")
-                .put("id",callId)
-                .put("begin_time",beginTime==null?null:beginTime.getTime())
-                .put("answer_time1",answerTime==null?null:answerTime.getTime())
-                .put("answer_time2",connectTime==null?null:connectTime.getTime())
-                .put("end_time",endTime==null?null:endTime.getTime())
-                .put("hangup_by",paramMap.get("hangup_by"))
-                .put("reason",paramMap.get("reason"))
-                .put("error",paramMap.get("error"))
-                .put("user_data",user_data)
+                .putIfNotEmpty("event","duo_callback.end")
+                .putIfNotEmpty("id",callId)
+                .putIfNotEmpty("subaccount_id",state.getSubaccountId())
+                .putIfNotEmpty("begin_time",beginTime==null?null:beginTime.getTime())
+                .putIfNotEmpty("answer_time1",answerTime==null?null:answerTime.getTime())
+                .putIfNotEmpty("answer_time2",connectTime==null?null:connectTime.getTime())
+                .putIfNotEmpty("end_time",endTime==null?null:endTime.getTime())
+                .putIfNotEmpty("hangup_by",paramMap.get("hangup_by"))
+                .putIfNotEmpty("reason",paramMap.get("reason"))
+                .putIfNotEmpty("error",paramMap.get("error"))
+                .putIfNotEmpty("user_data",user_data)
                 .build();
         notifyCallbackUtil.postNotify(callBackUrl,notify_data,3);
 
