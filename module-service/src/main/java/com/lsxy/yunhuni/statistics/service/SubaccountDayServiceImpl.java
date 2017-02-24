@@ -54,7 +54,7 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
         sql += " AND obj.tenant_id =:tenantId AND obj.dt BETWEEN :startTime AND :endTime ";
         String countSql = " SELECT COUNT(1) "+sql;
         String pageSql = " SELECT obj.id as id," +
-                "obj.subaccount_id as cert_id," +
+                "s.cert_id as cert_id," +
                 "s.secret_key as secret_key," +
                 "obj.app_id as app_id," +
                 "a.name as app_name," +
@@ -63,7 +63,6 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
                 "concat( (CASE WHEN obj.voice_used IS NULL THEN '0'ELSE obj.voice_used END) ,'/', (CASE WHEN obj.voice_quota_value IS NULL THEN '0' WHEN obj.voice_quota_value<0 THEN '∞' ELSE obj.voice_quota_value END) ) as voice_num," +
                 "concat( (CASE WHEN obj.msg_used IS NULL THEN '0'ELSE obj.msg_used END)  ,'/', (CASE WHEN obj.msg_quota_value IS NULL THEN '0' WHEN obj.msg_quota_value<0 THEN '∞' ELSE obj.msg_quota_value END)) as seat_num "+sql;
         Query countQuery = em.createNativeQuery(countSql);
-        pageSql +=" order by obj.dt desc";
         Query pageQuery = em.createNativeQuery(pageSql,SubaccountStatisticalVO.class);
         if(StringUtils.isNotEmpty(appId)){
             countQuery.setParameter("appId",appId);
