@@ -61,7 +61,7 @@ public class AreaAndTelNumSelector {
         return getTelnumberAndAreaId(subaccountId,app,false,from,to,null,null);
     }
 
-    public ResourceTelenum getTelnumber(String subaccountId, App app) throws NotAvailableLineException {
+    public ResourceTelenum getTelnumber(String subaccountId, App app) throws YunhuniApiException {
         //查找租户私有线路
         List<LineGatewayVO> lineGateways = lineGatewayToTenantService.findByTenantIdAndAreaId(app.getTenant().getId(),app.getAreaId());
         if(lineGateways == null || lineGateways.size() == 0){
