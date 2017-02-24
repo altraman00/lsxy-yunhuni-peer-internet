@@ -64,9 +64,10 @@ public class SelectorTest {
 
     }
 
-    private void select(){
+    @Test
+    public void select(){
         Long start = System.currentTimeMillis();
-        App app = appService.findById("40288aca574060400157406427f20005");
+        App app = appService.findById("8a2bc67257fae1820157faef2f290002");
         AreaAndTelNumSelector.Selector selector = null;
         try {
             selector = areaAndTelNumSelector.getTelnumberAndAreaId(null,app, null, "02082241195");

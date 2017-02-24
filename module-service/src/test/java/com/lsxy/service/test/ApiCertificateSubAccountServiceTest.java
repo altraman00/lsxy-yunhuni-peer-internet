@@ -106,7 +106,7 @@ public class ApiCertificateSubAccountServiceTest {
     @Test
     public void testDayStatistics(){
         Date prevMonth = DateUtils.getPrevMonth(new Date());
-        subaccountMonthService.monthStatistics(new Date());
+        subaccountDayService.dayStatistics(new Date());
     }
 
 }
