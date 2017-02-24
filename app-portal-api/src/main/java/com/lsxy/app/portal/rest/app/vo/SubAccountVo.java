@@ -49,9 +49,9 @@ public class SubAccountVo {
             for (int i = 0; i < list.size(); i++) {
                 CertAccountQuota certAccountQuota = list.get(i);
                 if(CertAccountQuotaType.AgentQuota.name().equals( certAccountQuota.getType() )){
-                    this.seatNum =  certAccountQuota.getValue().toString() ;
+                    this.seatNum = ( certAccountQuota.getValue()/60 )+"" ;
                 }else if(CertAccountQuotaType.CallQuota.name().equals( certAccountQuota.getType())){
-                    this.voiceNum =  certAccountQuota.getValue().toString() ;
+                    this.voiceNum = ( certAccountQuota.getValue()/60 ) +"";
                 }
             }
         }
