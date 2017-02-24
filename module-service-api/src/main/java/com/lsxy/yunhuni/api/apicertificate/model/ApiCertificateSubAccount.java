@@ -16,6 +16,10 @@ import javax.persistence.Table;
 @Where(clause = "deleted=0")
 @PrimaryKeyJoinColumn(name = "id")
 public class ApiCertificateSubAccount extends ApiCertificate{
+
+    public static final Integer ENABLED_TRUE = 1;
+    public static final Integer ENABLED_FALSE = 0;
+
     private String appId;
     private String parentId;
     private String callbackUrl;
