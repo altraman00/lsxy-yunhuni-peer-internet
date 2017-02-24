@@ -757,7 +757,7 @@
                 trigger: 'axis'
             },
             legend: {
-                data:['api调用次数']
+                data:['API调用次数']
             },
             grid: {
                 left: '15px',
@@ -783,7 +783,7 @@
             },
             series: [
                 {
-                    name:'api调用次数',
+                    name:'API调用次数',
                     type:'line',
                     stack: '',
                     data:xd,

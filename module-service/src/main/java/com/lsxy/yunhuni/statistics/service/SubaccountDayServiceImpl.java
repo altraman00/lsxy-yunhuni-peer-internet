@@ -146,7 +146,7 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
         List result = query.getResultList();
         if(result != null && result.size() >0){
 
-            String insertSql = "INSERT INTO db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day (id,app_id,tenant_id,subaccount_id,dt,month,among_amount,among_duration,voice_used," +
+            String insertSql = "INSERT INTO db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day (id,app_id,tenant_id,subaccount_id,dt,day,among_amount,among_duration,voice_used," +
                     "msg_used,voice_quota_value,msg_quota_value,create_time,last_time,deleted,sortno,version) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
             jdbcTemplate.batchUpdate(insertSql,result);
