@@ -213,5 +213,17 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
         return page;
     }
 
-
+    @Override
+    public boolean subaccountCheck(String sub1,String sub2){
+        if(sub1 == null && sub2 == null){
+            return true;
+        }
+        if(sub1 != null && sub2 == null){
+            return false;
+        }
+        if(sub1 == null && sub2 != null){
+            return false;
+        }
+        return sub1.equals(sub2);
+    }
 }

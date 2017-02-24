@@ -19,6 +19,7 @@ import com.lsxy.framework.core.exceptions.api.ConditionNotExistException;
 import com.lsxy.framework.core.utils.*;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.callcenter.EnqueueTimeoutEvent;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,9 @@ public class EnQueueServiceImpl implements EnQueueService{
 
     @Autowired
     private QueueBatchInserter queueBatchInserter;
+
+    @Autowired
+    private ApiCertificateSubAccountService apiCertificateSubAccountService;
 
     private CallCenterQueue save(String num,String tenantId,String appId,String agentId,String conditionId,Integer fetchTimeout,String callId,String conversationId,BaseEnQueue baseEnQueue,String type){
         CallCenterQueue queue = new CallCenterQueue();
@@ -160,6 +164,9 @@ public class EnQueueServiceImpl implements EnQueueService{
                     throw new ConditionNotExistException();
                 }
                 if(!appId.equals(condition.getAppId())){
+                    throw new ConditionNotExistException();
+                }
+                if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,condition.getSubaccountId())){
                     throw new ConditionNotExistException();
                 }
                 fetchTimout = condition.getFetchTimeout();

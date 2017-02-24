@@ -25,6 +25,8 @@ import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.app.service.ServiceType;
@@ -100,18 +102,8 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
     @Autowired
     private CallbackUrlUtil callbackUrlUtil;
 
-    private boolean subaccountCheck(String sub1,String sub2){
-        if(sub1 == null && sub2 == null){
-            return true;
-        }
-        if(sub1 != null && sub2 == null){
-            return false;
-        }
-        if(sub1 == null && sub2 != null){
-            return false;
-        }
-        return sub1.equals(sub2);
-    }
+    @Autowired
+    private ApiCertificateSubAccountService apiCertificateSubAccountService;
 
     @Override
     public boolean dismiss(String subaccountId, String ip, String appId, String conversationId) throws YunhuniApiException{
@@ -131,7 +123,7 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
-        if(!subaccountCheck(subaccountId,businessStateService.subaccountId(conversationId))){
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,businessStateService.subaccountId(conversationId))){
             throw new ConversationNotExistException();
         }
         return conversationService.dismiss(appId, conversationId);
@@ -162,10 +154,10 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
         if(callId == null){
             throw new CallNotExistsException();
         }
-        if(!subaccountCheck(subaccountId,businessStateService.subaccountId(callId))){
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,businessStateService.subaccountId(callId))){
             throw new CallNotExistsException();
         }
-        if(!subaccountCheck(subaccountId,businessStateService.subaccountId(conversationId))){
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,businessStateService.subaccountId(conversationId))){
             throw new ConversationNotExistException();
         }
         return conversationService.setVoiceMode(conversationId,callId,voiceMode);
@@ -219,7 +211,7 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
         if(conversation_state.getClosed()!= null && conversation_state.getClosed()){
             throw new ConversationNotExistException();
         }
-        if(!subaccountCheck(subaccountId,conversation_state.getSubaccountId())){
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,conversation_state.getSubaccountId())){
             throw new ConversationNotExistException();
         }
         /**排队都是在呼叫上排队，这里是在交谈上排队，所以创建一个虚拟的呼叫call，兼容排队的逻辑**/
@@ -240,7 +232,7 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,conversation_state.getBusinessData().get(CallCenterUtil.CALLCENTER_FIELD))
                         .putIfNotEmpty(CallCenterUtil.ENQUEUE_START_TIME_FIELD,""+new Date().getTime())
                         .putIfNotEmpty(CallCenterUtil.CONDITION_ID_FIELD,enQueue.getRoute().getCondition()!=null?enQueue.getRoute().getCondition().getId():null)
-                        .putIfNotEmpty("user_data",enQueue.getData())
+                        .putIfNotEmpty("user_data",enQueue.getUser_data())
                         .build())
                 .build();
         businessStateService.save(state);
@@ -314,7 +306,7 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
         if(conversation_state.getClosed()!= null && conversation_state.getClosed()){
             throw new ConversationNotExistException();
         }
-        if(!subaccountCheck(subaccountId,conversation_state.getSubaccountId())){
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,conversation_state.getSubaccountId())){
             throw new ConversationNotExistException();
         }
         return conversationService.inviteOut(subaccountId,appId,

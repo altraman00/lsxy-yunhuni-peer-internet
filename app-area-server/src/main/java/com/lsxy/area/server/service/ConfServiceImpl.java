@@ -19,6 +19,7 @@ import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.app.service.ServiceType;
@@ -101,6 +102,9 @@ public class ConfServiceImpl implements ConfService {
 
     @Autowired
     private CallbackUrlUtil callbackUrlUtil;
+
+    @Autowired
+    private ApiCertificateSubAccountService apiCertificateSubAccountService;
 
     @Override
     public String create(String subaccountId,String ip, String appId, Integer maxDuration, Integer maxParts,
@@ -209,6 +213,10 @@ public class ConfServiceImpl implements ConfService {
             throw new ConfNotExistsException();
         }
 
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,state.getSubaccountId())){
+            throw new ConfNotExistsException();
+        }
+
         String areaId = areaAndTelNumSelector.getAreaId(app);
 
         Map<String, Object> params = new MapBuilder<String,Object>()
@@ -267,6 +275,9 @@ public class ConfServiceImpl implements ConfService {
 
         if(!appId.equals(state.getAppId())){
             //不能跨app操作
+            throw new ConfNotExistsException();
+        }
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,state.getSubaccountId())){
             throw new ConfNotExistsException();
         }
         Integer maxParts = null;
@@ -377,6 +388,9 @@ public class ConfServiceImpl implements ConfService {
             //不能跨app操作
             throw new ConfNotExistsException();
         }
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,state.getSubaccountId())){
+            throw new ConfNotExistsException();
+        }
         Integer maxParts = null;
         if(StringUtil.isNotEmpty(state.getBusinessData().get("max_parts"))){
             maxParts = Integer.parseInt(state.getBusinessData().get("max_parts"));
@@ -427,6 +441,14 @@ public class ConfServiceImpl implements ConfService {
             throw new IllegalArgumentException();
         }
 
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,conf_state.getSubaccountId())){
+            throw new ConfNotExistsException();
+        }
+
+        if(!apiCertificateSubAccountService.subaccountCheck(call_state.getSubaccountId(),conf_state.getSubaccountId())){
+            throw new ConfNotExistsException();
+        }
+
         String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",call_state.getResId())
@@ -469,6 +491,14 @@ public class ConfServiceImpl implements ConfService {
 
         if(conf_state.getClosed()!= null && conf_state.getClosed()){
             throw new SystemBusyException();
+        }
+
+        if(!conf_state.getAppId().equals(appId)){
+            throw new IllegalArgumentException();
+        }
+
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,conf_state.getSubaccountId())){
+            throw new ConfNotExistsException();
         }
 
         playFiles = playFileUtil.convertArray(app.getTenant().getId(),appId,playFiles);
@@ -516,6 +546,14 @@ public class ConfServiceImpl implements ConfService {
             throw new SystemBusyException();
         }
 
+        if(!conf_state.getAppId().equals(appId)){
+            throw new IllegalArgumentException();
+        }
+
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,conf_state.getSubaccountId())){
+            throw new ConfNotExistsException();
+        }
+
         String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
@@ -557,6 +595,14 @@ public class ConfServiceImpl implements ConfService {
 
         if(conf_state.getClosed()!= null && conf_state.getClosed()){
             throw new SystemBusyException();
+        }
+
+        if(!conf_state.getAppId().equals(appId)){
+            throw new IllegalArgumentException();
+        }
+
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,conf_state.getSubaccountId())){
+            throw new ConfNotExistsException();
         }
 
         Map<String,String> businessData = conf_state.getBusinessData();
@@ -608,6 +654,14 @@ public class ConfServiceImpl implements ConfService {
 
         if(conf_state.getClosed()!= null && conf_state.getClosed()){
             throw new SystemBusyException();
+        }
+
+        if(!conf_state.getAppId().equals(appId)){
+            throw new IllegalArgumentException();
+        }
+
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,conf_state.getSubaccountId())){
+            throw new ConfNotExistsException();
         }
 
         String areaId = areaAndTelNumSelector.getAreaId(app);
@@ -664,6 +718,11 @@ public class ConfServiceImpl implements ConfService {
         if(!call_state.getAppId().equals(conf_state.getAppId())){
             throw new IllegalArgumentException();
         }
+
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,conf_state.getSubaccountId())){
+            throw new ConfNotExistsException();
+        }
+
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
                 .putIfNotEmpty("call_res_id",call_state.getResId())
@@ -706,7 +765,9 @@ public class ConfServiceImpl implements ConfService {
             //不合法的参数
             throw new IllegalArgumentException();
         }
-
+        if(!apiCertificateSubAccountService.subaccountCheck(call_state.getSubaccountId(),conf_state.getSubaccountId())){
+            throw new ConfNotExistsException();
+        }
         Map<String,String> call_business=call_state.getBusinessData();
         Map<String,String> conf_business=conf_state.getBusinessData();
 
