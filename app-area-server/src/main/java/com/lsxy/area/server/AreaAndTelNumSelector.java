@@ -61,6 +61,11 @@ public class AreaAndTelNumSelector {
         return getTelnumberAndAreaId(subaccountId,app,false,from,to,null,null);
     }
 
+    public ResourceTelenum getTelnumber(String subaccountId, App app){
+
+        return null;
+    }
+
     /**
      *
      * @param app
