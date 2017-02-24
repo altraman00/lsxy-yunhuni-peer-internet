@@ -33,8 +33,8 @@
                             <!--大图标 添加样子 application-tab -->
                             <section class="panel panel-default pos-rlt clearfix ">
                                 <ul id="myTab" class="nav nav-tabs" name="appId" style="margin-bottom: 10px;">
-                                    <li <c:if test="${appId=='all'}"> class="active"</c:if> >
-                                        <a href="" data-toggle="tab" onclick="appSubmit('all')">全部</a>
+                                    <li <c:if test="${empty appId}"> class="active"</c:if> >
+                                        <a href="" data-toggle="tab" onclick="appSubmit('')">全部</a>
                                     </li>
                                     <c:forEach items="${appList}" var="app" varStatus="s">
                                         <li
@@ -68,7 +68,7 @@
 
                                             <div class="col-md-5">
                                                 <button class="btn btn-primary" type="submit"> 查询</button>
-                                                <button class="btn btn-default finddatebtn compassbtn monthcbtn" type="button" onclick="download()"> 表格下载</button>
+                                                <%--<button class="btn btn-default finddatebtn compassbtn monthcbtn" type="button" onclick="download()"> 表格下载</button>--%>
                                             </div>
                                         </div>
                                     </form:form>
@@ -85,11 +85,12 @@
                                             <tr>
                                                 <th>鉴权账号</th>
                                                 <th>密钥</th>
+                                                <th>所属应用</th>
                                                 <c:if test="${appId=='all'}"><th>所属应用</th></c:if>
                                                 <th>话务量（分钟）</th>
                                                 <th><span style="float:left;width: 80px" ><span style="float:right;" >消费金额</span></span></th>
                                                 <th>语音总用量 /配额（分钟）</th>
-                                                <th>坐席数/配额（个）</th>
+                                                <%--<th>坐席数/配额（个）</th>--%>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -98,11 +99,11 @@
                                                     <%--<td><fmt:formatDate value="${result.callStartDt}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>--%>
                                                         <td>${result.certId}</td>
                                                     <td>${result.secretKey}</td>
-                                                    <td><a href="${ctx}/console/app/detail?id=${result.appId}">${result.appName}</td>
+                                                    <td><a href="${ctx}/console/app/detail?id=${result.appId}">${result.appName}</a></td>
                                                         <td>${result.amongDuration}</td>
                                                         <td><span style="float:left;width: 80px" ><span style="float:right;" >￥<fmt:formatNumber value="${result.amongAmount}" pattern="0.000"></fmt:formatNumber></span></span></td>
                                                         <td>${result.voiceNum}</td>
-                                                        <td>${result.seatNum}</td>
+                                                        <%--<td>${result.seatNum}</td>--%>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>
