@@ -61,8 +61,17 @@ public class AreaAndTelNumSelector {
         return getTelnumberAndAreaId(subaccountId,app,false,from,to,null,null);
     }
 
-    public ResourceTelenum getTelnumber(String subaccountId, App app){
-
+    public ResourceTelenum getTelnumber(String subaccountId, App app) throws NotAvailableLineException {
+        //查找租户私有线路
+        List<LineGatewayVO> lineGateways = lineGatewayToTenantService.findByTenantIdAndAreaId(app.getTenant().getId(),app.getAreaId());
+        if(lineGateways == null || lineGateways.size() == 0){
+            //如果没有私有线路，找公共线路
+            lineGateways = lineGatewayToPublicService.findAllLineGatewayByAreaId(app.getAreaId());
+        }
+        if(lineGateways == null || lineGateways.size() == 0){
+            //TODO 没有线路，则抛出异常
+            throw new NotAvailableLineException();
+        }
         return null;
     }
 
