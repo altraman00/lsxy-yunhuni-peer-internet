@@ -24,12 +24,16 @@ public class Consume extends IdEntity {
     private String appId;//所属应用编号（不能为空，仅用查询，勿关联应用，当一个消费不属于任何应用时，设为0）
     private String tenantId;//所属租户
     private String relevanceId; //消费的相关ID
-
+    private String subaccountId; //子账号ID
 
     public Consume() {
     }
 
     public Consume(Date dt, String type, BigDecimal amount, String remark, String appId, String tenantId,String relevanceId) {
+        this(dt,type,amount,remark,appId,tenantId,relevanceId,null);
+    }
+
+    public Consume(Date dt, String type, BigDecimal amount, String remark, String appId, String tenantId,String relevanceId,String subaccountId) {
         this.dt = dt;
         this.type = type;
         this.amount = amount;
@@ -37,6 +41,7 @@ public class Consume extends IdEntity {
         this.appId = appId;
         this.tenantId = tenantId;
         this.relevanceId = relevanceId;
+        this.subaccountId = subaccountId;
     }
 
     @Column(name = "remark")
@@ -97,5 +102,14 @@ public class Consume extends IdEntity {
 
     public void setRelevanceId(String relevanceId) {
         this.relevanceId = relevanceId;
+    }
+
+    @Column(name = "subaccount_id")
+    public String getSubaccountId() {
+        return subaccountId;
+    }
+
+    public void setSubaccountId(String subaccountId) {
+        this.subaccountId = subaccountId;
     }
 }

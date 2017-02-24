@@ -433,9 +433,9 @@
                                                 <th class="text-center">鉴权账号</th>
                                                 <th class="text-center">密钥</th>
                                                 <th class="text-center">语音用量 /总量（分钟）</th>
-<c:if test="${app.serviceType == 'call_center'}">
-                                                <th class="text-center">坐席用量 /总量（个）</th>
-</c:if>
+<%--<c:if test="${app.serviceType == 'call_center'}">--%>
+                                                <%--<th class="text-center">坐席用量 /总量（个）</th>--%>
+<%--</c:if>--%>
                                                 <th class="text-center">状态</th>
                                                 <th class="text-center">备注</th>
                                                 <th class="text-center">操作</th>
@@ -500,17 +500,17 @@
                                                     </div>
                                                     <span class="col-md-1 line-height-32 text-left text-danger">*</span>
                                                 </div>
-                                                <c:if test="${app.serviceType == 'call_center'}">
-                                                <div class="row margin-bottom-10">
-                                                    <div class="col-md-1 dev">
-                                                        坐席（个）：
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <input type="text"  class="form-control"  v-model="seatNum" value="{{seatNum}}" placeholder=""/>
-                                                    </div>
-                                                    <span class="col-md-1 line-height-32 text-left text-danger">*</span>
-                                                </div>
-                                                </c:if>
+                                                <%--<c:if test="${app.serviceType == 'call_center'}">--%>
+                                                <%--<div class="row margin-bottom-10">--%>
+                                                    <%--<div class="col-md-1 dev">--%>
+                                                        <%--坐席（个）：--%>
+                                                    <%--</div>--%>
+                                                    <%--<div class="col-md-6">--%>
+                                                        <%--<input type="text"  class="form-control"  v-model="seatNum" value="{{seatNum}}" placeholder=""/>--%>
+                                                    <%--</div>--%>
+                                                    <%--<span class="col-md-1 line-height-32 text-left text-danger">*</span>--%>
+                                                <%--</div>--%>
+                                                <%--</c:if>--%>
                                                 <div class="row margin-bottom-10">
                                                     <div class="col-md-1 dev line-height-32">
                                                         备注：
@@ -700,7 +700,7 @@
             <div class="title">创建子账号<a class="close_a modalCancel cancelfive" data-id="five"></a></div>
             <div class="content" id="createSubAccountFive" >
                 <p class="info info font14">
-                    1.创建子账号后，系统将会自动生成一个子账号和子账号密钥<br/>
+                    1.创建子账号后，系统将会自动生成一个鉴权账号和密钥<br/>
                     2.配额是会员提供给其客户使用服务的额度
                 </p>
                 <div class="row text-center">
@@ -726,15 +726,15 @@
                     </div>
                     <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
                 </div>
-                <c:if test="${app.serviceType == 'call_center'}">
-                <div class="row margin-bottom-10">
-                    <lable class="col-md-3 text-right line-height-32">坐席（个）：</lable>
-                    <div class="col-md-8 remove-padding-right">
-                        <input type="text" class="form-control" v-model="seatNum"  value="{{seatNum}}" placeholder="" />
-                    </div>
-                    <span class="col-md-1 line-height-32 text-left text-danger padding-left-5">*</span>
-                </div>
-                </c:if>
+                <%--<c:if test="${app.serviceType == 'call_center'}">--%>
+                <%--<div class="row margin-bottom-10">--%>
+                    <%--<lable class="col-md-3 text-right line-height-32">坐席（个）：</lable>--%>
+                    <%--<div class="col-md-8 remove-padding-right">--%>
+                        <%--<input type="text" class="form-control" v-model="seatNum"  value="{{seatNum}}" placeholder="" />--%>
+                    <%--</div>--%>
+                    <%--<span class="col-md-1 line-height-32 text-left text-danger padding-left-5">*</span>--%>
+                <%--</div>--%>
+                <%--</c:if>--%>
                 <div class="row">
                     <lable class="col-md-3 text-right line-height-32">备注：</lable>
                     <div class="col-md-8 remove-padding-right">
@@ -812,6 +812,9 @@
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.iframe-transport.js"></script>
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.fileupload-validate.js"></script>
         <script>
+            $('.cancelfive').click(function(){
+                createSubAccountFive.init();
+            });
             var appServiceType = '${app.serviceType}';
             $(function () {
                 $('.modal-box .content input[type="text"]').css("height","30px");
@@ -1050,11 +1053,25 @@
             },
             initObj2:function(obj){
                 this.id=this.certId=this.secretKey = this.url= this.remark='';
-                this.voiceNum= this.seatNum=0;
+                this.voiceNum= this.seatNum=-1;
             }
         }
     });
     function editSubAccount(){
+        if(isNaN(editSubAccountFive.voiceNum) || isNaN(editSubAccountFive.seatNum) ||
+            editSubAccountFive.voiceNum=='' || editSubAccountFive.seatNum==''){
+            showtoast("配额参数必须为数字");
+            return;
+        }
+        var re = /^http[s]?:\/\/.+$/;
+        if(!re.test(editSubAccountFive.url)){
+            showtoast("回调地址格式错误");
+            return;
+        }
+        if(editSubAccountFive.remark.length > 128){
+            showtoast("备注信息长度不能超过128");
+            return;
+        }
         var params = {
             'id':editSubAccountFive.id,
             'url':editSubAccountFive.url,
@@ -1094,6 +1111,15 @@
         if(isNaN(createSubAccountFive.voiceNum) || isNaN(createSubAccountFive.seatNum) ||
             createSubAccountFive.voiceNum=='' || createSubAccountFive.seatNum==''){
             showtoast("配额参数必须为数字");
+            return;
+        }
+        var re = /^http[s]?:\/\/.+$/;
+        if(!re.test(editSubAccountFive.url)){
+            showtoast("回调地址格式错误");
+            return;
+        }
+        if(createSubAccountFive.remark.length > 128){
+            showtoast("备注信息长度不能超过128");
             return;
         }
         var params = {
@@ -1393,6 +1419,7 @@
         if(type=='subAccount' ){
             tosubAccountHome();
             subAccountList();
+            $('#uploadButton').hide();
         }
     });
 
@@ -1945,7 +1972,7 @@
             }
         },"get");
         //每页显示数量
-        var listRow = 50;
+        var listRow = 20;
         //显示多少个分页按钮
         var showPageCount = 5;
         //指定id，创建分页标签
@@ -1996,14 +2023,15 @@
                 '<td class="text-center">'+ data[i].certId +'</td>' +
                 '<td class="text-center">'+ data[i].secretKey +'</td>'+
                 '<td class="text-center">' + data[i].voiceNum + '</td>' ;
-            if(appServiceType == 'call_center'){
-                html += '<td class="text-center">' + data[i].seatNum + '</td>' ;
-            }
+//            if(appServiceType == 'call_center'){
+//                html += '<td class="text-center">' + data[i].seatNum + '</td>' ;
+//            }
             var state = data[i].enabled == 1?"启用":"禁用";
             var color = data[i].enabled == 1?"text-success":"text-danger";
             var stateEdit = data[i].enabled == 1?"禁用":"启用";
+            var remark1 = data[i].remark !=null && data[i].remark.length>18 ? data[i].remark.substring(0,18)+"...": data[i].remark;
             html+= '<td class="text-center '+color+'" id="enable_'+data[i].id+'" >' + state+ '</td>' +
-                '<td class="text-center">' + data[i].remark + '</td>' +
+                '<td class="text-center">' + remark1 + '</td>' +
                 '<td class="text-center"> <a href="javascript:toSubAccountEnable(\''+data[i].id+'\')" data-state="'+data[i].enabled+'" id="enable_edit_'+data[i].id+'" >'+stateEdit+'</a>&nbsp;<a href="javascript:tosubAccountDatail(\''+data[i].id+'\')" >详情</a>&nbsp;<a href="javascript:delSubAccount(\''+data[i].id+'\')" >删除</a></td>' +
                 '</tr>'
         }

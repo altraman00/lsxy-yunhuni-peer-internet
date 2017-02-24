@@ -25,6 +25,7 @@ import sun.security.x509.CertificateSubjectName;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,6 +68,17 @@ public class SubaccountController extends AbstractAPIController {
         subAccount.setEnabled(1);
         subAccount.setCallbackUrl(dto.getCallbackUrl());
         subAccount.setRemark(dto.getRemark());
+        if(dto.getQuotas()!=null && dto.getQuotas().size()>0){
+            List<CertAccountQuota> quotas = new ArrayList<>();
+            List<QuotaDTO> qs = dto.getQuotas();
+            for(QuotaDTO q : qs){
+                CertAccountQuota quota = new CertAccountQuota();
+                quota.setType(q.getType());
+                quota.setValue(q.getValue() * 60);
+                quotas.add(quota);
+            }
+            subAccount.setQuotas(quotas);
+        }
         subAccount = apiCertificateSubAccountService.createSubAccount(subAccount);
         return ApiGatewayResponse.success(createOutput(subAccount));
     }
@@ -101,7 +113,7 @@ public class SubaccountController extends AbstractAPIController {
                                          @PathVariable String accountId,
                                          @RequestHeader(value = "AppID") String appId,
                                          @RequestParam(defaultValue = "1") String subaccountId
-    ) throws YunhuniApiException {
+    ) throws YunhuniApiException, InvocationTargetException, IllegalAccessException {
         if(logger.isDebugEnabled()){
             logger.debug("删除子账号API参数,accountId={},appId={},subaccountId={}",accountId,appId,subaccountId);
         }
@@ -141,7 +153,7 @@ public class SubaccountController extends AbstractAPIController {
             for(QuotaDTO q : qs){
                 CertAccountQuota quota = new CertAccountQuota();
                 quota.setType(q.getType());
-                quota.setValue(q.getValue());
+                quota.setValue(q.getValue() * 60);
                 quotas.add(quota);
             }
         }
@@ -224,7 +236,7 @@ public class SubaccountController extends AbstractAPIController {
                 for(CertAccountQuota q : qs){
                     QuotaDTO quota = new QuotaDTO();
                     quota.setType(q.getType());
-                    quota.setValue(q.getValue());
+                    quota.setValue(q.getValue()/60);
                     quotas.add(quota);
                 }
                 output.setQuotas(quotas);
