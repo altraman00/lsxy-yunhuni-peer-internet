@@ -5,6 +5,7 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
 import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuota;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -13,7 +14,7 @@ import java.util.List;
 public interface ApiCertificateSubAccountService extends BaseService<ApiCertificateSubAccount> {
     ApiCertificateSubAccount createSubAccount(ApiCertificateSubAccount subAccount);
 
-    void deleteSubAccount(String tenantId,String appId,String subAccountId);
+    void deleteSubAccount(String tenantId,String appId,String subAccountId) throws InvocationTargetException, IllegalAccessException;
 
     void updateSubAccount(ApiCertificateSubAccount subAccount);
 
@@ -24,4 +25,13 @@ public interface ApiCertificateSubAccountService extends BaseService<ApiCertific
     Page<ApiCertificateSubAccount> pageListWithNotQuota(String appId,int pageNo, int pageSize);
 
     Page<ApiCertificateSubAccount> pageListWithQuotaByCondition(String appId,int pageNo, int pageSize,String certId,String remark,Integer  enabled);
+
+    /**
+     * 判断子账号是否一致
+     * @param sub1
+     * @param sub2
+     * @return
+     */
+    boolean subaccountCheck(String sub1,String sub2);
+
 }

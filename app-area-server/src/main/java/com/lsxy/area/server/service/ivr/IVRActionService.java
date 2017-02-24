@@ -227,7 +227,7 @@ public class IVRActionService {
      * @param url
      * @return
      */
-    public String getFirstIvr(final String call_id,final String type,final String url,String from,String user_data){
+    public String getFirstIvr(final String subaccountId,final String call_id,final String type,final String url,String from,String user_data){
         String res = null;
         boolean success = false;
         int re_times = 0;
@@ -237,6 +237,7 @@ public class IVRActionService {
                 HttpPost post = new HttpPost(url);
                 Map<String,Object> data = new MapBuilder<String,Object>()
                         .putIfNotEmpty("action","ivr_start")
+                        .putIfNotEmpty("subaccount_id",subaccountId)
                         .putIfNotEmpty("type",type)//ivr_call   ivr_incoming
                         .putIfNotEmpty("call_id",call_id)
                         .putIfNotEmpty("from",from)
@@ -495,7 +496,7 @@ public class IVRActionService {
         String resXML = null;
         if(nextUrl == null){//第一次
             nextUrl = state.getCallBackUrl();
-            resXML = getFirstIvr(call_id,state.getType(),nextUrl,state.getBusinessData().get("to"),state.getUserdata());
+            resXML = getFirstIvr(state.getSubaccountId(),call_id,state.getType(),nextUrl,state.getBusinessData().get("to"),state.getUserdata());
         }else{
             resXML = getNextRequest(call_id,nextUrl,businessDate.get(IVR_ACTION_FIELD),prevResults);
         }
@@ -551,6 +552,7 @@ public class IVRActionService {
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","ivr.format_error")
                     .putIfNotEmpty("id",call_id)
+                    .putIfNotEmpty("subaccount_id",state.getSubaccountId())
                     .putIfNotEmpty("user_data",state.getUserdata())
                     .build();
             notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,3);

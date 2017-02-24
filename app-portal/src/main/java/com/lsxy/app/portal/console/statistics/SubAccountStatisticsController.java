@@ -40,13 +40,7 @@ public class SubAccountStatisticsController extends AbstractPortalController {
     public ModelAndView index(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String monthTime, String dayTime, String appId,String stime,String subId){
         ModelAndView mav = new ModelAndView();
         mav.addObject("appList",getAppList(request).getData());
-        String appId1 = appId;
-        if(StringUtil.isEmpty(appId)){
-            appId = "all";
-        }
-        if("all".equals(appId)){
-            appId1 = "";
-        }
+
         if(StringUtils.isEmpty(monthTime)){
             monthTime = DateUtils.formatDate(new Date(),"yyyy-MM");
         }
@@ -72,9 +66,9 @@ public class SubAccountStatisticsController extends AbstractPortalController {
         Account account = getCurrentAccount(request);
         //tenantId, String appId, String subId, String startTime, String endTime
         String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/api_sub_account_"+stime+"/plist?pageNo={1}&pageSize={2}&tenantId={3}&appId={4}&subId={5}&startTime={6}&endTime={7}";
-        RestResponse result = RestRequest.buildSecurityRequest(token).getPage(uri, SubaccountStatisticalVO.class, pageNo, pageSize, account.getTenant().getId(), appId1,subId,startTime,null);
+        RestResponse result = RestRequest.buildSecurityRequest(token).getPage(uri, SubaccountStatisticalVO.class, pageNo, pageSize, account.getTenant().getId(), appId,subId,startTime,null);
         String uri2 =  PortalConstants.REST_PREFIX_URL  + "/rest/api_sub_account_"+stime+"/sum?tenantId={1}&appId={2}&subId={3}&startTime={4}&endTime={5}";
-        RestResponse result2 = RestRequest.buildSecurityRequest(token).get(uri2, Map.class, account.getTenant().getId(), appId1,subId,startTime,null);
+        RestResponse result2 = RestRequest.buildSecurityRequest(token).get(uri2, Map.class, account.getTenant().getId(), appId,subId,startTime,null);
         mav.addObject("sum",result2.getData());
         mav.addObject("pageObj",result.getData());
         mav.setViewName("/console/statistics/subaccount/index");

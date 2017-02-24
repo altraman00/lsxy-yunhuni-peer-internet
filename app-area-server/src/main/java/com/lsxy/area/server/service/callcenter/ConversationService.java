@@ -28,6 +28,7 @@ import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.session.model.CallSession;
@@ -117,6 +118,9 @@ public class ConversationService {
 
     @Autowired
     private CallbackUrlUtil callbackUrlUtil;
+
+    @Autowired
+    private ApiCertificateSubAccountService apiCertificateSubAccountService;
 
     public BaseEnQueue getEnqueue(String queueId){
         BaseEnQueue enqueue = null;
@@ -581,7 +585,7 @@ public class ConversationService {
         }
 
         if(call_state.getClosed()!= null && call_state.getClosed()){
-            throw new SystemBusyException();
+            throw new CallNotExistsException();
         }
 
         BusinessState conversation_state = businessStateService.get(conversation_id);
@@ -600,7 +604,11 @@ public class ConversationService {
         }
 
         if(conversation_state.getClosed()!= null && conversation_state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConversationNotExistException();
+        }
+
+        if(!apiCertificateSubAccountService.subaccountCheck(call_state.getSubaccountId(),conversation_state.getSubaccountId())){
+            throw new ConversationNotExistException();
         }
 
         Map<String,String> call_business=call_state.getBusinessData();
@@ -841,7 +849,7 @@ public class ConversationService {
 
         if(call_state.getType().equals(BusinessState.TYPE_CC_INVITE_AGENT_CALL) ||
                 call_state.getType().equals(BusinessState.TYPE_CC_AGENT_CALL)){
-            callCenterUtil.agentExitConversationEvent(call_state.getCallBackUrl(),
+            callCenterUtil.agentExitConversationEvent(call_state.getSubaccountId(),call_state.getCallBackUrl(),
                     call_state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD),
                     call_state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),
                     conversationId);
@@ -941,12 +949,12 @@ public class ConversationService {
         }
         if(state.getType().equals(BusinessState.TYPE_CC_INVITE_AGENT_CALL) ||
                 state.getType().equals(BusinessState.TYPE_CC_AGENT_CALL)){
-            callCenterUtil.agentEnterConversationEvent(state.getCallBackUrl(),
+            callCenterUtil.agentEnterConversationEvent(state.getSubaccountId(),state.getCallBackUrl(),
                     businessData.get(CallCenterUtil.AGENT_ID_FIELD),
                     businessData.get(CallCenterUtil.AGENT_NAME_FIELD),
                     conversation_id);
         }
-        callCenterUtil.conversationPartsChangedEvent(state.getCallBackUrl(),conversation_id);
+        callCenterUtil.conversationPartsChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),conversation_id);
     }
 
     private void hangup(String res_id,String call_id,String area_id){

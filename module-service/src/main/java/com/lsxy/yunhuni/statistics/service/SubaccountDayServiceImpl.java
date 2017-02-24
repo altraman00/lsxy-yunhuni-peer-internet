@@ -43,7 +43,7 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
     public Page<SubaccountStatisticalVO> getPageByConditions(Integer pageNo, Integer pageSize, Date startTime, Date endTime, String tenantId, String appId, String subaccountId) {
         String sql = " FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day obj " +
                 "LEFT JOIN db_lsxy_bi_yunhuni.tb_bi_app a ON obj.app_id=a.id " +
-                "LEFT JOIN db_lsxy_bi_yunhuni.tb_bi_api_cert s ON obj.subaccount_id=s.cert_id " +
+                "LEFT JOIN db_lsxy_bi_yunhuni.tb_bi_api_cert s ON obj.subaccount_id=s.id " +
                 "WHERE obj.deleted=0 ";
         if(StringUtils.isNotEmpty(appId)){
             sql += " AND app_id = :appId";
@@ -54,7 +54,7 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
         sql += " AND obj.tenant_id =:tenantId AND obj.dt BETWEEN :startTime AND :endTime ";
         String countSql = " SELECT COUNT(1) "+sql;
         String pageSql = " SELECT obj.id as id," +
-                "obj.subaccount_id as cert_id," +
+                "s.cert_id as cert_id," +
                 "s.secret_key as secret_key," +
                 "obj.app_id as app_id," +
                 "a.name as app_name," +
@@ -63,7 +63,6 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
                 "concat( (CASE WHEN obj.voice_used IS NULL THEN '0'ELSE obj.voice_used END) ,'/', (CASE WHEN obj.voice_quota_value IS NULL THEN '0' WHEN obj.voice_quota_value<0 THEN '∞' ELSE obj.voice_quota_value END) ) as voice_num," +
                 "concat( (CASE WHEN obj.msg_used IS NULL THEN '0'ELSE obj.msg_used END)  ,'/', (CASE WHEN obj.msg_quota_value IS NULL THEN '0' WHEN obj.msg_quota_value<0 THEN '∞' ELSE obj.msg_quota_value END)) as seat_num "+sql;
         Query countQuery = em.createNativeQuery(countSql);
-        pageSql +=" group by obj.dt desc";
         Query pageQuery = em.createNativeQuery(pageSql,SubaccountStatisticalVO.class);
         if(StringUtils.isNotEmpty(appId)){
             countQuery.setParameter("appId",appId);
@@ -146,7 +145,7 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
         List result = query.getResultList();
         if(result != null && result.size() >0){
 
-            String insertSql = "INSERT INTO db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day (id,app_id,tenant_id,subaccount_id,dt,month,among_amount,among_duration,voice_used," +
+            String insertSql = "INSERT INTO db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day (id,app_id,tenant_id,subaccount_id,dt,day,among_amount,among_duration,voice_used," +
                     "msg_used,voice_quota_value,msg_quota_value,create_time,last_time,deleted,sortno,version) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
             jdbcTemplate.batchUpdate(insertSql,result);
