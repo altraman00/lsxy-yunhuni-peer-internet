@@ -235,6 +235,7 @@ public class DialActionHandler extends ActionHandler{
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","ivr.connect_end")
                     .putIfNotEmpty("id",ivr_call_id)
+                    .putIfNotEmpty("subaccount_id",subaccountId)
                     .putIfNotEmpty("begin_time",System.currentTimeMillis())
                     .putIfNotEmpty("end_time",System.currentTimeMillis())
                     .putIfNotEmpty("error","dial error")

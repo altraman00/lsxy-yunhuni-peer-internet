@@ -99,6 +99,7 @@ public class Handler_EVENT_SYS_CONF_ON_FAIL extends EventHandler{
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","conf.end")
                     .putIfNotEmpty("id",conf_id)
+                    .putIfNotEmpty("subaccount_id",state.getSubaccountId())
                     .putIfNotEmpty("error","创建会议失败")
                     .putIfNotEmpty("user_data",state.getUserdata())
                     .build();

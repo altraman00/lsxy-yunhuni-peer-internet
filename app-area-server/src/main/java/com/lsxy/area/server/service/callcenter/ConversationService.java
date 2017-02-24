@@ -849,7 +849,7 @@ public class ConversationService {
 
         if(call_state.getType().equals(BusinessState.TYPE_CC_INVITE_AGENT_CALL) ||
                 call_state.getType().equals(BusinessState.TYPE_CC_AGENT_CALL)){
-            callCenterUtil.agentExitConversationEvent(call_state.getCallBackUrl(),
+            callCenterUtil.agentExitConversationEvent(call_state.getSubaccountId(),call_state.getCallBackUrl(),
                     call_state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD),
                     call_state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),
                     conversationId);
@@ -949,12 +949,12 @@ public class ConversationService {
         }
         if(state.getType().equals(BusinessState.TYPE_CC_INVITE_AGENT_CALL) ||
                 state.getType().equals(BusinessState.TYPE_CC_AGENT_CALL)){
-            callCenterUtil.agentEnterConversationEvent(state.getCallBackUrl(),
+            callCenterUtil.agentEnterConversationEvent(state.getSubaccountId(),state.getCallBackUrl(),
                     businessData.get(CallCenterUtil.AGENT_ID_FIELD),
                     businessData.get(CallCenterUtil.AGENT_NAME_FIELD),
                     conversation_id);
         }
-        callCenterUtil.conversationPartsChangedEvent(state.getCallBackUrl(),conversation_id);
+        callCenterUtil.conversationPartsChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),conversation_id);
     }
 
     private void hangup(String res_id,String call_id,String area_id){

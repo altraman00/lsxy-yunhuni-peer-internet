@@ -3,6 +3,7 @@ package com.lsxy.app.api.gateway.security.auth;
 import com.lsxy.app.api.gateway.security.SpringSecurityConfig;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
@@ -96,7 +98,10 @@ public class RestAuthenticationProvider implements AuthenticationProvider {
         if(apiCertificate.getType()!=null && apiCertificate.getType().intValue() == ApiCertificate.TYPE_PRIMARY_ACCOUNT){
             //是主账号
             restToken = new RestToken(apiKey, credentials, restToken.getTimestamp(),tenantId,null, roles(SpringSecurityConfig.PRIMARY_ACCOUNT));
-        }else{
+        }else if(apiCertificate.getType().intValue() == ApiCertificate.TYPE_SUBACCOUNT){
+            if(!ApiCertificateSubAccount.ENABLED_TRUE.equals(((ApiCertificateSubAccount)apiCertificate).getEnabled())){
+                throw new DisabledException("子账号被禁用");
+            }
             restToken = new RestToken(apiKey, credentials, restToken.getTimestamp(),tenantId,apiCertificate.getId(), null);
         }
         return restToken;

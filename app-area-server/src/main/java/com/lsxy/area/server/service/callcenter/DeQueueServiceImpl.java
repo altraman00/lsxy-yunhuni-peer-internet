@@ -160,12 +160,12 @@ public class DeQueueServiceImpl implements DeQueueService {
             }
         }
 
-        callCenterUtil.sendQueueSelectedAgentEvent(state.getCallBackUrl(),
+        callCenterUtil.sendQueueSelectedAgentEvent(state.getSubaccountId(),state.getCallBackUrl(),
                 queueId,queueType,
                 state.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
                 callId,agentCallId,state.getUserdata());
 
-        callCenterUtil.agentStateChangedEvent(state.getCallBackUrl(),result.getAgent().getId(),
+        callCenterUtil.agentStateChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),result.getAgent().getId(),
                 result.getAgent().getName(),
                 CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
     }
@@ -211,7 +211,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         }
         conversationService.stopPlayWait(state);
 
-        callCenterUtil.sendQueueFailEvent(state.getCallBackUrl(),
+        callCenterUtil.sendQueueFailEvent(state.getSubaccountId(),state.getCallBackUrl(),
                 queueId,queueType,
                 state.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
                 CallCenterUtil.QUEUE_FAIL_TIMEOUT,
@@ -266,7 +266,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         }
         conversationService.stopPlayWait(state);
         
-        callCenterUtil.sendQueueFailEvent(state.getCallBackUrl(),
+        callCenterUtil.sendQueueFailEvent(state.getSubaccountId(),state.getCallBackUrl(),
                 queueId,queueType,
                 state.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
                 CallCenterUtil.QUEUE_FAIL_ERROR,
