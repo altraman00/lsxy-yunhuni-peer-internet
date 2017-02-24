@@ -22,6 +22,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -104,11 +105,12 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
     }
 
     @Override
-    public void deleteSubAccount(String tenantId,String appId,String subAccountId){
+    public void deleteSubAccount(String tenantId,String appId,String subAccountId) throws InvocationTargetException, IllegalAccessException {
         ApiCertificateSubAccount subAccount = this.findById(subAccountId);
         if(subAccount.getTenantId().equals(tenantId) && subAccount.getAppId().equals(appId)){
             resourceTelenumService.subaccountUnbindAll(tenantId,appId,subAccountId);
         }
+        this.delete(subAccount);
     }
 
     @Override
