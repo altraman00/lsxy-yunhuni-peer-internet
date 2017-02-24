@@ -132,15 +132,20 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
         String nextDateStr = DateUtils.formatDate(nextDate);
         String currentDateStr = DateUtils.formatDate(new Date());
 
-        String sql = "SELECT REPLACE(UUID(), '-', '') AS id,a.app_id,a.tenant_id,a.id AS subaccount_id ,'"+statisticsDateStr+"' AS dt, "+ day +" AS day , IFNULL(b.among_amount,0) AS among_amount, IFNULL(b.among_duration,0) AS among_duration," +
+        String sql = "SELECT REPLACE(UUID(), '-', '') AS id,a.app_id,a.tenant_id,a.id AS subaccount_id ,'"+statisticsDateStr+"' AS dt, "+ day +" AS day , IFNULL(c.among_amount,0) AS among_amount, IFNULL(b.among_duration,0) AS among_duration," +
                 "IFNULL((SELECT d.voice_used FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day d WHERE d.subaccount_id = a.id AND d.dt = '" + preDateStr + "'),0) + IFNULL(b.among_duration,0) AS voice_used, 0 AS msg_used ," +
                 "IFNULL((SELECT qu.value FROM db_lsxy_bi_yunhuni.tb_bi_cert_account_quota qu WHERE qu.type='CallQuota' AND qu.cert_account_id = a.id LIMIT 1),0) AS voice_quota_value, -1 AS msg_quota_value ," +
                 "'"+currentDateStr + "' AS create_time, '"+ currentDateStr + "' AS last_time," + " 0 AS deleted,0 AS sortno,0 AS version "+
                 "FROM (SELECT p.tenant_id ,s.app_id ,p.id FROM db_lsxy_bi_yunhuni.tb_bi_api_cert p INNER JOIN db_lsxy_bi_yunhuni.tb_bi_api_cert_subaccount s ON p.id = s.id WHERE p.deleted = 0) a " +
                 "LEFT JOIN " +
-                "(SELECT tenant_id,app_id,subaccount_id,SUM(cost_time_long) AS among_duration,SUM(cost) AS among_amount  " +
+                "(SELECT tenant_id,app_id,subaccount_id,SUM(cost_time_long) AS among_duration  " +
                 "FROM db_lsxy_bi_yunhuni.tb_bi_voice_cdr WHERE call_end_dt >= '" + statisticsDateStr + "'  AND call_end_dt < '" + nextDateStr + "' GROUP BY tenant_id,app_id,subaccount_id) b " +
-                "ON a.id = b.subaccount_id";
+                "ON a.id = b.subaccount_id " +
+                "LEFT JOIN " +
+                "(SELECT tenant_id,app_id,subaccount_id,SUM(amount) AS among_amount " +
+                "FROM db_lsxy_bi_yunhuni.tb_bi_consume WHERE dt >= '" + statisticsDateStr + "' AND dt < '" + nextDateStr + "' GROUP BY tenant_id,app_id,subaccount_id) c " +
+                "ON a.id = c.subaccount_id " ;
+
         Query query = getEm().createNativeQuery(sql);
         List result = query.getResultList();
         if(result != null && result.size() >0){
