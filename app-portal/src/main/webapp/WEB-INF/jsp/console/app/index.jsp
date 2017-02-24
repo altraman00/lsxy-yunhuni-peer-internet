@@ -114,7 +114,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">服务器白名单：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="whiteList" value="${app.whiteList}" placeholder="" class="form-control input-form limit300"/>
+                                                <input type="text" name="whiteList" value="${app.whiteList}" placeholder="" class="form-control input-form whiteList"/>
                                             </div>
                                         </div>
                                         <p class="tips">
@@ -123,7 +123,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">回调URL：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="url" value="${app.url}" placeholder="" class="form-control input-form notEmpty" maxlength="300"/>
+                                                <input type="text" name="url" value="${app.url}" placeholder="" class="form-control input-form url" maxlength="300"/>
                                             </div>
                                             <span class="span-required">*</span>
                                         </div>
