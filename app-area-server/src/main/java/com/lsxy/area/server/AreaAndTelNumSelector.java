@@ -61,6 +61,13 @@ public class AreaAndTelNumSelector {
         return getTelnumberAndAreaId(subaccountId,app,false,from,to,null,null);
     }
 
+    /**
+     * 获取一个可用的号码
+     * @param subaccountId
+     * @param app
+     * @return
+     * @throws YunhuniApiException
+     */
     public ResourceTelenum getTelnumber(String subaccountId, App app) throws YunhuniApiException {
         //查找租户私有线路
         List<LineGatewayVO> lineGateways = lineGatewayToTenantService.findByTenantIdAndAreaId(app.getTenant().getId(),app.getAreaId());
@@ -72,7 +79,14 @@ public class AreaAndTelNumSelector {
             //TODO 没有线路，则抛出异常
             throw new NotAvailableLineException();
         }
-        return null;
+        //所拥有的线路ID列表
+        List<String> lineIds = lineGateways.stream().map(LineGatewayVO::getId).collect(Collectors.toList());
+        List<ResourceTelenum> telnumbers = resourceTelenumService.findDialingTelnumber(subaccountId,lineIds,app);
+        if(telnumbers != null && telnumbers.size() > 0){
+            return telnumbers.get(0);
+        }else{
+            return null;
+        }
     }
 
     /**
