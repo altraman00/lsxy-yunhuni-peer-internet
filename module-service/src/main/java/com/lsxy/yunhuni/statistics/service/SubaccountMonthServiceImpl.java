@@ -59,8 +59,8 @@ public class SubaccountMonthServiceImpl extends AbstractService<SubaccountMonth>
                 "obj.app_id as app_id," +
                 "a.name as app_name," +
                 "obj.among_amount as among_amount," +
-                "obj.among_duration as among_duration," +
-                "concat( (CASE WHEN obj.voice_used IS NULL THEN '0'ELSE obj.voice_used END) ,'/', (CASE WHEN obj.voice_quota_value IS NULL THEN '0' WHEN obj.voice_quota_value<0 THEN '∞' ELSE obj.voice_quota_value END) ) as voice_num," +
+                "ROUND(obj.among_duration/60,0) as among_duration," +
+                "concat( (CASE WHEN obj.voice_used IS NULL THEN '0'ELSE ROUND(obj.voice_used/60,0) END) ,'/', (CASE WHEN obj.voice_quota_value IS NULL THEN '0' WHEN obj.voice_quota_value<0 THEN '∞' ELSE ROUND(obj.voice_quota_value/60,0) END) ) as voice_num," +
                 "concat( (CASE WHEN obj.msg_used IS NULL THEN '0'ELSE obj.msg_used END)  ,'/', (CASE WHEN obj.msg_quota_value IS NULL THEN '0' WHEN obj.msg_quota_value<0 THEN '∞' ELSE obj.msg_quota_value END)) as seat_num "+sql;
         Query countQuery = em.createNativeQuery(countSql);
         pageSql +=" group by obj.dt desc";
