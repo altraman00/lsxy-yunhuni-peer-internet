@@ -24,6 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
@@ -273,7 +274,7 @@ public class ResourcesRentController extends AbstractRestController{
      * @return
      */
     @RequestMapping("/num/unused/app/{appId}")
-    public RestResponse findOwnUnusedNum(@PathVariable String appId,int pageNo,int pageSize){
+    public RestResponse findOwnUnusedNum(@PathVariable String appId, @RequestParam(defaultValue = "0") int type, int pageNo, int pageSize){
         Tenant tenant = getCurrentAccount().getTenant();
         App app = appService.findById(appId);
         if(!tenant.getId().equals(app.getTenant().getId())){
@@ -282,7 +283,12 @@ public class ResourcesRentController extends AbstractRestController{
         if(app == null || StringUtils.isBlank(app.getOnlineAreaId())){
             return RestResponse.failed("0000","应用不存在");
         }
-        Page<ResourceTelenum> ownUnusedNum = resourceTelenumService.findOwnUnusedNum(tenant.getId(), app.getOnlineAreaId(), pageNo, pageSize);
+        Page<ResourceTelenum> ownUnusedNum ;
+        if(type == 0) {
+            ownUnusedNum = resourceTelenumService.findOwnUnusedNum(tenant.getId(), app.getOnlineAreaId(), pageNo, pageSize);
+        }else{
+            ownUnusedNum = resourceTelenumService.findOwnUnusedNumOrUnbindSubaccount(tenant.getId(),appId, app.getOnlineAreaId(), pageNo, pageSize);
+        }
         return RestResponse.success(ownUnusedNum);
     }
 

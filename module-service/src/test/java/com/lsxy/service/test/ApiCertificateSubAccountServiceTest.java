@@ -16,6 +16,8 @@ import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountServi
 import com.lsxy.yunhuni.api.apicertificate.service.CertAccountQuotaService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
+import com.lsxy.yunhuni.api.statistics.service.SubaccountDayService;
+import com.lsxy.yunhuni.api.statistics.service.SubaccountMonthService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,6 +97,16 @@ public class ApiCertificateSubAccountServiceTest {
         Date date = new Date();
         Date preDate = DateUtils.getPreDate(date);
         certAccountQuotaService.dayStatics(preDate);
+    }
+
+    @Autowired
+    SubaccountDayService subaccountDayService;
+    @Autowired
+    SubaccountMonthService subaccountMonthService;
+    @Test
+    public void testDayStatistics(){
+        Date prevMonth = DateUtils.getPrevMonth(new Date());
+        subaccountDayService.dayStatistics(new Date());
     }
 
 }

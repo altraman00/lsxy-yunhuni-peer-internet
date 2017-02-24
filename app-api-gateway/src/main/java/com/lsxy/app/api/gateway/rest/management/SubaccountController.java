@@ -25,6 +25,7 @@ import sun.security.x509.CertificateSubjectName;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -112,7 +113,7 @@ public class SubaccountController extends AbstractAPIController {
                                          @PathVariable String accountId,
                                          @RequestHeader(value = "AppID") String appId,
                                          @RequestParam(defaultValue = "1") String subaccountId
-    ) throws YunhuniApiException {
+    ) throws YunhuniApiException, InvocationTargetException, IllegalAccessException {
         if(logger.isDebugEnabled()){
             logger.debug("删除子账号API参数,accountId={},appId={},subaccountId={}",accountId,appId,subaccountId);
         }

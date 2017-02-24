@@ -21,6 +21,8 @@ import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.resourceTelenum.dao.ResourceTelenumDao;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.RandomUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
@@ -41,6 +43,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum> implements ResourceTelenumService {
+    private static final Logger logger = LoggerFactory.getLogger(ResourceTelenumServiceImpl.class);
+
     public static String testCallNumber = SystemConfig.getProperty("portal.test.call.number");
     @Autowired
     private ResourceTelenumDao resourceTelenumDao;
@@ -315,6 +319,13 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 result.add(availableNum);
             }
         }
+        if(logger.isDebugEnabled()){
+            if(result != null && result.size() > 0){
+                for(ResourceTelenum num : result){
+                    logger.debug("选择号码为：{}",num.getTelNumber());
+                }
+            }
+        }
         return result;
     }
 
@@ -556,7 +567,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     @Override
     public Page<ResourceTelenum> findOwnUnusedNumOrUnbindSubaccount(String tenantId, String appId, String areaId, int pageNo, int pageSize) {
         String hql = "from ResourceTelenum obj where obj.tenantId = ?1 and obj.areaId = ?2 and (obj.appId is null or (obj.appId=?3 and obj.subaccountId is null))";
-        return  this.pageList(hql,pageNo,pageSize,tenantId,areaId);
+        return  this.pageList(hql,pageNo,pageSize,tenantId,areaId,appId);
     }
 
     @Override

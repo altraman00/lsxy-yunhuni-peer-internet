@@ -18,9 +18,11 @@ import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.apicertificate.dao.ApiCertificateSubAccountDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -40,7 +42,8 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
     ResourcesRentService resourcesRentService;
     @Autowired
     ResourceTelenumService resourceTelenumService;
-
+    @Autowired
+    JdbcTemplate jdbcTemplate;
     @Override
     public BaseDaoInterface<ApiCertificateSubAccount, Serializable> getDao() {
         return this.apiCertificateSubAccountDao;
@@ -71,11 +74,12 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
         if(setQuotas != null){
             for(CertAccountQuota quota : setQuotas){
                 CertAccountQuota saveQ = new CertAccountQuota(tenantId,subAccount.getAppId(),subAccount.getId(),quota.getType(),quota.getValue(),quota.getRemark());
-                certAccountQuotaService.save(saveQ);
+                saveQ = certAccountQuotaService.save(saveQ);
                 subQuotas.add(saveQ);
             }
         }
         subAccount.setQuotas(subQuotas);
+        subAccount = this.save(subAccount);
         return subAccount;
     }
 
@@ -101,11 +105,12 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
     }
 
     @Override
-    public void deleteSubAccount(String tenantId,String appId,String subAccountId){
+    public void deleteSubAccount(String tenantId,String appId,String subAccountId) throws InvocationTargetException, IllegalAccessException {
         ApiCertificateSubAccount subAccount = this.findById(subAccountId);
         if(subAccount.getTenantId().equals(tenantId) && subAccount.getAppId().equals(appId)){
             resourceTelenumService.subaccountUnbindAll(tenantId,appId,subAccountId);
         }
+        this.delete(subAccount);
     }
 
     @Override
@@ -170,6 +175,43 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
     public Page<ApiCertificateSubAccount> pageListWithNotQuota(String appId, int pageNo, int pageSize) {
         String hql = "from ApiCertificateSubAccount obj where obj.appId = ?1";
         Page<ApiCertificateSubAccount> page = this.pageList(hql, pageNo, pageSize, appId);
+        return page;
+    }
+
+    @Override
+    public Page<ApiCertificateSubAccount> pageListWithQuotaByCondition(String appId, int pageNo, int pageSize, String certId, String remark, Integer enabled) {
+        String hql = "from ApiCertificateSubAccount obj where obj.appId = ?1";
+        if(StringUtils.isNotEmpty(certId)){
+            hql += " and obj.certId='"+certId+"' ";
+        }
+        if(StringUtils.isNotEmpty(remark)){
+            hql += " and obj.certId like '%"+certId+"%' ";
+        }
+        if(enabled != null){
+            hql += " and obj.enabled = '"+enabled+"' ";
+        }
+        Page<ApiCertificateSubAccount> page = this.pageList(hql, pageNo, pageSize, appId);
+        List<CertAccountQuota> quotas = certAccountQuotaService.findByAppId(appId);
+        for(CertAccountQuota quota : quotas){
+            //获取配额实时的数据
+            certAccountQuotaService.getCurrentQuota(quota);
+        }
+        Map<String,List<CertAccountQuota>> map = new HashMap();
+        for(CertAccountQuota quota : quotas){
+            String certAccountId = quota.getCertAccountId();
+            List<CertAccountQuota> quotaList = map.get(certAccountId);
+            if(quotaList == null){
+                quotaList = new ArrayList<>();
+                map.put(certAccountId,quotaList);
+            }
+            quotaList.add(quota);
+        }
+        List<ApiCertificateSubAccount> result = page.getResult();
+        if(result != null){
+            for(ApiCertificateSubAccount subAccount: result){
+                subAccount.setQuotas(map.get(subAccount.getId()));
+            }
+        }
         return page;
     }
 

@@ -37,6 +37,10 @@ public class CertAccountQuota extends IdEntity {
     @Transient
     private Boolean hasRemain;
 
+    public CertAccountQuota(String type, Long value) {
+        this.type = type;
+        this.value = value;
+    }
     public CertAccountQuota() {
     }
 
@@ -48,7 +52,7 @@ public class CertAccountQuota extends IdEntity {
      * 仅限服务层新建初始化配额
      */
     public CertAccountQuota(String tenantId, String appId, String certAccountId, String type, Long value, String remark) {
-        new CertAccountQuota(tenantId,appId,certAccountId,type,-1L,value,remark);
+        this(tenantId,appId,certAccountId,type,-1L,value,remark);
     }
 
     /**
