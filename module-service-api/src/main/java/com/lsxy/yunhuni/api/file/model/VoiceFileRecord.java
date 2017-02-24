@@ -21,6 +21,7 @@ public class VoiceFileRecord extends IdEntity {
     public final static int IS_DELETED_TRUE = 1;
     private String tenantId;//所属租户
     private String appId;//所属应用
+    private String subaccountId; //子账号Id
     private String areaId; //录音所在区域
     private String name;//文件名 生成规则uuid
     private String url;//录音文件URL
@@ -109,6 +110,15 @@ public class VoiceFileRecord extends IdEntity {
 
     public void setAppId(String appId) {
         this.appId = appId;
+    }
+
+    @Column(name="subaccount_id")
+    public String getSubaccountId() {
+        return subaccountId;
+    }
+
+    public void setSubaccountId(String subaccountId) {
+        this.subaccountId = subaccountId;
     }
 
     @Column(name="area_id")
