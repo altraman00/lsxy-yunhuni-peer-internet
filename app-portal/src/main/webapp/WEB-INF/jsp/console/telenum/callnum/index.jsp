@@ -575,7 +575,7 @@
                             call: re[i].isCalled,
                             callout: (re[i].isDialing+re[i].isThrough)>0?1:0,
                             place: re[i].areaCode,
-                            price:  (re[i].amount).toFixed(2)
+                            price:  (re[i].amount).toFixed(3)
                         };
                         data.push(d);
                     }
