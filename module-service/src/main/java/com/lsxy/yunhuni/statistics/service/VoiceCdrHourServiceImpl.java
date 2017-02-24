@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Query;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
@@ -19,6 +20,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,15 +44,15 @@ public class VoiceCdrHourServiceImpl extends AbstractService<VoiceCdrHour> imple
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");
-        String sql =" insert into db_lsxy_bi_yunhuni.tb_bi_voice_cdr_hour("+selects+" id,dt,hour,among_cost_time,among_duration,among_connect,among_not_connect,among_call,create_time,last_time,deleted,sortno,version )" +
-                " select "+selects+"  REPLACE(UUID(), '-', '') as id, ? as dt,? as day, "+
-                " IFNULL(sum(cost_time_long),0) as among_cost_time," +
-                " IFNULL(sum(call_time_long),0) as among_duration," +
-                " count(call_ack_dt) as among_connect," +
-                " (count(1) - count(call_ack_dt)) as  among_not_connect ," +
-                " count(1) as among_call,"+
-                " ? as create_time,? as last_time,? as deleted,? as sortno,? as version "+
-                " from db_lsxy_bi_yunhuni.tb_bi_voice_cdr a where call_end_dt BETWEEN ? AND ? "+groupbys;
+
+        String sql = " select "+selects+"  REPLACE(UUID(), '-', '') as id, ? as dt,? as day, "+
+                     " IFNULL(sum(cost_time_long),0) as among_cost_time," +
+                     " IFNULL(sum(call_time_long),0) as among_duration," +
+                     " count(call_ack_dt) as among_connect," +
+                     " (count(1) - count(call_ack_dt)) as  among_not_connect ," +
+                     " count(1) as among_call,"+
+                     " ? as create_time,? as last_time,? as deleted,? as sortno,? as version "+
+                     " from db_lsxy_bi_yunhuni.tb_bi_voice_cdr a where call_end_dt BETWEEN ? AND ? "+groupbys;
 
         //拼装条件
         Timestamp sqlDate1 = new Timestamp(date1.getTime());
@@ -64,14 +66,28 @@ public class VoiceCdrHourServiceImpl extends AbstractService<VoiceCdrHour> imple
                 initDate,initDate,0,times,0,
                 sqlDate1,sqlDate3
         };
-        jdbcTemplate.update(sql,new PreparedStatementSetter(){
-            @Override
-            public void setValues(PreparedStatement ps) throws SQLException {
-                for(int i=0;i<obj.length;i++){
-                    ps.setObject(i+1,obj[i]);
-                }
+        Query query = getEm().createNativeQuery(sql);
+        for(int i=0;i<obj.length;i++){
+            query.setParameter(i+1,obj[i]);
+        }
+        List resultList = query.getResultList();
+
+        String values = selects+" id,dt,hour,among_cost_time,among_duration,among_connect,among_not_connect,among_call,create_time,last_time,deleted,sortno,version";
+        String valuesMark = "";
+        int length = values.split(",").length;
+        for(int i = 0;i<length;i++){
+            if(i == length -1){
+                valuesMark += "?";
+            }else{
+                valuesMark += "?,";
             }
-        });
+        }
+
+        String insertSql = " insert into db_lsxy_bi_yunhuni.tb_bi_voice_cdr_hour("+ values + ") values ("+valuesMark+")";
+
+        if(resultList != null && resultList.size() > 0){
+            jdbcTemplate.batchUpdate(insertSql,resultList);
+        }
     }
 
     @Override
