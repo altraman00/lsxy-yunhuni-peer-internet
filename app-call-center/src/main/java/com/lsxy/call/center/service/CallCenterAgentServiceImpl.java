@@ -400,7 +400,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
-    public Page getPage(String appId, Integer pageNo, Integer pageSize) throws YunhuniApiException{
+    public Page getPageForPotal(String appId, Integer pageNo, Integer pageSize) throws YunhuniApiException{
         if(StringUtils.isBlank(appId)){
             throw new RequestIllegalArgumentException();
         }
@@ -416,17 +416,35 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         List<AgentSkill> skills = agentSkillService.findAllByAgents(agentIds);
         //分组这些技能，以座席Id为key放入Map中
         Map<String, List<AgentSkill>> collect = skills.stream().collect(Collectors.groupingBy(AgentSkill::getAgent, Collectors.toList()));
+        List<String> extensionIds = new ArrayList<>();
         result.stream().forEach(agent -> {
             AgentState.Model model = agentState.get(agent.getId());
             agent.setState(model.getState());
             agent.setExtension(model.getExtension());
+            extensionIds.add(model.getExtension());
             agent.setSkills(collect.get(agent.getId()));
         });
+        Map<String,AppExtension> map = new HashMap<>();
+        Iterable<AppExtension> appExtensions = appExtensionService.findAll(extensionIds);
+        if(appExtensions != null){
+            for(AppExtension e:appExtensions){
+                map.put(e.getId(),e);
+            }
+        }
+        result.stream().forEach(agent ->{
+            AppExtension extension = map.get(agent.getExtension());
+            if(extension != null){
+                agent.setExtension(extension.getUser());
+            }else{
+                agent.setExtension(null);
+            }
+        });
+
         return page;
     }
 
     @Override
-    public Page getPage(String appId, String subaccountId, Integer pageNo, Integer pageSize) throws YunhuniApiException {
+    public Page getPageForApiGW(String appId, String subaccountId, Integer pageNo, Integer pageSize) throws YunhuniApiException {
         if(StringUtils.isBlank(appId)){
             throw new RequestIllegalArgumentException();
         }
