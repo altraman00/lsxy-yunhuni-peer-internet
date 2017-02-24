@@ -47,8 +47,8 @@ public class ApiCertificateSubAccountController extends AbstractRestController {
     @RequestMapping(value = "/new")
     public RestResponse create(HttpServletRequest request,String appId, String url, long seatNum, long voiceNum, String remark){
         List<CertAccountQuota> quotas = new ArrayList<>();
-        quotas.add( new CertAccountQuota(CertAccountQuotaType.CallQuota.name(),voiceNum) );
-        quotas.add( new CertAccountQuota(CertAccountQuotaType.AgentQuota.name(),seatNum) );
+        quotas.add( new CertAccountQuota(CertAccountQuotaType.CallQuota.name(),voiceNum*60) );
+        quotas.add( new CertAccountQuota(CertAccountQuotaType.AgentQuota.name(),seatNum*60) );
         apiCertificateSubAccountService.createSubAccount(new ApiCertificateSubAccount( appId,  url,  remark,  quotas));
         return RestResponse.success("成功");
     }
@@ -124,8 +124,8 @@ public class ApiCertificateSubAccountController extends AbstractRestController {
             apiCertificateSubAccount.setCallbackUrl(url);
             apiCertificateSubAccount.setRemark(remark);
             List<CertAccountQuota> quotas = new ArrayList<>();
-            quotas.add( new CertAccountQuota(CertAccountQuotaType.CallQuota.name(),voiceNum) );
-            quotas.add( new CertAccountQuota(CertAccountQuotaType.AgentQuota.name(),seatNum) );
+            quotas.add( new CertAccountQuota(CertAccountQuotaType.CallQuota.name(),voiceNum*60) );
+            quotas.add( new CertAccountQuota(CertAccountQuotaType.AgentQuota.name(),seatNum*60) );
             apiCertificateSubAccount.setQuotas(quotas);
             apiCertificateSubAccountService.updateSubAccount(apiCertificateSubAccount);
             return RestResponse.success("修改成功");
