@@ -31,6 +31,7 @@ import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import org.apache.commons.lang.ArrayUtils;
@@ -422,7 +423,13 @@ public class ConversationService {
             to = selector.getToUri();
         }else{
             areaId = areaAndTelNumSelector.getAreaId(app);
-            //TODO 获取平台号码
+            if(StringUtil.isEmpty(systemNum)){
+                ResourceTelenum resourceTelenum =
+                        areaAndTelNumSelector.getTelnumber(subaccountId,app);
+                if(resourceTelenum!=null){
+                    systemNum = resourceTelenum.getTelNumber();
+                }
+            }
             from = (systemNum) + "@"+areaId+".area.oneyun.com";
             to = user + "@" + sip_address;
         }
