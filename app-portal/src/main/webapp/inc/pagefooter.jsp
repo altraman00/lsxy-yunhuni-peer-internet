@@ -1,3 +1,4 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
 <section class="panel panel-default yunhuni-personal">
     <nav class='pageWrap'>
         <ul class="pagination">
@@ -18,7 +19,11 @@
             <c:if test="${endPageNo < 5}">
                 <c:set  var="startPageNo" value="1"></c:set>
             </c:if>
-
+            <c:if test="${pageObj.totalCount > 0}">
+                <li>
+                    <span style="border:0px; "  onmouseover="this.style.backgroundColor='#FFFFFF'" >共${pageObj.totalCount}条</span>
+                </li>
+            </c:if>
             <c:if test="${startPageNo > 1}">
                 <li>
                     <a href="${pageUrl}?pageNo=${startPageNo-1}&pageSize=${pageObj.pageSize}${extraParam}" aria-label="Previous">
