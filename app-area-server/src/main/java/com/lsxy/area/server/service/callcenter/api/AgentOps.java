@@ -129,6 +129,9 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
     @Autowired
     private CallCenterStatisticsService callCenterStatisticsService;
 
+    @Autowired
+    private CallCenterUtil callCenterUtil;
+
     @Override
     public void reject(String subaccountId, String ip, String appId, String name, String queueId, String userData) throws YunhuniApiException {
         if(StringUtils.isBlank(name)){
@@ -295,6 +298,8 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     }catch (Throwable t){
                         logger.error("incrIntoRedis失败",t);
                     }
+                    callCenterUtil.agentStateChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),agent,name,
+                            CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
                 }catch (Throwable t){
                     callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_IDLE,true);
                     throw t;
@@ -409,6 +414,8 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_FETCHING,true);
                     //坐席加入交谈成功事件中要排队找坐席
                     businessStateService.updateInnerField(conversationId,"enqueue_xml",enqueueXml);
+                    callCenterUtil.agentStateChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),agent,name,
+                            CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
                 }catch (Throwable t){
                     callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_IDLE,true);
                     throw t;
@@ -582,7 +589,8 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                             callCenterAgent.getName(),
                             extension.getId(),null,extension.getTelnum(),extension.getType(),extension.getUser(),null,null,null);
                     callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_FETCHING,true);
-                    //坐席加入交谈成功事件中要排队找坐席
+                    callCenterUtil.agentStateChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),agent,name,
+                            CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
                 }catch (Throwable t){
                     callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_IDLE,true);
                     throw t;
