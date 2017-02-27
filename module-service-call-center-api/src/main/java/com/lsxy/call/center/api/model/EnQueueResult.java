@@ -4,14 +4,11 @@ import com.lsxy.framework.core.utils.JSONUtil;
 
 import java.io.Serializable;
 
-/**
- * 排队查询可用坐席列表
- * Created by zhangxb on 2016/10/21.
- */
 public class EnQueueResult implements Serializable {
 
     private AppExtension extension;
     private CallCenterAgent agent;
+    private Integer fetchTime;
     private BaseEnQueue baseEnQueue;
 
     public CallCenterAgent getAgent() {
@@ -36,6 +33,14 @@ public class EnQueueResult implements Serializable {
 
     public void setBaseEnQueue(BaseEnQueue baseEnQueue) {
         this.baseEnQueue = baseEnQueue;
+    }
+
+    public Integer getFetchTime() {
+        return fetchTime;
+    }
+
+    public void setFetchTime(Integer fetchTime) {
+        this.fetchTime = fetchTime;
     }
 
     @Override

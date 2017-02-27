@@ -8,12 +8,12 @@ import com.lsxy.call.center.api.model.Condition;
 import com.lsxy.call.center.api.operations.AgentSkillOperationDTO;
 import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.dao.CallCenterAgentDao;
-import com.lsxy.call.center.states.lock.AgentLock;
-import com.lsxy.call.center.states.lock.ExtensionLock;
-import com.lsxy.call.center.states.state.AgentState;
-import com.lsxy.call.center.states.state.ExtensionState;
-import com.lsxy.call.center.states.statics.ACs;
-import com.lsxy.call.center.states.statics.CAs;
+import com.lsxy.call.center.api.states.lock.AgentLock;
+import com.lsxy.call.center.api.states.lock.ExtensionLock;
+import com.lsxy.call.center.api.states.state.AgentState;
+import com.lsxy.call.center.api.states.state.ExtensionState;
+import com.lsxy.call.center.api.states.statics.ACs;
+import com.lsxy.call.center.api.states.statics.CAs;
 import com.lsxy.call.center.utils.ExpressionUtils;
 import com.lsxy.call.center.utils.Lua;
 import com.lsxy.framework.api.base.BaseDaoInterface;
@@ -380,6 +380,16 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         //技能
         agent.setSkills(skills);
         return agent;
+    }
+
+    @Override
+    public String getId(String appId, String agentName) throws YunhuniApiException {
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId, agentName);
+        if(agent == null){
+            // 座席不存在
+            throw new AgentNotExistException();
+        }
+        return agent.getId();
     }
 
     @Override

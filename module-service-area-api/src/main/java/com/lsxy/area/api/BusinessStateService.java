@@ -28,7 +28,7 @@ public interface BusinessStateService {
 
     public void updateInnerField(String id,List<String> params);
 
-    public void deleteInnerField(String id,String field);
+    public void deleteInnerField(String id,String... fields);
 
     public void delete(String id);
 }

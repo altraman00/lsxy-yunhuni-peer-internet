@@ -408,15 +408,23 @@ public class RedisCacheService {
 		/**
 		 * 
 		 * @param key
-		 * @param queueid
+		 * @param value
 		 */
-		public void zrem(final String key, final String queueid) {
-			redisTemplate.opsForZSet().remove(key, queueid);
+		public void zrem(final String key, final String value) {
+			redisTemplate.opsForZSet().remove(key, value);
 		}
 
 		public void zrem(String key, Object... array) {
 			redisTemplate.opsForZSet().remove(key, array);
 			
+		}
+
+		public long zsize(String key){
+			return redisTemplate.opsForZSet().size(key);
+		}
+
+		public Set zReverseRange(final String key, final long start, final long end){
+			return redisTemplate.opsForZSet().reverseRange(key, start, end);
 		}
 
 		public Set zRange(final String key, final long start, final long end) {
@@ -435,6 +443,10 @@ public class RedisCacheService {
 			return redisTemplate.opsForZSet().score(key,value);
 		}
 
+		public Long zCount(final String key,final double score1,double score2) {
+			return redisTemplate.opsForZSet().count(key,score1,score2);
+		}
+
 		public void sremove(final String key,final String... value){
 			redisTemplate.opsForSet().remove(key,value);
 		}
@@ -446,6 +458,10 @@ public class RedisCacheService {
 		public Set smembers(final String key) {
 			Set set = redisTemplate.opsForSet().members(key);
 			return set;
+		}
+
+		public boolean sismember(final String key,final String value){
+			return redisTemplate.opsForSet().isMember(key,value);
 		}
 
 		public long ssize(final String key){
@@ -472,8 +488,8 @@ public class RedisCacheService {
 			return redisTemplate.opsForHash().putIfAbsent(key,field,value);
 		}
 
-		public void hdel(final String key,final String field){
-			redisTemplate.opsForHash().delete(key,field);
+		public void hdel(final String key,final String... fields){
+			redisTemplate.opsForHash().delete(key,fields);
 		}
 
 	public BoundHashOperations getHashOps(String key){

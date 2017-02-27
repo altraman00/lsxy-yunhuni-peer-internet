@@ -28,6 +28,7 @@ public class ConditionCreateInputDTO extends CommonDTO {
     private String sortExpression;
 
     @Min(value = 0)
+    @Max(value = 99)
     @JsonProperty("priority")
     private Integer priority;
 
@@ -37,7 +38,8 @@ public class ConditionCreateInputDTO extends CommonDTO {
     @JsonProperty("queue_timeout")
     private Integer queueTimeout;
 
-    @Min(value = 0)
+    @Min(value = 1)
+    @Max(value = 60)
     @JsonProperty("fetch_timeout")
     private Integer fetchTimeout;
 
