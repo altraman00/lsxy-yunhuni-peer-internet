@@ -509,7 +509,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                     state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null);
                             //坐席加入交谈成功事件中要呼叫这个号码
                             businessStateService.updateInnerField(conversationId,"invite_from",
-                                    businessData.get("invite_from"),"invite_to",businessData.get("invite_to"));
+                                    businessData.get("invite_from")!=null?businessData.get("invite_from"):"","invite_to",businessData.get("invite_to"));
                             businessStateService.deleteInnerField(call_id,"invite_to","invite_from");
                         } catch (YunhuniApiException e) {
                             conversationService.logicExit(conversationId,call_id);
