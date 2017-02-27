@@ -221,12 +221,12 @@ public class AreaAndTelNumSelector {
         if(TelnumToLineGateway.ISDIALING_TRUE.equals(telnumToLineGateway.getIsDialing())){
             //主叫
             entity = new TelnumSortEntity(svTelnumber.getCallUri(),
-                    telnumLocationService.solveNum(to,lg.getTelAreaRule(),lg.getMobileAreaRule(),lg.getAreaCode()),
+                    telnumLocationService.solveNum(to,lg.getTelAreaRule(),lg.getMobileAreaRule(),svTelnumber.getAreaCode()),
                     lg.getSipProviderDomain(),lg.getSipProviderIp(),lg.getId(),lg.getPriority());
         }else if(TelnumToLineGateway.ISTHROUGH_TRUE.equals(telnumToLineGateway.getIsThrough())){
             //透传
             entity = new TelnumSortEntity(svTelnumber.getTelNumber(),
-                    telnumLocationService.solveNum(to,lg.getTelAreaRule(),lg.getMobileAreaRule(),lg.getAreaCode()),
+                    telnumLocationService.solveNum(to,lg.getTelAreaRule(),lg.getMobileAreaRule(),svTelnumber.getAreaCode()),
                     lg.getSipProviderDomain(),lg.getSipProviderIp(),lg.getId(),lg.getPriority());
         }
         return entity;
