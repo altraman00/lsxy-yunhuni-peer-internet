@@ -116,9 +116,23 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
                 conversationService.logicExit(conversation,call_id);
             }
         }else if(BusinessState.TYPE_CC_INVITE_OUT_CALL.equals(state.getType())){
-            String conversationId = state.getBusinessData().get(CallCenterUtil.CONVERSATION_FIELD);
-            if(conversationId == null){
-                throw new InvalidParamException("将呼叫加入到会议失败conversationId为null");
+            Map<String,String> businessData = state.getBusinessData();
+            String conversationId = businessData.get(CallCenterUtil.CONVERSATION_FIELD);
+            BusinessState conversationState = businessStateService.get(conversationId);
+            if(conversationState == null || (conversationState.getClosed() != null && conversationState.getClosed())){
+                conversationService.logicExit(conversationId,state.getId());
+                return res;
+            }
+            String initiator = state.getBusinessData().get(CallCenterUtil.INITIATOR_FIELD);
+            if(initiator != null){
+                BusinessState initiatorState = businessStateService.get(initiator);
+                if(logger.isDebugEnabled()){
+                    logger.info("[{}][{}]开始判断振铃前是否客户挂断了呼叫:{}",state.getTenantId(),state.getAppId(),initiatorState);
+                }
+                if(initiatorState!=null && initiatorState.getClosed() != null && initiatorState.getClosed()){
+                    conversationService.logicExit(conversationId,state.getId());
+                    return res;
+                }
             }
             try {
                 conversationService.join(conversationId,call_id,null,null,null);
