@@ -8,6 +8,7 @@ import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.batch.CallCenterBatchInserter;
 import com.lsxy.area.server.service.callcenter.*;
 import com.lsxy.area.server.service.ivr.IVRActionService;
+import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.*;
@@ -131,6 +132,9 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
 
     @Autowired
     private CallCenterUtil callCenterUtil;
+
+    @Autowired
+    private CallbackUrlUtil callbackUrlUtil;
 
     @Override
     public void reject(String subaccountId, String ip, String appId, String name, String queueId, String userData) throws YunhuniApiException {
@@ -298,7 +302,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     }catch (Throwable t){
                         logger.error("incrIntoRedis失败",t);
                     }
-                    callCenterUtil.agentStateChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),agent,name,
+                    callCenterUtil.agentStateChangedEvent(subaccountId,callbackUrlUtil.get(app,subaccountId),agent,name,
                             CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
                 }catch (Throwable t){
                     agentState.setState(agent,CallCenterAgent.STATE_IDLE);
@@ -414,7 +418,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     agentState.setState(agent,CallCenterAgent.STATE_FETCHING);
                     //坐席加入交谈成功事件中要排队找坐席
                     businessStateService.updateInnerField(conversationId,"enqueue_xml",enqueueXml);
-                    callCenterUtil.agentStateChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),agent,name,
+                    callCenterUtil.agentStateChangedEvent(subaccountId,callbackUrlUtil.get(app,subaccountId),agent,name,
                             CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
                 }catch (Throwable t){
                     agentState.setState(agent,CallCenterAgent.STATE_IDLE);
@@ -589,7 +593,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                             callCenterAgent.getName(),
                             extension.getId(),null,extension.getTelnum(),extension.getType(),extension.getUser(),null,null,null);
                     agentState.setState(agent,CallCenterAgent.STATE_FETCHING);
-                    callCenterUtil.agentStateChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),agent,name,
+                    callCenterUtil.agentStateChangedEvent(subaccountId,callbackUrlUtil.get(app,subaccountId),agent,name,
                             CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
                 }catch (Throwable t){
                     agentState.setState(agent,CallCenterAgent.STATE_IDLE);
