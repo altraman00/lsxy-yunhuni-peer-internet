@@ -65,7 +65,7 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_SUCCESS extends EventHandler {
         }
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null");
+            throw new InvalidParamException("businessstate is null,call_id=",call_id);
         }
         businessStateService.updateResId(call_id,res_id);
         Map<String,String> busniessData = state.getBusinessData();

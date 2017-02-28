@@ -319,15 +319,28 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
     @Override
     public boolean callAgent(String subaccountId,String ip, String appId, String name, String from, String enqueueXml, Integer maxDialSeconds, Integer maxAnswerSeconds) throws YunhuniApiException {
         if(StringUtil.isBlank(enqueueXml)){
-            throw new RequestIllegalArgumentException();
+            throw new RequestIllegalArgumentException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("enqueueXml",enqueueXml)
+            );
         }
         try {
             Document doc = DocumentHelper.parseText(enqueueXml);
             if(!ivrActionService.validateXMLSchema(doc)){
-                throw new RequestIllegalArgumentException();
+                throw new RequestIllegalArgumentException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                                .put("enqueueXml",enqueueXml)
+                );
             }
         } catch (DocumentException e) {
-            throw new RequestIllegalArgumentException();
+            logger.info("解析xml出错",e);
+            throw new RequestIllegalArgumentException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("enqueueXml",enqueueXml)
+            );
         }
 
         if(maxAnswerSeconds == null || maxAnswerSeconds > ConversationService.MAX_DURATION){
@@ -336,12 +349,19 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
 
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                                .put("ip",ip)
+                );
             }
         }
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
@@ -354,36 +374,81 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         //根据坐席name 找到坐席
         String agent = callCenterAgentService.getId(appId,subaccountId,name);
         if(StringUtil.isEmpty(agent)){
-            throw new AgentNotExistException();
+            throw new AgentNotExistException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("agentName",name)
+            );
         }
         CallCenterAgent callCenterAgent = callCenterAgentService.findById(agent);
         if(callCenterAgent == null){
-            throw new AgentNotExistException();
+            throw new AgentNotExistException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("agentName",name)
+                            .put("agentId",agent)
+            );
         }
         if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,callCenterAgent.getSubaccountId())){
-            throw new AgentNotExistException();
+            throw new AgentNotExistException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("agentName",name)
+                            .put("agentId",agent)
+                            .put("agent",callCenterAgent)
+            );
         }
         //获取坐席状态
         AgentState.Model aState = agentState.get(agent);
         if(aState == null || aState.getState() == null){
-            throw new AgentNotExistException();
+            throw new AgentNotExistException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("agentName",name)
+                            .put("agentId",agent)
+                            .put("agentstate",aState)
+            );
         }
         if(aState.getExtension() == null){
-            throw new ExtensionNotExistException();
+            throw new ExtensionNotExistException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("agentName",name)
+                            .put("agentId",agent)
+            );
         }
         //座席没有报道
         if (aState.getLastRegTime() + AgentState.REG_EXPIRE < System.currentTimeMillis()) {
-            throw new AgentExpiredException();
+            throw new AgentExpiredException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("agentName",name)
+                            .put("agentId",agent)
+                            .put("agentstate",aState)
+            );
         }
         ExtensionState.Model eState = extensionState.get(aState.getExtension());
 
         //分机不可用
         if(eState == null || !ExtensionState.Model.ENABLE_TRUE.equals(eState.getEnable())){
-            throw new ExtensionUnEnableException();
+            throw new ExtensionUnEnableException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("agentName",name)
+                            .put("agentId",agent)
+                            .put("extension_id",aState.getExtension())
+                            .put("extensionState",eState)
+            );
         }
         AppExtension extension = appExtensionService.findById(aState.getExtension());
         if(extension == null){
-            throw new ExtensionNotExistException();
+            throw new ExtensionNotExistException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("agentName",name)
+                            .put("agentId",agent)
+                            .put("extension_id",aState.getExtension())
+            );
         }
         BusinessState state = null;
         String callId = agentIdCallReference.get(agent);
@@ -436,10 +501,19 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
     @Override
     public boolean setVoiceMode(String subaccountId, String appId, String ip, String name, String conversationId, Integer mode) throws YunhuniApiException {
         if(StringUtils.isBlank(name)){
-            throw new RequestIllegalArgumentException();
+            throw new RequestIllegalArgumentException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("agentName",name)
+            );
         }
         if(StringUtils.isBlank(conversationId)){
-            throw new RequestIllegalArgumentException();
+            throw new RequestIllegalArgumentException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("agentName",name)
+                            .put("conversation_id",conversationId)
+            );
         }
         if(mode == null){
             mode = CallCenterConversationMember.MODE_DEFAULT;
@@ -449,12 +523,19 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         }
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                                .put("ip",ip)
+                );
             }
         }
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){

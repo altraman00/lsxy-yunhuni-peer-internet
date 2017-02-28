@@ -107,17 +107,28 @@ public class IVRServiceImpl implements IVRService {
     public String ivrCall(String subaccountId,String ip, String appId, String from, String to,
                           Integer maxDialDuration, Integer maxCallDuration, String userData) throws YunhuniApiException {
         if(apiGwRedBlankNumService.isRedNum(to)){
-            throw new NumberNotAllowToCallException();
+            throw new NumberNotAllowToCallException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("to",to)
+            );
         }
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
         String tenantId = app.getTenant().getId();
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                                .put("ip",ip)
+                );
             }
         }
 
@@ -125,12 +136,18 @@ public class IVRServiceImpl implements IVRService {
 
         if(app.getServiceType().equals(App.PRODUCT_CALL_CENTER)){
             if(!appService.enabledService(tenantId,app.getId(), ServiceType.CallCenter)){
-                throw new AppServiceInvalidException();
+                throw new AppServiceInvalidException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                );
             }
             isCallCenter = true;
         }else{
             if(!appService.enabledService(tenantId,app.getId(), ServiceType.IvrService)){
-                throw new AppServiceInvalidException();
+                throw new AppServiceInvalidException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                );
             }
         }
 

@@ -281,16 +281,25 @@ public class ConversationService {
     public boolean dismiss(String appId, String conversationId) throws YunhuniApiException {
         BusinessState state = businessStateService.get(conversationId);
         if(state == null || (state.getClosed() != null && state.getClosed())){
-            throw new ConversationNotExistException();
+            throw new ConversationNotExistException(
+                    new ExceptionContext().put("conversationId",conversationId)
+                            .put("appId",appId)
+            );
         }
 
         if(state.getResId() == null){
-            throw new SystemBusyException();
+            throw new SystemBusyException(
+                    new ExceptionContext().put("conversationId",conversationId)
+                            .put("appId",appId)
+            );
         }
 
         if(!appId.equals(state.getAppId())){
             //不能跨app操作
-            throw new ConversationNotExistException();
+            throw new ConversationNotExistException(
+                    new ExceptionContext().put("conversationId",conversationId)
+                            .put("appId",appId)
+            );
         }
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",state.getResId())
@@ -572,7 +581,10 @@ public class ConversationService {
     public boolean join(String conversationId, String callId, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException{
 
         if(this.outOfParts(conversationId)){
-            throw new OutOfConversationMaxPartsException();
+            throw new OutOfConversationMaxPartsException(
+                    new ExceptionContext().put("conversationId",conversationId)
+                            .put("call_id",callId)
+            );
         }
         if(sismember(conversationId, callId)){
             return true;
@@ -589,15 +601,24 @@ public class ConversationService {
         BusinessState call_state = businessStateService.get(call_id);
 
         if(call_state == null){
-            throw new CallNotExistsException();
+            throw new CallNotExistsException(
+                    new ExceptionContext().put("conversationId",conversation_id)
+                            .put("call_id",call_id)
+            );
         }
 
         if(call_state.getResId() == null){
-            throw new SystemBusyException();
+            throw new SystemBusyException(
+                    new ExceptionContext().put("conversationId",conversation_id)
+                            .put("call_id",call_id)
+            );
         }
 
         if(call_state.getClosed()!= null && call_state.getClosed()){
-            throw new CallNotExistsException();
+            throw new CallNotExistsException(
+                    new ExceptionContext().put("conversationId",conversation_id)
+                            .put("call_id",call_id)
+            );
         }
 
         BusinessState conversation_state = businessStateService.get(conversation_id);
@@ -612,19 +633,31 @@ public class ConversationService {
         }
 
         if(conversation_state == null){
-            throw new ConversationNotExistException();
+            throw new ConversationNotExistException(
+                    new ExceptionContext().put("conversationId",conversation_id)
+                            .put("call_id",call_id)
+            );
         }
 
         if(conversation_state.getResId() == null){
-            throw new SystemBusyException();
+            throw new SystemBusyException(
+                    new ExceptionContext().put("conversationId",conversation_id)
+                            .put("call_id",call_id)
+            );
         }
 
         if(conversation_state.getClosed()!= null && conversation_state.getClosed()){
-            throw new ConversationNotExistException();
+            throw new ConversationNotExistException(
+                    new ExceptionContext().put("conversationId",conversation_id)
+                            .put("call_id",call_id)
+            );
         }
 
         if(!apiCertificateSubAccountService.subaccountCheck(call_state.getSubaccountId(),conversation_state.getSubaccountId())){
-            throw new ConversationNotExistException();
+            throw new ConversationNotExistException(
+                    new ExceptionContext().put("conversationId",conversation_id)
+                            .put("call_id",call_id)
+            );
         }
 
         Map<String,String> call_business=call_state.getBusinessData();
