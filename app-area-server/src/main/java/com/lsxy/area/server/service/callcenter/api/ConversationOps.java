@@ -199,7 +199,7 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
             throw new AppServiceInvalidException();
         }
         //判断余额配额是否充足
-        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
+        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.call_center.getApiCmd(), app.getTenant().getId());
 
         BusinessState conversation_state = businessStateService.get(conversationId);
         if(conversation_state == null){
@@ -294,7 +294,7 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
             throw new AppServiceInvalidException();
         }
         //判断余额配额是否充足
-        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
+        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.call_center.getApiCmd(), app.getTenant().getId());
 
         BusinessState conversation_state = businessStateService.get(conversationId);
         if(conversation_state == null){

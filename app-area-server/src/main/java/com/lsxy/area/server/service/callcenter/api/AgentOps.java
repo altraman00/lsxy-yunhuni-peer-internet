@@ -219,7 +219,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             throw new AppServiceInvalidException();
         }
         //判断余额配额是否充足
-        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
+        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.call_center.getApiCmd(), app.getTenant().getId());
 
         String conversationId = UUIDGenerator.uuid();
         //根据坐席name 找到坐席
@@ -348,7 +348,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             throw new AppServiceInvalidException();
         }
         //判断余额配额是否充足
-        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
+        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.call_center.getApiCmd(), app.getTenant().getId());
 
         String conversationId = UUIDGenerator.uuid();
         //根据坐席name 找到坐席
@@ -512,7 +512,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             throw new SystemBusyException();
         }
         //判断余额配额是否充足
-        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
+        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.call_center.getApiCmd(), app.getTenant().getId());
 
         //根据坐席name 找到坐席
         String agent = callCenterAgentService.getId(appId,subaccountId,name);
