@@ -28,6 +28,7 @@ public class VoiceFilePlay extends IdEntity {
     public static int DELETED_FAIL = -1;
     private Tenant tenant;//所属租户
     private App app;//所属应用
+    private String subaccountId; //子账号Id
     private String name;//文件名
     private String fileKey;//fileKey 生成规则/play_voice/tenant_id/app_id/yyyyMMdd/uuid
     private String remark;//备注
@@ -94,6 +95,15 @@ public class VoiceFilePlay extends IdEntity {
 
     public void setApp(App app) {
         this.app = app;
+    }
+
+    @Column(name="subaccount_id")
+    public String getSubaccountId() {
+        return subaccountId;
+    }
+
+    public void setSubaccountId(String subaccountId) {
+        this.subaccountId = subaccountId;
     }
 
     @Column(name="file_key")
