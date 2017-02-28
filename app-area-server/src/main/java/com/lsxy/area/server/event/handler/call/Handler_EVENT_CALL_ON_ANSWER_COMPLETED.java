@@ -75,7 +75,7 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
         }
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null");
+            throw new InvalidParamException("businessstate is null,callid="+call_id);
         }
         try{
             callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(state.getTenantId(),state.getAppId(),

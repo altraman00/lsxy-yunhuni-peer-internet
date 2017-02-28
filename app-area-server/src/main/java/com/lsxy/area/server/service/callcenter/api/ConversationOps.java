@@ -264,9 +264,9 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
                     state.getBusinessData().get("from"),
                     callId, enQueue,CallCenterUtil.QUEUE_TYPE_INVITE_AGENT,conversationId);
         }catch (Throwable t){
-            logger.error("调用呼叫中心排队失败",t);
+            logger.info("排队找坐席出错",t);
             deQueueService.fail(conversation_state.getTenantId(),
-                    conversation_state.getAppId(),callId,null,CallCenterUtil.QUEUE_TYPE_INVITE_AGENT,"调用呼叫中心排队失败",conversationId);
+                    conversation_state.getAppId(),callId,null,CallCenterUtil.QUEUE_TYPE_INVITE_AGENT,"排队找坐席出错",conversationId);
             businessStateService.delete(callId);
             throw t;
         }

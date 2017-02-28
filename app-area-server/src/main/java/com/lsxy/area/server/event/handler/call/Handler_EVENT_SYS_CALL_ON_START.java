@@ -69,7 +69,7 @@ public class Handler_EVENT_SYS_CALL_ON_START extends EventHandler{
         }
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null");
+            throw new InvalidParamException("businessstate is null,call_id=",call_id);
         }
         if(res_id!=null){
             businessStateService.updateResId(call_id,res_id);

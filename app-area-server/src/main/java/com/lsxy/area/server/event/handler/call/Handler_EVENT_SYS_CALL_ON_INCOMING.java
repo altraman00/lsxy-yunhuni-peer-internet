@@ -5,6 +5,7 @@ import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.core.exceptions.api.BalanceNotEnoughException;
+import com.lsxy.framework.core.exceptions.api.ExceptionContext;
 import com.lsxy.framework.core.exceptions.api.NumberNotAllowToCallException;
 import com.lsxy.framework.core.exceptions.api.QuotaNotEnoughException;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -243,32 +244,50 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                         }else if(from.startsWith("010")){
                             checkBlackNum = from.substring(3);
                         }else{
-                            throw new RuntimeException(new NumberNotAllowToCallException());
+                            throw new RuntimeException(new NumberNotAllowToCallException(
+                                    new ExceptionContext().put("from",from)
+                                    .put("linegateway",lineGateway)
+                            ));
                         }
                     }else if(from.startsWith("1")){
                         if(from.length() == 11){
                             checkBlackNum = from;
                         }else{
-                            throw new RuntimeException(new NumberNotAllowToCallException());
+                            throw new RuntimeException(new NumberNotAllowToCallException(
+                                    new ExceptionContext().put("from",from)
+                                            .put("linegateway",lineGateway)
+                            ));
                         }
                     } else{
                         String areaCode = telNumLocationService.getAreaCodeOfTelephone(from);
                         if(StringUtils.isNotBlank(areaCode)){
                             checkBlackNum = from.substring(areaCode.length());
                         }else{
-                            throw new RuntimeException(new NumberNotAllowToCallException());
+                            throw new RuntimeException(new NumberNotAllowToCallException(
+                                    new ExceptionContext().put("from",from)
+                                            .put("linegateway",lineGateway)
+                            ));
                         }
                     }
                 }else{
-                    throw new RuntimeException(new NumberNotAllowToCallException());
+                    throw new RuntimeException(new NumberNotAllowToCallException(
+                            new ExceptionContext().put("from",from)
+                                    .put("linegateway",lineGateway)
+                    ));
                 }
             }else{
-                throw new RuntimeException(new NumberNotAllowToCallException());
+                throw new RuntimeException(new NumberNotAllowToCallException(
+                        new ExceptionContext().put("from",from)
+                                .put("linegateway",lineGateway)
+                ));
             }
         }
         boolean isBlackNum = apiGwRedBlankNumService.isBlackNum(checkBlackNum);
         if(isBlackNum){
-            throw new RuntimeException(new NumberNotAllowToCallException());
+            throw new RuntimeException(new NumberNotAllowToCallException(
+                    new ExceptionContext().put("from",from)
+                            .put("linegateway",lineGateway)
+            ));
         }
         return from;
     }
