@@ -5,8 +5,10 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
+import com.lsxy.area.server.batch.CallCenterBatchInserter;
 import com.lsxy.area.server.service.callcenter.*;
 import com.lsxy.area.server.service.ivr.IVRActionService;
+import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.*;
@@ -29,6 +31,8 @@ import com.lsxy.yunhuni.api.app.service.ServiceType;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
+import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
+import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;
@@ -39,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -118,6 +123,18 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
 
     @Autowired
     private ApiCertificateSubAccountService apiCertificateSubAccountService;
+
+    @Autowired
+    private CallCenterBatchInserter callCenterBatchInserter;
+
+    @Autowired
+    private CallCenterStatisticsService callCenterStatisticsService;
+
+    @Autowired
+    private CallCenterUtil callCenterUtil;
+
+    @Autowired
+    private CallbackUrlUtil callbackUrlUtil;
 
     @Override
     public void reject(String subaccountId, String ip, String appId, String name, String queueId, String userData) throws YunhuniApiException {
@@ -248,7 +265,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     state.getBusinessData().get(BusinessState.REF_RES_ID),state,
                     state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),maxAnswerSeconds,null);
             //坐席加入交谈成功事件中要呼叫这个号码
-            businessStateService.updateInnerField(conversationId,"invite_from",from,"invite_to",to);
+            businessStateService.updateInnerField(conversationId,"invite_from",from!=null?from:"","invite_to",to);
         }else{
             AgentLock agentLock = new AgentLock(redisCacheService,agent);
             if(!agentLock.lock()){
@@ -267,7 +284,26 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                             extension.getId(),from,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null);
                     agentState.setState(agent,CallCenterAgent.STATE_FETCHING);
                     //坐席加入交谈成功事件中要呼叫这个号码
-                    businessStateService.updateInnerField(callId,"invite_from",from,"invite_to",to);
+                    businessStateService.updateInnerField(callId,"invite_from",(from == null?"":from),"invite_to",to);
+                    CallCenter callCenter = new CallCenter();
+                    callCenter.setId(callId);
+                    callCenter.setTenantId(app.getTenant().getId());
+                    callCenter.setAppId(app.getId());
+                    callCenter.setFromNum(from);
+                    callCenter.setToNum(to);
+                    callCenter.setStartTime(new Date());
+                    callCenter.setType(""+CallCenter.CALL_DIAL);
+                    callCenter.setCost(BigDecimal.ZERO);
+                    callCenter.setAgent(name);
+                    callCenterBatchInserter.put(callCenter);
+                    try{
+                        callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(app.getTenant().getId(),app.getId(),
+                                new Date()).setCallOut(1L).build());
+                    }catch (Throwable t){
+                        logger.error("incrIntoRedis失败",t);
+                    }
+                    callCenterUtil.agentStateChangedEvent(subaccountId,callbackUrlUtil.get(app,subaccountId),agent,name,
+                            CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
                 }catch (Throwable t){
                     agentState.setState(agent,CallCenterAgent.STATE_IDLE);
                     throw t;
@@ -382,6 +418,8 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     agentState.setState(agent,CallCenterAgent.STATE_FETCHING);
                     //坐席加入交谈成功事件中要排队找坐席
                     businessStateService.updateInnerField(conversationId,"enqueue_xml",enqueueXml);
+                    callCenterUtil.agentStateChangedEvent(subaccountId,callbackUrlUtil.get(app,subaccountId),agent,name,
+                            CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
                 }catch (Throwable t){
                     agentState.setState(agent,CallCenterAgent.STATE_IDLE);
                     throw t;
@@ -555,7 +593,8 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                             callCenterAgent.getName(),
                             extension.getId(),null,extension.getTelnum(),extension.getType(),extension.getUser(),null,null,null);
                     agentState.setState(agent,CallCenterAgent.STATE_FETCHING);
-                    //坐席加入交谈成功事件中要排队找坐席
+                    callCenterUtil.agentStateChangedEvent(subaccountId,callbackUrlUtil.get(app,subaccountId),agent,name,
+                            CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
                 }catch (Throwable t){
                     agentState.setState(agent,CallCenterAgent.STATE_IDLE);
                     throw t;
