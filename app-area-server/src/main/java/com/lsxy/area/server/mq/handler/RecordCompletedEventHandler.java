@@ -78,6 +78,7 @@ public class RecordCompletedEventHandler implements MQMessageHandler<RecordCompl
         }
         record.setTenantId(message.getTenantId());
         record.setAppId(message.getAppId());
+        record.setSubaccountId(message.getSubaccountId());
         record.setAreaId(message.getAreaId());
         record.setSessionId(message.getCallId());
         record.setSessionCode(message.getType());

@@ -14,11 +14,6 @@ import javax.validation.constraints.Size;
 public class ConditionCreateInputDTO extends CommonDTO {
 
     @NotNull
-    @Size(max = 32)
-    @JsonProperty("channel")
-    private String channelId;
-
-    @NotNull
     @Size(max = 512)
     @JsonProperty("where")
     private String whereExpression;
@@ -47,14 +42,6 @@ public class ConditionCreateInputDTO extends CommonDTO {
     @Size(max = 128)
     private String remark;
 
-
-    public String getChannelId() {
-        return channelId;
-    }
-
-    public void setChannelId(String channelId) {
-        this.channelId = channelId;
-    }
 
     public String getWhereExpression() {
         return whereExpression;

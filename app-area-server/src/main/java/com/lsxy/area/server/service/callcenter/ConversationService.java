@@ -7,6 +7,7 @@ import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.batch.CallCenterConversationBatchInserter;
 import com.lsxy.area.server.batch.CallSessionBatchInserter;
 import com.lsxy.area.server.service.ivr.IVRActionService;
+import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.call.center.api.model.*;
@@ -27,8 +28,10 @@ import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import org.apache.commons.lang.ArrayUtils;
@@ -113,6 +116,12 @@ public class ConversationService {
 
     @Autowired
     private CallCenterConversationBatchInserter callCenterConversationBatchInserter;
+
+    @Autowired
+    private CallbackUrlUtil callbackUrlUtil;
+
+    @Autowired
+    private ApiCertificateSubAccountService apiCertificateSubAccountService;
 
     public BaseEnQueue getEnqueue(String queueId){
         BaseEnQueue enqueue = null;
@@ -208,7 +217,7 @@ public class ConversationService {
      * @return
      * @throws YunhuniApiException
      */
-    public String create(String id,String ref_res_id,String channel,
+    public String create(String subaccountId,String id,String ref_res_id,
                          BusinessState initiator,String tenantId,String appId, String areaId,String callBackUrl, Integer maxDuration,String hold_voice) throws YunhuniApiException {
         if(maxDuration == null || maxDuration > MAX_DURATION){
             maxDuration = MAX_DURATION;
@@ -230,6 +239,7 @@ public class ConversationService {
         BusinessState state = new BusinessState.Builder()
                 .setTenantId(tenantId)
                 .setAppId(appId)
+                .setSubaccountId(subaccountId)
                 .setId(id)
                 .setType(BusinessState.TYPE_CC_CONVERSATION)
                 .setCallBackUrl(callBackUrl)
@@ -239,7 +249,6 @@ public class ConversationService {
                         .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,initiator.getId())//交谈发起者的callid
                         .putIfNotEmpty(CallCenterUtil.CONVERSATION_SYSNUM_FIELD,initiator.getBusinessData().get("from"))
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(initiator))
-                        .putIfNotEmpty(CallCenterUtil.CHANNEL_ID_FIELD,channel)
                         .putIfNotEmpty(CallCenterUtil.HOLD_VOICE_FIELD,hold_voice)//TODO 如果hold_voice为null是否要默认的
                         .putIfNotEmpty("max_seconds",maxDuration.toString())//交谈最大持续时长
                         .build())
@@ -248,8 +257,8 @@ public class ConversationService {
         try{
             CallCenterConversation conversation = new CallCenterConversation();
             conversation.setId(id);
+            conversation.setSubaccountId(subaccountId);
             conversation.setState(CallCenterConversation.STATE_UNREADY);
-            conversation.setChannelId(channel);
             conversation.setAppId(appId);
             conversation.setTenantId(tenantId);
             conversation.setRelevanceId(initiator.getId());
@@ -318,7 +327,7 @@ public class ConversationService {
      * @return
      * @throws YunhuniApiException
      */
-    public String inviteAgent(String appId,String ref_res_id,String initiator, String conversationId,String agentId,String agentName,String extension,
+    public String inviteAgent(String subaccountId,String appId,String ref_res_id,String initiator, String conversationId,String agentId,String agentName,String extension,
                          String systemNum,String diaplyNum,String agentPhone,String type,String user,
                           Integer maxDuration, Integer maxDialDuration,Integer voiceMode) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
@@ -330,7 +339,7 @@ public class ConversationService {
 
         if(AppExtension.TYPE_TELPHONE.equals(type)){
             AreaAndTelNumSelector.Selector selector =
-                    areaAndTelNumSelector.getTelnumberAndAreaId(app,systemNum,agentPhone);
+                    areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app,systemNum,agentPhone);
             areaId = selector.getAreaId();
             lineId = selector.getLineId();
             from = selector.getOneTelnumber();
@@ -371,9 +380,10 @@ public class ConversationService {
         BusinessState callstate = new BusinessState.Builder()
                 .setTenantId(app.getTenant().getId())
                 .setAppId(app.getId())
+                .setSubaccountId(subaccountId)
                 .setId(callId)
                 .setType(BusinessState.TYPE_CC_INVITE_AGENT_CALL)
-                .setCallBackUrl(app.getUrl())
+                .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
@@ -394,9 +404,9 @@ public class ConversationService {
         return callId;
     }
 
-    public String agentCall(String appId,String conversationId,String agentId,String agentName,String extension,
+    public String agentCall(String subaccountId,String appId,String conversationId,String agentId,String agentName,String extension,
                               String systemNum,String agentPhone,String type,String user,
-                              Integer maxDuration, Integer maxDialDuration,Integer voiceMode) throws YunhuniApiException{
+                              Integer maxDuration, Integer maxDialDuration,Integer voiceMode,String userData) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
         App app = appService.findById(appId);
         String from = null;
@@ -406,14 +416,20 @@ public class ConversationService {
 
         if(AppExtension.TYPE_TELPHONE.equals(type)){
             AreaAndTelNumSelector.Selector selector =
-                    areaAndTelNumSelector.getTelnumberAndAreaId(app,systemNum,agentPhone);
+                    areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app,systemNum,agentPhone);
             areaId = selector.getAreaId();
             lineId = selector.getLineId();
             from = selector.getOneTelnumber();
             to = selector.getToUri();
         }else{
             areaId = areaAndTelNumSelector.getAreaId(app);
-            //TODO 获取平台号码
+            if(StringUtil.isEmpty(systemNum)){
+                ResourceTelenum resourceTelenum =
+                        areaAndTelNumSelector.getTelnumber(subaccountId,app);
+                if(resourceTelenum!=null){
+                    systemNum = resourceTelenum.getTelNumber();
+                }
+            }
             from = (systemNum) + "@"+areaId+".area.oneyun.com";
             to = user + "@" + sip_address;
         }
@@ -447,18 +463,20 @@ public class ConversationService {
         BusinessState callstate = new BusinessState.Builder()
                 .setTenantId(app.getTenant().getId())
                 .setAppId(app.getId())
+                .setSubaccountId(subaccountId)
                 .setId(callId)
                 .setType(BusinessState.TYPE_CC_AGENT_CALL)
-                .setCallBackUrl(app.getUrl())
+                .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
+                .setUserdata(userData)
                 .setBusinessData(new MapBuilder<String,String>()
                         .putIfNotEmpty(BusinessState.REF_RES_ID,null)
                         .putIfNotEmpty(CallCenterUtil.CONVERSATION_FIELD,conversationId)
                         .putIfNotEmpty(CallCenterUtil.AGENT_ID_FIELD,agentId)
                         .putIfNotEmpty(CallCenterUtil.AGENT_NAME_FIELD,agentName)
                         .putIfNotEmpty(CallCenterUtil.AGENT_EXTENSION_FIELD,extension)
-                        .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,null)
+                        .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,callId)
                         .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,null)
                         .putIfNotEmpty(CallCenterUtil.VOICE_MODE_FIELD,voiceMode==null?CallCenterConversationMember.MODE_DEFAULT.toString():voiceMode.toString())
                         .putIfNotEmpty("from",StringUtil.isEmpty(systemNum)?from:systemNum)
@@ -483,12 +501,12 @@ public class ConversationService {
      * @return
      * @throws YunhuniApiException
      */
-    public String inviteOut(String appId,String ref_res_id, String conversationId,
+    public String inviteOut(String subaccountId,String appId,String ref_res_id, String conversationId,
                               String from, String to, Integer maxDuration, Integer maxDialDuration,
                               String playFile, Integer voiceMode) throws YunhuniApiException{
         App app = appService.findById(appId);
         AreaAndTelNumSelector.Selector selector =
-                areaAndTelNumSelector.getTelnumberAndAreaId(app,from,to);
+                areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app,from,to);
 
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber();
@@ -527,9 +545,10 @@ public class ConversationService {
         BusinessState callstate = new BusinessState.Builder()
                 .setTenantId(app.getTenant().getId())
                 .setAppId(app.getId())
+                .setSubaccountId(subaccountId)
                 .setId(callId)
                 .setType(BusinessState.TYPE_CC_INVITE_OUT_CALL)
-                .setCallBackUrl(app.getUrl())
+                .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
@@ -569,12 +588,16 @@ public class ConversationService {
         }
         BusinessState call_state = businessStateService.get(call_id);
 
-        if(call_state ==null || call_state.getResId() == null){
+        if(call_state == null){
+            throw new CallNotExistsException();
+        }
+
+        if(call_state.getResId() == null){
             throw new SystemBusyException();
         }
 
         if(call_state.getClosed()!= null && call_state.getClosed()){
-            throw new SystemBusyException();
+            throw new CallNotExistsException();
         }
 
         BusinessState conversation_state = businessStateService.get(conversation_id);
@@ -588,12 +611,20 @@ public class ConversationService {
             return false;
         }
 
-        if(conversation_state == null || conversation_state.getResId() == null){
+        if(conversation_state == null){
+            throw new ConversationNotExistException();
+        }
+
+        if(conversation_state.getResId() == null){
             throw new SystemBusyException();
         }
 
         if(conversation_state.getClosed()!= null && conversation_state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConversationNotExistException();
+        }
+
+        if(!apiCertificateSubAccountService.subaccountCheck(call_state.getSubaccountId(),conversation_state.getSubaccountId())){
+            throw new ConversationNotExistException();
         }
 
         Map<String,String> call_business=call_state.getBusinessData();
@@ -725,7 +756,12 @@ public class ConversationService {
             throw new RequestIllegalArgumentException();
         }
         BusinessState call_state = businessStateService.get(callId);
-        if(call_state ==null || call_state.getResId() == null){
+
+        if(call_state == null){
+            throw new CallNotExistsException();
+        }
+
+        if(call_state.getResId() == null){
             throw new SystemBusyException();
         }
 
@@ -734,7 +770,12 @@ public class ConversationService {
         }
 
         BusinessState conversation_state = businessStateService.get(conversationId);
-        if(conversation_state == null || conversation_state.getResId() == null){
+
+        if(conversation_state == null){
+            throw new ConfNotExistsException();
+        }
+
+        if(conversation_state.getResId() == null){
             throw new SystemBusyException();
         }
 
@@ -834,7 +875,7 @@ public class ConversationService {
 
         if(call_state.getType().equals(BusinessState.TYPE_CC_INVITE_AGENT_CALL) ||
                 call_state.getType().equals(BusinessState.TYPE_CC_AGENT_CALL)){
-            callCenterUtil.agentExitConversationEvent(call_state.getCallBackUrl(),
+            callCenterUtil.agentExitConversationEvent(call_state.getSubaccountId(),call_state.getCallBackUrl(),
                     call_state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD),
                     call_state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),
                     conversationId);
@@ -934,12 +975,12 @@ public class ConversationService {
         }
         if(state.getType().equals(BusinessState.TYPE_CC_INVITE_AGENT_CALL) ||
                 state.getType().equals(BusinessState.TYPE_CC_AGENT_CALL)){
-            callCenterUtil.agentEnterConversationEvent(state.getCallBackUrl(),
+            callCenterUtil.agentEnterConversationEvent(state.getSubaccountId(),state.getCallBackUrl(),
                     businessData.get(CallCenterUtil.AGENT_ID_FIELD),
                     businessData.get(CallCenterUtil.AGENT_NAME_FIELD),
                     conversation_id);
         }
-        callCenterUtil.conversationPartsChangedEvent(state.getCallBackUrl(),conversation_id);
+        callCenterUtil.conversationPartsChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),conversation_id);
     }
 
     private void hangup(String res_id,String call_id,String area_id){

@@ -78,6 +78,12 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
             logger.info("call_id={},state={}",call_id,state);
         }
 
+        if(BusinessState.TYPE_CC_INVITE_AGENT_CALL.equals(state.getType()) ||
+                BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
+            //设置坐席对应的callid
+            agentIdCallReference.set(state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD),state.getId());
+        }
+
         if(BusinessState.TYPE_CC_INVITE_AGENT_CALL.equals(state.getType())){
             /**开始判断振铃前是否客户挂断了呼叫，挂断了要同时挂断被叫的坐席**/
             Map<String,String> businessData = state.getBusinessData();
@@ -97,10 +103,9 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
                     logger.info("[{}][{}]开始判断振铃前是否客户挂断了呼叫:{}",state.getTenantId(),state.getAppId(),initiatorState);
                 }
                 if(initiatorState!=null && initiatorState.getClosed() != null && initiatorState.getClosed()){
-                    callCenterUtil.sendQueueFailEvent(initiatorState.getCallBackUrl(),
+                    callCenterUtil.sendQueueFailEvent(initiatorState.getSubaccountId(),initiatorState.getCallBackUrl(),
                             initiatorState.getBusinessData().get(CallCenterUtil.QUEUE_ID_FIELD),
                             initiatorState.getBusinessData().get(CallCenterUtil.QUEUE_TYPE_FIELD),
-                            initiatorState.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),
                             initiatorState.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
                             CallCenterUtil.QUEUE_FAIL_HANGUP,
                             initiator,null,initiatorState.getUserdata());
@@ -117,9 +122,23 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
                 conversationService.logicExit(conversation,call_id);
             }
         }else if(BusinessState.TYPE_CC_INVITE_OUT_CALL.equals(state.getType())){
-            String conversationId = state.getBusinessData().get(CallCenterUtil.CONVERSATION_FIELD);
-            if(conversationId == null){
-                throw new InvalidParamException("将呼叫加入到会议失败conversationId为null");
+            Map<String,String> businessData = state.getBusinessData();
+            String conversationId = businessData.get(CallCenterUtil.CONVERSATION_FIELD);
+            BusinessState conversationState = businessStateService.get(conversationId);
+            if(conversationState == null || (conversationState.getClosed() != null && conversationState.getClosed())){
+                conversationService.logicExit(conversationId,state.getId());
+                return res;
+            }
+            String initiator = state.getBusinessData().get(CallCenterUtil.INITIATOR_FIELD);
+            if(initiator != null){
+                BusinessState initiatorState = businessStateService.get(initiator);
+                if(logger.isDebugEnabled()){
+                    logger.info("[{}][{}]开始判断振铃前是否客户挂断了呼叫:{}",state.getTenantId(),state.getAppId(),initiatorState);
+                }
+                if(initiatorState!=null && initiatorState.getClosed() != null && initiatorState.getClosed()){
+                    conversationService.logicExit(conversationId,state.getId());
+                    return res;
+                }
             }
             try {
                 conversationService.join(conversationId,call_id,null,null,null);
@@ -127,11 +146,6 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
                 logger.error("将呼叫加入到会议失败",e);
                 conversationService.logicExit(conversationId,call_id);
             }
-        }
-        if(BusinessState.TYPE_CC_INVITE_AGENT_CALL.equals(state.getType()) ||
-            BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
-            //设置坐席对应的callid
-            agentIdCallReference.set(state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD),state.getId());
         }
         return res;
     }

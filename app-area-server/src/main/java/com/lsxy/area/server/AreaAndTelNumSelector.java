@@ -48,11 +48,60 @@ public class AreaAndTelNumSelector {
     @Autowired
     LineGatewayToPublicService lineGatewayToPublicService;
 
-    public Selector getTelnumberAndAreaId(App app, String from,String to)throws YunhuniApiException{
-        return getTelnumberAndAreaId(app,false,from,to,null,null);
+    /**
+     *
+     * @param app
+     * @param subaccountId 子账号ID,为null表示为主账号
+     * @param from
+     * @param to
+     * @return
+     * @throws YunhuniApiException
+     */
+    public Selector getTelnumberAndAreaId(String subaccountId, App app,String from,String to)throws YunhuniApiException{
+        return getTelnumberAndAreaId(subaccountId,app,false,from,to,null,null);
     }
 
-    public Selector getTelnumberAndAreaId(App app,boolean isDuoCall ,String from1,String to1,String from2,String to2) throws YunhuniApiException {
+    /**
+     * 获取一个可用的号码
+     * @param subaccountId
+     * @param app
+     * @return
+     * @throws YunhuniApiException
+     */
+    public ResourceTelenum getTelnumber(String subaccountId, App app) throws YunhuniApiException {
+        //查找租户私有线路
+        List<LineGatewayVO> lineGateways = lineGatewayToTenantService.findByTenantIdAndAreaId(app.getTenant().getId(),app.getAreaId());
+        if(lineGateways == null || lineGateways.size() == 0){
+            //如果没有私有线路，找公共线路
+            lineGateways = lineGatewayToPublicService.findAllLineGatewayByAreaId(app.getAreaId());
+        }
+        if(lineGateways == null || lineGateways.size() == 0){
+            //TODO 没有线路，则抛出异常
+            throw new NotAvailableLineException();
+        }
+        //所拥有的线路ID列表
+        List<String> lineIds = lineGateways.stream().map(LineGatewayVO::getId).collect(Collectors.toList());
+        List<ResourceTelenum> telnumbers = resourceTelenumService.findDialingTelnumber(subaccountId,lineIds,app);
+        if(telnumbers != null && telnumbers.size() > 0){
+            return telnumbers.get(0);
+        }else{
+            return null;
+        }
+    }
+
+    /**
+     *
+     * @param app
+     * @param subaccountId 子账号ID,为null表示为主账号
+     * @param isDuoCall
+     * @param from1
+     * @param to1
+     * @param from2
+     * @param to2
+     * @return
+     * @throws YunhuniApiException
+     */
+    public Selector getTelnumberAndAreaId(String subaccountId,App app,boolean isDuoCall ,String from1,String to1,String from2,String to2) throws YunhuniApiException {
         Selector selector;
         //TODO 获取号码和区域ID
         List<TelnumSortEntity> toNum = new ArrayList<>();
@@ -75,7 +124,7 @@ public class AreaAndTelNumSelector {
             List<ResourceTelenum> telnumber;
             if(isDuoCall){
                 //获取一个可呼出的号码
-                telnumber = resourceTelenumService.findDialingTelnumber(lineIds,app,from1,from2);
+                telnumber = resourceTelenumService.findDialingTelnumber(subaccountId,lineIds,app,from1,from2);
                 if(telnumber.get(0).getTelNumber().equals(telnumber.get(1).getTelNumber())){
                     ResourceTelenum callTelnumber = telnumber.get(0);
                     //当两个呼出号码一样时，查一次线路就够了
@@ -89,7 +138,7 @@ public class AreaAndTelNumSelector {
                     addToTelnumSortEntity(to2, lineGateways, to2Num, telnumber.get(1));
                 }
             }else{
-                telnumber = resourceTelenumService.findDialingTelnumber(lineIds,app,from1);
+                telnumber = resourceTelenumService.findDialingTelnumber(subaccountId,lineIds,app,from1);
                 addToTelnumSortEntity(to1, lineGateways, toNum, telnumber.get(0));
             }
 
@@ -172,12 +221,12 @@ public class AreaAndTelNumSelector {
         if(TelnumToLineGateway.ISDIALING_TRUE.equals(telnumToLineGateway.getIsDialing())){
             //主叫
             entity = new TelnumSortEntity(svTelnumber.getCallUri(),
-                    telnumLocationService.solveNum(to,lg.getTelAreaRule(),lg.getMobileAreaRule(),lg.getAreaCode()),
+                    telnumLocationService.solveNum(to,lg.getTelAreaRule(),lg.getMobileAreaRule(),svTelnumber.getAreaCode()),
                     lg.getSipProviderDomain(),lg.getSipProviderIp(),lg.getId(),lg.getPriority());
         }else if(TelnumToLineGateway.ISTHROUGH_TRUE.equals(telnumToLineGateway.getIsThrough())){
             //透传
             entity = new TelnumSortEntity(svTelnumber.getTelNumber(),
-                    telnumLocationService.solveNum(to,lg.getTelAreaRule(),lg.getMobileAreaRule(),lg.getAreaCode()),
+                    telnumLocationService.solveNum(to,lg.getTelAreaRule(),lg.getMobileAreaRule(),svTelnumber.getAreaCode()),
                     lg.getSipProviderDomain(),lg.getSipProviderIp(),lg.getId(),lg.getPriority());
         }
         return entity;

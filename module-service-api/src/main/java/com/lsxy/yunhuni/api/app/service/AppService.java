@@ -76,7 +76,9 @@ public interface AppService extends BaseService<App> {
      */
     App create(App app);
 
-    boolean enabledService(String tenantId,String appId,ServiceType service);
+    Long getExtensionPrefixNum();
+
+    boolean enabledService(String tenantId, String appId, ServiceType service);
 
     void deleteApp(String appId) throws InvocationTargetException, IllegalAccessException;
 }

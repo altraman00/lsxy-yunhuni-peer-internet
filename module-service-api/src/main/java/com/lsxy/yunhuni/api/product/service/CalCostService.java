@@ -1,5 +1,7 @@
 package com.lsxy.yunhuni.api.product.service;
 
+import com.lsxy.framework.core.exceptions.api.BalanceNotEnoughException;
+import com.lsxy.framework.core.exceptions.api.QuotaNotEnoughException;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.model.ProductItem;
@@ -36,7 +38,7 @@ public interface CalCostService {
      * @param tenantId
      * @return
      */
-    boolean isCallTimeRemainOrBalanceEnough(String apiCmd, String tenantId);
+    boolean isCallTimeRemainOrBalanceEnough(String subaccountId,String apiCmd, String tenantId) throws BalanceNotEnoughException, QuotaNotEnoughException;
 
     void recordConsumeCal(VoiceFileRecord record);
 }

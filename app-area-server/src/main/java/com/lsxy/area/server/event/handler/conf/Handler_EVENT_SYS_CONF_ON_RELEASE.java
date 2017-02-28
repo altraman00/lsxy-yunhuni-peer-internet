@@ -127,9 +127,11 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
             logger.warn("更新交谈记录失败",t);
             mqService.publish(new ConversationCompletedEvent(conversation_id));
         }
-        callCenterUtil.conversationEndEvent(state.getCallBackUrl(),conversation_id,
-                CallCenterUtil.CONVERSATION_TYPE_QUEUE,
-                conversation!=null?conversation.getStartTime().getTime():null,null,null,null,null,null,null);
+        if(state.getBusinessData().get(CallCenterUtil.CONVERSATION_STARTED_FIELD) != null){//交谈开始了才需要发送结束事件啊
+            callCenterUtil.conversationEndEvent(state.getSubaccountId(),state.getCallBackUrl(),conversation_id,
+                    CallCenterUtil.CONVERSATION_TYPE_QUEUE,
+                    conversation!=null?conversation.getStartTime().getTime():null,null,null,null,null,null);
+        }
     }
 
     private void conf(BusinessState state,Map<String,Object> params,String conf_id){
@@ -159,6 +161,7 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","conf.end")
                     .putIfNotEmpty("id",conf_id)
+                    .putIfNotEmpty("subaccount_id",state.getSubaccountId())
                     .putIfNotEmpty("begin_time",begin_time == null ? System.currentTimeMillis():begin_time)
                     .putIfNotEmpty("end_time",end_time == null ? System.currentTimeMillis():end_time)
                     .putIfNotEmpty("end_by",null)
