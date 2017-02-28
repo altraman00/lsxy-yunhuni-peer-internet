@@ -10,6 +10,7 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.app.service.ServiceType;
@@ -40,6 +41,9 @@ public class CallCenterConversationServiceImpl extends AbstractService<CallCente
 
     @Autowired
     private ApplicationContext applicationContext;
+
+    @Autowired
+    private ApiCertificateSubAccountService apiCertificateSubAccountService;
 
     @Override
     public BaseDaoInterface<CallCenterConversation, Serializable> getDao() {
@@ -88,7 +92,7 @@ public class CallCenterConversationServiceImpl extends AbstractService<CallCente
         if(conversation == null){
             return null;
         }
-        if(subaccountId != conversation.getSubaccountId()){
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,conversation.getSubaccountId())){
             return null;
         }
         CallCenterConversationDetail detail = new CallCenterConversationDetail();
