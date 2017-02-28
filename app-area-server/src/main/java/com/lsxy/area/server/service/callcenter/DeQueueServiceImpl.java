@@ -167,7 +167,7 @@ public class DeQueueServiceImpl implements DeQueueService {
 
         callCenterUtil.agentStateChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),result.getAgent().getId(),
                 result.getAgent().getName(),
-                CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
+                CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,state.getUserdata());
     }
 
     @Override

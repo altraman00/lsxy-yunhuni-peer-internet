@@ -196,7 +196,8 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
     }
 
     @Override
-    public boolean callOut(String subaccountId,String ip, String appId, String name, String from, String to, Integer maxDialSeconds, Integer maxAnswerSeconds) throws YunhuniApiException {
+    public boolean callOut(String subaccountId,String ip, String appId, String name,
+                           String from, String to, Integer maxDialSeconds, Integer maxAnswerSeconds,String userData) throws YunhuniApiException {
         if(StringUtil.isBlank(to)){
             throw new RequestIllegalArgumentException();
         }
@@ -281,7 +282,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                 try{
                     String callId = conversationService.agentCall(subaccountId,appId,conversationId,agent,
                             callCenterAgent.getName(),
-                            extension.getId(),from,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null);
+                            extension.getId(),from,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null,userData);
                     agentState.setState(agent,CallCenterAgent.STATE_FETCHING);
                     //坐席加入交谈成功事件中要呼叫这个号码
                     businessStateService.updateInnerField(callId,"invite_from",(from == null?"":from),"invite_to",to);
@@ -303,7 +304,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                         logger.error("incrIntoRedis失败",t);
                     }
                     callCenterUtil.agentStateChangedEvent(subaccountId,callbackUrlUtil.get(app,subaccountId),agent,name,
-                            CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
+                            CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,userData);
                 }catch (Throwable t){
                     agentState.setState(agent,CallCenterAgent.STATE_IDLE);
                     throw t;
@@ -414,12 +415,12 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                 try{
                     callId = conversationService.agentCall(subaccountId,appId,conversationId,agent,
                             callCenterAgent.getName(),
-                            extension.getId(),name,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null);
+                            extension.getId(),name,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null,null);
                     agentState.setState(agent,CallCenterAgent.STATE_FETCHING);
                     //坐席加入交谈成功事件中要排队找坐席
                     businessStateService.updateInnerField(conversationId,"enqueue_xml",enqueueXml);
                     callCenterUtil.agentStateChangedEvent(subaccountId,callbackUrlUtil.get(app,subaccountId),agent,name,
-                            CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
+                            CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,null);
                 }catch (Throwable t){
                     agentState.setState(agent,CallCenterAgent.STATE_IDLE);
                     throw t;
@@ -591,10 +592,10 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                 try{
                     callId = conversationService.agentCall(subaccountId,appId,conversationId,agent,
                             callCenterAgent.getName(),
-                            extension.getId(),null,extension.getTelnum(),extension.getType(),extension.getUser(),null,null,null);
+                            extension.getId(),null,extension.getTelnum(),extension.getType(),extension.getUser(),null,null,null,null);
                     agentState.setState(agent,CallCenterAgent.STATE_FETCHING);
                     callCenterUtil.agentStateChangedEvent(subaccountId,callbackUrlUtil.get(app,subaccountId),agent,name,
-                            CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
+                            CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,null);
                 }catch (Throwable t){
                     agentState.setState(agent,CallCenterAgent.STATE_IDLE);
                     throw t;
