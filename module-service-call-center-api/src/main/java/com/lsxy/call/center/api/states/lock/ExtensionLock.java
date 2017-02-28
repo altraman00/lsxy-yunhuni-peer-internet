@@ -5,7 +5,7 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 /**
  * Created by liuws on 2016/11/11.
  */
-public class ExtensionLock extends DistributeLock {
+public class ExtensionLock extends ReentrantLock {
 
     private static final String PREFIXED = "callcenter.extensionlock_";
 
