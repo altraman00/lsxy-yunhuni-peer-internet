@@ -12,6 +12,10 @@ public class OutOfConversationMaxPartsException extends YunhuniApiException {
         super();
     }
 
+    public OutOfConversationMaxPartsException(String cause) {
+        super(cause);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.OutOfConversationMaxParts;

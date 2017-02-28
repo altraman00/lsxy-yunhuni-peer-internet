@@ -12,6 +12,10 @@ public class SystemBusyException extends YunhuniApiException {
         super();
     }
 
+    public SystemBusyException(String cause) {
+        super(cause);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.SystemBusy;

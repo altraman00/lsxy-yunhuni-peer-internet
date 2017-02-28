@@ -12,6 +12,10 @@ public class AppNotFoundException extends YunhuniApiException{
         super();
     }
 
+    public AppNotFoundException(String cause){
+        super(cause);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.AppNotFound;

@@ -14,6 +14,10 @@ public class RequestIllegalArgumentException extends YunhuniApiException {
         super();
     }
 
+    public RequestIllegalArgumentException(String cause) {
+        super(cause);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.IllegalArgument;

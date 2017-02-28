@@ -13,6 +13,10 @@ public class PlayFileNotExistsException extends YunhuniApiException {
         super();
     }
 
+    public PlayFileNotExistsException(String cause) {
+        super(cause);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.PlayFileNotExists;

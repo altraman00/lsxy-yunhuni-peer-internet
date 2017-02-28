@@ -12,6 +12,10 @@ public class ExtensionUserExistException extends YunhuniApiException {
         super();
     }
 
+    public ExtensionUserExistException(String cause) {
+        super(cause);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.ExtensionUserExist;

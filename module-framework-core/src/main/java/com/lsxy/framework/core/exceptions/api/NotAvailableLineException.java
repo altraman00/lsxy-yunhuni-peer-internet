@@ -12,6 +12,10 @@ public class NotAvailableLineException extends YunhuniApiException {
         super();
     }
 
+    public NotAvailableLineException(String cause) {
+        super(cause);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.NotAvailableLine;

@@ -12,6 +12,10 @@ public class AgentNotConversationMemberException extends YunhuniApiException {
         super();
     }
 
+    public AgentNotConversationMemberException(String cause) {
+        super(cause);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.AgentNotConversationMember;

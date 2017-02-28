@@ -12,6 +12,10 @@ public class QuotaNotEnoughException extends YunhuniApiException{
         super();
     }
 
+    public QuotaNotEnoughException(String cause) {
+        super(cause);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.QuotaNotEnough;

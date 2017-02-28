@@ -12,6 +12,10 @@ public class BalanceNotEnoughException extends YunhuniApiException {
         super();
     }
 
+    public BalanceNotEnoughException(String cause) {
+        super(cause);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.BalanceNotEnough;

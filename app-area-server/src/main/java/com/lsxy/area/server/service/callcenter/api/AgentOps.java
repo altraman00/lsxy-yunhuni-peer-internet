@@ -571,7 +571,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     }
                 }
             } catch (YunhuniApiException e) {
-                logger.info("加入交谈失败:{}",e.getCode());
+                logger.info("加入交谈失败",e);
                 //--是否需要调用退出
                 conversationService.logicExit(conversationId,callId);
                 throw e;

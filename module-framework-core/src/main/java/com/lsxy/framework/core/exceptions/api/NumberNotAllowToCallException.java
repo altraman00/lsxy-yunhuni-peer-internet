@@ -12,6 +12,10 @@ public class NumberNotAllowToCallException extends YunhuniApiException {
         super();
     }
 
+    public NumberNotAllowToCallException(String cause) {
+        super(cause);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.NumberNotAllowToCall;

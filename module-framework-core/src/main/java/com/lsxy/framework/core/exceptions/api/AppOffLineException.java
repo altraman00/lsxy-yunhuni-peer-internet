@@ -14,6 +14,10 @@ public class AppOffLineException extends YunhuniApiException {
         super();
     }
 
+    public AppOffLineException(String cause) {
+        super(cause);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.AppOffLine;

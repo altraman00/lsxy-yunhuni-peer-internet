@@ -12,6 +12,10 @@ public class InvokeCallException extends YunhuniApiException {
         super();
     }
 
+    public InvokeCallException(String cause) {
+        super(cause);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.InvokeCall;

@@ -12,6 +12,10 @@ public class IPNotInWhiteListException extends YunhuniApiException{
         super();
     }
 
+    public IPNotInWhiteListException(String cause) {
+        super(cause);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.IPNotInWhiteList;

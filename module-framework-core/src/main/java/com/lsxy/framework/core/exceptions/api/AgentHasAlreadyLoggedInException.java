@@ -12,6 +12,10 @@ public class AgentHasAlreadyLoggedInException extends YunhuniApiException {
         super();
     }
 
+    public AgentHasAlreadyLoggedInException(String cause) {
+        super(cause);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.AgentHasAlreadyLoggedIn;

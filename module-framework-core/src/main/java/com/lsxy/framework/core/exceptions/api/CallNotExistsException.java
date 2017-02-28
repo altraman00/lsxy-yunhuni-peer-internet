@@ -12,6 +12,10 @@ public class CallNotExistsException extends YunhuniApiException {
         super();
     }
 
+    public CallNotExistsException(String cause) {
+        super(cause);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.CallNotExists;

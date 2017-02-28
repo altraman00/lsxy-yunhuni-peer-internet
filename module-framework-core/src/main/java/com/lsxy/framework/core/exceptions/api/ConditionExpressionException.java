@@ -12,6 +12,10 @@ public class ConditionExpressionException extends YunhuniApiException {
         super();
     }
 
+    public ConditionExpressionException(String cause) {
+        super(cause);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.ConditionExpression;

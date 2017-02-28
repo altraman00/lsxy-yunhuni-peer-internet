@@ -597,7 +597,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                     try {
                         conversationService.join(conversationId,call_id,null,null,null);
                     } catch (YunhuniApiException e) {
-                        logger.info("加入交谈失败:{}",e.getCode());
+                        logger.info("加入交谈失败",e);
                         conversationService.logicExit(conversationId,call_id);
                     }
                 }else{

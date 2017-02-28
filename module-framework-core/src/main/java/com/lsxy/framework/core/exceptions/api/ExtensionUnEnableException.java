@@ -12,6 +12,10 @@ public class ExtensionUnEnableException extends YunhuniApiException {
         super();
     }
 
+    public ExtensionUnEnableException(String cause) {
+        super(cause);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.ExtensionUnEnable;

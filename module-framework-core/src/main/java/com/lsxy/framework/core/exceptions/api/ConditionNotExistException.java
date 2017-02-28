@@ -12,6 +12,11 @@ public class ConditionNotExistException extends YunhuniApiException {
         super();
     }
 
+    public ConditionNotExistException(String cause) {
+        super(cause);
+    }
+
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.ConditionNotExist;

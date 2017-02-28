@@ -12,6 +12,10 @@ public class AppServiceInvalidException extends YunhuniApiException {
         super();
     }
 
+    public AppServiceInvalidException(String cause) {
+        super(cause);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.AppServiceInvalid;
