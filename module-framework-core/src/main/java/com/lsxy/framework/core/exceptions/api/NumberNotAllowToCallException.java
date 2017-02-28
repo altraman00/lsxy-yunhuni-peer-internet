@@ -12,8 +12,12 @@ public class NumberNotAllowToCallException extends YunhuniApiException {
         super();
     }
 
-    public NumberNotAllowToCallException(String cause) {
-        super(cause);
+    public NumberNotAllowToCallException(String context) {
+        super(context);
+    }
+
+    public NumberNotAllowToCallException(ExceptionContext context){
+        super(context);
     }
 
     @Override

@@ -5,7 +5,7 @@ package com.lsxy.framework.core.exceptions.api;
  */
 public abstract class YunhuniApiException extends Exception{
 
-    private String cause;
+    private String context;
 
     public YunhuniApiException(Throwable t) {
         super(t);
@@ -15,9 +15,16 @@ public abstract class YunhuniApiException extends Exception{
         super();
     }
 
-    public YunhuniApiException(String cause){
+    public YunhuniApiException(String context){
         super();
-        this.cause = cause;
+        this.context = context;
+    }
+
+    public YunhuniApiException(ExceptionContext context){
+        super();
+        if(context!=null){
+            this.context = context.toString();
+        }
     }
 
     public abstract ApiReturnCodeEnum getApiExceptionEnum();
@@ -31,7 +38,7 @@ public abstract class YunhuniApiException extends Exception{
     }
 
     public final String getMessage(){
-        return "[code="+getCode()+"]"+"[message="+getSimpleMessage()+"]"+"[cause="+this.cause+"]";
+        return "[code="+getCode()+"]"+"[message="+getSimpleMessage()+"]"+"[context="+this.context+"]";
     }
 
 }

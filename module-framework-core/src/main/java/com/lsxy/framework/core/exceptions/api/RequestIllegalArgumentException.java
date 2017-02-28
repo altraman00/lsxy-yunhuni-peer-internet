@@ -14,8 +14,12 @@ public class RequestIllegalArgumentException extends YunhuniApiException {
         super();
     }
 
-    public RequestIllegalArgumentException(String cause) {
-        super(cause);
+    public RequestIllegalArgumentException(String context) {
+        super(context);
+    }
+
+    public RequestIllegalArgumentException(ExceptionContext context){
+        super(context);
     }
 
     @Override

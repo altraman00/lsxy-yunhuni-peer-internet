@@ -12,8 +12,12 @@ public class AgentHasAlreadyLoggedInException extends YunhuniApiException {
         super();
     }
 
-    public AgentHasAlreadyLoggedInException(String cause) {
-        super(cause);
+    public AgentHasAlreadyLoggedInException(String context){
+        super(context);
+    }
+
+    public AgentHasAlreadyLoggedInException(ExceptionContext context){
+        super(context);
     }
 
     @Override

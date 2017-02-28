@@ -12,8 +12,12 @@ public class IPNotInWhiteListException extends YunhuniApiException{
         super();
     }
 
-    public IPNotInWhiteListException(String cause) {
-        super(cause);
+    public IPNotInWhiteListException(String context) {
+        super(context);
+    }
+
+    public IPNotInWhiteListException(ExceptionContext context){
+        super(context);
     }
 
     @Override

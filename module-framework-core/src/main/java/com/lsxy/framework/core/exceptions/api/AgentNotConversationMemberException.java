@@ -12,8 +12,12 @@ public class AgentNotConversationMemberException extends YunhuniApiException {
         super();
     }
 
-    public AgentNotConversationMemberException(String cause) {
-        super(cause);
+    public AgentNotConversationMemberException(String context) {
+        super(context);
+    }
+
+    public AgentNotConversationMemberException(ExceptionContext context){
+        super(context);
     }
 
     @Override

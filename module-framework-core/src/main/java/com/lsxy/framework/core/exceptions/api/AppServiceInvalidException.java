@@ -12,8 +12,12 @@ public class AppServiceInvalidException extends YunhuniApiException {
         super();
     }
 
-    public AppServiceInvalidException(String cause) {
-        super(cause);
+    public AppServiceInvalidException(String context) {
+        super(context);
+    }
+
+    public AppServiceInvalidException(ExceptionContext context){
+        super(context);
     }
 
     @Override

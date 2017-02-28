@@ -12,8 +12,12 @@ public class ConditionExpressionException extends YunhuniApiException {
         super();
     }
 
-    public ConditionExpressionException(String cause) {
-        super(cause);
+    public ConditionExpressionException(String context) {
+        super(context);
+    }
+
+    public ConditionExpressionException(ExceptionContext context){
+        super(context);
     }
 
     @Override

@@ -12,8 +12,12 @@ public class AgentNotExistException extends YunhuniApiException {
         super();
     }
 
-    public AgentNotExistException(String cause) {
-        super(cause);
+    public AgentNotExistException(String context) {
+        super(context);
+    }
+
+    public AgentNotExistException(ExceptionContext context){
+        super(context);
     }
 
     @Override

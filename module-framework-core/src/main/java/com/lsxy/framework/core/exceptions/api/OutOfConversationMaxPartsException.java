@@ -12,8 +12,12 @@ public class OutOfConversationMaxPartsException extends YunhuniApiException {
         super();
     }
 
-    public OutOfConversationMaxPartsException(String cause) {
-        super(cause);
+    public OutOfConversationMaxPartsException(String context) {
+        super(context);
+    }
+
+    public OutOfConversationMaxPartsException(ExceptionContext context){
+        super(context);
     }
 
     @Override

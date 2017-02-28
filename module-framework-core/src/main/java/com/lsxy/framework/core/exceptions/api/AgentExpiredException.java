@@ -12,8 +12,12 @@ public class AgentExpiredException extends YunhuniApiException {
         super();
     }
 
-    public AgentExpiredException(String cause){
-        super(cause);
+    public AgentExpiredException(String context){
+        super(context);
+    }
+
+    public AgentExpiredException(ExceptionContext context){
+        super(context);
     }
 
     @Override

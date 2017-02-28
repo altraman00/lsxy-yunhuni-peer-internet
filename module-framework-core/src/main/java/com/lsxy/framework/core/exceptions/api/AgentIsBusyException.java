@@ -12,8 +12,12 @@ public class AgentIsBusyException extends YunhuniApiException {
         super();
     }
 
-    public AgentIsBusyException(String cause) {
-        super(cause);
+    public AgentIsBusyException(String context) {
+        super(context);
+    }
+
+    public AgentIsBusyException(ExceptionContext context){
+        super(context);
     }
 
     @Override

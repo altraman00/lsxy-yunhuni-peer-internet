@@ -12,8 +12,12 @@ public class QuotaNotEnoughException extends YunhuniApiException{
         super();
     }
 
-    public QuotaNotEnoughException(String cause) {
-        super(cause);
+    public QuotaNotEnoughException(String context) {
+        super(context);
+    }
+
+    public QuotaNotEnoughException(ExceptionContext context){
+        super(context);
     }
 
     @Override

@@ -13,8 +13,12 @@ public class PlayFileNotExistsException extends YunhuniApiException {
         super();
     }
 
-    public PlayFileNotExistsException(String cause) {
-        super(cause);
+    public PlayFileNotExistsException(String context) {
+        super(context);
+    }
+
+    public PlayFileNotExistsException(ExceptionContext context){
+        super(context);
     }
 
     @Override

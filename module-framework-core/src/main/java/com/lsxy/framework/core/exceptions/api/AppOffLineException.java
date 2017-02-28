@@ -14,8 +14,12 @@ public class AppOffLineException extends YunhuniApiException {
         super();
     }
 
-    public AppOffLineException(String cause) {
-        super(cause);
+    public AppOffLineException(String context) {
+        super(context);
+    }
+
+    public AppOffLineException(ExceptionContext context){
+        super(context);
     }
 
     @Override

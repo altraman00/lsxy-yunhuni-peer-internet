@@ -12,8 +12,12 @@ public class CallNotExistsException extends YunhuniApiException {
         super();
     }
 
-    public CallNotExistsException(String cause) {
-        super(cause);
+    public CallNotExistsException(String context) {
+        super(context);
+    }
+
+    public CallNotExistsException(ExceptionContext context){
+        super(context);
     }
 
     @Override

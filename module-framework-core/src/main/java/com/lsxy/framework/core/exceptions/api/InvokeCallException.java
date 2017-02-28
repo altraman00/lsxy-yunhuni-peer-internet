@@ -12,8 +12,12 @@ public class InvokeCallException extends YunhuniApiException {
         super();
     }
 
-    public InvokeCallException(String cause) {
-        super(cause);
+    public InvokeCallException(String context) {
+        super(context);
+    }
+
+    public InvokeCallException(ExceptionContext context){
+        super(context);
     }
 
     @Override

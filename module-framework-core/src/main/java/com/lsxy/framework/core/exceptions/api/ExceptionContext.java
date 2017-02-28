@@ -13,9 +13,9 @@ public class ExceptionContext implements Serializable{
 
     private final static String EMPTY_STR = "";
 
-    private Map<String,Object> context = null;
+    private Map<String,Serializable> context = null;
 
-    public ExceptionContext put(String key,String desc){
+    public ExceptionContext put(String key,Serializable desc){
         if(key!=null){
             if(context == null){
                 context = new HashMap<>();

@@ -12,8 +12,12 @@ public class DuoCallbackNumIsSampleException extends YunhuniApiException {
         super();
     }
 
-    public DuoCallbackNumIsSampleException(String cause) {
-        super(cause);
+    public DuoCallbackNumIsSampleException(String context) {
+        super(context);
+    }
+
+    public DuoCallbackNumIsSampleException(ExceptionContext context){
+        super(context);
     }
 
     @Override

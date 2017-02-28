@@ -12,8 +12,12 @@ public class SystemBusyException extends YunhuniApiException {
         super();
     }
 
-    public SystemBusyException(String cause) {
-        super(cause);
+    public SystemBusyException(String context) {
+        super(context);
+    }
+
+    public SystemBusyException(ExceptionContext context){
+        super(context);
     }
 
     @Override

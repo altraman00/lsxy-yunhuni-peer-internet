@@ -12,8 +12,12 @@ public class UserNumberHasNotAvailableLineException extends YunhuniApiException 
         super();
     }
 
-    public UserNumberHasNotAvailableLineException(String cause) {
-        super(cause);
+    public UserNumberHasNotAvailableLineException(String context) {
+        super(context);
+    }
+
+    public UserNumberHasNotAvailableLineException(ExceptionContext context){
+        super(context);
     }
 
     @Override

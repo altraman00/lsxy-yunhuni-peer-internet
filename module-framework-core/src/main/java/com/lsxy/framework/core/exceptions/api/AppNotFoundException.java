@@ -12,8 +12,12 @@ public class AppNotFoundException extends YunhuniApiException{
         super();
     }
 
-    public AppNotFoundException(String cause){
-        super(cause);
+    public AppNotFoundException(String context){
+        super(context);
+    }
+
+    public AppNotFoundException(ExceptionContext context){
+        super(context);
     }
 
     @Override

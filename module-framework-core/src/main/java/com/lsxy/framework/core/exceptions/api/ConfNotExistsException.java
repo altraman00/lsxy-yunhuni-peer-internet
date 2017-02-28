@@ -12,8 +12,12 @@ public class ConfNotExistsException extends YunhuniApiException {
         super();
     }
 
-    public ConfNotExistsException(String cause) {
-        super(cause);
+    public ConfNotExistsException(String context) {
+        super(context);
+    }
+
+    public ConfNotExistsException(ExceptionContext context){
+        super(context);
     }
 
     @Override

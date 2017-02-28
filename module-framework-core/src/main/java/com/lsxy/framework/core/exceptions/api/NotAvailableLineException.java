@@ -12,8 +12,12 @@ public class NotAvailableLineException extends YunhuniApiException {
         super();
     }
 
-    public NotAvailableLineException(String cause) {
-        super(cause);
+    public NotAvailableLineException(String context) {
+        super(context);
+    }
+
+    public NotAvailableLineException(ExceptionContext context){
+        super(context);
     }
 
     @Override

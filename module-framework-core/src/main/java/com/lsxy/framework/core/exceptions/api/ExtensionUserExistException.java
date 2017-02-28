@@ -12,8 +12,12 @@ public class ExtensionUserExistException extends YunhuniApiException {
         super();
     }
 
-    public ExtensionUserExistException(String cause) {
-        super(cause);
+    public ExtensionUserExistException(String context) {
+        super(context);
+    }
+
+    public ExtensionUserExistException(ExceptionContext context){
+        super(context);
     }
 
     @Override

@@ -12,8 +12,12 @@ public class ExtensionNotExistException extends YunhuniApiException {
         super();
     }
 
-    public ExtensionNotExistException(String cause) {
-        super(cause);
+    public ExtensionNotExistException(String context) {
+        super(context);
+    }
+
+    public ExtensionNotExistException(ExceptionContext context){
+        super(context);
     }
 
     @Override

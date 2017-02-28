@@ -12,10 +12,13 @@ public class ConditionNotExistException extends YunhuniApiException {
         super();
     }
 
-    public ConditionNotExistException(String cause) {
-        super(cause);
+    public ConditionNotExistException(String context) {
+        super(context);
     }
 
+    public ConditionNotExistException(ExceptionContext context){
+        super(context);
+    }
 
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
