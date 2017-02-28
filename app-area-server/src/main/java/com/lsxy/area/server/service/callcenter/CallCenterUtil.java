@@ -201,7 +201,7 @@ public class CallCenterUtil {
     /**
      * 坐席状态改变事件
      */
-    public void agentStateChangedEvent(String subaccountId,String url,String agent_id,String agentName,String previous_state,String latest_state){
+    public void agentStateChangedEvent(String subaccountId,String url,String agent_id,String agentName,String previous_state,String latest_state,String userData){
         try{
             if(latest_state == null){
                 latest_state = callCenterAgentService.getState(agent_id);
@@ -213,6 +213,7 @@ public class CallCenterUtil {
                     .putIfNotEmpty("previous_state",previous_state)
                     .putIfNotEmpty("latest_state",latest_state)
                     .putIfNotEmpty("current_time",System.currentTimeMillis())
+                    .putIfNotEmpty("user_data",userData)
                     .build();
             notifyCallbackUtil.postNotify(url,notify_data,null,3);
         }catch (Throwable t){

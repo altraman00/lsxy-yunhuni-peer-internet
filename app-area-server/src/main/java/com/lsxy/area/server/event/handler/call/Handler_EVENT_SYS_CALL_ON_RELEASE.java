@@ -299,7 +299,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 if(preState!=null && curState != null){
                     if(!preState.equals(curState)){
                         callCenterUtil.agentStateChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),agentId,
-                                state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),preState, curState);
+                                state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),preState, curState,state.getUserdata());
                     }
                 }
                 agentIdCallReference.clear(agentId);

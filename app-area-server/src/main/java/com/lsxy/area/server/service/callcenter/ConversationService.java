@@ -406,7 +406,7 @@ public class ConversationService {
 
     public String agentCall(String subaccountId,String appId,String conversationId,String agentId,String agentName,String extension,
                               String systemNum,String agentPhone,String type,String user,
-                              Integer maxDuration, Integer maxDialDuration,Integer voiceMode) throws YunhuniApiException{
+                              Integer maxDuration, Integer maxDialDuration,Integer voiceMode,String userData) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
         App app = appService.findById(appId);
         String from = null;
@@ -469,13 +469,14 @@ public class ConversationService {
                 .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
+                .setUserdata(userData)
                 .setBusinessData(new MapBuilder<String,String>()
                         .putIfNotEmpty(BusinessState.REF_RES_ID,null)
                         .putIfNotEmpty(CallCenterUtil.CONVERSATION_FIELD,conversationId)
                         .putIfNotEmpty(CallCenterUtil.AGENT_ID_FIELD,agentId)
                         .putIfNotEmpty(CallCenterUtil.AGENT_NAME_FIELD,agentName)
                         .putIfNotEmpty(CallCenterUtil.AGENT_EXTENSION_FIELD,extension)
-                        .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,null)
+                        .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,callId)
                         .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,null)
                         .putIfNotEmpty(CallCenterUtil.VOICE_MODE_FIELD,voiceMode==null?CallCenterConversationMember.MODE_DEFAULT.toString():voiceMode.toString())
                         .putIfNotEmpty("from",StringUtil.isEmpty(systemNum)?from:systemNum)
