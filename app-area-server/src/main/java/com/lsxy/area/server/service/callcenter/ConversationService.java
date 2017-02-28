@@ -406,7 +406,7 @@ public class ConversationService {
 
     public String agentCall(String subaccountId,String appId,String conversationId,String agentId,String agentName,String extension,
                               String systemNum,String agentPhone,String type,String user,
-                              Integer maxDuration, Integer maxDialDuration,Integer voiceMode) throws YunhuniApiException{
+                              Integer maxDuration, Integer maxDialDuration,Integer voiceMode,String userData) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
         App app = appService.findById(appId);
         String from = null;
@@ -469,6 +469,7 @@ public class ConversationService {
                 .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
+                .setUserdata(userData)
                 .setBusinessData(new MapBuilder<String,String>()
                         .putIfNotEmpty(BusinessState.REF_RES_ID,null)
                         .putIfNotEmpty(CallCenterUtil.CONVERSATION_FIELD,conversationId)
