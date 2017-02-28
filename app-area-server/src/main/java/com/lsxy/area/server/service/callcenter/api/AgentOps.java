@@ -293,7 +293,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     callCenter.setFromNum(from);
                     callCenter.setToNum(to);
                     callCenter.setStartTime(new Date());
-                    callCenter.setType(""+CallCenter.CALL_DIAL);
+                    callCenter.setType(""+CallCenter.CALL_UP);
                     callCenter.setCost(BigDecimal.ZERO);
                     callCenter.setAgent(name);
                     callCenterBatchInserter.put(callCenter);

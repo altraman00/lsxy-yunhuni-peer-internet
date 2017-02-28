@@ -7,6 +7,7 @@ import java.util.List;
  */
 public class ApiCertificateSubAccountOutput extends CommonDTO {
 
+    private String id;
     private String appId;
     private String parentId;
     private String callbackUrl;
@@ -15,6 +16,14 @@ public class ApiCertificateSubAccountOutput extends CommonDTO {
     private String certId;      //凭证ID
     private String secretKey;   //凭证密钥
     private List<QuotaDTO> quotas;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getAppId() {
         return appId;
