@@ -2,6 +2,7 @@ package com.lsxy.app.portal.console.app.vo;
 
 import com.lsxy.call.center.api.model.AgentSkill;
 import com.lsxy.call.center.api.model.CallCenterAgent;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,8 +11,10 @@ import java.util.List;
  * Created by liups on 2016/11/18.
  */
 public class AgentVO {
+    private String id;
     private String name;
     private String subaccountId;
+    private String certId;
     private String num;
     private String state;
     private String extension;
@@ -20,16 +23,18 @@ public class AgentVO {
     public AgentVO() {
     }
 
-    public AgentVO(String name, String subaccountId, String num, String state, String extension, List skills) {
+    public AgentVO(String id,String name, String subaccountId, String num, String state, String extension, List skills,String certId) {
+        this.id = id;
         this.name = name;
         this.subaccountId = subaccountId;
         this.num = num;
-        this.state = CallCenterAgent.getChineseState(state) ;
+        this.state = state!=null?CallCenterAgent.getChineseState(state):"未知" ;
         this.extension = extension;
         this.skills = skills;
+        this.certId = certId;
     }
 
-    public static AgentVO changeCallCenterAgentToAgentVO(CallCenterAgent agent){
+    public static AgentVO changeCallCenterAgentToAgentVO(CallCenterAgent agent, ApiCertificateSubAccount apiCertificateSubAccount){
         List<AgentSkill> skills = agent.getSkills();
         List<AgentSkillVO> skillVos = null;
         if(skills != null){
@@ -39,7 +44,24 @@ public class AgentVO {
                 skillVos.add(skillVO);
             }
         }
-        return new AgentVO(agent.getName(),agent.getSubaccountId(),agent.getNum(),agent.getState(),agent.getExtension(),skillVos);
+        String certId = apiCertificateSubAccount!=null ? apiCertificateSubAccount.getCertId() :"";
+        return new AgentVO(agent.getId(),agent.getName(),agent.getSubaccountId(),agent.getNum(),agent.getState(),agent.getExtension(),skillVos,certId);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getCertId() {
+        return certId;
+    }
+
+    public void setCertId(String certId) {
+        this.certId = certId;
     }
 
     public String getName() {
