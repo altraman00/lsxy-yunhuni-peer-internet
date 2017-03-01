@@ -10,6 +10,9 @@ import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.CallCenterQueueService;
 import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.call.center.api.service.DeQueueService;
+import com.lsxy.framework.core.exceptions.api.CallNotExistsException;
+import com.lsxy.framework.core.exceptions.api.ConversationNotExistException;
+import com.lsxy.framework.core.exceptions.api.ExceptionContext;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
@@ -96,14 +99,23 @@ public class DeQueueServiceImpl implements DeQueueService {
         if(state == null || (state.getClosed() != null && state.getClosed())){
             logger.info("会话已关闭callid={}",callId);
             //抛异常后呼叫中心微服务会回滚坐席状态
-            throw new IllegalStateException("会话已关闭");
+            throw new CallNotExistsException(
+                    new ExceptionContext().put("tenantId",tenantId)
+                    .put("appId",appId)
+                    .put("call_id",callId)
+            );
         }
         conversationService.stopPlayWait(state);
         String conversation = conversationId;
 
         if(conversationId!=null){//判断交谈是否已关闭
             if(businessStateService.closed(conversationId)){
-                throw new IllegalStateException("交谈已结束");
+                throw new ConversationNotExistException(
+                        new ExceptionContext().put("tenantId",tenantId)
+                                .put("appId",appId)
+                                .put("call_id",callId)
+                                .put("conversation_id",conversationId)
+                );
             }
         }
 
@@ -156,7 +168,7 @@ public class DeQueueServiceImpl implements DeQueueService {
                                 .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD)))/1000)
                         .build());
             }catch (Throwable t){
-                logger.error("incrIntoRedis失败",t);
+                logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
             }
         }
 
@@ -188,7 +200,7 @@ public class DeQueueServiceImpl implements DeQueueService {
                                     .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD))) / 1000)
                             .build());
                 } catch (Throwable t) {
-                    logger.error("incrIntoRedis失败", t);
+                    logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
                 }
             }
             updateQueue(queueId,callId,null,null,null,CallCenterQueue.RESULT_FAIL);
@@ -244,7 +256,7 @@ public class DeQueueServiceImpl implements DeQueueService {
                                     .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD)))/1000)
                             .build());
                 }catch (Throwable t){
-                    logger.error("incrIntoRedis失败",t);
+                    logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
                 }
             }
             updateQueue(queueId,callId,null,null,null,CallCenterQueue.RESULT_FAIL);
@@ -321,7 +333,7 @@ public class DeQueueServiceImpl implements DeQueueService {
             updateCallCenterQueue.setResult(result);
             callCenterQueueService.update(id,updateCallCenterQueue);
         }catch (Throwable t){
-            logger.error("更新排队记录失败",t);
+            logger.error(String.format("更新排队记录失败,queueId=%s",id),t);
         }
     }
 

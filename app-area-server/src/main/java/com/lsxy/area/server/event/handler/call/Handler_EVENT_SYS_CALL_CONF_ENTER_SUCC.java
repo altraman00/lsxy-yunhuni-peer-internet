@@ -114,7 +114,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         }
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null");
+            throw new InvalidParamException("businessstate is null,call_id="+call_id);
         }
 
         if(logger.isDebugEnabled()){
@@ -166,6 +166,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
                 enQueueService.lookupAgent(state.getTenantId(),state.getAppId(),state.getSubaccountId(),
                         businessData.get(CallCenterUtil.AGENT_NAME_FIELD),call_id,enqueue,CallCenterUtil.QUEUE_TYPE_CALL_AGENT,conversation_id);
             }catch (Throwable t){
+                logger.info("排队找坐席出错",t);
                 conversationService.exit(conversation_id,call_id);
             }
         }
@@ -263,10 +264,10 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
                 .build();
         try {
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD, params);
-            rpcCaller.invoke(sessionContext, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest,true);
             businessStateService.deleteInnerField(conf_id,"recording");
         } catch (Exception e) {
-            logger.error("会议创建自动录音：",e);
+            logger.error(String.format("会议创建自动录音失败，appId=%s,call_id=%s",state.getAppId(),state.getId()),e);
         }
     }
 }

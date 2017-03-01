@@ -92,7 +92,7 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         }
         BusinessState state = businessStateService.get(conf_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null");
+            throw new InvalidParamException("businessstate is null,call_id={}",conf_id);
         }
         if(res_id!=null){
             businessStateService.updateResId(conf_id,res_id);
@@ -127,7 +127,8 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
                 try {
                     rpcCaller.invoke(sessionContext, rpcrequest,true);
                 } catch (Throwable t) {
-                    logger.error("调用失败",t);
+                    logger.error(String.format("调用会议放音失败,appId=%s,res_id=%s,conversation_id=%s",
+                            state.getAppId(),state.getResId(),state.getId()),t);
                 }
             }
         }
@@ -136,7 +137,7 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
             try {
                 conversationService.join(conversationId,initiator,null,null,null);
             } catch (YunhuniApiException e) {
-                logger.info("加入交谈失败:{}",e.getCode());
+                logger.info("加入交谈失败",e);
                 conversationService.logicExit(conversationId,initiator);
             }
         }
