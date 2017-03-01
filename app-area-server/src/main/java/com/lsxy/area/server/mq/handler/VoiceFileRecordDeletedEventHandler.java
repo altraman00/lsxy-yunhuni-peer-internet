@@ -65,13 +65,8 @@ public class VoiceFileRecordDeletedEventHandler implements MQMessageHandler<Voic
             logger.debug("删除录音文件开启");
         }
         //获取全部租户
-        List<Tenant> tenants = tenantService.getListByPage();
-        if(tenants==null||tenants.size()==0){
-            if(logger.isDebugEnabled()){
-                logger.debug("删除录音文件结束，当前没有应用存在");
-            }
-            return ;
-        }
+        Iterable<Tenant> tenants = tenantService.list();
+
         //获取全局时间
         int globalTime = 7;
         GlobalConfig globalConfig = globalConfigService.findByTypeAndName(GlobalConfig.TYPE_RECORDING,GlobalConfig.KEY_RECORDING);
@@ -80,61 +75,64 @@ public class VoiceFileRecordDeletedEventHandler implements MQMessageHandler<Voic
             globalTime = Integer.valueOf(globalConfig.getValue());
         }
         //遍历全部用户
-        for(int i=0;i<tenants.size();i++) {
-            Tenant tenant1 = tenants.get(i);
-            List<App> apps = appService.getAppsByTenantId(tenant1.getId());
-            for(int ai=0;ai<apps.size();ai++){
-                //获取要删除文件的创建时间
-                Date createTime = getCreateDate(globalTime,tenant1.getId(),apps.get(ai).getId());
-                //获取租户对应的录音文件
-                List<VoiceFileRecord> list2 = null;//voiceFileRecordService.get(createTime,tenant1.getId());
-                for(int j=0;j<list2.size();j++){
-                    VoiceFileRecord temp = list2.get(i);
-                    if(temp.getOssDeleted()==1&& StringUtils.isNotEmpty(temp.getOssUrl())){//需要删除oss文件
+        if(tenants != null){
+            for(Tenant tenant : tenants){
+                Tenant tenant1 = tenant;
+                List<App> apps = appService.getAppsByTenantId(tenant1.getId());
+                for(int ai=0;ai<apps.size();ai++){
+                    //获取要删除文件的创建时间
+                    Date createTime = getCreateDate(globalTime,tenant1.getId(),apps.get(ai).getId());
+                    //获取租户对应的录音文件
+                    List<VoiceFileRecord> list2 = null;//voiceFileRecordService.get(createTime,tenant1.getId());
+                    for(int j=0;j<list2.size();j++){
+                        VoiceFileRecord temp = list2.get(j);
+                        if(temp.getOssDeleted()==1&& StringUtils.isNotEmpty(temp.getOssUrl())){//需要删除oss文件
+                            try {
+                                String repository= SystemConfig.getProperty("global.oss.aliyun.bucket");
+                                ossService.deleteObject(repository, temp.getOssUrl());
+                                temp.setOssDeleted(VoiceFilePlay.DELETED_SUCCESS);
+                            }catch(Exception e){
+                                logger.error("删除OSS文件：{1}失败，异常{2}",temp.getOssUrl(),e);
+                                temp.setOssDeleted(VoiceFilePlay.DELETED_FAIL);
+                            }
+                        }
+                        voiceFileRecordService.save(temp);
                         try {
-                            String repository= SystemConfig.getProperty("global.oss.aliyun.bucket");
-                            ossService.deleteObject(repository, temp.getOssUrl());
-                            temp.setOssDeleted(VoiceFilePlay.DELETED_SUCCESS);
-                        }catch(Exception e){
-                            logger.error("删除OSS文件：{1}失败，异常{2}",temp.getOssUrl(),e);
-                            temp.setOssDeleted(VoiceFilePlay.DELETED_FAIL);
+                            voiceFileRecordService.delete(temp);
+                        } catch (Exception e) {
+                            logger.error("删除录音文件记录：{1}失败，异常{2}",temp.getId(),e);
                         }
                     }
-                    voiceFileRecordService.save(temp);
-                    try {
-                        voiceFileRecordService.delete(temp);
-                    } catch (Exception e) {
-                        logger.error("删除录音文件记录：{1}失败，异常{2}",temp.getId(),e);
+                    //获取租户需要删除的区域
+                    List<String> list3 = voiceFileRecordService.getAAAreaByCreateTimeAndTenantId(createTime,tenant1.getId());
+                    if(list3==null|| list3.size()==0){
+                        logger.info("删除录音文件记录：[{}]租户[{}]没有需要删除的录音文件", tenant1.getId(), tenant1.getTenantName());
                     }
-                }
-                //获取租户需要删除的区域
-                List<String> list3 = voiceFileRecordService.getAAAreaByCreateTimeAndTenantId(createTime,tenant1.getId());
-                if(list3==null|| list3.size()==0){
-                    logger.info("删除录音文件记录：[{}]租户[{}]没有需要删除的录音文件", tenant1.getId(), tenant1.getTenantName());
-                }
-                for(int k=0;k<list3.size();k++){
-                    Area area = areaService.findById(list3.get(i));
-                    if(area!=null) {
-                        List<Map> list4 = voiceFileRecordService.getAAListByCreateTimeAndTenantIdAndAreaId(createTime, tenant1.getId(), list3.get(i));
-                        //通知区域代理删除文件
-                        String param = JSON.toJSON(list4).toString();
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("本次删除录音文件信息:{}", param);
-                        }
-                        Map<String, Object> params = new HashMap<>();
-                        params.put("areaId", area.getId());
-                        RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_RF_DELETED, params);
-                        request.setBody(param);
-                        try {
-                            rpcCaller.invoke(sessionContext, request);
-                            logger.info("发送本次删除录音文件信息指令成功");
-                        } catch (Exception ex) {
-                            logger.error("发送本次删除录音文件信息指令失败:" + request, ex);
+                    for(int k=0;k<list3.size();k++){
+                        Area area = areaService.findById(list3.get(k));
+                        if(area!=null) {
+                            List<Map> list4 = voiceFileRecordService.getAAListByCreateTimeAndTenantIdAndAreaId(createTime, tenant1.getId(), list3.get(k));
+                            //通知区域代理删除文件
+                            String param = JSON.toJSON(list4).toString();
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("本次删除录音文件信息:{}", param);
+                            }
+                            Map<String, Object> params = new HashMap<>();
+                            params.put("areaId", area.getId());
+                            RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_RF_DELETED, params);
+                            request.setBody(param);
+                            try {
+                                rpcCaller.invoke(sessionContext, request);
+                                logger.info("发送本次删除录音文件信息指令成功");
+                            } catch (Exception ex) {
+                                logger.error("发送本次删除录音文件信息指令失败:" + request, ex);
+                            }
                         }
                     }
                 }
             }
         }
+
     }
 
     /**删除时间*/

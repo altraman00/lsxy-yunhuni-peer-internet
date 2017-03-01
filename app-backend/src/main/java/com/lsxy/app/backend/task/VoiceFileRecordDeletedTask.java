@@ -107,13 +107,8 @@ public class VoiceFileRecordDeletedTask {
     }
     private void delete(){
         //获取全部租户
-        List<Tenant> tenants = tenantService.getListByPage();
-        if(tenants==null||tenants.size()==0){
-            if(logger.isDebugEnabled()){
-                logger.debug("删除录音文件结束，当前没有租户存在");
-            }
-            return ;
-        }
+        Iterable<Tenant> tenants = tenantService.list();
+
         //获取全局时间
         GlobalConfig globalConfig = globalConfigService.findByTypeAndName(GlobalConfig.TYPE_RECORDING,GlobalConfig.KEY_RECORDING);
         int globalTime = 7;//如果没有找到有效全局配置，将使用7为默认免费时长
@@ -133,38 +128,40 @@ public class VoiceFileRecordDeletedTask {
             }
         }
         //遍历全部用户
-        for(int i=0;i<tenants.size();i++) {
-            Tenant tenant1 = tenants.get(i);
-            //获取用户名下的应用
-            List<App> apps = appService.getAppsByTenantId(tenant1.getId());
-            for(int ai=0;ai<apps.size();ai++){
-                //获取要删除文件的创建时间
-                Date createTime = getCreateDate(globalTime,tenant1.getId(),apps.get(ai).getId());
-                if(createTime==null){
-                    continue;
-                }
-                //获取租户对应的录音文件
-                List<VoiceFileRecord> list2 = voiceFileRecordService.getListByTenantAndAppAndCreateTime(tenant1.getId(),apps.get(ai).getId(),createTime);
-                for(int j=0;j<list2.size();j++){
-                    VoiceFileRecord temp = list2.get(j);
-                    //已同步oss 并且存在oss文件，并且未删除
-                    if((temp.getStatus()!=null&&temp.getStatus()==1)&&StringUtils.isNotEmpty(temp.getOssUrl())&&(temp.getOssDeleted()==null||temp.getOssDeleted()!=1)){//需要删除oss文件
-                        try {
-                            ossService.deleteObject(repository, temp.getOssUrl());
-                            temp.setOssDeleted(VoiceFilePlay.DELETED_SUCCESS);
-                        }catch(Exception e){
-                            logger.error("删除OSS文件：{1}失败，异常{2}",temp.getOssUrl(),e);
-                            temp.setOssDeleted(VoiceFilePlay.DELETED_FAIL);
-                        }
-                        temp = voiceFileRecordService.save(temp);
+        if(tenants != null){
+            for(Tenant tenant : tenants){
+                Tenant tenant1 = tenant;
+                //获取用户名下的应用
+                List<App> apps = appService.getAppsByTenantId(tenant1.getId());
+                for(int ai=0;ai<apps.size();ai++){
+                    //获取要删除文件的创建时间
+                    Date createTime = getCreateDate(globalTime,tenant1.getId(),apps.get(ai).getId());
+                    if(createTime==null){
+                        continue;
                     }
-                    try {
-                        voiceFileRecordService.delete(temp);
-                        if(logger.isDebugEnabled()) {
-                            logger.debug("删除录音文件记录：{1}成功", temp.getId());
+                    //获取租户对应的录音文件
+                    List<VoiceFileRecord> list2 = voiceFileRecordService.getListByTenantAndAppAndCreateTime(tenant1.getId(),apps.get(ai).getId(),createTime);
+                    for(int j=0;j<list2.size();j++){
+                        VoiceFileRecord temp = list2.get(j);
+                        //已同步oss 并且存在oss文件，并且未删除
+                        if((temp.getStatus()!=null&&temp.getStatus()==1)&&StringUtils.isNotEmpty(temp.getOssUrl())&&(temp.getOssDeleted()==null||temp.getOssDeleted()!=1)){//需要删除oss文件
+                            try {
+                                ossService.deleteObject(repository, temp.getOssUrl());
+                                temp.setOssDeleted(VoiceFilePlay.DELETED_SUCCESS);
+                            }catch(Exception e){
+                                logger.error("删除OSS文件：{1}失败，异常{2}",temp.getOssUrl(),e);
+                                temp.setOssDeleted(VoiceFilePlay.DELETED_FAIL);
+                            }
+                            temp = voiceFileRecordService.save(temp);
                         }
-                    } catch (Exception e) {
-                        logger.error("删除录音文件记录：["+temp.getId()+"]失败，异常",e);
+                        try {
+                            voiceFileRecordService.delete(temp);
+                            if(logger.isDebugEnabled()) {
+                                logger.debug("删除录音文件记录：{1}成功", temp.getId());
+                            }
+                        } catch (Exception e) {
+                            logger.error("删除录音文件记录：["+temp.getId()+"]失败，异常",e);
+                        }
                     }
                 }
             }

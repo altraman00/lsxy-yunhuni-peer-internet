@@ -40,7 +40,7 @@ public class CallCenterAgent extends IdEntity {
     public static String getChineseState(String state){
         state = state.replace(STATE_ONLINE,"在线");
         state = state.replace(STATE_IDLE,"空闲");
-        state = state.replace(STATE_FETCHING,"摘机");
+        state = state.replace(STATE_FETCHING,"正在呼叫");
         state = state.replace(STATE_TALKING,"通话");
         state = state.replace(STATE_BUSY,"忙碌");
         state = state.replace(STATE_AWAY,"离席");
