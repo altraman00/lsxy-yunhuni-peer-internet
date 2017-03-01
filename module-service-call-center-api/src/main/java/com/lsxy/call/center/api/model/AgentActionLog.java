@@ -19,17 +19,17 @@ public class AgentActionLog extends IdEntity {
 
     private String tenantId;
     private String appId;
-    private String channel;
+    private String subaccountId;
     private String name;
     private Integer action; //1登录，0注销
 
     public AgentActionLog() {
     }
 
-    public AgentActionLog(String tenantId, String appId, String channel, String name, Integer action) {
+    public AgentActionLog(String tenantId, String appId, String subaccountId, String name, Integer action) {
         this.tenantId = tenantId;
         this.appId = appId;
-        this.channel = channel;
+        this.subaccountId = subaccountId;
         this.name = name;
         this.action = action;
     }
@@ -52,13 +52,13 @@ public class AgentActionLog extends IdEntity {
         this.appId = appId;
     }
 
-    @Column(name = "channel")
-    public String getChannel() {
-        return channel;
+    @Column(name = "subaccount_id")
+    public String getSubaccountId() {
+        return subaccountId;
     }
 
-    public void setChannel(String channel) {
-        this.channel = channel;
+    public void setSubaccountId(String subaccountId) {
+        this.subaccountId = subaccountId;
     }
 
     @Column(name = "name")

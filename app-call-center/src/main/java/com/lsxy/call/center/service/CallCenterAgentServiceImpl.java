@@ -55,8 +55,6 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
-    private ChannelService channelService;
-    @Autowired
     private ConditionService conditionService;
     @Autowired
     private ExtensionState extensionState;
@@ -112,10 +110,6 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         if(StringUtils.isBlank(agent.getName())){
             throw new RequestIllegalArgumentException();
         }
-        //通道不能为空
-        if(StringUtils.isBlank(agent.getChannel())){
-            throw new RequestIllegalArgumentException();
-        }
         //初始化座席状态
         if(StringUtils.isBlank(agent.getState())){
             agent.setState(CallCenterAgent.STATE_ONLINE);
@@ -123,15 +117,13 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 && !agent.getState().startsWith("busy/") && !agent.getState().startsWith("away/") && !agent.getState().equals("online")){
             throw new RequestIllegalArgumentException();
         }
-        //校验通道
-        channelService.findOne(agent.getTenantId(), agent.getAppId(), agent.getChannel());
         CallCenterAgent oldAgent = callCenterAgentDao.findByAppIdAndName(agent.getAppId(),agent.getName());
         if(oldAgent != null){
             Long lastRegTime = agentState.getLastRegTime(oldAgent.getId());
             //TODO 注册是否过期，过期执行注销过程
             if(lastRegTime == null || (System.currentTimeMillis() - lastRegTime) > 10 * 60 * 1000){
                 //TODO 注销
-                logout(agent.getTenantId(), agent.getAppId(), agent.getName(), true);
+                logout(agent.getTenantId(), agent.getAppId(),agent.getSubaccountId(), agent.getName(), true);
             }else{
                 //TODO 注册没有过期
                 throw new AgentHasAlreadyLoggedInException();
@@ -142,7 +134,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         if(StringUtils.isBlank(extensionId)){
            throw new RequestIllegalArgumentException();
         }
-        AppExtension extension = appExtensionService.findOne(agent.getAppId(),extensionId);
+        AppExtension extension = appExtensionService.findOne(agent.getAppId(),extensionId,agent.getSubaccountId());
         if(extension == null){
             throw new ExtensionNotExistException();
         }
@@ -251,14 +243,14 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     /**
-     * 查询指定通道下所有条件集合，查出匹配的条件
+     * 查询指定账号下所有条件集合，查出匹配的条件
      * @param agent 座席
      * @param suitedConditions 条件集合，请传入一个空的List对象
      * @param conditionScore 条件的分数，key为条件Id，请传入一个空的Map
      * @param skillScore 技能分数，key为技能名称，请传入一个空的Map
      */
     private void setSuitedConditionsAndConditionScore(CallCenterAgent agent, List<Condition> suitedConditions, Map<String, Long> conditionScore, Map<String, Integer> skillScore) throws YunhuniApiException {
-        List<Condition> conditions = conditionService.getAll(agent.getTenantId(), agent.getAppId(), agent.getChannel());
+        List<Condition> conditions = conditionService.getAll(agent.getTenantId(), agent.getAppId(), agent.getSubaccountId());
         conditions.stream().forEach(condition -> {
             if(ExpressionUtils.execWhereExpression(condition.getWhereExpression(),skillScore)){
                 long score = ExpressionUtils.execSortExpression(condition.getSortExpression(), skillScore);
@@ -270,12 +262,12 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     //注销
     @Override
-    public void logout(String tenantId, String appId, String agentName, boolean force) throws YunhuniApiException {
+    public void logout(String tenantId, String appId,String subaccountId ,String agentName, boolean force) throws YunhuniApiException {
         if(StringUtils.isBlank(agentName)){
             throw new RequestIllegalArgumentException();
         }
-        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
-        if(agent == null){
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndSubaccountIdAndName(appId,subaccountId,agentName);
+        if(agent == null ){
             // 座席不存在
             throw new AgentNotExistException();
         }
@@ -335,14 +327,15 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
-    public void keepAlive(String appId, String agentName) throws YunhuniApiException{
+    public void keepAlive(String appId,String subaccountId, String agentName) throws YunhuniApiException{
         if(StringUtils.isBlank(appId)){
             throw new RequestIllegalArgumentException();
         }
         if(StringUtils.isBlank(agentName)){
             throw new RequestIllegalArgumentException();
         }
-        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
+
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndSubaccountIdAndName(appId,subaccountId,agentName);
         if(agent == null){
             // 座席不存在
             throw new AgentNotExistException();
@@ -351,22 +344,26 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
-    public List<String> getAgentIdsByChannel(String tenantId,String appId,String channelId){
+    public List<String> getAgentIdsBySubaccountId(String tenantId,String appId,String subaccountId){
         String sql = "select id  from db_lsxy_bi_yunhuni.tb_bi_call_center_agent " +
-                "where tenant_id=\""+tenantId+"\" and app_id=\""+appId+"\" and channel=\""+channelId+"\" and deleted = 0";
-
+                "where tenant_id=\""+tenantId+"\" and app_id=\""+appId+"\" and subaccount_id=\""+subaccountId+"\" and deleted = 0";
         return jdbcTemplate.queryForList(sql, new Object[]{}, String.class);
     }
 
     @Override
-    public CallCenterAgent get(String appId, String agentName) throws YunhuniApiException {
+    public CallCenterAgent get(String appId, String agentName) throws YunhuniApiException{
+        return this.get(appId,null, agentName);
+    }
+
+    @Override
+    public CallCenterAgent get(String appId,String subaccountId, String agentName) throws YunhuniApiException {
         if(StringUtils.isBlank(appId)){
             throw new RequestIllegalArgumentException();
         }
         if(StringUtils.isBlank(agentName)){
             throw new RequestIllegalArgumentException();
         }
-        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId, agentName);
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndSubaccountIdAndName(appId,subaccountId, agentName);
         if(agent == null){
             // 座席不存在
             throw new AgentNotExistException();
@@ -393,13 +390,74 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
-    public Page getPage(String appId, Integer pageNo, Integer pageSize) throws YunhuniApiException{
+    public String getId(String appId,String subaccountId, String agentName) throws YunhuniApiException {
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndSubaccountIdAndName(appId, subaccountId,agentName);
+        if(agent == null){
+            // 座席不存在
+            throw new AgentNotExistException();
+        }
+        return agent.getId();
+    }
+
+    @Override
+    public Page getPageForPotal(String appId, Integer pageNo, Integer pageSize) throws YunhuniApiException{
         if(StringUtils.isBlank(appId)){
             throw new RequestIllegalArgumentException();
         }
         List<String> agentIds = new ArrayList<>();
+        Page page;
         String hql = "from CallCenterAgent obj where obj.appId=?1";
-        Page page = this.pageList(hql, pageNo, pageSize, appId);
+        page = this.pageList(hql, pageNo, pageSize, appId);
+
+        List<CallCenterAgent> result = page.getResult();
+        //将所有座席ID放入集合中
+        result.stream().forEach(agent ->agentIds.add(agent.getId()));
+        //查询这些座席的技能
+        List<AgentSkill> skills = agentSkillService.findAllByAgents(agentIds);
+        //分组这些技能，以座席Id为key放入Map中
+        Map<String, List<AgentSkill>> collect = skills.stream().collect(Collectors.groupingBy(AgentSkill::getAgent, Collectors.toList()));
+        List<String> extensionIds = new ArrayList<>();
+        result.stream().forEach(agent -> {
+            AgentState.Model model = agentState.get(agent.getId());
+            agent.setState(model.getState());
+            agent.setExtension(model.getExtension());
+            extensionIds.add(model.getExtension());
+            agent.setSkills(collect.get(agent.getId()));
+        });
+        Map<String,AppExtension> map = new HashMap<>();
+        Iterable<AppExtension> appExtensions = appExtensionService.findAll(extensionIds);
+        if(appExtensions != null){
+            for(AppExtension e:appExtensions){
+                map.put(e.getId(),e);
+            }
+        }
+        result.stream().forEach(agent ->{
+            AppExtension extension = map.get(agent.getExtension());
+            if(extension != null){
+                agent.setExtension(extension.getUser());
+            }else{
+                agent.setExtension(null);
+            }
+        });
+
+        return page;
+    }
+
+    @Override
+    public Page getPageForApiGW(String appId, String subaccountId, Integer pageNo, Integer pageSize) throws YunhuniApiException {
+        if(StringUtils.isBlank(appId)){
+            throw new RequestIllegalArgumentException();
+        }
+        List<String> agentIds = new ArrayList<>();
+        Page page;
+        if(StringUtils.isNotBlank(subaccountId)){
+            String hql = "from CallCenterAgent obj where obj.appId=?1 and obj.subaccountId=?2";
+            page = this.pageList(hql, pageNo, pageSize, appId,subaccountId);
+        }else{
+            String hql = "from CallCenterAgent obj where obj.appId=?1 and obj.subaccountId is null";
+            page = this.pageList(hql, pageNo, pageSize, appId);
+        }
+
         List<CallCenterAgent> result = page.getResult();
         //将所有座席ID放入集合中
         result.stream().forEach(agent ->agentIds.add(agent.getId()));
@@ -417,7 +475,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
-    public void extension(String appId, String agentName,String extensionId) throws YunhuniApiException{
+    public void extension(String appId, String agentName,String extensionId,String subaccountId) throws YunhuniApiException{
         if(StringUtils.isBlank(appId)){
             throw new RequestIllegalArgumentException();
         }
@@ -427,12 +485,12 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         if(StringUtils.isBlank(extensionId)){
             throw new RequestIllegalArgumentException();
         }
-        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndSubaccountIdAndName(appId,subaccountId,agentName);
         if(agent == null){
             // 座席不存在
             throw new AgentNotExistException();
         }
-        AppExtension extension = appExtensionService.findOne(agent.getAppId(),extensionId);
+        AppExtension extension = appExtensionService.findOne(agent.getAppId(),extensionId,subaccountId);
         if(extension == null){
             throw new ExtensionNotExistException();
         }
@@ -465,7 +523,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
-    public String state(String appId, String agentName, String state) throws YunhuniApiException{
+    public String state(String appId,String subaccountId, String agentName, String state) throws YunhuniApiException{
         if(StringUtils.isBlank(appId)){
             throw new RequestIllegalArgumentException();
         }
@@ -475,7 +533,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         if(StringUtils.isBlank(state)){
             throw new RequestIllegalArgumentException();
         }
-        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndSubaccountIdAndName(appId,subaccountId,agentName);
         if(agent == null){
             // 座席不存在
             throw new AgentNotExistException();
@@ -525,11 +583,11 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         return state;
     }
     @Override
-    public void skills(String tenantId, String appId, String agentName, List<AgentSkillOperationDTO> skillOpts) throws YunhuniApiException{
+    public void skills(String tenantId, String appId, String subaccountId , String agentName, List<AgentSkillOperationDTO> skillOpts) throws YunhuniApiException{
         if(StringUtils.isBlank(agentName)){
             throw new RequestIllegalArgumentException();
         }
-        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndSubaccountIdAndName(appId,subaccountId,agentName);
         if(agent == null){
             //座席不存在
             throw new AgentNotExistException();

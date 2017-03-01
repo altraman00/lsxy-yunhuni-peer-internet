@@ -69,8 +69,8 @@ public class EnqueueHandler extends ActionHandler{
         String xml = root.asXML();
         EnQueue enQueue = EnQueueDecoder.decode(xml);
         if(enQueue!=null){
-            if(StringUtil.isNotEmpty(enQueue.getData())){
-                businessStateService.updateUserdata(callId,enQueue.getData());
+            if(StringUtil.isNotEmpty(enQueue.getUser_data())){
+                businessStateService.updateUserdata(callId,enQueue.getUser_data());
             }
             if(StringUtil.isNotBlank(enQueue.getWait_voice())){
                 String playWait = enQueue.getWait_voice();
@@ -101,13 +101,11 @@ public class EnqueueHandler extends ActionHandler{
         if(enQueue.getRoute().getCondition()!=null){
             businessStateService.updateInnerField(callId,
                     CallCenterUtil.ENQUEUE_START_TIME_FIELD,""+new Date().getTime(),
-                    CallCenterUtil.CHANNEL_ID_FIELD,enQueue.getChannel(),
                     CallCenterUtil.CONDITION_ID_FIELD,enQueue.getRoute().getCondition().getId(),
                     IVRActionService.IVR_NEXT_FIELD,next);
         }else{
             businessStateService.updateInnerField(callId,
                     CallCenterUtil.ENQUEUE_START_TIME_FIELD,""+new Date().getTime(),
-                    CallCenterUtil.CHANNEL_ID_FIELD,enQueue.getChannel(),
                     IVRActionService.IVR_NEXT_FIELD,next);
         }
 
@@ -122,7 +120,7 @@ public class EnqueueHandler extends ActionHandler{
         }
 
         try {
-            enQueueService.lookupAgent(state.getTenantId(), state.getAppId(), businessData.get("to"), callId, enQueue,CallCenterUtil.QUEUE_TYPE_IVR,null);
+            enQueueService.lookupAgent(state.getTenantId(), state.getAppId(),state.getSubaccountId(), businessData.get("to"), callId, enQueue,CallCenterUtil.QUEUE_TYPE_IVR,null);
         }catch (Throwable t){
             logger.error("调用呼叫中心排队失败",t);
             deQueueService.fail(state.getTenantId(),state.getAppId(),callId,null,CallCenterUtil.QUEUE_TYPE_IVR,"调用呼叫中心排队失败",null);

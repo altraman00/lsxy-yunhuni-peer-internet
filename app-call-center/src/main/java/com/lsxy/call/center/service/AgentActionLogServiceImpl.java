@@ -30,14 +30,14 @@ public class AgentActionLogServiceImpl extends AbstractService<AgentActionLog> i
     @Override
     @Async
     public void agentLogin(CallCenterAgent agent) {
-        AgentActionLog log = new AgentActionLog(agent.getTenantId(),agent.getAppId(),agent.getChannel(),agent.getName(),AgentActionLog.ACTION_LOGIN);
+        AgentActionLog log = new AgentActionLog(agent.getTenantId(),agent.getAppId(),agent.getSubaccountId(),agent.getName(),AgentActionLog.ACTION_LOGIN);
         this.save(log);
     }
 
     @Override
     @Async
     public void agentLogout(CallCenterAgent agent) {
-        AgentActionLog log = new AgentActionLog(agent.getTenantId(),agent.getAppId(),agent.getChannel(),agent.getName(),AgentActionLog.ACTION_LOGOUT);
+        AgentActionLog log = new AgentActionLog(agent.getTenantId(),agent.getAppId(),agent.getSubaccountId(),agent.getName(),AgentActionLog.ACTION_LOGOUT);
         this.save(log);
     }
 }

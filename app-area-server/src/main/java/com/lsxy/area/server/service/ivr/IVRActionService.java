@@ -12,6 +12,7 @@ import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.handler.ActionHandler;
 import com.lsxy.area.server.service.ivr.handler.EnqueueHandler;
 import com.lsxy.area.server.service.ivr.handler.HangupActionHandler;
+import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.HttpClientHelper;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.call.center.api.model.CallCenter;
@@ -148,6 +149,9 @@ public class IVRActionService {
     @Autowired
     private VoiceIvrBatchInserter voiceIvrBatchInserter;
 
+    @Autowired
+    private CallbackUrlUtil callbackUrlUtil;
+
     private CloseableHttpAsyncClient client = null;
 
     private ExecutorService worker = null;
@@ -223,7 +227,7 @@ public class IVRActionService {
      * @param url
      * @return
      */
-    public String getFirstIvr(final String call_id,final String url,String from){
+    public String getFirstIvr(final String subaccountId,final String call_id,final String type,final String url,String from,String user_data){
         String res = null;
         boolean success = false;
         int re_times = 0;
@@ -233,8 +237,11 @@ public class IVRActionService {
                 HttpPost post = new HttpPost(url);
                 Map<String,Object> data = new MapBuilder<String,Object>()
                         .putIfNotEmpty("action","ivr_start")
+                        .putIfNotEmpty("subaccount_id",subaccountId)
+                        .putIfNotEmpty("type",type)//ivr_call   ivr_incoming
                         .putIfNotEmpty("call_id",call_id)
                         .putIfNotEmpty("from",from)
+                        .putIfNotEmpty("user_data",user_data)
                         .build();
                 post.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
@@ -243,15 +250,13 @@ public class IVRActionService {
                 Future<HttpResponse> future = client.execute(post,null);
                 HttpResponse response = future.get();
                 if(logger.isDebugEnabled()){
-                    logger.info("url={},status={}"
-                            ,url,response.getStatusLine().getStatusCode());
+                    logger.info("url={},status={},data={}"
+                            ,url,response.getStatusLine().getStatusCode(),JSONUtil2.objectToJson(data));
+                    logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
                 }
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     res = receiveResponse(response);
                     success = true;
-                }
-                if(logger.isDebugEnabled()){
-                    logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
                 }
             }catch (Throwable t){
                 logger.error("调用{}失败,耗时={},error={}",url,(System.currentTimeMillis() - start),t);
@@ -358,15 +363,15 @@ public class IVRActionService {
      * 询问是否接受，然后执行action
      * @return
      */
-    public boolean doActionIfAccept(App app, Tenant tenant,String res_id,
+    public boolean doActionIfAccept(String subaccountId,App app, Tenant tenant,String res_id,
                                     String from, String to,String lineId,boolean iscc){
         String call_id = UUIDGenerator.uuid();
-        saveIvrSessionCall(call_id,app,tenant,res_id,from,to,lineId,iscc);
+        saveIvrSessionCall(subaccountId,call_id,app,tenant,res_id,from,to,lineId,iscc);
         doAction(call_id,null);
         return true;
     }
 
-    private void saveIvrSessionCall(String call_id, App app, Tenant tenant, String res_id, String from, String to, String lineId, boolean iscc){
+    private void saveIvrSessionCall(String subaccountId,String call_id, App app, Tenant tenant, String res_id, String from, String to, String lineId, boolean iscc){
         CallSession callSession = new CallSession();
         callSession.setId(UUIDGenerator.uuid());
         try{
@@ -415,10 +420,11 @@ public class IVRActionService {
         BusinessState state = new BusinessState.Builder()
                 .setTenantId(tenant.getId())
                 .setAppId(app.getId())
+                .setSubaccountId(subaccountId)
                 .setId(call_id)
                 .setResId(res_id)
                 .setType(BusinessState.TYPE_IVR_INCOMING)
-                .setCallBackUrl(app.getUrl())
+                .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
@@ -488,7 +494,7 @@ public class IVRActionService {
         String resXML = null;
         if(nextUrl == null){//第一次
             nextUrl = state.getCallBackUrl();
-            resXML = getFirstIvr(call_id,nextUrl,state.getBusinessData().get("to"));
+            resXML = getFirstIvr(state.getSubaccountId(),call_id,state.getType(),nextUrl,state.getBusinessData().get("to"),state.getUserdata());
         }else{
             resXML = getNextRequest(call_id,nextUrl,businessDate.get(IVR_ACTION_FIELD),prevResults);
         }
@@ -544,6 +550,7 @@ public class IVRActionService {
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","ivr.format_error")
                     .putIfNotEmpty("id",call_id)
+                    .putIfNotEmpty("subaccount_id",state.getSubaccountId())
                     .putIfNotEmpty("user_data",state.getUserdata())
                     .build();
             notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,3);

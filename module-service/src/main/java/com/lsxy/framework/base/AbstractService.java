@@ -296,6 +296,7 @@ public abstract class AbstractService<T extends IdEntity> implements BaseService
         if(excludeDeleted){
             jpql = HqlUtil.addCondition(jpql, "deleted", 0,HqlUtil.LOGIC_AND,HqlUtil.TYPE_NUMBER);
         }
+        jpql = jpql.replaceAll("fetch", "");
         String countJpql = " select count(1) " + HqlUtil.removeOrders(HqlUtil.removeSelect(jpql));
         Query query = this.em.createQuery(countJpql);
         for (int i = 0; i < params.length; i++) {

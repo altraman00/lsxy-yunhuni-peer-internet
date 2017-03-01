@@ -15,7 +15,7 @@ public class ConfSetVoiceModeInputDTO extends CommonDTO{
 
     @JsonProperty("call_id")
     @NotNull
-    @Size(min=32,max=32)
+    @Size(min = 1,max = 128)
     private String callId;
 
     @JsonProperty("voice_mode")

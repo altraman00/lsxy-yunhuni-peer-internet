@@ -450,26 +450,28 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
         Date endTime =  cal.getTime();
         cal.add(Calendar.MONTH, -1);// 月份减1
         Date startTime = cal.getTime();
-        List<Tenant> tenants = tenantService.getListByPage();
-        for(int i=0;i<tenants.size();i++){
-            List<App> apps = appService.getAppsByTenantId(tenants.get(i).getId());
-            for(int j=0;j<apps.size();j++){
-                App app = apps.get(j);
-                if(app == null || !App.PRODUCT_CALL_CENTER.equals(app.getServiceType())){
-                    continue;
-                }
-                long sum =  sumAgentNum(tenants.get(i).getId(),app.getId(),startTime,endTime);
-                BigDecimal cost = calCostService.calCost(ProductCode.call_center_month.name(),tenants.get(i).getId());
-                if(cost != null && cost.compareTo(BigDecimal.ZERO) == 1){
-                    Consume consume = new Consume(new Date(), ConsumeCode.call_center_month.name(),cost.multiply(new BigDecimal(sum)),"应用id["+app.getId()+"]总共有"+sum+"个坐席",app.getId(),tenants.get(i).getId(),null);
-                    consumeService.consume(consume);
+        Iterable<Tenant> tenants = tenantService.list();
+        if(tenants != null){
+            for(Tenant tenant : tenants){
+                List<App> apps = appService.getAppsByTenantId(tenant.getId());
+                for(int j=0;j<apps.size();j++){
+                    App app = apps.get(j);
+                    if(app == null || !App.PRODUCT_CALL_CENTER.equals(app.getServiceType())){
+                        continue;
+                    }
+                    long sum =  sumAgentNum(tenant.getId(),app.getId(),startTime,endTime);
+                    BigDecimal cost = calCostService.calCost(ProductCode.call_center_month.name(),tenant.getId());
+                    BigDecimal sumCost = cost.multiply(new BigDecimal(sum));
+                    if(sumCost != null && sumCost.compareTo(BigDecimal.ZERO) == 1){
+                        Consume consume = new Consume(new Date(), ConsumeCode.call_center_month.name(),sumCost,"应用id["+app.getId()+"]总共有"+sum+"个坐席",app.getId(),tenant.getId(),null);
+                        consumeService.consume(consume);
+                    }
                 }
             }
         }
-
     }
     public long sumAgentNum(String tenantId, String appId, Date startTime, Date endTime) {
-        String sql = " select count(1) from (select DISTINCT channel,name  from db_lsxy_bi_yunhuni.tb_bi_call_center_agent_action_log where tenant_id=? and app_id=? and  action=1 and create_time BETWEEN ? and ? ) a" ;
+        String sql = " select count(1) from (select DISTINCT subaccount_id,name  from db_lsxy_bi_yunhuni.tb_bi_call_center_agent_action_log where tenant_id=? and app_id=? and  action=1 and create_time BETWEEN ? and ? ) a" ;
         return jdbcTemplate.queryForObject(sql,Long.class,tenantId,appId,startTime,endTime);
     }
 

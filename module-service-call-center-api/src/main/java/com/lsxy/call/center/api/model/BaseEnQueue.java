@@ -7,7 +7,7 @@ import java.io.Serializable;
  */
 public class BaseEnQueue implements Serializable{
 
-    private String channel;
+    private String subaccountId;
 
     private Integer conversation_level;
 
@@ -35,14 +35,14 @@ public class BaseEnQueue implements Serializable{
 
     private String post_num_voice;
 
-    private String data;
+    private String user_data;
 
-    public String getChannel() {
-        return channel;
+    public String getSubaccountId() {
+        return subaccountId;
     }
 
-    public void setChannel(String channel) {
-        this.channel = channel;
+    public void setSubaccountId(String subaccountId) {
+        this.subaccountId = subaccountId;
     }
 
     public Integer getConversation_level() {
@@ -149,11 +149,11 @@ public class BaseEnQueue implements Serializable{
         this.post_num_voice = post_num_voice;
     }
 
-    public String getData() {
-        return data;
+    public String getUser_data() {
+        return user_data;
     }
 
-    public void setData(String data) {
-        this.data = data;
+    public void setUser_data(String user_data) {
+        this.user_data = user_data;
     }
 }

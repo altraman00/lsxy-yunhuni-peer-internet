@@ -75,7 +75,7 @@ public class Handler_EVENT_SYS_CONF_ON_RECORD_COMPLETED extends EventHandler {
         }
 
         try{
-            mqService.publish(new RecordCompletedEvent(state.getTenantId(),state.getAppId(),state.getAreaId(),state.getId(),
+            mqService.publish(new RecordCompletedEvent(state.getTenantId(),state.getAppId(),state.getSubaccountId(),state.getAreaId(),state.getId(),
                     ProductCode.changeApiCmdToProductCode(state.getType()).name(),(String)params.get("record_file"),
                     Long.parseLong((String)params.get("begin_time")),Long.parseLong((String)params.get("end_time"))
             ));
@@ -115,6 +115,7 @@ public class Handler_EVENT_SYS_CONF_ON_RECORD_COMPLETED extends EventHandler {
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","conf.record_end")
                     .putIfNotEmpty("id",conf_id)
+                    .putIfNotEmpty("subaccount_id",state.getSubaccountId())
                     .putIfNotEmpty("begin_time",begin_time)
                     .putIfNotEmpty("end_time",end_time)
                     .putIfNotEmpty("user_data",user_data)
