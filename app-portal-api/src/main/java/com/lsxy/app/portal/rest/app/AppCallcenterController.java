@@ -3,6 +3,7 @@ package com.lsxy.app.portal.rest.app;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
@@ -39,18 +40,30 @@ public class AppCallcenterController extends AbstractRestController {
     @RequestMapping(value = "/{appId}/agent/page",method = RequestMethod.GET)
     public RestResponse page(HttpServletRequest request, @PathVariable String appId,
                              @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
-                             @RequestParam(defaultValue = "20",required = false)  Integer pageSize) throws YunhuniApiException {
-        Page page  = callCenterAgentService.getPageForPotal(appId,pageNo,pageSize);
+                             @RequestParam(defaultValue = "20",required = false)  Integer pageSize,String agentNum,String subId) throws YunhuniApiException {
+        Page page  = callCenterAgentService.getPageForPotal(appId,pageNo,pageSize,agentNum,subId);
         return RestResponse.success(page);
     }
+
+    @RequestMapping(value = "/{appId}/agent/delete/{agentId}",method = RequestMethod.GET)
+    public RestResponse agentDelete(HttpServletRequest request, @PathVariable String appId,@PathVariable String agentId) throws YunhuniApiException {
+        CallCenterAgent callCenterAgent = callCenterAgentService.findById(agentId);
+        if(callCenterAgent!= null && appId.equals( callCenterAgent.getAppId() )){
+            //String tenantId, String appId,String subaccountId, String agentName, boolean force 强制注销
+            callCenterAgentService.logout(callCenterAgent.getTenantId(), appId, callCenterAgent.getSubaccountId(),callCenterAgent.getName(),true);
+            return RestResponse.success("删除成功");
+        }else{
+            return RestResponse.failed("","坐席不存在或者不属于该应用");
+        }
+    }
     @RequestMapping(value = "/{appId}/app_extension/delete/{extensionId}",method = RequestMethod.GET)
-    public RestResponse page(HttpServletRequest request, @PathVariable String appId,@PathVariable String extensionId) throws YunhuniApiException {
+    public RestResponse extensionDelete(HttpServletRequest request, @PathVariable String appId,@PathVariable String extensionId) throws YunhuniApiException {
         AppExtension appExtension = appExtensionService.findById(extensionId);
         if(appExtension!= null && appId.equals( appExtension.getAppId() )){
             appExtensionService.delete(extensionId, appId, appExtension.getSubaccountId());
             return RestResponse.success("删除成功");
         }else{
-            return RestResponse.failed("","子账号不存在或者不属于该应用");
+            return RestResponse.failed("","分机不存在或者不属于该应用");
         }
     }
     @RequestMapping(value = "/{appId}/app_extension/new",method = RequestMethod.GET)

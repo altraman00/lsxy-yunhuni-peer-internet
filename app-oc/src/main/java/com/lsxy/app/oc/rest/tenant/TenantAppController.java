@@ -286,7 +286,7 @@ public class TenantAppController {
     public RestResponse<Page<AgentVO>> page(HttpServletRequest request, @PathVariable String appId,
                                    @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
                                    @RequestParam(defaultValue = "20",required = false)  Integer pageSize) throws YunhuniApiException {
-        Page page  = callCenterAgentService.getPageForPotal(appId,pageNo,pageSize);
+        Page page  = callCenterAgentService.getPageForPotal(appId,pageNo,pageSize,null,null);
         List<AgentVO> agentVOs = new ArrayList<>();
         List<CallCenterAgent> result = page.getResult();
         result.stream().forEach(agent -> agentVOs.add(AgentVO.changeCallCenterAgentToAgentVO(agent)));

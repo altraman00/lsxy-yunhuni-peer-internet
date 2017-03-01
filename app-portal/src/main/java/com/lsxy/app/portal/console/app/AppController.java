@@ -255,9 +255,17 @@ public class AppController extends AbstractPortalController {
         }
         return response;
     }
+    @RequestMapping(value = "/{appId}/agent/delete/{agentId}")
+    @ResponseBody
+    public RestResponse agentDelete(HttpServletRequest request, @PathVariable String appId,@PathVariable String agentId) throws YunhuniApiException {
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/callcenter/{1}/agent/delete/{2}";
+        RestResponse response = RestRequest.buildSecurityRequest(token).get(uri, String.class,appId,agentId);
+        return response;
+    }
     @RequestMapping(value = "/{appId}/app_extension/delete/{extensionId}")
     @ResponseBody
-    public RestResponse listExtensions(HttpServletRequest request, @PathVariable String appId,String extensionId) throws YunhuniApiException {
+    public RestResponse dxtensionDelete(HttpServletRequest request, @PathVariable String appId,@PathVariable String extensionId) throws YunhuniApiException {
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/callcenter/{1}/app_extension/delete/{2}";
         RestResponse response = RestRequest.buildSecurityRequest(token).get(uri, String.class,appId,extensionId);
@@ -265,7 +273,7 @@ public class AppController extends AbstractPortalController {
     }
     @RequestMapping(value = "/{appId}/app_extension/new")
     @ResponseBody
-    public RestResponse listExtensions(HttpServletRequest request, @PathVariable String appId,String subId,String user,String password) throws YunhuniApiException {
+    public RestResponse extensionNew(HttpServletRequest request, @PathVariable String appId,String subId,String user,String password) throws YunhuniApiException {
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/callcenter/{1}/app_extension/new?subId={2}&user={3}&password={4}";
         RestResponse response = RestRequest.buildSecurityRequest(token).get(uri, String.class,appId,subId,user,password);
@@ -275,10 +283,10 @@ public class AppController extends AbstractPortalController {
     @ResponseBody
     public RestResponse page(HttpServletRequest request, @PathVariable String appId,
                              @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
-                             @RequestParam(defaultValue = "20",required = false)  Integer pageSize) throws YunhuniApiException {
+                             @RequestParam(defaultValue = "20",required = false)  Integer pageSize,String agentNum,String subId) throws YunhuniApiException {
         String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/callcenter/{1}/agent/page?pageNo={2}&pageSize={3}";
-        RestResponse<Page<CallCenterAgent>> response = RestRequest.buildSecurityRequest(token).getPage(uri, CallCenterAgent.class, appId,pageNo,pageSize);
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/callcenter/{1}/agent/page?pageNo={2}&pageSize={3}&agentNum={4}&subId={5}";
+        RestResponse<Page<CallCenterAgent>> response = RestRequest.buildSecurityRequest(token).getPage(uri, CallCenterAgent.class, appId,pageNo,pageSize,agentNum,subId);
         if(response.isSuccess()){
             Page page = response.getData();
             if(page != null){

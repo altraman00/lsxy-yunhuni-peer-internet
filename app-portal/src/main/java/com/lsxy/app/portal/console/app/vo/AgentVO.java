@@ -10,6 +10,7 @@ import java.util.List;
  * Created by liups on 2016/11/18.
  */
 public class AgentVO {
+    private String id;
     private String name;
     private String subaccountId;
     private String num;
@@ -20,11 +21,12 @@ public class AgentVO {
     public AgentVO() {
     }
 
-    public AgentVO(String name, String subaccountId, String num, String state, String extension, List skills) {
+    public AgentVO(String id,String name, String subaccountId, String num, String state, String extension, List skills) {
+        this.id = id;
         this.name = name;
         this.subaccountId = subaccountId;
         this.num = num;
-        this.state = CallCenterAgent.getChineseState(state) ;
+        this.state = state!=null?CallCenterAgent.getChineseState(state):"未知" ;
         this.extension = extension;
         this.skills = skills;
     }
@@ -39,7 +41,7 @@ public class AgentVO {
                 skillVos.add(skillVO);
             }
         }
-        return new AgentVO(agent.getName(),agent.getSubaccountId(),agent.getNum(),agent.getState(),agent.getExtension(),skillVos);
+        return new AgentVO(agent.getId(),agent.getName(),agent.getSubaccountId(),agent.getNum(),agent.getState(),agent.getExtension(),skillVos);
     }
 
     public String getName() {

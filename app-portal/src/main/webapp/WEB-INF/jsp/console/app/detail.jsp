@@ -409,14 +409,25 @@
                                     <!--分机列表end-->
                                     <!--坐席列表-->
                                     <div class="tab-pane fade" id="agent">
-
+                                        <div class="form-group">
+                                            <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="坐席名称（ID）" id="agent_num" /></div>
+                                            <div class="col-md-3 remove-padding" style="padding-left:15px;">
+                                                <select id="agent_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号"  >
+                                                </select>
+                                                <%--<input type="text" class="form-control " placeholder="子账号鉴权账号" id="subId"/>--%></div>
+                                            <div class="col-md-2">
+                                                <button class="btn btn-primary" type="button" onclick="agentList()">查询</button>
+                                            </div>
+                                        </div>
                                         <table class="table table-striped cost-table-history tablelist" id="agent-table">
                                             <thead>
                                             <tr>
                                                 <th class="text-center">坐席名称（ID）</th>
                                                 <th class="text-center">技能组</th>
                                                 <th class="text-center">绑定分机</th>
+                                                <th class="text-center">关联子账号</th>
                                                 <th class="text-center">状态</th>
+                                                <th class="text-center">操作</th>
                                             </tr>
                                             </thead>
                                             <tbody id="agent-list">
@@ -1380,6 +1391,35 @@
             }
         });
     }
+    function delAgent(id){
+        bootbox.setLocale("zh_CN");
+        bootbox.confirm("确认删除坐席", function(result) {
+            if(result){
+                ajaxsync(ctx + "/console/app/"+appId+"/agent/delete/"+id,{csrfParameterName:csrfToken},function(response){
+                    if(response.success){
+                        showtoast("删除成功");
+                        if(extensionPage){
+                            var currentPage;
+                            if(((agentPage.nowPage - 1) * agentPage.listRow +1) <= --agentPage.count){
+                                currentPage = agentPage.nowPage;
+                            }else {
+                                currentPage = agentPage.nowPage - 1;
+                            }
+                            if(currentPage>0){
+                                $('#page' + currentPage + agentPage.obj).click();
+                            }else{
+                                $('#extension-'+id).remove();
+                                $('#page0'+agentPage.obj).hide();
+                            }
+                        }
+                    }else{
+                        showtoast("删除失败");
+                    }
+                },"post");
+
+            }
+        });
+    }
     function delExtension(id){
         bootbox.setLocale("zh_CN");
         bootbox.confirm("确认删除分机", function(result) {
@@ -1388,7 +1428,6 @@
                     if(response.success){
                         showtoast("删除成功");
                         if(extensionPage){
-                            console.info("进入-成功");
                             var currentPage;
                             if(((extensionPage.nowPage - 1) * extensionPage.listRow +1) <= --extensionPage.count){
                                 currentPage = extensionPage.nowPage;
@@ -1399,9 +1438,9 @@
                                 $('#page' + currentPage + extensionPage.obj).click();
                             }else{
                                 $('#extension-'+id).remove();
+                                $('#page0'+subAccountPage.obj).hide();
                             }
                         }
-                        console.info("进入-结束")
                     }else{
                         showtoast("删除失败");
                     }
@@ -1420,9 +1459,7 @@
                 ajaxsync(ctx + "/console/sub_account/delete/"+id,{csrfParameterName:csrfToken},function(response){
                     if(response.success){
                         showtoast("删除成功");
-                        console.info("进入")
                         if(subAccountPage){
-                            console.info("进入-成功");
                             var currentPage;
                             if(((subAccountPage.nowPage - 1) * subAccountPage.listRow +1) <= --subAccountPage.count){
                                 currentPage = subAccountPage.nowPage;
@@ -2152,7 +2189,9 @@
         $('#uploadButton').hide();
         //获取数据总数
         var count = 0;
-        var params = {"pageNo":1,"pageSize":10};
+        var agentNum = $('#agent_num').val();
+        var subId = $('#agent_subId option:selected') .val();
+        var params = {"pageNo":1,"pageSize":10,"agentNum":agentNum,"subId":subId};
         ajaxsync(ctx + "/console/app/" + appId + "/agent/page" ,params,function(response) {
             if(response.success){
                 count = response.data.totalCount;
@@ -2262,7 +2301,10 @@
     var agentTable = function(nowPage,listRows){
         var html = '';
         var data = [];
-        ajaxsync(ctx + "/console/app/" + appId + "/agent/page" ,{pageNo:nowPage,pageSize:listRows},function(response){
+        var agentNum = $('#agent_num').val();
+        var subId = $('#agent_subId option:selected') .val();
+        var params = {"pageNo":nowPage,"pageSize":listRows,"agentNum":agentNum,"subId":subId};
+        ajaxsync(ctx + "/console/app/" + appId + "/agent/page" ,params,function(response){
             if(response.success){
                 data = response.data.result;
             }else{
@@ -2287,7 +2329,9 @@
                     '<td class="text-center">'+ data[i].name +'</td>' +
                     '<td class="text-center">'+ skillStr +'</td>' +
                     '<td class="text-center">'+ data[i].extension +'</td>' +
+                     '<td class="text-center">'+ data[i].subaccountId +'</td>' +
                     '<td class="text-center">' + data[i].state + '</td>' +
+                    '<td class="text-center"><a href="javascript:delAgent(\''+data[i].id+'\')" >删除</a></td>' +
                     '</tr>'
         }
         $('#agent-list').html(html);
