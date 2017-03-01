@@ -216,6 +216,11 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
     }
 
     @Override
+    public List<ApiCertificateSubAccount> findByAppId(String appId) {
+        return apiCertificateSubAccountDao.findByAppId(appId);
+    }
+
+    @Override
     public boolean subaccountCheck(String sub1,String sub2){
         if(sub1 == null && sub2 == null){
             return true;
