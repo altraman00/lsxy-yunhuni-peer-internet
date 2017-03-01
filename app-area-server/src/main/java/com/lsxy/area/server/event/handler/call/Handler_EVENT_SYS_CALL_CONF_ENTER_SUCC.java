@@ -264,10 +264,10 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
                 .build();
         try {
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD, params);
-            rpcCaller.invoke(sessionContext, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest,true);
             businessStateService.deleteInnerField(conf_id,"recording");
         } catch (Exception e) {
-            logger.error("会议创建自动录音：",e);
+            logger.error(String.format("会议创建自动录音失败，appId=%s,call_id=%s",state.getAppId(),state.getId()),e);
         }
     }
 }

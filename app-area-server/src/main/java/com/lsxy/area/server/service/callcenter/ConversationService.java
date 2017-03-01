@@ -131,7 +131,7 @@ public class ConversationService {
                 enqueue = JSONUtil2.fromJson(ccQueue.getEnqueue(),BaseEnQueue.class);
             }
         }catch (Throwable t){
-            logger.error("获取排队信息失败 ",t);
+            logger.error(String.format("获取排队信息失败,queueId=%s",queueId),t);
         }
         return enqueue;
     }
@@ -265,7 +265,7 @@ public class ConversationService {
             conversation.setStartTime(new Date());
             callCenterConversationBatchInserter.put(conversation);
         }catch (Throwable t){
-            logger.error("保存CallCenterConversation失败",t);
+            logger.error(String.format("保存CallCenterConversation失败，appId=%s,id=%s",appId,id),t);
         }
         return id;
     }
@@ -778,7 +778,7 @@ public class ConversationService {
         try {
             rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Exception e) {
-            logger.error("启动交谈录音失败",e);
+            logger.error(String.format("启动交谈录音失败,conversationId=%s",state.getId()),e);
         }
     }
 
@@ -898,7 +898,7 @@ public class ConversationService {
         try{
             mqService.publish(new ConversationMemberExitEvent(conversationId,callId));
         }catch (Throwable t){
-            logger.error("设置交谈成员的结束时间失败",t);
+            logger.error(String.format("设置交谈成员的结束时间失败,conversationId=%s,callid=%s",conversationId,callId),t);
         }
         //交谈成员递减
         this.decrPart(conversationId,callId);
@@ -912,7 +912,7 @@ public class ConversationService {
                     String holdvoice = conversation_state.getBusinessData().get(CallCenterUtil.HOLD_VOICE_FIELD);
                     try {
                         holdvoice = playFileUtil.convert(conversation_state.getTenantId(),conversation_state.getAppId(),holdvoice);
-                    } catch (Throwable e) {
+                    } catch (YunhuniApiException e) {
                         logger.error("调用失败",e);
                     }
                     if(StringUtil.isNotBlank(holdvoice)){
@@ -927,7 +927,7 @@ public class ConversationService {
                         try {
                             rpcCaller.invoke(sessionContext, rpcrequest,true);
                         } catch (Throwable t) {
-                            logger.error("调用失败",t);
+                            logger.error(String.format("调用交谈放音失败,conversationId=%s",conversationId),t);
                         }
                     }
                 }
@@ -1058,7 +1058,7 @@ public class ConversationService {
                 rpcCaller.invoke(sessionContext, rpcrequest, true);
             }
         } catch (Throwable e) {
-            logger.error("调用失败",e);
+            logger.error(String.format("调用挂断失败,callid=%s",call_id),e);
         }
     }
 
@@ -1069,7 +1069,7 @@ public class ConversationService {
         try {
             boolean isPlayWait = this.isPlayWait(state);
             if(logger.isDebugEnabled()){
-                logger.info("停止播放排队录音isPlayWait={}",isPlayWait);
+                logger.info("停止播放排队录音appId={},conversationId={},isPlayWait={}",state.getAppId(),state.getId(),isPlayWait);
             }
             if(isPlayWait){
                 Map<String, Object> params = new MapBuilder<String,Object>()
@@ -1083,7 +1083,7 @@ public class ConversationService {
                 }
             }
         } catch (Throwable e) {
-            logger.error("调用失败",e);
+            logger.error(String.format("停止播放排队录音失败,conversationId=%s",state.getId()),e);
         }
     }
 
@@ -1101,7 +1101,7 @@ public class ConversationService {
         try {
             rpcCaller.invoke(sessionContext, rpcrequest, true);
         } catch (Throwable e) {
-            logger.error("调用失败",e);
+            logger.error(String.format("交谈停止放音失败,conversationId=%s",conversation_id),e);
         }
     }
 
@@ -1197,7 +1197,7 @@ public class ConversationService {
         try{
             results = redisCacheService.zRange(key,0,-1);
         }catch (Throwable t){
-            logger.error("获取交谈成员失败",t);
+            logger.error(String.format("获取交谈成员失败,conversationId=%s",conversationId),t);
         }
         return results;
     }
@@ -1211,12 +1211,12 @@ public class ConversationService {
         try{
             results = redisCacheService.zRange(key,0,-1);
         }catch (Throwable t){
-            logger.error("获取交谈成员失败",t);
+            logger.error(String.format("获取交谈成员失败,conversationId=%s",conversationId),t);
         }
         try{
             redisCacheService.del(key);
         }catch (Throwable t){
-            logger.info("删除交谈成员缓存失败",t);
+            logger.error(String.format("删除交谈成员缓存失败,conversationId=%s",conversationId),t);
         }
         return results;
     }

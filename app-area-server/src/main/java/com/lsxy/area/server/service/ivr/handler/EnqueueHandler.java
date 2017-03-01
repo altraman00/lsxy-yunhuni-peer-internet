@@ -93,7 +93,7 @@ public class EnqueueHandler extends ActionHandler{
                     }
                     businessStateService.updateInnerField(callId, CallCenterUtil.PLAYWAIT_FIELD,playWait);
                 } catch (Throwable e) {
-                    logger.error("调用失败",e);
+                    logger.error("调用播放排队等待音失败",e);
                 }
             }
         }

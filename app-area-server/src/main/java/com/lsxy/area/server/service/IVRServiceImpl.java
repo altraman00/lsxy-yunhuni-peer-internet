@@ -176,7 +176,7 @@ public class IVRServiceImpl implements IVRService {
                 callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(tenantId,app.getId(),
                         new Date()).setCallOut(1L).build());
             }catch (Throwable t){
-                logger.error("incrIntoRedis失败",t);
+                logger.error(String.format("incrIntoRedis失败,appId=%s",app.getId()),t);
             }
         }else{
             VoiceIvr voiceIvr = new VoiceIvr();

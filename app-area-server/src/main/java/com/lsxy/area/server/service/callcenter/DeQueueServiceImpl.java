@@ -168,7 +168,7 @@ public class DeQueueServiceImpl implements DeQueueService {
                                 .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD)))/1000)
                         .build());
             }catch (Throwable t){
-                logger.error("incrIntoRedis失败",t);
+                logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
             }
         }
 
@@ -200,7 +200,7 @@ public class DeQueueServiceImpl implements DeQueueService {
                                     .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD))) / 1000)
                             .build());
                 } catch (Throwable t) {
-                    logger.error("incrIntoRedis失败", t);
+                    logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
                 }
             }
             updateQueue(queueId,callId,null,null,null,CallCenterQueue.RESULT_FAIL);
@@ -256,7 +256,7 @@ public class DeQueueServiceImpl implements DeQueueService {
                                     .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD)))/1000)
                             .build());
                 }catch (Throwable t){
-                    logger.error("incrIntoRedis失败",t);
+                    logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
                 }
             }
             updateQueue(queueId,callId,null,null,null,CallCenterQueue.RESULT_FAIL);
@@ -333,7 +333,7 @@ public class DeQueueServiceImpl implements DeQueueService {
             updateCallCenterQueue.setResult(result);
             callCenterQueueService.update(id,updateCallCenterQueue);
         }catch (Throwable t){
-            logger.error("更新排队记录失败",t);
+            logger.error(String.format("更新排队记录失败,queueId=%s",id),t);
         }
     }
 

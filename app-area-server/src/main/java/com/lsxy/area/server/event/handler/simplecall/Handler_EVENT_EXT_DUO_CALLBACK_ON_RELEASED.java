@@ -113,7 +113,7 @@ public class Handler_EVENT_EXT_DUO_CALLBACK_ON_RELEASED extends EventHandler {
         }
         String callBackUrl = state.getCallBackUrl();
         if(StringUtils.isBlank(callBackUrl)){
-            logger.info("回调地址callBackUrl为空");
+            logger.info("回调地址callBackUrl为空,appId={}",state.getAppId());
             return res;
         }
         //开始通知开发者

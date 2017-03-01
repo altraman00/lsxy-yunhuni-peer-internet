@@ -142,7 +142,7 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
             }
             try {
                 conversationService.join(conversationId,call_id,null,null,null);
-            } catch (Throwable e) {
+            } catch (YunhuniApiException e) {
                 logger.error("将呼叫加入到会议失败",e);
                 conversationService.logicExit(conversationId,call_id);
             }

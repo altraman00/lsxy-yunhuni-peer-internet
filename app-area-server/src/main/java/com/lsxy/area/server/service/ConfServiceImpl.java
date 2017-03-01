@@ -694,7 +694,11 @@ public class ConfServiceImpl implements ConfService {
         }
 
         if(!conf_state.getAppId().equals(appId)){
-            throw new IllegalArgumentException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,conf_state.getSubaccountId())){
@@ -778,7 +782,11 @@ public class ConfServiceImpl implements ConfService {
         }
 
         if(!conf_state.getAppId().equals(appId)){
-            throw new IllegalArgumentException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,conf_state.getSubaccountId())){
@@ -862,7 +870,11 @@ public class ConfServiceImpl implements ConfService {
         }
 
         if(!conf_state.getAppId().equals(appId)){
-            throw new IllegalArgumentException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,conf_state.getSubaccountId())){
@@ -954,7 +966,11 @@ public class ConfServiceImpl implements ConfService {
         }
 
         if(!conf_state.getAppId().equals(appId)){
-            throw new IllegalArgumentException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,conf_state.getSubaccountId())){
@@ -1251,7 +1267,7 @@ public class ConfServiceImpl implements ConfService {
         try{
             results = redisCacheService.smembers(key);
         }catch (Throwable t){
-            logger.error("获取会议成员失败",t);
+            logger.error(String.format("获取会议成员失败,confId=%s",confId),t);
         }
         return results;
     }
@@ -1266,12 +1282,12 @@ public class ConfServiceImpl implements ConfService {
         try{
             results = redisCacheService.smembers(key);
         }catch (Throwable t){
-            logger.error("获取会议成员失败",t);
+            logger.error(String.format("获取会议成员失败,confId=%s",confId),t);
         }
         try{
             redisCacheService.del(key);
         }catch (Throwable t){
-            logger.info("删除会议成员缓存失败",t);
+            logger.error(String.format("删除会议成员缓存失败,confId=%s",confId),t);
         }
         return results;
     }

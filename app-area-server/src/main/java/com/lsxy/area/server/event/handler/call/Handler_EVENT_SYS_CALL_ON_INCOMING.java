@@ -123,39 +123,39 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             //被叫是公共测试号,根据主叫号查出应用
             TestNumBind testNumBind = testNumBindService.findByNumber(from);
             if(testNumBind == null){
-                logger.error("公共测试号={}找不到对应的app，from={}",testNum,from);
+                logger.info("公共测试号={}找不到对应的app，from={}",testNum,from);
                 return res;
             }
             tenant = testNumBind.getTenant();
             app = testNumBind.getApp();
             //已上线的应用不允许呼叫测试号码
             if(app != null && app.getStatus() != null && app.getStatus() == App.STATUS_ONLINE){
-                logger.error("已上线应用不允许呼叫测试号码");
+                logger.info("已上线应用不允许呼叫测试号码,appId={}",app.getId());
                 return res;
             }
         }else{
             subaccountId = to.getSubaccountId(); //根据号码找到对应的子账号(如果是子账号的号码)
             //不是公共测试号，从号码资源池中查出被叫号码的应用
             if(StringUtils.isBlank(to.getAppId())){
-                logger.error("呼入号码没有绑定应用：{}",params);
+                logger.info("呼入号码没有绑定应用：{}",params);
             }
             app = appService.findById(to.getAppId());
             if(app == null){
-                logger.error("号码资源池中找不到被叫号码对应的应用：{}",params);
+                logger.info("号码资源池中找不到被叫号码对应的应用：{}",params);
                 return res;
             }
             tenant = app.getTenant();
-            if(app!= null && app.getStatus() == null || app.getStatus() == App.STATUS_OFFLINE){
-                logger.error("应用未上线");
+            if(app.getStatus() == null || app.getStatus() == App.STATUS_OFFLINE){
+                logger.info("应用未上线appId={}",app.getId());
                 return res;
             }
         }
         if(tenant == null){
-            logger.error("找不到对应的租户:{}",params);
+            logger.info("找不到对应的租户:{}",params);
             return res;
         }
         if(app == null){
-            logger.error("找不到对应的APP:{}", params);
+            logger.info("找不到对应的APP:{}", params);
             return res;
         }
         boolean isCallCenter = false;

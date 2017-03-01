@@ -430,7 +430,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                         callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(app.getTenant().getId(),app.getId(),
                                 new Date()).setCallOut(1L).build());
                     }catch (Throwable t){
-                        logger.error("incrIntoRedis失败",t);
+                        logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
                     }
                     callCenterUtil.agentStateChangedEvent(subaccountId,callbackUrlUtil.get(app,subaccountId),agent,name,
                             CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,userData);
@@ -663,7 +663,13 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             mode = CallCenterConversationMember.MODE_DEFAULT;
         }
         if(!ArrayUtils.contains(CallCenterConversationMember.MODE_ARRAY,mode)){
-            throw new RequestIllegalArgumentException();
+            throw new RequestIllegalArgumentException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("agentName",name)
+                            .put("conversationId",conversationId)
+                            .put("voice",mode)
+            );
         }
         App app = appService.findById(appId);
         if(app == null){
@@ -683,15 +689,27 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             }
         }
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
-            throw new AppServiceInvalidException();
+            throw new AppServiceInvalidException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
         String agentId = callCenterAgentService.getId(appId,subaccountId,name);
         if(agentId == null){
-            throw new AgentNotExistException();
+            throw new AgentNotExistException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("agentName",name)
+            );
         }
         String callId = agentIdCallReference.get(agentId);
         if(callId == null){
-            throw new CallNotExistsException();
+            throw new CallNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("agentName",name)
+                            .put("agentId",agentId)
+            );
         }
         return conversationService.setVoiceMode(conversationId,callId,mode);
     }

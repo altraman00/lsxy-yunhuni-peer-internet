@@ -202,7 +202,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(state.getTenantId(),state.getAppId(),
                                 new Date()).setCallOutSuccess(1L).build());
                     }catch (Throwable t){
-                        logger.warn("incrIntoRedis失败",t);
+                        logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
                     }
                 }
                 ivrActionService.doAction(call_id,null);
@@ -438,7 +438,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                     .setToManualSuccess(1L)
                                     .build());
                         }catch (Throwable t){
-                            logger.warn("incrIntoRedis失败",t);
+                            logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
                         }
                         if((conversationState.getClosed()== null || !conversationState.getClosed())){
                             //交谈开始事件
@@ -562,7 +562,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                 .setCallOutSuccess(1L)
                                 .build());
                     }catch (Throwable t){
-                        logger.warn("incrIntoRedis失败",t);
+                        logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
                     }
                     //交谈开始事件
                     callCenterUtil.conversationBeginEvent(state.getSubaccountId(),state.getCallBackUrl(),conversationId,
