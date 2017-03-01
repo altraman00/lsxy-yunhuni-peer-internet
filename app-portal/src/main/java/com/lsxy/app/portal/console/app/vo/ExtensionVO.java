@@ -1,6 +1,7 @@
 package com.lsxy.app.portal.console.app.vo;
 
 import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
 
 /**
  * Created by liups on 2016/11/18.
@@ -13,12 +14,13 @@ public class ExtensionVO {
     private String ipaddr;  //SIP 网关IP地址与端口，默认5060，仅用于 type==2的情况
     private String telnum;//    telenum              varchar(32) comment '如果是电话分机，该属性记录电话号码（保留，不用）',
     private String subaccountId;
+    private String certId;
     private Boolean enable; //分机是否可用（不存到数据库）;
 
     public ExtensionVO() {
     }
 
-    public ExtensionVO(String id, String type, String user, String password, String ipaddr, String telnum,Boolean enable,String subaccountId) {
+    public ExtensionVO(String id, String type, String user, String password, String ipaddr, String telnum,Boolean enable,String subaccountId,String certId) {
         this.id = id;
         this.type = type;
         this.user = user;
@@ -27,10 +29,20 @@ public class ExtensionVO {
         this.telnum = telnum;
         this.enable = enable;
         this.subaccountId = subaccountId;
+        this.certId = certId;
     }
 
-    public static ExtensionVO changeAppExtensionToExtensionVO(AppExtension ext){
-        return new ExtensionVO(ext.getId(),ext.getType(),ext.getUser(),ext.getPassword(),ext.getIpaddr(),ext.getTelnum(),ext.getEnable(),ext.getSubaccountId());
+    public static ExtensionVO changeAppExtensionToExtensionVO(AppExtension ext, ApiCertificateSubAccount apiCertificateSubAccount){
+        String certId = apiCertificateSubAccount!=null ? apiCertificateSubAccount.getCertId() :"";
+        return new ExtensionVO(ext.getId(),ext.getType(),ext.getUser(),ext.getPassword(),ext.getIpaddr(),ext.getTelnum(),ext.getEnable(),ext.getSubaccountId(),certId);
+    }
+
+    public String getCertId() {
+        return certId;
+    }
+
+    public void setCertId(String certId) {
+        this.certId = certId;
     }
 
     public String getSubaccountId() {

@@ -105,6 +105,15 @@ public abstract class AbstractPortalController {
         String uri = PortalConstants.REST_PREFIX_URL + "/rest/sub_account/list?appId={1}";
         return RestRequest.buildSecurityRequest(token).getList(uri, ApiCertificateSubAccount.class,appId);
     }
+    public Map<String,ApiCertificateSubAccount> getMapSubAccountList(HttpServletRequest request,String appId){
+        RestResponse<List<ApiCertificateSubAccount>> restResponse = getSubAccountList(request,appId);
+        List<ApiCertificateSubAccount> list =  restResponse.getData();
+        Map<String ,ApiCertificateSubAccount> map = new HashMap<>();
+        for (int i = 0; i < list.size(); i++) {
+            map.put(list.get(i).getId(),list.get(i));
+        }
+        return map;
+    }
     /**
      * 获取单个应用
      * @param request

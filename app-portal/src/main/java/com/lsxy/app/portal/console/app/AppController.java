@@ -4,14 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.app.portal.console.app.vo.AgentVO;
+import com.lsxy.app.portal.console.app.vo.ConditionVo;
 import com.lsxy.app.portal.console.app.vo.ExtensionVO;
 import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.call.center.api.model.CallCenterAgent;
+import com.lsxy.call.center.api.model.Condition;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import org.slf4j.Logger;
@@ -247,8 +251,9 @@ public class AppController extends AbstractPortalController {
             if(page != null){
                 List<ExtensionVO> returnResult = new ArrayList<>();
                 List<AppExtension> result = page.getResult();
+                Map<String,ApiCertificateSubAccount> map = getMapSubAccountList(request,appId);
                 if(result != null){
-                    result.stream().forEach(extension -> returnResult.add(ExtensionVO.changeAppExtensionToExtensionVO(extension)));
+                    result.stream().forEach(extension -> returnResult.add(ExtensionVO.changeAppExtensionToExtensionVO(extension,map.get(extension.getSubaccountId()))));
                     page.setResult(returnResult);
                 }
             }
@@ -281,7 +286,7 @@ public class AppController extends AbstractPortalController {
     }
     @RequestMapping(value = "/{appId}/agent/page",method = RequestMethod.GET)
     @ResponseBody
-    public RestResponse page(HttpServletRequest request, @PathVariable String appId,
+    public RestResponse agentpage(HttpServletRequest request, @PathVariable String appId,
                              @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
                              @RequestParam(defaultValue = "20",required = false)  Integer pageSize,String agentNum,String subId) throws YunhuniApiException {
         String token = getSecurityToken(request);
@@ -292,13 +297,35 @@ public class AppController extends AbstractPortalController {
             if(page != null){
                 List<AgentVO> returnResult = new ArrayList<>();
                 List<CallCenterAgent> result = page.getResult();
+                Map<String,ApiCertificateSubAccount> map = getMapSubAccountList(request,appId);
                 if(result != null){
-                    result.stream().forEach(agent -> returnResult.add(AgentVO.changeCallCenterAgentToAgentVO(agent)));
+                    result.stream().forEach(agent -> returnResult.add(AgentVO.changeCallCenterAgentToAgentVO(agent,map.get(agent.getSubaccountId()))));
                     page.setResult(returnResult);
                 }
             }
         }
         return response;
     }
-
+    @RequestMapping(value = "/{appId}/queue/page",method = RequestMethod.GET)
+    @ResponseBody
+    public RestResponse queuepage(HttpServletRequest request, @PathVariable String appId,
+                             @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
+                             @RequestParam(defaultValue = "20",required = false)  Integer pageSize,String queueNum,String subId) throws YunhuniApiException {
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/callcenter/{1}/queue/page?pageNo={2}&pageSize={3}&queueNum={4}&subId={5}";
+        RestResponse<Page<Condition>> response = RestRequest.buildSecurityRequest(token).getPage(uri, Condition.class, appId,pageNo,pageSize,queueNum,subId);
+        if(response.isSuccess()){
+            Page<Condition> page = response.getData();
+            if(page != null){
+                List<ConditionVo> returnResult = new ArrayList<>();
+                List<Condition> result = page.getResult();
+                Map<String,ApiCertificateSubAccount> map = getMapSubAccountList(request,appId);
+                if(result != null){
+                    result.stream().forEach(condition -> returnResult.add(ConditionVo.changeConditionToConditionVO( condition,map.get(condition.getSubaccountId()))));
+                    page.setResult(returnResult);
+                }
+            }
+        }
+        return response;
+    }
 }

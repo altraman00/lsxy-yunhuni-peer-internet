@@ -236,7 +236,12 @@
                                 <!--新的应用详情结束-->
                             <section class="panel panel-default pos-rlt clearfix application-tab">
                                 <ul id="myTab" class="nav nav-tabs">
-                                    <li class="active" data-id="play">
+                                    <c:if test="${app.serviceType=='call_center'}">
+                                        <li data-id="extension" class="active"><a href="#extension" data-toggle="tab">分机列表</a></li>
+                                        <li data-id="agent"><a href="#agent" data-toggle="tab">坐席列表</a></li>
+                                        <li data-id="queue"><a href="#queue" data-toggle="tab">排队条件</a></li>
+                                    </c:if>
+                                    <li <c:if test="${app.serviceType!='call_center'}">class="active" </c:if> data-id="play">
                                         <a href="#play" data-toggle="tab">
                                             放音媒体库
                                         </a>
@@ -244,15 +249,11 @@
                                     <li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>
                                     <!--号码绑定-->
                                     <li data-id="number"><a href="#number" data-toggle="tab">号码绑定</a></li>
-                                    <c:if test="${app.serviceType=='call_center'}">
-                                        <li data-id="extension"><a href="#extension" data-toggle="tab">分机列表</a></li>
-                                        <li data-id="agent"><a href="#agent" data-toggle="tab">坐席列表</a></li>
-                                    </c:if>
                                     <li data-id="subAccount"><a href="#subAccount" data-toggle="tab">子账号</a></li>
                                     <li class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
-                                    <div class="tab-pane fade in active" id="play">
+                                    <div class="tab-pane fade<c:if test="${app.serviceType!='call_center'}"> in active</c:if>" id="play">
                                         <p class="application_info">
                                             当您的应用需要开通语音通知、自定义IVR或者云呼叫中心时，请上传语音文件至放音媒体库，语音文件均需要审核
                                         </p>
@@ -374,7 +375,7 @@
                                     <!--号码绑定end-->
 
                                     <!--分机列表-->
-                                    <div class="tab-pane fade" id="extension">
+                                    <div class="tab-pane fade<c:if test="${app.serviceType=='call_center'}"> in active</c:if>" id="extension">
                                         <div class="form-group">
                                             <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="分机号" id="extension_num" /></div>
                                             <div class="col-md-3 remove-padding" style="padding-left:15px;">
@@ -436,6 +437,40 @@
                                         </table>
                                         <section class="panel panel-default yunhuni-personal">
                                             <div id="agent-page"></div>
+                                        </section>
+                                    </div>
+                                    <!--坐席列表end-->
+                                    <!--坐席列表-->
+                                    <div class="tab-pane fade" id="queue">
+                                        <div class="form-group">
+                                            <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="ID" id="queue_num" /></div>
+                                            <div class="col-md-3 remove-padding" style="padding-left:15px;">
+                                                <select id="queue_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号"  >
+                                                </select>
+                                                <%--<input type="text" class="form-control " placeholder="子账号鉴权账号" id="subId"/>--%></div>
+                                            <div class="col-md-2">
+                                                <button class="btn btn-primary" type="button" onclick="queueList()">查询</button>
+                                            </div>
+                                        </div>
+                                        <table class="table table-striped cost-table-history tablelist" id="queue-table">
+                                            <thead>
+                                            <tr>
+                                                <th class="text-center">ID</th>
+                                                <th class="text-center">条件选择表达式</th>
+                                                <th class="text-center">排序表达式</th>
+                                                <th class="text-center">优先级</th>
+                                                <th class="text-center">等待超时时间（秒）</th>
+                                                <th class="text-center">接听超时时间（秒）</th>
+                                                <th class="text-center">关联子账号</th>
+                                                <th class="text-center">备注</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="queue-list">
+
+                                            </tbody>
+                                        </table>
+                                        <section class="panel panel-default yunhuni-personal">
+                                            <div id="queue-page"></div>
                                         </section>
                                     </div>
                                     <!--坐席列表end-->
@@ -1486,7 +1521,11 @@
 
     //默认加载放音文件分页
     $(function () {
-        upplay();
+        if('${app.serviceType}'=='call_center') {
+            extensionList();
+        }else{
+            upplay();
+        }
     });
     /**
      *触发放音文件分页
@@ -1609,6 +1648,9 @@
             tosubAccountHome();
             subAccountList();
             $('#uploadButton').hide();
+        }
+        if(type=='queue'){
+            queueList();
         }
         getSubAccountByAppId();
     });
@@ -2150,7 +2192,7 @@
                     '<td class="">'+ data[i].id +'</td>' +
                     '<td class="">' + data[i].user + '</td>' +
                     '<td class="">'+ data[i].password +'</td>' +
-                    '<td class="">'+ (data[i].subaccountId == undefined ||data[i].subaccountId== null ?'': data[i].subaccountId) +'</td>' +
+                    '<td class="">'+ (data[i].certId == undefined ||data[i].certId== null ?'': data[i].certId) +'</td>' +
                     '<td class="">'+ (data[i].enable?'可用':'不可用') +'</td>' +
                     '<td class="">'+ (data[i].type==1?'SIP 终端':(data[i].type==2?'SIP 网关':(data[i].type==3?'普通电话':'未知类型'))) +'</td>' +
                     '<td class=""><a href="javascript:delExtension(\''+data[i].id+'\')" >删除</a></td>' +
@@ -2208,6 +2250,34 @@
         //searchTable 为方法名
         agentPage = new Page(count,listRow,showPageCount,pageId,agentTable);
         agentPage.show();
+    }
+    /**
+     * 坐席分页
+     */
+    var queuePage;
+    function queueList(){
+        $('#uploadButton').hide();
+        //获取数据总数
+        var count = 0;
+        var queueNum = $('#queue_num').val();
+        var subId = $('#queue_subId option:selected') .val();
+        var params = {"pageNo":1,"pageSize":10,"queueNum":queueNum,"subId":subId};
+        ajaxsync(ctx + "/console/app/" + appId + "/queue/page" ,params,function(response) {
+            if(response.success){
+                count = response.data.totalCount;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+            }
+        },"get");
+        //每页显示数量
+        var listRow = 10;
+        //显示多少个分页按钮
+        var showPageCount = 5;
+        //指定id，创建分页标签
+        var pageId = 'queue-page';
+        //searchTable 为方法名
+        queuePage = new Page(count,listRow,showPageCount,pageId,queueTable);
+        queuePage.show();
     }
     var subAccountTable = function (nowPage,listRows) {
         var certId = $('#five_certId').val();
@@ -2328,13 +2398,47 @@
             html +='<tr id="agent-'+ data[i].name +'">' +
                     '<td class="text-center">'+ data[i].name +'</td>' +
                     '<td class="text-center">'+ skillStr +'</td>' +
-                    '<td class="text-center">'+ data[i].extension +'</td>' +
-                     '<td class="text-center">'+ data[i].subaccountId +'</td>' +
+                    '<td class="text-center">'+ (data[i].extension!=null?data[i].extension:'') +'</td>' +
+                     '<td class="text-center">'+ data[i].certId +'</td>' +
                     '<td class="text-center">' + data[i].state + '</td>' +
                     '<td class="text-center"><a href="javascript:delAgent(\''+data[i].id+'\')" >删除</a></td>' +
                     '</tr>'
         }
         $('#agent-list').html(html);
+    }
+    /**
+     * 坐席分机分页回调方法
+     * @param nowPage 当前页数
+     * @param listRows 每页显示多少条数据
+     * */
+    var queueTable = function(nowPage,listRows){
+        var html = '';
+        var data = [];
+        var queueNum = $('#queue_num').val();
+        var subId = $('#queue_subId option:selected') .val();
+        var params = {"pageNo":nowPage,"pageSize":listRows,"queueNum":queueNum,"subId":subId};
+        ajaxsync(ctx + "/console/app/" + appId + "/queue/page" ,params,function(response){
+            if(response.success){
+                data = response.data.result;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
+            }
+        },"get");
+
+        // $('#playtable').find(".playtr").remove();["✔", "✘"],
+        for(var i =0 ; i<data.length; i++){
+            html +='<tr id="queue-'+ data[i].id +'">' +
+                '<td class="text-center">'+ data[i].id +'</td>' +
+                '<td class="text-center">'+ data[i].whereExpression +'</td>' +
+                '<td class="text-center">'+ data[i].sortExpression +'</td>' +
+                '<td class="text-center">' + data[i].priority + '</td>' +
+                '<td class="text-center">' + data[i].queueTimeout + '</td>' +
+                '<td class="text-center">' + data[i].fetchTimeout + '</td>' +
+                '<td class="text-center">'+ data[i].certId +'</td>' +
+                '<td class="text-center">' + data[i].remark + '</td>' +
+                '</tr>'
+        }
+        $('#queue-list').html(html);
     }
 //    $(document).ready(function () {
 //        $('.sublist').selectpicker('refresh');

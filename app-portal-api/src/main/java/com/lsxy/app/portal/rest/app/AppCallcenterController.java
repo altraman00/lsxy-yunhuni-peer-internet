@@ -6,6 +6,7 @@ import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
+import com.lsxy.call.center.api.service.ConditionService;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -25,10 +26,11 @@ public class AppCallcenterController extends AbstractRestController {
     private static final Logger logger = LoggerFactory.getLogger(AppCallcenterController.class);
 
     @Reference(timeout = 3000,check = false,lazy = true)
-    AppExtensionService appExtensionService;
+    private AppExtensionService appExtensionService;
     @Reference(timeout=3000,check = false,lazy = true)
     private CallCenterAgentService callCenterAgentService;
-
+    @Reference(timeout=3000,check = false,lazy = true)
+    private ConditionService conditionService;
     @RequestMapping("/{appId}/app_extension/page")
     public RestResponse listExtensions(HttpServletRequest request, @PathVariable String appId,
                                        @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
@@ -36,7 +38,13 @@ public class AppCallcenterController extends AbstractRestController {
         Page page = appExtensionService.getPageByCondition(appId,extensionNum,subId,pageNo,pageSize);
         return RestResponse.success(page);
     }
-
+    @RequestMapping("/{appId}/queue/page")
+    public RestResponse listQueueCondition(HttpServletRequest request, @PathVariable String appId,
+                                       @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
+                                       @RequestParam(defaultValue = "20",required = false)  Integer pageSize,String queueNum,String subId) throws YunhuniApiException {
+        Page page = conditionService.getPageByCondition(pageNo,pageSize,getCurrentAccount().getTenant().getId(),appId,subId,queueNum);
+        return RestResponse.success(page);
+    }
     @RequestMapping(value = "/{appId}/agent/page",method = RequestMethod.GET)
     public RestResponse page(HttpServletRequest request, @PathVariable String appId,
                              @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
