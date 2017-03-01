@@ -399,7 +399,7 @@ public class IVRActionService {
                     callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(tenant.getId(),app.getId(),
                             new Date()).setCallIn(1L).build());
                 }catch (Throwable t){
-                    logger.error("incrIntoRedis失败",t);
+                    logger.error(String.format("incrIntoRedis失败，appId=%s",app.getId()),t);
                 }
             }else{
                 VoiceIvr voiceIvr = new VoiceIvr();
@@ -413,7 +413,7 @@ public class IVRActionService {
                 voiceIvrBatchInserter.put(voiceIvr);
             }
         }catch (Throwable t){
-            logger.error("保存callsession失败",t);
+            logger.error(String.format("保存callsession失败,appId=%s,callid=%s",app.getId(),call_id),t);
         }
         String areaId = areaAndTelNumSelector.getAreaId(app);
         //保存业务数据，后续事件要用到
@@ -454,7 +454,7 @@ public class IVRActionService {
         try {
             rpcCaller.invoke(sessionContext, rpcrequest,true);
         } catch (Throwable e) {
-            logger.error("调用失败",e);
+            logger.error(String.format("调用应答失败,callid=%s",call_id),e);
         }
     }
 
@@ -574,7 +574,7 @@ public class IVRActionService {
                 rpcCaller.invoke(sessionContext, rpcrequest, true);
             }
         } catch (Throwable e) {
-            logger.error("调用失败",e);
+            logger.error(String.format("调用挂断失败,callid=%s",call_id),e);
         }
     }
     /**

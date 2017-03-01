@@ -75,13 +75,13 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
         }
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null");
+            throw new InvalidParamException("businessstate is null,callid="+call_id);
         }
         try{
             callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(state.getTenantId(),state.getAppId(),
                     new Date()).setCallInSuccess(1L).build());
         }catch (Throwable t){
-            logger.error("incrIntoRedis失败",t);
+            logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
         }
         //删除等待应答标记
         businessStateService.deleteInnerField(call_id,IVRActionService.IVR_ANSWER_WAITTING_FIELD);

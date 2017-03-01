@@ -1,5 +1,6 @@
 package com.lsxy.area.server.util;
 
+import com.lsxy.framework.core.exceptions.api.ExceptionContext;
 import com.lsxy.framework.core.exceptions.api.PlayFileNotExistsException;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
 import org.apache.commons.lang.StringUtils;
@@ -34,7 +35,10 @@ public class PlayFileUtil {
         }
         String[] files = playFile.split("\\|");
         if(files == null || files.length == 0){
-            throw new PlayFileNotExistsException();
+            throw new PlayFileNotExistsException(
+                    new ExceptionContext().put("appId",appId)
+                            .put("file",playFile)
+            );
         }
         return StringUtils.join(convertArray(tenantId,appId, files),"|");
     }
@@ -84,7 +88,10 @@ public class PlayFileUtil {
         }
         String f = voiceFilePlayService.getVerifiedFile(appId,file);
         if(f == null){
-            throw new PlayFileNotExistsException();
+            throw new PlayFileNotExistsException(
+                    new ExceptionContext().put("appId",appId)
+                    .put("file",file)
+            );
         }
         return convert(tenantId,appId,file,f);
     }

@@ -77,7 +77,7 @@ public class CallConversationService {
         try{
             results = redisCacheService.zRange(key,0,-1);
         }catch (Throwable t){
-            logger.error("获取交谈成员失败",t);
+            logger.error(String.format("获取成员的交谈失败,callId=%s",callId),t);
         }
         return results;
     }
@@ -91,7 +91,7 @@ public class CallConversationService {
         try{
             results = redisCacheService.zRange(key,0,-1);
         }catch (Throwable t){
-            logger.error("获取交谈失败",t);
+            logger.error(String.format("获取成员的交谈失败,callId=%s",callId),t);
         }
         clear(callId);
         return results;
@@ -101,7 +101,7 @@ public class CallConversationService {
         try{
             redisCacheService.del(key(callId));
         }catch (Throwable t){
-            logger.info("删除交谈缓存失败",t);
+            logger.error(String.format("删除交谈缓存失败,callId=%s",callId),t);
         }
     }
 }

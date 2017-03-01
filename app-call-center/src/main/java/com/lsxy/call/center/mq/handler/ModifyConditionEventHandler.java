@@ -59,16 +59,16 @@ public class ModifyConditionEventHandler implements MQMessageHandler<ModifyCondi
         if(message.getConditionId() == null ||
                 message.getTenantId() == null ||
                 message.getAppId() == null){
-            logger.info("处理CallCenter.ModifyConditionEvent，参数错误！");
+            logger.info("处理CallCenter.ModifyConditionEvent，参数错误！,message={}",message);
             return;
         }
         if(!message.ismWhere() && !message.ismSort() && !message.ismPriority()){
-            logger.info("处理CallCenter.ModifyConditionEvent，没有修改表达式");
+            logger.info("处理CallCenter.ModifyConditionEvent，没有修改表达式,message={}",message);
             return;
         }
         Condition condition = conditionService.findById(message.getConditionId());
         if(condition == null){
-            logger.info("处理CallCenter.ModifyConditionEvent出错，条件不存在！");
+            logger.info("处理CallCenter.ModifyConditionEvent出错，条件不存在！,message={}",message);
             return;
         }
 

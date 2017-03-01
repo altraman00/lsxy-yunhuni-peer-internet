@@ -12,6 +12,14 @@ public class AgentIsBusyException extends YunhuniApiException {
         super();
     }
 
+    public AgentIsBusyException(String context) {
+        super(context);
+    }
+
+    public AgentIsBusyException(ExceptionContext context){
+        super(context);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.AgentIsBusy;

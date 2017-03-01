@@ -223,6 +223,7 @@ public class SubaccountController extends AbstractAPIController {
         ApiCertificateSubAccountOutput output = null;
         if(subAccount!=null){
             output = new ApiCertificateSubAccountOutput();
+            output.setId(subAccount.getId());
             output.setAppId(subAccount.getAppId());
             output.setParentId(subAccount.getParentId());
             output.setCallbackUrl(subAccount.getCallbackUrl());
