@@ -91,10 +91,10 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      */
     @RequestMapping("/list")
     @ResponseBody
-    public RestResponse VoiceFilePlay(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize, String appId,String name){
+    public RestResponse VoiceFilePlay(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize, String appId,String name,String subId){
         String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/plist?pageNo={1}&pageSize={2}&name={3}&appId={4}";
-        return RestRequest.buildSecurityRequest(token).getPage(uri,VoiceFilePlay.class,pageNo,pageSize,name,appId);
+        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/plist?pageNo={1}&pageSize={2}&name={3}&appId={4}&subId={5}";
+        return RestRequest.buildSecurityRequest(token).getPage(uri,VoiceFilePlay.class,pageNo,pageSize,name,appId,subId);
     }
     /**
      * 根据放音文件的ｉｄ修改放音文件的备注
@@ -156,7 +156,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/upload")
-    public void uploadMore(HttpServletRequest request, HttpServletResponse response, @RequestParam("file") MultipartFile[] multipartfiles, String appId , String key){
+    public void uploadMore(HttpServletRequest request, HttpServletResponse response, @RequestParam("file") MultipartFile[] multipartfiles, String appId , String key,String subId){
         response.setHeader("content-type", "application/json");
         response.setCharacterEncoding("UTF-8");
         try {
@@ -169,7 +169,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
             }else{
                 throw new RuntimeException("获取app失败");
             }
-            RestResponse restResponse = getRestResponse( request,  response, multipartfiles,  appId ,  key);
+            RestResponse restResponse = getRestResponse( request,  response, multipartfiles,  appId ,  key,subId);
             if(!restResponse.isSuccess()) {
                 response.setStatus(489,"错误啦");
             }
@@ -180,7 +180,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
             logger.error("上传文件IO异常",e1);
         }
     }
-    private RestResponse getRestResponse(HttpServletRequest request, HttpServletResponse response, @RequestParam("file") MultipartFile[] multipartfiles, String appId , String key){
+    private RestResponse getRestResponse(HttpServletRequest request, HttpServletResponse response, @RequestParam("file") MultipartFile[] multipartfiles, String appId , String key,String subId){
         String tenantId = this.getCurrentUser(request).getTenantId();
         String ymd = DateUtils.formatDate(new Date(),"yyyyMMdd");
         RestResponse restResponse = null;
@@ -224,7 +224,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
 //                    int re = downFile(file,filePlayPath +"/"+fileKey);
                     if (flag) {
                         //文件保存成功，将对象保存数据库
-                        restResponse = createVoiceFilePlay(request, name, size, fileKey, appId);
+                        restResponse = createVoiceFilePlay(request, name, size, fileKey, appId,subId);
                         if (!restResponse.isSuccess()) {
                             logger.info("上传成功，保存失败：{}", name);
                             //将本地文件删除
@@ -296,10 +296,10 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      * @param appId　应用ｉｄ
      * @return
      */
-    private RestResponse createVoiceFilePlay(HttpServletRequest request,String name,long size,String fileKey,String appId){
+    private RestResponse createVoiceFilePlay(HttpServletRequest request,String name,long size,String fileKey,String appId,String subId){
         String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/create?name={1}&size={2}&fileKey={3}&appId={4}";
-        return RestRequest.buildSecurityRequest(token).get(uri, VoiceFilePlay.class,name,size,fileKey,appId);
+        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/create?name={1}&size={2}&fileKey={3}&appId={4}&subId={5}";
+        return RestRequest.buildSecurityRequest(token).get(uri, VoiceFilePlay.class,name,size,fileKey,appId,subId);
     }
 
     /**

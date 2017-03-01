@@ -258,6 +258,10 @@
                                         </p>
                                         <div class="form-group">
                                             <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="文件名" id="name"/></div>
+                                            <div class="col-md-3 remove-padding" style="padding-left:15px;">
+                                                <select id="voice_file_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号" >
+                                                </select>
+                                                <%--<input type="text" class="form-control " placeholder="子账号鉴权账号" id="subId"/>--%></div>
                                             <div class="col-md-1"><button class="btn btn-primary" type="button" onclick="upplay()">查询</button></div>
                                             <div class="col-md-8 sizebox  remove-padding " id="voiceFilePlay">
                                             </div>
@@ -269,7 +273,8 @@
                                                 <th width="20%">文件名</th>
                                                 <th width="10%">状态</th>
                                                 <th width="10%">大小</th>
-                                                <th width="35%">备注</th>
+                                                <th width="10%">关联子账号</th>
+                                                <th width="25%">备注</th>
                                                 <th width="20%">操作</th>
                                             </tr>
                                             </thead>
@@ -370,14 +375,27 @@
 
                                     <!--分机列表-->
                                     <div class="tab-pane fade" id="extension">
+                                        <div class="form-group">
+                                            <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="分机号" id="extension_num" /></div>
+                                            <div class="col-md-3 remove-padding" style="padding-left:15px;">
+                                                <select id="extension_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号"  >
+                                                </select>
+                                                <%--<input type="text" class="form-control " placeholder="子账号鉴权账号" id="subId"/>--%></div>
+                                            <div class="col-md-2">
+                                                <button class="btn btn-primary" type="button" onclick="extensionList()">查询</button>
+                                                <button href="#"  class="btn btn-primary defind modalShow" data-id="six" >创建分机</button>
+                                            </div>
+                                        </div>
                                         <table class="table table-striped cost-table-history tablelist" id="extension-table">
                                             <thead>
                                             <tr>
                                                 <th class="">ID</th>
                                                 <th class="">账号</th>
                                                 <th class="">密码</th>
+                                                <th>关联子账号</th>
                                                 <th class="">状态</th>
                                                 <th class="">鉴权方式</th>
+                                                <th class="">操作</th>
                                             </tr>
                                             </thead>
                                             <tbody id="extension-list">
@@ -747,6 +765,44 @@
                 <a class="sure modalSureFive" data-id="five">创建</a>
             </div>
         </div>
+        <!---创建分机--->
+        <div class="modal-box application-detail-box" id="modalsix" style="display:none;">
+            <div class="title">创建分机<a class="close_a modalCancel cancelsix" data-id="six"></a></div>
+            <div class="content" id="createSix" >
+                <br>
+                <div class="row margin-bottom-10">
+                    <lable class="col-md-3 text-right line-height-32">分机号：</lable>
+                    <div class="col-md-8 remove-padding-right">
+                        <input type="text" class="form-control" v-model="user"  value="{{user}}" placeholder=""/>
+                        <span>6-12的数字</span>
+                    </div>
+                    <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
+                </div>
+
+                <div class="row margin-bottom-10">
+                    <lable class="col-md-3 text-right line-height-32">分机密码：</lable>
+                    <div class="col-md-8 remove-padding-right">
+                        <input type="text" class="form-control" v-model="password" value="{{password}}" placeholder=""/>
+                        <span>6-12的数字</span>
+                    </div>
+                    <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
+                </div>
+                <div class="row margin-bottom-10">
+                    <lable class="col-md-3 text-right line-height-32">关联子账号：</lable>
+                    <div class="col-md-8 remove-padding-right">
+                        <select id="create_six_subId" class="sublist" name="subId" data-live-search="true" title="">
+                        </select>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <p class="error_msg_six" style="color: red"></p>
+                </div>
+            </div>
+            <div class="footer">
+                <a class="cancel modalCancel cancelsix" data-id="six">返回</a>
+                <a class="sure modalSureSix" data-id="six">创建</a>
+            </div>
+        </div>
 <!---上传文件--->
 <div class="modal-box application-detail-box application-file-box" id="modalfour" style="display:none ">
     <div class="modal-loadding loadding"></div>
@@ -755,12 +811,21 @@
         <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、16位）后再上传,单条语音最大支持 5M。</p>
         <form:form action="${ctx}/console/app/file/play/upload" method="post" id="uploadMianForm" enctype="multipart/form-data" target="hidden_frame">
             <div class="input-box ">
-                <div class="row  mt-10">
-                    <input type="hidden" name="appId" value="${app.id}">
-                    <div class="col-md-2">
-                        文件 :
+                <div class="row margin-bottom-10">
+                    <div class="col-md-3">
+                    <label class="control-label" for="file_sub_accout_num">关联子账号：</label>
                     </div>
-                    <div class="col-md-10">
+                    <div class="col-md-9 remove-padding">
+                    <select id="file_sub_accout_num" class="sublist" name="subId" data-live-search="true" title="">
+                    </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <input type="hidden" name="appId" value="${app.id}">
+                    <div class="col-md-3">
+                        <label>文件 :</label>
+                    </div>
+                    <div class="col-md-9 remove-padding" >
                         <span class="btn btn-success fileinput-button">
                         <i class="glyphicon glyphicon-plus"></i>
                         <span>选择文件</span>
@@ -793,9 +858,8 @@
 </div>
 
 
-
-
 <%@include file="/inc/footer.jsp"%>
+
 <script type="text/javascript">
     var appId = '${app.id}';
 </script>
@@ -811,15 +875,22 @@
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.fileupload-process.js"></script>
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.iframe-transport.js"></script>
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.fileupload-validate.js"></script>
+        <link rel="stylesheet" href="${resPrefixUrl }/js/dist/css/bootstrap-select.css">
+        <script src="${resPrefixUrl }/js/dist/js/bootstrap-select.js"></script>
+
         <script>
             $('.cancelfive').click(function(){
                 createSubAccountFive.init();
+            });
+            $('.cancelsix').click(function(){
+                createSix.init();
             });
             var appServiceType = '${app.serviceType}';
             $(function () {
                 $('.modal-box .content input[type="text"]').css("height","30px");
                 $('.modal-box .content input[type="number"]').css("height","30px");
-                $('.modal-box, .appliation-modal-box').css("height","450px");
+                $('#modalfive').css("height","450px");
+                $('#modalsix').css("height","330px");
             })
         </script>
 
@@ -870,11 +941,13 @@
 //                        showtoast("请先上线应用");
 //                    })
 //                }
+                getSubAccountByAppId();
             }
             // 上传多个文件
             var cancelCancel=false;
             $(function(){
                 var Allfile = [],allFileLength = 0, errorFileArray = [];
+                var file_sub_accout_num = $('#file_sub_accout_num').val();
                 $('#fileupload').fileupload({
                     url: '${ctx}/console/app/file/play/upload',
                     maxFileSize: 5* 1024 * 1024,
@@ -1042,7 +1115,6 @@
             seatNum:''
         },methods:{
             initObj:function(obj){
-                console.info(obj)
                 this.id=obj.id;
                 this.certId=obj.certId;
                 this.secretKey = obj.secretKey;
@@ -1088,6 +1160,49 @@
             }
         },"post");
     };
+    /*新增分机*/
+    var createSix = new Vue({
+        el:'#createSix',
+        data:{
+            user:'',
+            password:''
+        },
+        methods:{
+            init:function(){
+                this.user=this.password='';
+            }
+        }
+    });
+    $('.modalSureSix').click(function(){
+        var id = $(this).attr('data-id');
+        var t1 = /^[0-9]{6,12}$/;
+        if(createSix.user ==''||createSix.user.length <=0 || !t1.test(createSix.user)){
+            showtoast('分机号格式错误' );
+            return;
+        }
+//        var t2 = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,18}$/;
+        if(createSix.password =='' ||  createSix.password.length <= 0 || !t1.test(createSix.password)){
+            showtoast("密码格式错误");
+            return;
+        }
+        var subId = $('#create_six_subId option:selected') .val();
+        var params = {
+            subId:subId,
+            user:createSix.user,
+            password:createSix.password,
+            csrfParameterName:csrfToken
+        }
+        ajaxsync(ctx + "/console/app/"+appId+"/app_extension/new",params,function(response){
+            if(response.success){
+                showtoast("新增分机成功");
+                createSix.init();
+                hideModal(id);
+                extensionList();
+            }else{
+                showtoast(response.errorMsg);
+            }
+        },"post");
+    });
     /**
      *新增子账号
      */
@@ -1264,7 +1379,36 @@
             }
         });
     }
+    function delExtension(id){
+        bootbox.setLocale("zh_CN");
+        bootbox.confirm("确认删除分机", function(result) {
+            if(result){
+                ajaxsync(ctx + "/console/app/"+appId+"/app_extension/delete/"+id,{csrfParameterName:csrfToken},function(response){
+                    if(response.success){
+                        showtoast("删除成功");
+                        if(extensionPage){
+                            console.info("进入-成功");
+                            var currentPage;
+                            if(((extensionPage.nowPage - 1) * extensionPage.listRow +1) <= --extensionPage.count){
+                                currentPage = extensionPage.nowPage;
+                            }else {
+                                currentPage = extensionPage.nowPage - 1;
+                            }
+                            if(currentPage>0){
+                                $('#page' + currentPage + extensionPage.obj).click();
+                            }else{
+                                $('#extension-'+id).remove();
+                            }
+                        }
+                        console.info("进入-结束")
+                    }else{
+                        showtoast("删除失败");
+                    }
+                },"post");
 
+            }
+        });
+    }
     /**
      * 删除操作
      */
@@ -1321,8 +1465,9 @@
         //获取数据总数
         var count = 0;
         var name = $('#name').val();
-
-        ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':1,'pageSize':20,csrfParameterName:csrfToken},function(response){
+        var subId = $('#voice_file_subId option:selected') .val();
+        console.info(subId);
+        ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':1,'pageSize':20,'subId':subId,csrfParameterName:csrfToken},function(response){
             if(response.success){
                 count=response.data.totalCount;
             }else{
@@ -1365,16 +1510,24 @@
     var playTable = function(nowPage,listRows)
     {
         var name = $('#name').val();
-        ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':nowPage,'pageSize':listRows,csrfParameterName:csrfToken},function(response){
+        var subId = $('#voice_file_subId option:selected') .val();
+        ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':nowPage,'pageSize':listRows,'subId':subId,csrfParameterName:csrfToken},function(response){
             if(response.success){
                 var data =[];
                 for(var j=0;j<response.data.result.length;j++){
                     var tempFile = response.data.result[j];
-                    var temp = [tempFile.id,tempFile.name,tempFile.status,resultFileSize(tempFile.size),tempFile.remark,tempFile.reason?tempFile.reason:'',tempFile.sync];
+                    var temp = [tempFile.id,
+                        tempFile.name,
+                        tempFile.status,resultFileSize(tempFile.size),
+                        tempFile.remark,
+                        tempFile.reason?tempFile.reason:'',
+                        tempFile.sync,
+                        tempFile.subaccountId];
                     data[j]=temp;
                 }
                 var html ='';
                 //数据列表
+                console.info(data);
                 for(var i = 0 ; i<data.length; i++){
                     html +='<tr class="playtr" id="play-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
                     if(data[i][2]==-1){
@@ -1385,6 +1538,7 @@
                         html+='<td>待审核</td>';
                     }
                     html+='<td>'+data[i][3]+'</td>';
+                    html +='<td>'+(data[i][7] == null?'':data[i][7] )+'</td>';
                     html+='<td id="remark-a-'+data[i][0]+'">'+data[i][4]+'</td>';
                     html+='<td class="operation"> <a onclick="delplay(this)" id="delete-'+data[i][0]+'" >删除</a> <span ></span> <a onclick="editremark(this)" id="remark-b-'+data[i][0]+'">修改备注</a> </td></tr>';
                 }
@@ -1421,6 +1575,7 @@
             subAccountList();
             $('#uploadButton').hide();
         }
+        getSubAccountByAppId();
     });
 
 //    fileTotalSoze();
@@ -1911,7 +2066,9 @@
         $('#uploadButton').hide();
         //获取数据总数
         var count = 0;
-        var params = {"pageNo":1,"pageSize":10};
+        var extensionNum = $('#extension_num').val();
+        var subId = $('#extension_subId option:selected') .val();
+        var params = {"pageNo":1,"pageSize":10,"extensionNum":extensionNum,'subId':subId};
         ajaxsync(ctx + "/console/app/" + appId + "/app_extension/page" ,params,function(response) {
             if(response.success){
                 count = response.data.totalCount;
@@ -1938,7 +2095,10 @@
     var extensionTable = function(nowPage,listRows){
         var html = '';
         var data = [];
-        ajaxsync(ctx + "/console/app/" + appId + "/app_extension/page" ,{pageNo:nowPage,pageSize:listRows},function(response){
+        var extensionNum = $('#extension_num').val();
+        var subId = $('#extension_subId option:selected') .val();
+        var params = {"pageNo":nowPage,"pageSize":listRows,"extensionNum":extensionNum,'subId':subId};
+        ajaxsync(ctx + "/console/app/" + appId + "/app_extension/page" ,params,function(response){
             if(response.success){
                 data = response.data.result;
             }else{
@@ -1948,12 +2108,15 @@
 
         // $('#playtable').find(".playtr").remove();["✔", "✘"],
         for(var i =0 ; i<data.length; i++){
+            console.info(data[i].subaccountId);
             html +='<tr id="extension-'+ data[i].id +'">' +
                     '<td class="">'+ data[i].id +'</td>' +
                     '<td class="">' + data[i].user + '</td>' +
                     '<td class="">'+ data[i].password +'</td>' +
+                    '<td class="">'+ (data[i].subaccountId == undefined ||data[i].subaccountId== null ?'': data[i].subaccountId) +'</td>' +
                     '<td class="">'+ (data[i].enable?'可用':'不可用') +'</td>' +
                     '<td class="">'+ (data[i].type==1?'SIP 终端':(data[i].type==2?'SIP 网关':(data[i].type==3?'普通电话':'未知类型'))) +'</td>' +
+                    '<td class=""><a href="javascript:delExtension(\''+data[i].id+'\')" >删除</a></td>' +
                     '</tr>'
         }
         $('#extension-list').html(html);
@@ -2129,8 +2292,48 @@
         }
         $('#agent-list').html(html);
     }
-
-
+//    $(document).ready(function () {
+//        $('.sublist').selectpicker('refresh');
+//
+//    });
+    function getSubAccountByAppId(){
+        console.info(1)
+        if(appId == null || appId.length==0){
+            showtoast("应用标识异常，获取子账号列表失败");
+        }else{
+            ajaxsync(ctx + "/console/sub_account/by/"+appId+"/list" ,{},function(response) {
+                if(response.success){
+                    var list =  response.data;
+                    $("select.sublist[data-live-search=true] option").remove();
+                    var opt = '<option  class="get-class" value=""></option>';
+                    $("select.sublist[data-live-search=true]").append(opt);
+                    for(var i=0;i< list.length ;i++){
+                        var opt = '<option value="'+list[i].id+'" >'+list[i].certId+'</option>';
+                        $("select.sublist[data-live-search=true]").append(opt);
+                    }
+                    $("select.sublist[data-live-search=true]").selectpicker('refresh');
+//                    $("div.sublist option").remove();
+                    $("div.open").css("position","absolute");
+                    $("div.sublist button[data-id=file_sub_accout_num]").css("width","270px");
+                    $('div.sublist').each(function (index) {
+                        var len = $(this).children("button[data-id=file_sub_accout_num]").length;
+                        if(len >0 ){
+                            $(this).children("div.open").children("div.bs-searchbox").css("height","35px");
+                            $(this).children("div.open").children("div.bs-searchbox").children("input").css("height","30px");
+                        }
+                        var len2 = $(this).children("button[data-id=create_six_subId]").length;
+                        if(len2 >0){
+                            $(this).css("width","293px");
+                            $(this).children("div.open").children("div.bs-searchbox").css("height","35px");
+                            $(this).children("div.open").children("div.bs-searchbox").children("input").css("height","30px");
+                        }
+                    });
+                }else{
+                    showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+                }
+            });
+        }
+    }
 </script>
 
 </body>

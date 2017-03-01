@@ -71,6 +71,11 @@ public class ApiCertificateSubAccountController extends AbstractRestController {
         Page page2 = new Page(page.getStartIndex(),page.getTotalCount(),page.getPageSize(),list);
         return RestResponse.success(page2);
     }
+    @RequestMapping(value = "/list")
+    public RestResponse list2(HttpServletRequest request,String appId){
+        List<ApiCertificateSubAccount> list = apiCertificateSubAccountService.findByAppId(appId);
+        return RestResponse.success(list);
+    }
     @RequestMapping(value = "/delete/{subId}")
     public RestResponse delete(HttpServletRequest request,@PathVariable String subId){
         ApiCertificateSubAccount subAccount = apiCertificateSubAccountService.findById(subId);

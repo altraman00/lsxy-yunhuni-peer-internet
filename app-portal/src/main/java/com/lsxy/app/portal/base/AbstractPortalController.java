@@ -8,6 +8,7 @@ import com.lsxy.framework.core.utils.ExportExcel;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
 import com.lsxy.yunhuni.api.app.model.App;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.DateUtils;
@@ -98,6 +99,11 @@ public abstract class AbstractPortalController {
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL + "/rest/app/list?serviceType={1}";
         return RestRequest.buildSecurityRequest(token).getList(uri, App.class,serviceType);
+    }
+    public RestResponse getSubAccountList(HttpServletRequest request,String appId){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL + "/rest/sub_account/list?appId={1}";
+        return RestRequest.buildSecurityRequest(token).getList(uri, ApiCertificateSubAccount.class,appId);
     }
     /**
      * 获取单个应用
