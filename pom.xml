@@ -49,6 +49,8 @@
         <module>app-mc</module>
         <module>app-opensips-proxy</module>
         <module>oneyun-api-sdk</module>
+        <module>module-service-msg-api</module>
+        <module>app-msg</module>
 
     </modules>
     <packaging>pom</packaging>
@@ -172,6 +174,23 @@
                 <artifactId>module-framework-rpc</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.lsxy</groupId>
+                <artifactId>module-service-msg-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lsxy</groupId>
+                <artifactId>app-msg</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.lsxy</groupId>
+                <artifactId>module-framework-rpc</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.apache.ant</groupId>
                 <artifactId>ant</artifactId>
