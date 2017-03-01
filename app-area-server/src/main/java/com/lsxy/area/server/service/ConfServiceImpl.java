@@ -208,7 +208,10 @@ public class ConfServiceImpl implements ConfService {
         }
 
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
-            throw new AppServiceInvalidException();
+            throw new AppServiceInvalidException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
 
         BusinessState state = businessStateService.get(confId);
@@ -1143,7 +1146,12 @@ public class ConfServiceImpl implements ConfService {
             throw new IllegalArgumentException();
         }
         if(!apiCertificateSubAccountService.subaccountCheck(call_state.getSubaccountId(),conf_state.getSubaccountId())){
-            throw new ConfNotExistsException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("call_id",call_id)
+                            .put("conf_id",conf_id)
+                            .put("call_subaccount",call_state.getSubaccountId())
+                            .put("conf_subaccount",conf_state.getSubaccountId())
+            );
         }
         Map<String,String> call_business=call_state.getBusinessData();
         Map<String,String> conf_business=conf_state.getBusinessData();

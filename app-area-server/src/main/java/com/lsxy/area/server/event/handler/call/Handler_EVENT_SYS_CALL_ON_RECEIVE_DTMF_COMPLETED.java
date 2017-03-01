@@ -67,7 +67,7 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
 
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null,call_id=",call_id);
+            throw new InvalidParamException("businessstate is null,call_id={}",call_id);
         }
 
         if(logger.isDebugEnabled()){

@@ -784,37 +784,63 @@ public class ConversationService {
 
     public boolean setVoiceMode(String conversationId, String callId, Integer voiceMode) throws YunhuniApiException {
         if(voiceMode ==null){
-            throw new RequestIllegalArgumentException();
+            throw new RequestIllegalArgumentException(
+                    new ExceptionContext().put("conversation_id",conversationId)
+                    .put("call_id",callId)
+                    .put("voice_mode",voiceMode)
+            );
         }
         if(!ArrayUtils.contains(CallCenterConversationMember.MODE_ARRAY,voiceMode)){
-            throw new RequestIllegalArgumentException();
+            throw new RequestIllegalArgumentException(
+                    new ExceptionContext().put("conversation_id",conversationId)
+                            .put("call_id",callId)
+                            .put("voice_mode",voiceMode)
+            );
         }
         BusinessState call_state = businessStateService.get(callId);
 
         if(call_state == null){
-            throw new CallNotExistsException();
+            throw new CallNotExistsException(
+                    new ExceptionContext().put("conversation_id",conversationId)
+                            .put("call_id",callId)
+            );
         }
 
         if(call_state.getResId() == null){
-            throw new SystemBusyException();
+            throw new SystemBusyException(
+                    new ExceptionContext().put("conversation_id",conversationId)
+                            .put("call_id",callId)
+            );
         }
 
         if(call_state.getClosed()!= null && call_state.getClosed()){
-            throw new CallNotExistsException();
+            throw new CallNotExistsException(
+                    new ExceptionContext().put("conversation_id",conversationId)
+                            .put("call_id",callId)
+            );
         }
 
         BusinessState conversation_state = businessStateService.get(conversationId);
 
         if(conversation_state == null){
-            throw new ConfNotExistsException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("conversation_id",conversationId)
+                            .put("call_id",callId)
+            );
         }
 
         if(conversation_state.getResId() == null){
-            throw new SystemBusyException();
+            throw new SystemBusyException(
+                    new ExceptionContext().put("conversation_id",conversationId)
+                            .put("call_id",callId)
+            );
         }
 
         if(conversation_state.getClosed()!= null && conversation_state.getClosed()){
-            throw new ConversationNotExistException();
+            throw new ConversationNotExistException(
+                    new ExceptionContext().put("conversation_id",conversationId)
+                            .put("call_id",callId)
+            );
         }
 
         if(!call_state.getAppId().equals(conversation_state.getAppId())){
@@ -822,7 +848,10 @@ public class ConversationService {
         }
 
         if(!this.sismember(conversationId,callId)){
-            throw new AgentNotConversationMemberException();
+            throw new AgentNotConversationMemberException(
+                    new ExceptionContext().put("conversation_id",conversationId)
+                            .put("call_id",callId)
+            );
         }
 
         Map<String,Object> params = new MapBuilder<String,Object>()

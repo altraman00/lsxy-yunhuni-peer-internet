@@ -77,7 +77,7 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
 
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null,call_id=",call_id);
+            throw new InvalidParamException("businessstate is null,call_id={}",call_id);
         }
 
         String record_id = UUIDGenerator.uuid();

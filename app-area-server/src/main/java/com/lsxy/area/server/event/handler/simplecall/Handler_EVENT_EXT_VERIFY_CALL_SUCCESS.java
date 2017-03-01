@@ -64,7 +64,7 @@ public class Handler_EVENT_EXT_VERIFY_CALL_SUCCESS extends EventHandler {
         }
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null,call_id=",call_id);
+            throw new InvalidParamException("businessstate is null,call_id={}",call_id);
         }
         businessStateService.updateResId(call_id,res_id);
         //更新会话记录状态

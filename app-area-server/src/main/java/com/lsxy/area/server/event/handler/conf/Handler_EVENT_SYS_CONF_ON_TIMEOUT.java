@@ -67,7 +67,7 @@ public class Handler_EVENT_SYS_CONF_ON_TIMEOUT extends EventHandler{
         }
         BusinessState state = businessStateService.get(conf_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null,call_id=",conf_id);
+            throw new InvalidParamException("businessstate is null,call_id={}",conf_id);
         }
         if(logger.isDebugEnabled()){
             logger.info("confi_id={},state={}",conf_id,state);

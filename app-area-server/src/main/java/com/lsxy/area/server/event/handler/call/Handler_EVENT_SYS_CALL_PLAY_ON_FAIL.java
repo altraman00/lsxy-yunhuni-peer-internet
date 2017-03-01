@@ -70,7 +70,7 @@ public class Handler_EVENT_SYS_CALL_PLAY_ON_FAIL extends EventHandler{
 
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null,call_id=",call_id);
+            throw new InvalidParamException("businessstate is null,call_id={}",call_id);
         }
         if(canDoivr(state)){
             ivr(state,params,call_id);

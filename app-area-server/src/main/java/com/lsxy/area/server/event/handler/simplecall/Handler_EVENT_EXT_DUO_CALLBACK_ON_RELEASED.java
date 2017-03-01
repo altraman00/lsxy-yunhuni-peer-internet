@@ -56,7 +56,7 @@ public class Handler_EVENT_EXT_DUO_CALLBACK_ON_RELEASED extends EventHandler {
         }
         BusinessState state = businessStateService.get(callId);
         if(state == null){
-            throw new InvalidParamException("businessstate is null,call_id=",callId);
+            throw new InvalidParamException("businessstate is null,call_id={}",callId);
         }
 
         //释放资源

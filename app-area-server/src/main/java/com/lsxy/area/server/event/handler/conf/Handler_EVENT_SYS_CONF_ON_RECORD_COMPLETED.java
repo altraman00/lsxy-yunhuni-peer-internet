@@ -67,7 +67,7 @@ public class Handler_EVENT_SYS_CONF_ON_RECORD_COMPLETED extends EventHandler {
         }
         BusinessState state = businessStateService.get(conf_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null,call_id=",conf_id);
+            throw new InvalidParamException("businessstate is null,call_id={}",conf_id);
         }
 
         if(logger.isDebugEnabled()){
