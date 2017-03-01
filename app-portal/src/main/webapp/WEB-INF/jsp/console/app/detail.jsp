@@ -1275,7 +1275,7 @@
             return;
         }
         var re = /^http[s]?:\/\/.+$/;
-        if(editSubAccountFive.url!=null&& editSubAccountFive.url.length >0 && !re.test(editSubAccountFive.url)){
+        if(createSubAccountFive.url!=null&& createSubAccountFive.url.length >0 && !re.test(createSubAccountFive.url)){
             showtoast("回调地址格式错误");
             return;
         }
