@@ -1369,6 +1369,7 @@
                                 $('#page' + currentPage + pagePlay.obj).click();
                             }else{
                                 $('#play-'+id).remove();
+                                $('#page0'+pagePlay.obj).hide();
                             }
                         }
                     }else{
@@ -1425,17 +1426,14 @@
                             var currentPage;
                             if(((subAccountPage.nowPage - 1) * subAccountPage.listRow +1) <= --subAccountPage.count){
                                 currentPage = subAccountPage.nowPage;
-                                console.info("1:"+currentPage);
                             }else {
                                 currentPage = subAccountPage.nowPage - 1;
-                                console.info("2:"+currentPage);
                             }
                             if(currentPage>0){
-                                console.info("3:"+'#page' + currentPage + subAccountPage.obj);
                                 $('#page' + currentPage + subAccountPage.obj).click();
                             }else{
-                                console.info("4:"+'#play-'+id);
                                 $('#play-'+id).remove();
+                                $('#page0'+subAccountPage.obj).hide();
                             }
                         }
                         console.info("进入-结束")
@@ -1926,6 +1924,7 @@
                                             $('#page' + currentPage + bindNumPage2.obj).click();
                                         }else{
                                             $('#rent-'+id).remove();
+                                            $('#page0'+bindNumPage2.obj).hide();
                                         }
                                     }
                                 }else{
@@ -1971,6 +1970,7 @@
                                                 $('#page' + currentPage + bindNumPage.obj).click();
                                             }else{
                                                 $('#rent-'+id).remove();
+                                                $('#page0'+bindNumPage.obj).hide();
                                             }
                                         }
                                     }else{
