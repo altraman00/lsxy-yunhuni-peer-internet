@@ -156,7 +156,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
                             voiceCdr.setIvrType(Integer.parseInt(callCenter.getType()));
                         }
                     }catch (Throwable t){
-                        logger.error("设置cdr的呼入呼出类型失败",t);
+                        logger.error("设置cdr的呼入呼出类型失败"+callCenterId,t);
                     }
                 }
             }

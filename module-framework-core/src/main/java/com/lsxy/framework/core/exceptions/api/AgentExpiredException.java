@@ -12,6 +12,14 @@ public class AgentExpiredException extends YunhuniApiException {
         super();
     }
 
+    public AgentExpiredException(String context){
+        super(context);
+    }
+
+    public AgentExpiredException(ExceptionContext context){
+        super(context);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.AgentExpired;

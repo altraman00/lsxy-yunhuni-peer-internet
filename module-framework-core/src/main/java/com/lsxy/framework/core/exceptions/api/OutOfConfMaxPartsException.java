@@ -13,6 +13,14 @@ public class OutOfConfMaxPartsException extends YunhuniApiException {
         super();
     }
 
+    public OutOfConfMaxPartsException(String context) {
+        super(context);
+    }
+
+    public OutOfConfMaxPartsException(ExceptionContext context){
+        super(context);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.OutOfConfMaxParts;

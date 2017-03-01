@@ -12,6 +12,14 @@ public class ConversationNotExistException extends YunhuniApiException {
         super();
     }
 
+    public ConversationNotExistException(String context) {
+        super(context);
+    }
+
+    public ConversationNotExistException(ExceptionContext context){
+        super(context);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.ConversationNotExist;

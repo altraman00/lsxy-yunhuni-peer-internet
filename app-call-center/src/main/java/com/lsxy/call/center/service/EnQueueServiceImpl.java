@@ -19,6 +19,7 @@ import com.lsxy.call.center.utils.Lua;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.AgentNotExistException;
 import com.lsxy.framework.core.exceptions.api.ConditionNotExistException;
+import com.lsxy.framework.core.exceptions.api.ExceptionContext;
 import com.lsxy.framework.core.utils.*;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.callcenter.EnqueueTimeoutEvent;
@@ -161,16 +162,55 @@ public class EnQueueServiceImpl implements EnQueueService{
                 conditionId = enQueue.getRoute().getCondition().getId();
                 condition = conditionService.findById(conditionId);
                 if(condition == null){
-                    throw new ConditionNotExistException();
+                    throw new ConditionNotExistException(
+                            new ExceptionContext().put("tenantId",tenantId)
+                            .put("appId",appId)
+                            .put("subaccountId",subaccountId)
+                            .put("num",num)
+                            .put("callId",callId)
+                            .put("enQueue",enQueue)
+                            .put("queueType",queueType)
+                            .put("conversationId",conversationId)
+                    );
                 }
                 if(!tenantId.equals(condition.getTenantId())){
-                    throw new ConditionNotExistException();
+                    throw new ConditionNotExistException(
+                            new ExceptionContext().put("tenantId",tenantId)
+                                    .put("appId",appId)
+                                    .put("subaccountId",subaccountId)
+                                    .put("num",num)
+                                    .put("callId",callId)
+                                    .put("enQueue",enQueue)
+                                    .put("queueType",queueType)
+                                    .put("conversationId",conversationId)
+                                    .put("condition",condition)
+                    );
                 }
                 if(!appId.equals(condition.getAppId())){
-                    throw new ConditionNotExistException();
+                    throw new ConditionNotExistException(
+                            new ExceptionContext().put("tenantId",tenantId)
+                                    .put("appId",appId)
+                                    .put("subaccountId",subaccountId)
+                                    .put("num",num)
+                                    .put("callId",callId)
+                                    .put("enQueue",enQueue)
+                                    .put("queueType",queueType)
+                                    .put("conversationId",conversationId)
+                                    .put("condition",condition)
+                    );
                 }
                 if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,condition.getSubaccountId())){
-                    throw new ConditionNotExistException();
+                    throw new ConditionNotExistException(
+                            new ExceptionContext().put("tenantId",tenantId)
+                                    .put("appId",appId)
+                                    .put("subaccountId",subaccountId)
+                                    .put("num",num)
+                                    .put("callId",callId)
+                                    .put("enQueue",enQueue)
+                                    .put("queueType",queueType)
+                                    .put("conversationId",conversationId)
+                                    .put("condition",condition)
+                    );
                 }
                 fetchTimout = condition.getFetchTimeout();
                 queueTimout = condition.getQueueTimeout();
@@ -178,13 +218,42 @@ public class EnQueueServiceImpl implements EnQueueService{
                 agentName = enQueue.getRoute().getAgent().getName();
                 agent = callCenterAgentService.get(appId,subaccountId,agentName);
                 if(agent == null){
-                    throw new AgentNotExistException();
+                    throw new AgentNotExistException(
+                            new ExceptionContext().put("tenantId",tenantId)
+                                    .put("appId",appId)
+                                    .put("subaccountId",subaccountId)
+                                    .put("num",num)
+                                    .put("callId",callId)
+                                    .put("enQueue",enQueue)
+                                    .put("queueType",queueType)
+                                    .put("conversationId",conversationId)
+                    );
                 }
                 if(!tenantId.equals(agent.getTenantId())){
-                    throw new AgentNotExistException();
+                    throw new AgentNotExistException(
+                            new ExceptionContext().put("tenantId",tenantId)
+                                    .put("appId",appId)
+                                    .put("subaccountId",subaccountId)
+                                    .put("num",num)
+                                    .put("callId",callId)
+                                    .put("enQueue",enQueue)
+                                    .put("queueType",queueType)
+                                    .put("conversationId",conversationId)
+                                    .put("agent",agent)
+                    );
                 }
                 if(!appId.equals(agent.getAppId())){
-                    throw new AgentNotExistException();
+                    throw new AgentNotExistException(
+                            new ExceptionContext().put("tenantId",tenantId)
+                                    .put("appId",appId)
+                                    .put("subaccountId",subaccountId)
+                                    .put("num",num)
+                                    .put("callId",callId)
+                                    .put("enQueue",enQueue)
+                                    .put("queueType",queueType)
+                                    .put("conversationId",conversationId)
+                                    .put("agent",agent)
+                    );
                 }
                 fetchTimout = enQueue.getRoute().getAgent().getFetch_timeout();
                 queueTimout = enQueue.getRoute().getAgent().getQueue_timeout();

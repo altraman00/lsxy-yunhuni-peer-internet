@@ -141,7 +141,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
         }
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null");
+            throw new InvalidParamException("businessstate is null,call_id="+call_id);
         }
         if(logger.isDebugEnabled()){
             logger.info("call_id={},state={}",call_id,state);
@@ -153,10 +153,10 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             String conf_id = businessData.get("conf_id");
             try {
                 if(conf_id == null){
-                    throw new InvalidParamException("将呼叫加入到会议失败conf_id为null");
+                    throw new InvalidParamException("将呼叫加入到会议失败conf_id为null,state="+state);
                 }
                 if(StringUtils.isNotBlank(error)){
-                    throw new RuntimeException("邀请呼叫加入会议失败"+error);
+                    throw new RuntimeException("邀请呼叫加入会议失败"+error+",state="+state);
                 }
                 confService.confEnter(call_id,conf_id,null,null,null);
             } catch (Throwable e) {
@@ -203,7 +203,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(state.getTenantId(),state.getAppId(),
                                 new Date()).setCallOutSuccess(1L).build());
                     }catch (Throwable t){
-                        logger.warn("incrIntoRedis失败",t);
+                        logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
                     }
                 }
                 ivrActionService.doAction(call_id,null);
@@ -439,7 +439,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                     .setToManualSuccess(1L)
                                     .build());
                         }catch (Throwable t){
-                            logger.warn("incrIntoRedis失败",t);
+                            logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
                         }
                         if((conversationState.getClosed()== null || !conversationState.getClosed())){
                             //交谈开始事件
@@ -563,7 +563,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                 .setCallOutSuccess(1L)
                                 .build());
                     }catch (Throwable t){
-                        logger.warn("incrIntoRedis失败",t);
+                        logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
                     }
                     //交谈开始事件
                     callCenterUtil.conversationBeginEvent(state.getSubaccountId(),state.getCallBackUrl(),conversationId,
@@ -598,7 +598,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                     try {
                         conversationService.join(conversationId,call_id,null,null,null);
                     } catch (YunhuniApiException e) {
-                        logger.info("加入交谈失败:{}",e.getCode());
+                        logger.info("加入交谈失败",e);
                         conversationService.logicExit(conversationId,call_id);
                     }
                 }else{

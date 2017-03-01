@@ -39,7 +39,7 @@ public class CdrEventHandler implements MQMessageHandler<CdrEvent> {
         try{
             voiceCdr = JSONUtil2.fromJson(message.getVoiceCdr(),VoiceCdr.class);
         }catch (Throwable t){
-            logger.error("cdr反序列化失败{}",t);
+            logger.error(String.format("cdr反序列化失败,cdr=%s",message.getVoiceCdr()),t);
         }
         if(voiceCdr == null){
             return;
