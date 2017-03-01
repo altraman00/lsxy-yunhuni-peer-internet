@@ -141,7 +141,7 @@ public class DeQueueServiceImpl implements DeQueueService {
                         result.getAgent().getName(),result.getExtension().getId(),
                         state.getBusinessData().get("from"),state.getBusinessData().get("to"),
                         result.getExtension().getTelnum(),result.getExtension().getType(),
-                        result.getExtension().getUser(),conversationTimeout,result.getFetchTime(),enQueue.getVoice_mode());
+                        result.getExtension().getUser(),conversationTimeout,result.getFetchTime(),enQueue.getVoice_mode(),state.getUserdata());
         if(conversationId == null){//在现有的交谈上邀请座席，不需要创建交谈
             //开始创建交谈
             conversationService.create(state.getSubaccountId(),conversation,state.getBusinessData().get(BusinessState.REF_RES_ID),
