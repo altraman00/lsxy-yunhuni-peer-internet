@@ -24,7 +24,7 @@ public class AgentVO {
         this.name = name;
         this.subaccountId = subaccountId;
         this.num = num;
-        this.state = state;
+        this.state = CallCenterAgent.getChineseState(state) ;
         this.extension = extension;
         this.skills = skills;
     }

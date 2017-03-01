@@ -1064,7 +1064,7 @@
             return;
         }
         var re = /^http[s]?:\/\/.+$/;
-        if(!re.test(editSubAccountFive.url)){
+        if(editSubAccountFive.url!=null&& editSubAccountFive.url.length >0 && !re.test(editSubAccountFive.url)){
             showtoast("回调地址格式错误");
             return;
         }
@@ -1114,7 +1114,7 @@
             return;
         }
         var re = /^http[s]?:\/\/.+$/;
-        if(!re.test(editSubAccountFive.url)){
+        if(editSubAccountFive.url!=null&& editSubAccountFive.url.length >0 && !re.test(editSubAccountFive.url)){
             showtoast("回调地址格式错误");
             return;
         }

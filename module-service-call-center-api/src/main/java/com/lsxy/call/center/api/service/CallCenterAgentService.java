@@ -70,9 +70,9 @@ public interface CallCenterAgentService extends BaseService<CallCenterAgent> {
      * @return
      * @throws YunhuniApiException
      */
-    Page getPage(String appId, Integer pageNo, Integer pageSize) throws YunhuniApiException;
+    Page getPageForPotal(String appId, Integer pageNo, Integer pageSize) throws YunhuniApiException;
 
-    Page getPage(String appId,String subaccountId, Integer pageNo, Integer pageSize) throws YunhuniApiException;
+    Page getPageForApiGW(String appId,String subaccountId, Integer pageNo, Integer pageSize) throws YunhuniApiException;
 
     /**
      * 修改座席分机
