@@ -19,5 +19,5 @@ public interface ConditionService extends BaseService<Condition> {
 
     public List<Condition> getAll(String tenantId, String appId) throws YunhuniApiException;
 
-    public List<Condition> getAll(String tenantId, String appId,String channelId) throws YunhuniApiException;
+    public List<Condition> getAll(String tenantId, String appId,String subaccountId) throws YunhuniApiException;
 }

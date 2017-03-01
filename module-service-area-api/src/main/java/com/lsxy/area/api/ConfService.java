@@ -24,19 +24,19 @@ public interface ConfService {
      * user_data 用户数据
      * @return
      */
-    public String create(String ip,String appId,Integer maxDuration,Integer maxParts,
+    public String create(String subaccountId,String ip,String appId,Integer maxDuration,Integer maxParts,
                          Boolean recording,Boolean autoHangup,String bgmFile,String userData) throws YunhuniApiException;
 
     /**
      * 解散会议
      */
-    public boolean dismiss(String ip,String appId,String confId) throws YunhuniApiException;
+    public boolean dismiss(String subaccountId,String ip,String appId,String confId) throws YunhuniApiException;
 
     /**
      * 会议邀请呼叫
      * @return
      */
-    public String invite(String ip,String appId,String confId,
+    public String invite(String subaccountId,String ip,String appId,String confId,
                          String from,String to,Integer maxDuration,Integer maxDialDuration,
                          Integer dialVoiceStopCond,String playFile,Integer voiceMode) throws YunhuniApiException;
 
@@ -44,7 +44,7 @@ public interface ConfService {
      * 将通话加入到会议
      * @return
      */
-    public boolean join(String ip,String appId,String confId,String callId,Integer maxDuration,
+    public boolean join(String subaccountId,String ip,String appId,String confId,String callId,Integer maxDuration,
                         String playFile,Integer voiceMode) throws YunhuniApiException;
 
 
@@ -52,31 +52,31 @@ public interface ConfService {
      * 退出会议
      * @return
      */
-    public boolean quit(String ip,String appId,String confId,String callId) throws YunhuniApiException;
+    public boolean quit(String subaccountId,String ip,String appId,String confId,String callId) throws YunhuniApiException;
 
     /**
      * 会议放音
      * @return
      */
-    public boolean startPlay(String ip,String appId,String confId,List<String> playFiles) throws YunhuniApiException;
+    public boolean startPlay(String subaccountId,String ip,String appId,String confId,List<String> playFiles) throws YunhuniApiException;
 
     /**
      * 停止会议放音
      * @return
      */
-    public boolean stopPlay(String ip,String appId,String confId) throws YunhuniApiException;
+    public boolean stopPlay(String subaccountId,String ip,String appId,String confId) throws YunhuniApiException;
 
     /**
      * 会议录音
      * @return
      */
-    public boolean startRecord(String ip,String appId,String confId,Integer maxDuration) throws YunhuniApiException;
+    public boolean startRecord(String subaccountId,String ip,String appId,String confId,Integer maxDuration) throws YunhuniApiException;
 
     /**
      * 停止会议录音
      * @return
      */
-    public boolean stopRecord(String ip,String appId,String confId) throws YunhuniApiException;
+    public boolean stopRecord(String subaccountId,String ip,String appId,String confId) throws YunhuniApiException;
 
     /**
      * 设置成员声音模式
@@ -86,7 +86,7 @@ public interface ConfService {
      * 4: 不能听；不能说
      * @return
      */
-    public boolean setVoiceMode(String ip,String appId,String confId,String callId,Integer voiceMode) throws YunhuniApiException;
+    public boolean setVoiceMode(String subaccountId,String ip,String appId,String confId,String callId,Integer voiceMode) throws YunhuniApiException;
 
     /**
      * 将呼叫加入到会议

@@ -47,6 +47,7 @@ public class AgentController extends AbstractAPIController {
         }
         agent.setAppId(appId);
         agent.setTenantId(app.getTenant().getId());
+        agent.setSubaccountId(getSubaccountId(request));
         callCenterAgentService.login(agent);
         return ApiGatewayResponse.success();
     }
@@ -61,7 +62,7 @@ public class AgentController extends AbstractAPIController {
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
-        callCenterAgentService.logout(app.getTenant().getId(),appId,agentName,force);
+        callCenterAgentService.logout(app.getTenant().getId(),appId,getSubaccountId(request),agentName,force);
         if(logger.isDebugEnabled()){
             logger.debug("注销座席结束：{}",agentName);
         }
@@ -75,7 +76,7 @@ public class AgentController extends AbstractAPIController {
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
-        callCenterAgentService.keepAlive(appId,agentName);
+        callCenterAgentService.keepAlive(appId,getSubaccountId(request),agentName);
         return ApiGatewayResponse.success();
     }
 
@@ -86,7 +87,7 @@ public class AgentController extends AbstractAPIController {
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
-        CallCenterAgent agent = callCenterAgentService.get(appId,agentName);
+        CallCenterAgent agent = callCenterAgentService.get(appId,getSubaccountId(request),agentName);
         AgentVO agentVO = AgentVO.changeCallCenterAgentToAgentVO(agent);
         return ApiGatewayResponse.success(agentVO);
     }
@@ -100,7 +101,7 @@ public class AgentController extends AbstractAPIController {
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
-        Page page  = callCenterAgentService.getPage(appId,pageNo,pageSize);
+        Page page  = callCenterAgentService.getPageForApiGW(appId,getSubaccountId(request),pageNo,pageSize);
         List<AgentVO> agentVOs = new ArrayList<>();
         List<CallCenterAgent> result = page.getResult();
         result.stream().forEach(agent -> agentVOs.add(AgentVO.changeCallCenterAgentToAgentVO(agent)));
@@ -116,7 +117,7 @@ public class AgentController extends AbstractAPIController {
             throw new AppServiceInvalidException();
         }
         String extensionId = (String) map.get("id");
-        callCenterAgentService.extension(appId,agentName,extensionId);
+        callCenterAgentService.extension(appId,agentName,extensionId,getSubaccountId(request));
         return ApiGatewayResponse.success();
     }
 
@@ -133,7 +134,7 @@ public class AgentController extends AbstractAPIController {
             throw new RequestIllegalArgumentException();
         }
         if(state.equals("busy") || state.equals("away") || state.equals("idle") || state.startsWith("busy/") || state.startsWith("away/")){
-            callCenterAgentService.state(appId,agentName,state);
+            callCenterAgentService.state(appId,getSubaccountId(request),agentName,state);
             return ApiGatewayResponse.success();
         }else{
             throw new RequestIllegalArgumentException();
@@ -151,7 +152,7 @@ public class AgentController extends AbstractAPIController {
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
-        callCenterAgentService.skills(app.getTenant().getId(),appId,agentName,skillOpts.getOpts());
+        callCenterAgentService.skills(app.getTenant().getId(),appId,getSubaccountId(request),agentName,skillOpts.getOpts());
         return ApiGatewayResponse.success();
     }
 

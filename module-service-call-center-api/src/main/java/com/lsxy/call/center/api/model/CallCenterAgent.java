@@ -27,7 +27,7 @@ public class CallCenterAgent extends IdEntity {
 
     private String tenantId;
     private String appId;
-    private String channel;
+    private String subaccountId;
     private String name;//坐席id
     private String num;//坐席工号
 
@@ -36,6 +36,16 @@ public class CallCenterAgent extends IdEntity {
     private List<AgentSkill> skills; //座席技能，不存入座席表
     private String extension;   //座席分机，不存入座席表
 
+
+    public static String getChineseState(String state){
+        state = state.replace(STATE_ONLINE,"在线");
+        state = state.replace(STATE_IDLE,"空闲");
+        state = state.replace(STATE_FETCHING,"正在呼叫");
+        state = state.replace(STATE_TALKING,"通话");
+        state = state.replace(STATE_BUSY,"忙碌");
+        state = state.replace(STATE_AWAY,"离席");
+        return state;
+    }
 
     @Column(name = "tenant_id")
     public String getTenantId() {
@@ -55,13 +65,13 @@ public class CallCenterAgent extends IdEntity {
         this.appId = appId;
     }
 
-    @Column(name = "channel")
-    public String getChannel() {
-        return channel;
+    @Column(name = "subaccount_id")
+    public String getSubaccountId() {
+        return subaccountId;
     }
 
-    public void setChannel(String channel) {
-        this.channel = channel;
+    public void setSubaccountId(String subaccountId) {
+        this.subaccountId = subaccountId;
     }
 
     @Column(name = "name")

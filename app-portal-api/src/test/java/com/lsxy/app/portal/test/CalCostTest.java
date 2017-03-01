@@ -203,7 +203,7 @@ public class CalCostTest {
     private Long select(){
         Long start = System.currentTimeMillis();
         App app = appService.findById("40288aca574060400157406427f20005");
-        List<ResourceTelenum> dialingTelnumber = resourceTelenumService.findDialingTelnumber(null, app, "8675522730043", "02082241195");
+        List<ResourceTelenum> dialingTelnumber = resourceTelenumService.findDialingTelnumber(null,null, app, "8675522730043", "02082241195");
 //        System.out.println(JSONUtil.objectToJson(dialingTelnumber));
         Long end = System.currentTimeMillis();
         System.out.println("方法执行时间："  + (end-start) + "ms");

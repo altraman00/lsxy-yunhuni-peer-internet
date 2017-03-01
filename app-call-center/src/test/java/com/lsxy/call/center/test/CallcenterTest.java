@@ -147,7 +147,7 @@ public class CallcenterTest {
                 "        </condition>\n" +
                 "    </filter>\n" +
                 "</enqueue>");
-        enQueueService.lookupAgent("40288ac9575612a30157561c7ff50004","40288ac957e1812e0157e18a994e0000","","",enQueue,null,null);
+        enQueueService.lookupAgent("40288ac9575612a30157561c7ff50004","40288ac957e1812e0157e18a994e0000",null,"","",enQueue,null,null);
     }
 
     @Test
@@ -161,6 +161,6 @@ public class CallcenterTest {
 
     @Test
     public void test7() throws YunhuniApiException {
-        System.out.println(callCenterConversationService.pageList(null,"8a2a6a4a58b9c19d0158bd76a9310000",1,10).getTotalCount());;
+        System.out.println(callCenterConversationService.conversationPageList(null,null,"8a2a6a4a58b9c19d0158bd76a9310000",1,10).getTotalCount());;
     }
 }

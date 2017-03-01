@@ -12,6 +12,8 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import org.apache.commons.lang.StringUtils;
@@ -48,6 +50,8 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     AppService appService;
     @Autowired
     private OpensipsExtensionService opensipsExtensionService;
+    @Autowired
+    ApiCertificateSubAccountService apiCertificateSubAccountService;
 
     @Override
     public BaseDaoInterface<AppExtension, Serializable> getDao() {
@@ -63,12 +67,12 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
 
     //创建
     @Override
-    public AppExtension create(String appId,AppExtension appExtension) throws YunhuniApiException {
+    public AppExtension create(String appId,String subaccountId,AppExtension appExtension) throws YunhuniApiException {
         App app = appService.findById(appId);
 
         appExtension.setAppId(appId);
         appExtension.setTenantId(app.getTenant().getId());
-
+        appExtension.setSubaccountId(subaccountId);
         if(appExtension == null || StringUtil.isBlank(appExtension.getTenantId()) || StringUtil.isBlank(appExtension.getAppId())){
             throw new RequestIllegalArgumentException();
         }
@@ -87,9 +91,13 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
                 if(!uB || !pB){
                     throw new RequestIllegalArgumentException();
                 }
-
-                Long ccn = app.getCallCenterNum();
-                //创建分机的用户名要加上应用编号，以区分唯一性
+                Long ccn;
+                if(StringUtils.isBlank(subaccountId)){
+                    ccn = app.getCallCenterNum();
+                }else{
+                    ccn = apiCertificateSubAccountService.findById(subaccountId).getExtensionPrefix();
+                }
+                //创建分机的用户名要加上分机前缀，以区分唯一性
                 appExtension.setUser(ccn + appExtension.getUser());
                 //用户名是否已存在
                 if(this.exists(appExtension.getUser())){
@@ -133,12 +141,19 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     }
 
     @Override
-    public void delete(String extensionId, String appId) throws YunhuniApiException{
+    public void delete(String extensionId, String appId,String subaccountId) throws YunhuniApiException{
         AppExtension extension = this.findById(extensionId);
         if(extension == null){
             throw new ExtensionNotExistException();
         }
         if(StringUtils.isNotBlank(appId) && appId.equals(extension.getAppId())){
+            if(StringUtils.isBlank(subaccountId) && StringUtils.isNotBlank(extension.getSubaccountId())){
+                throw new ExtensionNotExistException();
+            }
+            if(StringUtils.isNotBlank(subaccountId) && !subaccountId.equals(extension.getSubaccountId())){
+                throw new ExtensionNotExistException();
+            }
+
             //获取分机锁
             ExtensionLock extensionLock = new ExtensionLock(redisCacheService,extensionId);
             boolean lock = extensionLock.lock();
@@ -174,8 +189,9 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
 
     @Override
     public Page<AppExtension> getPage(String appId, Integer pageNo, Integer pageSize) {
+        Page page;
         String hql = "from AppExtension obj where obj.appId=?1";
-        Page page = this.pageList(hql, pageNo, pageSize, appId);
+        page = this.pageList(hql, pageNo, pageSize, appId);
         List<AppExtension> result = page.getResult();
         if(result != null && result.size() > 0){
             for(AppExtension ext : result){
@@ -187,7 +203,27 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     }
 
     @Override
-    public AppExtension findOne(String appId, String extensionId) throws YunhuniApiException{
+    public Page<AppExtension> getPage(String appId,String subaccountId, Integer pageNo, Integer pageSize) {
+        Page page;
+        if(StringUtils.isBlank(subaccountId)){
+            String hql = "from AppExtension obj where obj.appId=?1 and obj.subaccountId is null";
+            page = this.pageList(hql, pageNo, pageSize, appId);
+        }else{
+            String hql = "from AppExtension obj where obj.appId=?1 and obj.subaccountId = ?2";
+            page = this.pageList(hql, pageNo, pageSize, appId,subaccountId);
+        }
+        List<AppExtension> result = page.getResult();
+        if(result != null && result.size() > 0){
+            for(AppExtension ext : result){
+                boolean enable = extensionState.getEnable(ext.getId());
+                ext.setEnable(enable);
+            }
+        }
+        return page;
+    }
+
+    @Override
+    public AppExtension findOne(String appId, String extensionId,String subaccountId) throws YunhuniApiException{
         if(StringUtils.isBlank(appId)){
             logger.error("appId 不能为空");
             throw new RequestIllegalArgumentException();
@@ -201,7 +237,13 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
             throw new ExtensionNotExistException();
         }
         if(!appId.equals(extension.getAppId())){
-            throw new RequestIllegalArgumentException();
+            throw new ExtensionNotExistException();
+        }
+        if(StringUtils.isBlank(subaccountId) && StringUtils.isNotBlank(extension.getSubaccountId())){
+            throw new ExtensionNotExistException();
+        }
+        if(StringUtils.isNotBlank(subaccountId) && !subaccountId.equals(extension.getSubaccountId())){
+            throw new ExtensionNotExistException();
         }
         boolean enable = extensionState.getEnable(extension.getId());
         extension.setEnable(enable);

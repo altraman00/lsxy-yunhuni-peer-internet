@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <response xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ivraction.xsd">
     <enqueue
-            channel="40288ae2586b014801586b0171520000"
             wait_voice="3.wav"
             ring_mode="4"
             play_num="true"

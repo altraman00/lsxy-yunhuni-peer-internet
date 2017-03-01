@@ -100,6 +100,8 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         voiceCdr.setAreaId(businessState.getAreaId());
         voiceCdr.setTenantId(businessState.getTenantId());
         voiceCdr.setAppId(businessState.getAppId());
+        //子账号ID，如果是主账号的呼叫，此处为null
+        voiceCdr.setSubaccountId(businessState.getSubaccountId());
         voiceCdr.setLineId(businessState.getLineGatewayId());
         //产品编码，可根据些判断此cdr是哪个产品的cdr
 

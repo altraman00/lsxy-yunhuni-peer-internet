@@ -85,6 +85,7 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_ON_RELEASED extends EventHandler {
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","captcha_call.end")
                     .putIfNotEmpty("id",call_id)
+                    .putIfNotEmpty("subaccount_id",state.getSubaccountId())
                     .putIfNotEmpty("begin_time",begin_time)
                     .putIfNotEmpty("answer_time",answer_time)
                     .putIfNotEmpty("end_time",end_time)

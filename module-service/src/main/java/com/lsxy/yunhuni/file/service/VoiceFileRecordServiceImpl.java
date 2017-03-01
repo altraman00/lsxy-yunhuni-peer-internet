@@ -240,7 +240,7 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
         if(record.getCost().compareTo(BigDecimal.ZERO) == 1){
             //插入消费
             Consume consume = new Consume(record.getCreateTime(),ProductCode.recording.name(),record.getCost(),ProductCode.recording.getRemark(),
-                    record.getAppId(),record.getTenantId(),record.getId());
+                    record.getAppId(),record.getTenantId(),record.getId(),record.getSubaccountId());
             consumeService.consume(consume);
         }
     }

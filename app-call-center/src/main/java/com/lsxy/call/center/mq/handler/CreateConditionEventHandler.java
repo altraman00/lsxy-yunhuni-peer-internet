@@ -64,7 +64,7 @@ public class CreateConditionEventHandler implements MQMessageHandler<CreateCondi
         //初始化CAs ACs
         long start = System.currentTimeMillis();
         List<String> agentIds = callCenterAgentService
-                                        .getAgentIdsByChannel(condition.getTenantId(),condition.getAppId(),condition.getChannelId());
+                                        .getAgentIdsBySubaccountId(condition.getTenantId(),condition.getAppId(),condition.getSubaccountId());
 
         if(agentIds != null && agentIds.size() > 0){
             for (String agentId : agentIds) {

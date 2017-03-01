@@ -105,6 +105,7 @@ public class NotifyCallbackUtil {
             post.setHeader("accept",ACCEPT_TYPE_TEXT_PLAIN);
             client.execute(post,new FutureCallback<HttpResponse>(){
 
+
                 @Override
                 public void completed(HttpResponse response) {
                     boolean success = false;
@@ -112,8 +113,8 @@ public class NotifyCallbackUtil {
                         success = true;
                     }
                     if(logger.isDebugEnabled()){
-                        logger.info("url={},status={}"
-                                ,url,response.getStatusLine().getStatusCode());
+                        logger.info("url={},status={},data={}"
+                                ,url,response.getStatusLine().getStatusCode(),JSONUtil2.objectToJson(data));
                         logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
                     }
                     if(!success){
@@ -145,7 +146,7 @@ public class NotifyCallbackUtil {
         }
     }
 
-    public boolean postNotifySync(final String url, final Map<String,Object> data,final Integer timeout,int retry){
+    /*public boolean postNotifySync(final String url, final Map<String,Object> data,final Integer timeout,int retry){
         boolean success = false;
         data.put("action","event_notify");
         do{
@@ -171,7 +172,7 @@ public class NotifyCallbackUtil {
             }
         }while (!success && retry>0);
         return success;
-    }
+    }*/
     /*public static void main(String[] args) {
         NotifyCallbackUtil a = new NotifyCallbackUtil();
         a.init();

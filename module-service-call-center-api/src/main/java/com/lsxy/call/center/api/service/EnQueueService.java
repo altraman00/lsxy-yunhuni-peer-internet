@@ -7,7 +7,7 @@ import com.lsxy.call.center.api.model.EnQueue;
  */
 public interface EnQueueService {
 
-    public void lookupAgent(String tenantId, String appId,String num, String callId, EnQueue enQueue,String queueType,String conversationId);
+    public void lookupAgent(String tenantId, String appId,String subaccountId,String num, String callId, EnQueue enQueue,String queueType,String conversationId);
 
     public void lookupQueue(String tenantId, String appId,String conditionId, String agentId);
 

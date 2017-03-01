@@ -107,7 +107,7 @@
                                                 <c:if test="${sum!=null && sum.num!=null}">
                                                     <c:set value="${sum.num}" var="sum_num"></c:set>
                                                 </c:if>
-                                                <th colspan="11" style="text-align: right;"><span class="p-money">呼叫个数：${sum_num}个&nbsp;&nbsp;总消费金额：<fmt:formatNumber value="${sum_cost}" pattern="0.000"></fmt:formatNumber> 元</span></th>
+                                                <th colspan="11" style="text-align: right;"><span class="p-money">总消费金额：<fmt:formatNumber value="${sum_cost}" pattern="0.000"></fmt:formatNumber> 元</span></th>
                                             </tr>
                                             <tr>
                                                 <th>呼叫时间</th>

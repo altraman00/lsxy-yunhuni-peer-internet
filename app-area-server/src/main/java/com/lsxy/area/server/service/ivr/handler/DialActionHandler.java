@@ -7,6 +7,7 @@ import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
+import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.call.center.api.model.CallCenter;
@@ -84,6 +85,9 @@ public class DialActionHandler extends ActionHandler{
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterService callCenterService;
 
+    @Autowired
+    private CallbackUrlUtil callbackUrlUtil;
+
     @Override
     public String getAction() {
         return "dial";
@@ -103,7 +107,7 @@ public class DialActionHandler extends ActionHandler{
     public boolean handle(String callId,BusinessState state, Element root,String next) {
         //更新下一步
         businessStateService.updateInnerField(callId,IVRActionService.IVR_NEXT_FIELD,next);
-        dial(callId,state.getResId(),state.getAppId(),state.getTenantId(),conversationService.isCC(state),state.getBusinessData().get(CallCenterUtil.CALLCENTER_FIELD),root);
+        dial(state.getSubaccountId(),callId,state.getResId(),state.getAppId(),state.getTenantId(),conversationService.isCC(state),state.getBusinessData().get(CallCenterUtil.CALLCENTER_FIELD),root);
         return true;
     }
 
@@ -121,7 +125,7 @@ public class DialActionHandler extends ActionHandler{
         return Long.parseLong(s);
     }
 
-    public boolean dial(String ivr_call_id, String parent_call_res_id, String appId, String tenantId,boolean isCC,String callCenterId, Element root){
+    public boolean dial(String subaccountId,String ivr_call_id, String parent_call_res_id, String appId, String tenantId,boolean isCC,String callCenterId, Element root){
         App app = appService.findById(appId);
         //解析xml
         String ring_play_file = root.elementTextTrim("play");
@@ -161,7 +165,7 @@ public class DialActionHandler extends ActionHandler{
 
         AreaAndTelNumSelector.Selector selector;
         try {
-            selector = areaAndTelNumSelector.getTelnumberAndAreaId(app,from,to);
+            selector = areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app,from,to);
         } catch (YunhuniApiException e) {
             return false;
         }
@@ -231,6 +235,7 @@ public class DialActionHandler extends ActionHandler{
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","ivr.connect_end")
                     .putIfNotEmpty("id",ivr_call_id)
+                    .putIfNotEmpty("subaccount_id",subaccountId)
                     .putIfNotEmpty("begin_time",System.currentTimeMillis())
                     .putIfNotEmpty("end_time",System.currentTimeMillis())
                     .putIfNotEmpty("error","dial error")
@@ -246,9 +251,10 @@ public class DialActionHandler extends ActionHandler{
         BusinessState callstate = new BusinessState.Builder()
                 .setTenantId(tenantId)
                 .setAppId(appId)
+                .setSubaccountId(subaccountId)
                 .setId(callId)
                 .setType(BusinessState.TYPE_IVR_DIAL)
-                .setCallBackUrl(app.getUrl())
+                .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
