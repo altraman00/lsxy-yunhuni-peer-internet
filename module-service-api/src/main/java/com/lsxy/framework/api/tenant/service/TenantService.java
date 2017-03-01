@@ -124,8 +124,6 @@ public interface TenantService extends BaseService<Tenant> {
      */
     Map getAwaitNum();
 
-    List<Tenant> getListByPage();
-
     List<Tenant> findByIds(Collection<String> ids);
 
     Page<TenantVO> pageListBySearchAndAccount(String name,Date regDateStart,Date regDateEnd,
