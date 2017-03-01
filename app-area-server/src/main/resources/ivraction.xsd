@@ -197,7 +197,6 @@
         <xs:choice minOccurs="1" maxOccurs="1">
             <xs:element name="route" type="route" minOccurs="1" maxOccurs="1"></xs:element>
         </xs:choice>
-        <xs:attribute name="channel" type="uuid"></xs:attribute>
         <xs:attribute name="conversation_level" type="positivenumber"></xs:attribute>
         <xs:attribute name="conversation_timeout" type="positivenumber"></xs:attribute>
         <xs:attribute name="choice" type="xs:string"></xs:attribute>

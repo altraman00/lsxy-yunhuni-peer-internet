@@ -201,10 +201,10 @@ public class RentTelnumController extends AbstractPortalController {
 
     @RequestMapping(value = "/num/unused/app/{appId}")
     @ResponseBody
-    public RestResponse findOwnUnusedNum(HttpServletRequest request,@PathVariable String appId,int pageNo,int pageSize){
+    public RestResponse findOwnUnusedNum(HttpServletRequest request,@PathVariable String appId,int type,int pageNo,int pageSize){
         String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/num/unused/app/{1}?pageNo={2}&pageSize={3}";
-        RestResponse<Page<ResourceTelenum>> response = RestRequest.buildSecurityRequest(token).getPage(uri, ResourceTelenum.class, appId, pageNo, pageSize);
+        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/num/unused/app/{1}?pageNo={2}&pageSize={3}&type={4}";
+        RestResponse<Page<ResourceTelenum>> response = RestRequest.buildSecurityRequest(token).getPage(uri, ResourceTelenum.class, appId, pageNo, pageSize,type);
         if(!response.isSuccess()){
             return response;
         }

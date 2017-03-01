@@ -33,7 +33,7 @@ public class ConfController extends AbstractAPIController{
             logger.debug("创建会议API参数,accountId={},appId={},dto={}",accountId,appId,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        String confId = confService.create(ip,appId,dto.getMaxDuration(),dto.getMaxParts(),
+        String confId = confService.create(getSubaccountId(request),ip,appId,dto.getMaxDuration(),dto.getMaxParts(),
                 dto.getRecording(),dto.getAutoHangup(),dto.getBgmFile(),dto.getUserData());
         Map<String,String> result = new HashMap<>();
         result.put("confId",confId);
@@ -48,7 +48,7 @@ public class ConfController extends AbstractAPIController{
             logger.debug("解散会议API参数,accountId={},appId={},confId={}",accountId,appId,id);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        boolean result = confService.dismiss(ip,appId,id);
+        boolean result = confService.dismiss(getSubaccountId(request),ip,appId,id);
         return ApiGatewayResponse.success(result);
     }
 
@@ -60,7 +60,7 @@ public class ConfController extends AbstractAPIController{
             logger.debug("邀请会议API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        String callId = confService.invite(ip,appId,id,
+        String callId = confService.invite(getSubaccountId(request),ip,appId,id,
                 dto.getFrom(),dto.getTo(),dto.getMaxDuration(),dto.getMaxDialDuration(),
                 dto.getDialVoiceStopCond(),dto.getPlayFile(),dto.getVoiceMode());
         Map<String,String> result = new HashMap<>();
@@ -76,7 +76,7 @@ public class ConfController extends AbstractAPIController{
             logger.debug("加入会议API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        boolean  result = confService.join(ip,appId,id,dto.getCallId(),dto.getMaxDuration(),dto.getPlayFile(),dto.getVoiceMode());
+        boolean  result = confService.join(getSubaccountId(request),ip,appId,id,dto.getCallId(),dto.getMaxDuration(),dto.getPlayFile(),dto.getVoiceMode());
         return ApiGatewayResponse.success(result);
     }
 
@@ -88,7 +88,7 @@ public class ConfController extends AbstractAPIController{
             logger.debug("退出会议API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        boolean  result = confService.quit(ip,appId,id,dto.getCallId());
+        boolean  result = confService.quit(getSubaccountId(request),ip,appId,id,dto.getCallId());
         return ApiGatewayResponse.success(result);
     }
 
@@ -100,7 +100,7 @@ public class ConfController extends AbstractAPIController{
             logger.debug("会议放音API参数,accountId={},appId={},confId={}",accountId,appId,id);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        boolean  result = confService.startPlay(ip,appId,id,dto.getFiles());
+        boolean  result = confService.startPlay(getSubaccountId(request),ip,appId,id,dto.getFiles());
         return ApiGatewayResponse.success(result);
     }
 
@@ -111,7 +111,7 @@ public class ConfController extends AbstractAPIController{
             logger.debug("会议停止放音API参数,accountId={},appId={},confId={}",accountId,appId,id);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        boolean result = confService.stopPlay(ip,appId,id);
+        boolean result = confService.stopPlay(getSubaccountId(request),ip,appId,id);
         return ApiGatewayResponse.success(result);
     }
 
@@ -123,7 +123,7 @@ public class ConfController extends AbstractAPIController{
             logger.debug("会议放音API参数,accountId={},appId={},confId={}",accountId,appId,id);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        boolean  result = confService.startRecord(ip,appId,id,dto.getMaxDuration());
+        boolean  result = confService.startRecord(getSubaccountId(request),ip,appId,id,dto.getMaxDuration());
         return ApiGatewayResponse.success(result);
     }
 
@@ -134,7 +134,7 @@ public class ConfController extends AbstractAPIController{
             logger.debug("会议停止放音API参数,accountId={},appId={},confId={}",accountId,appId,id);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        boolean  result = confService.stopRecord(ip,appId,id);
+        boolean  result = confService.stopRecord(getSubaccountId(request),ip,appId,id);
         return ApiGatewayResponse.success(result);
     }
 
@@ -146,7 +146,7 @@ public class ConfController extends AbstractAPIController{
             logger.debug("设置会议成员录放音模式API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        boolean  result = confService.setVoiceMode(ip,appId,id,dto.getCallId(),dto.getVoiceMode());
+        boolean  result = confService.setVoiceMode(getSubaccountId(request),ip,appId,id,dto.getCallId(),dto.getVoiceMode());
         return ApiGatewayResponse.success(result);
     }
 }

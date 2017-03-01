@@ -16,9 +16,6 @@ public class EnQueue implements Serializable{
     public static final String CHOICE_RANDOM = "random";
 
     @XStreamAsAttribute
-    private String channel;
-
-    @XStreamAsAttribute
     private Integer conversation_level;
 
     @XStreamAsAttribute
@@ -63,13 +60,6 @@ public class EnQueue implements Serializable{
 
     public EnQueue(){
         
-    }
-    public String getChannel() {
-        return channel;
-    }
-
-    public void setChannel(String channel) {
-        this.channel = channel;
     }
 
     public Integer getConversation_level() {

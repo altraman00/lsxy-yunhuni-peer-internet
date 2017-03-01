@@ -26,6 +26,7 @@ public class VoiceCdr extends IdEntity {
     private String areaId;//所属区域
     private String tenantId;//所属租户
     private String  appId;//所属应用
+    private String subaccountId;//子账号id，如果是主账号那么此字段为null
     private String lineId;//所属线路
     private BigDecimal lineCost;//线路成本
     private String type;//'查看产品表code字段或枚举类ProductCode
@@ -100,6 +101,16 @@ public class VoiceCdr extends IdEntity {
     public void setAppId(String appId) {
         this.appId = appId;
     }
+
+    @Column( name = "subaccount_id")
+    public String getSubaccountId() {
+        return subaccountId;
+    }
+
+    public void setSubaccountId(String subaccountId) {
+        this.subaccountId = subaccountId;
+    }
+
     @Column( name = "line_id")
     public String getLineId() {
         return lineId;

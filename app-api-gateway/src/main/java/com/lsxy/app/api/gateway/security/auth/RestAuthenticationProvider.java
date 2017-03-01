@@ -1,7 +1,9 @@
 package com.lsxy.app.api.gateway.security.auth;
 
+import com.lsxy.app.api.gateway.security.SpringSecurityConfig;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -9,14 +11,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Tandy on 2016/7/1.
@@ -51,7 +58,6 @@ public class RestAuthenticationProvider implements AuthenticationProvider {
             secretKey = apiCertificate.getSecretKey();
             tenantId = apiCertificate.getTenantId();
         }
-
 
         if(logger.isDebugEnabled()){
             logger.debug("签名数据：{}",credentials.getRequestData());
@@ -88,8 +94,16 @@ public class RestAuthenticationProvider implements AuthenticationProvider {
 
         // this constructor create a new fully authenticated token, with the "authenticated" flag set to true
         // we use null as to indicates that the user has no authorities. you can change it if you need to set some roles.
-        restToken = new RestToken(apiKey, credentials, restToken.getTimestamp(),tenantId, null);
 
+        if(apiCertificate.getType()!=null && apiCertificate.getType().intValue() == ApiCertificate.TYPE_PRIMARY_ACCOUNT){
+            //是主账号
+            restToken = new RestToken(apiKey, credentials, restToken.getTimestamp(),tenantId,null, roles(SpringSecurityConfig.PRIMARY_ACCOUNT));
+        }else if(apiCertificate.getType().intValue() == ApiCertificate.TYPE_SUBACCOUNT){
+            if(!ApiCertificateSubAccount.ENABLED_TRUE.equals(((ApiCertificateSubAccount)apiCertificate).getEnabled())){
+                throw new DisabledException("子账号被禁用");
+            }
+            restToken = new RestToken(apiKey, credentials, restToken.getTimestamp(),tenantId,apiCertificate.getId(), null);
+        }
         return restToken;
     }
 
@@ -105,6 +119,15 @@ public class RestAuthenticationProvider implements AuthenticationProvider {
         return (diff/1000) > expiredMinute*60;
     }
 
+
+    private List<GrantedAuthority> roles(String... roles) {
+        List<GrantedAuthority> authorities = new ArrayList<>(
+                roles.length);
+        for (String role : roles) {
+            authorities.add(new SimpleGrantedAuthority( role));
+        }
+        return authorities;
+    }
 
     public boolean supports(Class<?> authentication) {
         return RestToken.class.equals(authentication);

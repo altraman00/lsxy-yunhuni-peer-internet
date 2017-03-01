@@ -97,10 +97,9 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
                     logger.info("[{}][{}]开始判断振铃前是否客户挂断了呼叫:{}",state.getTenantId(),state.getAppId(),initiatorState);
                 }
                 if(initiatorState!=null && initiatorState.getClosed() != null && initiatorState.getClosed()){
-                    callCenterUtil.sendQueueFailEvent(initiatorState.getCallBackUrl(),
+                    callCenterUtil.sendQueueFailEvent(initiatorState.getSubaccountId(),initiatorState.getCallBackUrl(),
                             initiatorState.getBusinessData().get(CallCenterUtil.QUEUE_ID_FIELD),
                             initiatorState.getBusinessData().get(CallCenterUtil.QUEUE_TYPE_FIELD),
-                            initiatorState.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),
                             initiatorState.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
                             CallCenterUtil.QUEUE_FAIL_HANGUP,
                             initiator,null,initiatorState.getUserdata());
