@@ -141,7 +141,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
         }
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null");
+            throw new InvalidParamException("businessstate is null,call_id="+call_id);
         }
         if(logger.isDebugEnabled()){
             logger.info("call_id={},state={}",call_id,state);
@@ -153,10 +153,10 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             String conf_id = businessData.get("conf_id");
             try {
                 if(conf_id == null){
-                    throw new InvalidParamException("将呼叫加入到会议失败conf_id为null");
+                    throw new InvalidParamException("将呼叫加入到会议失败conf_id为null,state="+state);
                 }
                 if(StringUtils.isNotBlank(error)){
-                    throw new RuntimeException("邀请呼叫加入会议失败"+error);
+                    throw new RuntimeException("邀请呼叫加入会议失败"+error+",state="+state);
                 }
                 confService.confEnter(call_id,conf_id,null,null,null);
             } catch (Throwable e) {
@@ -202,7 +202,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(state.getTenantId(),state.getAppId(),
                                 new Date()).setCallOutSuccess(1L).build());
                     }catch (Throwable t){
-                        logger.warn("incrIntoRedis失败",t);
+                        logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
                     }
                 }
                 ivrActionService.doAction(call_id,null);
@@ -311,7 +311,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         if(CallCenterAgent.STATE_FETCHING.equals(preState)){
                             callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,curState,true);
                             callCenterUtil.agentStateChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),agentId,
-                                    businessData.get(CallCenterUtil.AGENT_NAME_FIELD),preState,curState);
+                                    businessData.get(CallCenterUtil.AGENT_NAME_FIELD),preState,curState,state.getUserdata());
                         }
                     } catch (YunhuniApiException e) {
                         logger.info("[{}][{}]agentID={}设置坐席状态失败 ",state.getTenantId(),state.getAppId(),agentId);
@@ -438,7 +438,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                     .setToManualSuccess(1L)
                                     .build());
                         }catch (Throwable t){
-                            logger.warn("incrIntoRedis失败",t);
+                            logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
                         }
                         if((conversationState.getClosed()== null || !conversationState.getClosed())){
                             //交谈开始事件
@@ -466,27 +466,127 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             }
 
         }else if(BusinessState.TYPE_CC_INVITE_OUT_CALL.equals(state.getType())){
+            String conversationId = businessData.get(CallCenterUtil.CONVERSATION_FIELD);
+            if(conversationId == null){
+                logger.info("交谈不存在{}",conversationId);
+                return res;
+            }
+            BusinessState conversationState = businessStateService.get(conversationId);
+            if(conversationState == null){
+                logger.info("交谈不存在{}",conversationId);
+                return res;
+            }
+            if(conversationState.getClosed() !=null && conversationState.getClosed()){
+                logger.info("交谈已结束{}",conversationId);
+                return  res;
+            }
+            String callCenterId = conversationService.getCallCenter(state);
+
             if(StringUtils.isNotBlank(error)){
                 logger.warn("邀请外线加入到交谈失败{}",error);
-                String conversation = businessData.get(CallCenterUtil.CONVERSATION_FIELD);
-                if(conversation!=null){
-                    conversationService.logicExit(conversation,call_id);
+                if(conversationState.getBusinessData().get(CallCenterUtil.CONVERSATION_STARTED_FIELD) == null){
+                    try{
+                        CallCenter callCenter = null;
+                        if(callCenterId!=null){
+                            callCenter = callCenterService.findById(callCenterId);
+                        }
+                        if(logger.isDebugEnabled()){
+                            logger.info("[{}][{}][{}]更新CallCenter,callCenter={},state={}",
+                                    state.getTenantId(),state.getAppId(),call_id,callCenter,state);
+                        }
+                        if(callCenter != null){
+                            CallCenter updateCallcenter = new CallCenter();
+                            if(callCenter.getAnswerTime() == null){
+                                updateCallcenter.setAnswerTime(new Date());
+                            }
+                            if(callCenter.getToManualTime() != null &&
+                                    callCenter.getToManualTimeLong() == null){
+                                Long toManualTimeLong = (new Date().getTime()
+                                        - callCenter.getToManualTime().getTime()) / 1000;
+                                updateCallcenter.setToManualTimeLong(toManualTimeLong);
+                            }
+                            if(callCenter.getToManualResult() == null){
+                                updateCallcenter.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_FAIL);
+                            }
+                            callCenterService.update(callCenterId,updateCallcenter);
+                        }
+                    }catch (Throwable t){
+                        logger.warn("更新CallCenter失败",t);
+                    }
                 }
             }else{
-                String conversation = businessData.get(CallCenterUtil.CONVERSATION_FIELD);
-                if(conversation!=null){
-                    try {
-                        conversationService.join(conversation,call_id,null,null,null);
-                    } catch (Throwable e) {
-                        logger.error("将呼叫加入到会议失败",e);
-                        conversationService.logicExit(conversation,call_id);
+                //交谈开始
+                if(conversationState.getBusinessData().get(CallCenterUtil.CONVERSATION_STARTED_FIELD) == null){
+                    businessStateService.updateInnerField(conversationId,
+                            CallCenterUtil.CONVERSATION_STARTED_FIELD,CallCenterUtil.CONVERSATION_STARTED_TRUE);
+                    //开始录音
+                    conversationService.startRecord(conversationState);
+                    try{
+                        CallCenterConversation updateCallCenterConversation = new CallCenterConversation();
+                        updateCallCenterConversation.setState(CallCenterConversation.STATE_READY);
+                        callCenterConversationService.update(conversationId,updateCallCenterConversation);
+                    }catch (Throwable t){
+                        logger.warn("更新交谈记录失败",t);
                     }
+                    try{
+                        CallCenter callCenter = null;
+                        if(callCenterId!=null){
+                            callCenter = callCenterService.findById(callCenterId);
+                        }
+                        if(logger.isDebugEnabled()){
+                            logger.info("[{}][{}][{}]更新CallCenter,callCenter={},state={}",
+                                    state.getTenantId(),state.getAppId(),call_id,callCenter,state);
+                        }
+                        if(callCenter != null){
+                            CallCenter updateCallcenter = new CallCenter();
+                            if(callCenter.getAnswerTime() == null){
+                                updateCallcenter.setAnswerTime(new Date());
+                            }
+                            if(callCenter.getToManualTime() != null &&
+                                    callCenter.getToManualTimeLong() == null){
+                                Long toManualTimeLong = (new Date().getTime()
+                                        - callCenter.getToManualTime().getTime()) / 1000;
+                                updateCallcenter.setToManualTimeLong(toManualTimeLong);
+                            }
+                            if(callCenter.getToManualResult() == null){
+                                updateCallcenter.setToManualResult(""+CallCenter.TO_MANUAL_RESULT_SUCESS);
+                            }
+                            callCenterService.update(callCenterId,updateCallcenter);
+                        }
+                    }catch (Throwable t){
+                        logger.warn("更新CallCenter失败",t);
+                    }
+                    try{
+                        callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
+                                .Builder(state.getTenantId(),state.getAppId(),new Date())
+                                .setCallOutSuccess(1L)
+                                .build());
+                    }catch (Throwable t){
+                        logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
+                    }
+                    //交谈开始事件
+                    callCenterUtil.conversationBeginEvent(state.getSubaccountId(),state.getCallBackUrl(),conversationId,
+                            CallCenterUtil.CONVERSATION_TYPE_CALL_OUT,null,call_id);
                 }
             }
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
             if(StringUtils.isNotBlank(error)){
                 logger.warn("呼叫坐席失败{}",error);
             }else{
+                String agentId = businessData.get(CallCenterUtil.AGENT_ID_FIELD);
+                if(agentId != null){
+                    try {
+                        String preState = callCenterAgentService.getState(agentId);
+                        String curState = CallCenterAgent.STATE_TALKING;
+                        if(CallCenterAgent.STATE_FETCHING.equals(preState)){
+                            callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,curState,true);
+                            callCenterUtil.agentStateChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),agentId,
+                                    businessData.get(CallCenterUtil.AGENT_NAME_FIELD),preState,curState,state.getUserdata());
+                        }
+                    } catch (YunhuniApiException e) {
+                        logger.info("[{}][{}]agentID={}设置坐席状态失败 ",state.getTenantId(),state.getAppId(),agentId);
+                    }
+                }
                 String conversationId = businessData.get(CallCenterUtil.CONVERSATION_FIELD);
                 if(conversationId == null){
                     return res;
@@ -497,7 +597,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                     try {
                         conversationService.join(conversationId,call_id,null,null,null);
                     } catch (YunhuniApiException e) {
-                        logger.info("加入交谈失败:{}",e.getCode());
+                        logger.info("加入交谈失败",e);
                         conversationService.logicExit(conversationId,call_id);
                     }
                 }else{
@@ -509,7 +609,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                     state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null);
                             //坐席加入交谈成功事件中要呼叫这个号码
                             businessStateService.updateInnerField(conversationId,"invite_from",
-                                    businessData.get("invite_from"),"invite_to",businessData.get("invite_to"));
+                                    businessData.get("invite_from")!=null?businessData.get("invite_from"):"","invite_to",businessData.get("invite_to"));
                             businessStateService.deleteInnerField(call_id,"invite_to","invite_from");
                         } catch (YunhuniApiException e) {
                             conversationService.logicExit(conversationId,call_id);

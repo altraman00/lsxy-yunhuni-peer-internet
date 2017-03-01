@@ -12,6 +12,14 @@ public class AgentNotExistException extends YunhuniApiException {
         super();
     }
 
+    public AgentNotExistException(String context) {
+        super(context);
+    }
+
+    public AgentNotExistException(ExceptionContext context){
+        super(context);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.AgentNotExist;
