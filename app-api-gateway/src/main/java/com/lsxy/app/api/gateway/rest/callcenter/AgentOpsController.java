@@ -45,7 +45,7 @@ public class AgentOpsController extends AbstractAPIController {
             logger.debug("AGENT CALLOUT API参数,accountId={},appId={},name={},dto={}",accountId,appId,name,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        agentOps.callOut(getSubaccountId(request),ip,appId,name,dto.getFrom(),dto.getTo(),dto.getMaxDialSeconds(),dto.getMaxAnswerSeconds());
+        agentOps.callOut(getSubaccountId(request),ip,appId,name,dto.getFrom(),dto.getTo(),dto.getMaxDialSeconds(),dto.getMaxAnswerSeconds(),dto.getUserData());
         return ApiGatewayResponse.success(true);
     }
 
