@@ -623,7 +623,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                 try{
                     callId = conversationService.agentCall(subaccountId,appId,conversationId,agent,
                             callCenterAgent.getName(),
-                            extension.getId(),name,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null,null);
+                            extension.getId(),null,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null,null);
                     agentState.setState(agent,CallCenterAgent.STATE_FETCHING);
                     //坐席加入交谈成功事件中要排队找坐席
                     businessStateService.updateInnerField(conversationId,"enqueue_xml",enqueueXml);
