@@ -630,6 +630,12 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                     }
                 }
             }
+            if(businessData.get("invite_to") != null){
+                businessStateService.deleteInnerField(call_id,"enqueue_xml");
+            }
+            if(businessData.get("enqueue_xml") != null){
+                businessStateService.deleteInnerField(call_id,"invite_to","invite_from");
+            }
         }
         return res;
     }
