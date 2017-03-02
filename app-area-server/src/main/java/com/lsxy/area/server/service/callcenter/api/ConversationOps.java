@@ -11,6 +11,7 @@ import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
+import com.lsxy.area.server.util.SipUrlUtil;
 import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
 import com.lsxy.call.center.api.service.CallCenterConversationService;
@@ -327,7 +328,7 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
                 .setLineGatewayId(conversation_state.getLineGatewayId())
                 .setBusinessData(new MapBuilder<String,String>()
                         .put(BusinessState.REF_RES_ID,conversation_state.getBusinessData().get(BusinessState.REF_RES_ID))
-                        .putIfNotEmpty("from",conversation_state.getBusinessData().get(CallCenterUtil.CONVERSATION_SYSNUM_FIELD))
+                        .putIfNotEmpty("from", SipUrlUtil.extractTelnum(conversation_state.getBusinessData().get(CallCenterUtil.CONVERSATION_SYSNUM_FIELD)))
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,conversation_state.getBusinessData().get(CallCenterUtil.CALLCENTER_FIELD))
                         .putIfNotEmpty(CallCenterUtil.ENQUEUE_START_TIME_FIELD,""+new Date().getTime())
                         .putIfNotEmpty(CallCenterUtil.CONDITION_ID_FIELD,enQueue.getRoute().getCondition()!=null?enQueue.getRoute().getCondition().getId():null)
