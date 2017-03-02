@@ -76,7 +76,9 @@ public class Handler_EVENT_SYS_CONF_ON_RECORD_COMPLETED extends EventHandler {
         }
 
         try{
-            mqService.publish(new RecordCompletedEvent(state.getTenantId(),state.getBusinessData().get(CallCenterUtil.CALLCENTER_FIELD),state.getAppId(),state.getSubaccountId(),state.getAreaId(),state.getId(),
+            mqService.publish(new RecordCompletedEvent(state.getBusinessData().get(CallCenterUtil.CALLCENTER_FIELD),
+                    state.getTenantId(),
+                    state.getAppId(),state.getSubaccountId(),state.getAreaId(),state.getId(),
                     ProductCode.changeApiCmdToProductCode(state.getType()).name(),(String)params.get("record_file"),
                     Long.parseLong((String)params.get("begin_time")),Long.parseLong((String)params.get("end_time"))
             ));
