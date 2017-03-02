@@ -96,8 +96,18 @@ public class VoiceFilePlayController extends AbstractRestController {
      * @return
      */
     @RequestMapping("/count/name")
-    public RestResponse countName(String appId,String name){
-        List list = voiceFilePlayService.findByFileName(getCurrentAccount().getTenant().getId(),appId,name);
+    public RestResponse countName(String appId,String name,String subId){
+        if(StringUtils.isNotEmpty(subId)){
+            ApiCertificateSubAccount apiCertificateSubAccount = apiCertificateSubAccountService.findByCerbId( subId );
+            if(apiCertificateSubAccount == null){
+                return RestResponse.failed("","子账号不存在");
+            }else{
+                subId = apiCertificateSubAccount.getId();
+            }
+        }else{
+            subId = null;
+        }
+        List list = voiceFilePlayService.findByFileName(getCurrentAccount().getTenant().getId(),appId,name,subId);
         return RestResponse.success(list.size());
     }
     /**
@@ -117,12 +127,16 @@ public class VoiceFilePlayController extends AbstractRestController {
             logger.debug("判断应用{}是否有重名文件{}", appId, voiceFilePlay.getName());
         }
         if(StringUtils.isNotEmpty(subId)){
-            ApiCertificateSubAccount apiCertificateSubAccount = apiCertificateSubAccountService.findById( subId );
+            ApiCertificateSubAccount apiCertificateSubAccount = apiCertificateSubAccountService.findByCerbId( subId );
             if(apiCertificateSubAccount == null){
                 return RestResponse.failed("","子账号不存在");
+            }else{
+                subId = apiCertificateSubAccount.getId();
             }
+        }else{
+            subId = null;
         }
-        List<VoiceFilePlay> list = voiceFilePlayService.findByFileName(getCurrentAccount().getTenant().getId(),appId,voiceFilePlay.getName());
+        List<VoiceFilePlay> list = voiceFilePlayService.findByFileName(getCurrentAccount().getTenant().getId(),appId,voiceFilePlay.getName(),subId);
         if(list!=null) {
             for (int i = 0; i < list.size(); i++) {
                 if(logger.isDebugEnabled()) {

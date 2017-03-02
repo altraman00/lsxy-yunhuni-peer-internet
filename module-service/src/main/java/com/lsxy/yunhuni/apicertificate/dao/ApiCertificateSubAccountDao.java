@@ -14,4 +14,5 @@ import java.util.List;
  */
 public interface ApiCertificateSubAccountDao extends BaseDaoInterface<ApiCertificateSubAccount, Serializable> {
     List<ApiCertificateSubAccount> findByAppId(String appId);
+    ApiCertificateSubAccount findByCertId(String certId);
 }

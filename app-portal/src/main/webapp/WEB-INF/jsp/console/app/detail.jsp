@@ -260,8 +260,9 @@
                                         <div class="form-group">
                                             <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="文件名" id="name"/></div>
                                             <div class="col-md-3 remove-padding" style="padding-left:15px;">
-                                                <select id="voice_file_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号" >
-                                                </select>
+                                                <input type="text" class="form-control" placeholder="关联子账号" id="voice_file_subId"/>
+                                                <%--<select id="voice_file_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号" >--%>
+                                                <%--</select>--%>
                                                 <%--<input type="text" class="form-control " placeholder="子账号鉴权账号" id="subId"/>--%></div>
                                             <div class="col-md-1"><button class="btn btn-primary" type="button" onclick="upplay()">查询</button></div>
                                             <div class="col-md-8 sizebox  remove-padding " id="voiceFilePlay">
@@ -379,9 +380,9 @@
                                         <div class="form-group">
                                             <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="分机号" id="extension_num" /></div>
                                             <div class="col-md-3 remove-padding" style="padding-left:15px;">
-                                                <select id="extension_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号"  >
-                                                </select>
-                                                <%--<input type="text" class="form-control " placeholder="子账号鉴权账号" id="subId"/>--%></div>
+                                                <%--<select id="extension_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号"  >--%>
+                                                <%--</select>--%>
+                                                    <input type="text" class="form-control" placeholder="关联子账号" id="extension_subId" /></div>
                                             <div class="col-md-2">
                                                 <button class="btn btn-primary" type="button" onclick="extensionList()">查询</button>
                                                 <button href="#"  class="btn btn-primary defind modalShow" data-id="six" >创建分机</button>
@@ -391,7 +392,7 @@
                                             <thead>
                                             <tr>
                                                 <th class="">ID</th>
-                                                <th class="">账号</th>
+                                                <th class="">分机号</th>
                                                 <th class="">密码</th>
                                                 <th>关联子账号</th>
                                                 <th class="">状态</th>
@@ -411,11 +412,13 @@
                                     <!--坐席列表-->
                                     <div class="tab-pane fade" id="agent">
                                         <div class="form-group">
-                                            <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="坐席名称（ID）" id="agent_num" /></div>
+                                            <div class="col-md-3 remove-padding">
+                                                <input type="text" class="form-control" placeholder="坐席名称（ID）" id="agent_num" /></div>
                                             <div class="col-md-3 remove-padding" style="padding-left:15px;">
-                                                <select id="agent_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号"  >
-                                                </select>
-                                                <%--<input type="text" class="form-control " placeholder="子账号鉴权账号" id="subId"/>--%></div>
+                                                <%--<select id="agent_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号"  >--%>
+                                                <%--</select>--%>
+                                                    <input type="text" class="form-control" placeholder="关联子账号" id="agent_subId" /></div>
+                                                <%--<input type="text" class="form-control " placeholder="子账号鉴权账号" id="subId"/>--%>
                                             <div class="col-md-2">
                                                 <button class="btn btn-primary" type="button" onclick="agentList()">查询</button>
                                             </div>
@@ -440,14 +443,15 @@
                                         </section>
                                     </div>
                                     <!--坐席列表end-->
-                                    <!--坐席列表-->
+                                    <!--排队条件列表-->
                                     <div class="tab-pane fade" id="queue">
                                         <div class="form-group">
                                             <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="ID" id="queue_num" /></div>
                                             <div class="col-md-3 remove-padding" style="padding-left:15px;">
-                                                <select id="queue_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号"  >
-                                                </select>
-                                                <%--<input type="text" class="form-control " placeholder="子账号鉴权账号" id="subId"/>--%></div>
+                                                <%--<select id="queue_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号"  >--%>
+                                                <%--</select>--%>
+                                                    <input type="text" class="form-control" placeholder="关联子账号" id="queue_subId" />
+                                                    <%--<input type="text" class="form-control " placeholder="子账号鉴权账号" id="subId"/>--%></div>
                                             <div class="col-md-2">
                                                 <button class="btn btn-primary" type="button" onclick="queueList()">查询</button>
                                             </div>
@@ -455,12 +459,11 @@
                                         <table class="table table-striped cost-table-history tablelist" id="queue-table">
                                             <thead>
                                             <tr>
-                                                <th class="text-center">ID</th>
-                                                <th class="text-center">条件选择表达式</th>
+                                                <th class="text-center" >条件选择表达式</th>
                                                 <th class="text-center">排序表达式</th>
-                                                <th class="text-center">优先级</th>
-                                                <th class="text-center">等待超时时间（秒）</th>
-                                                <th class="text-center">接听超时时间（秒）</th>
+                                                <th class="text-center" style="width: 20px">优先级</th>
+                                                <th class="text-center" style="width: 20px">等待超时时间（秒）</th>
+                                                <th class="text-center" style="width: 20px">接听超时时间（秒）</th>
                                                 <th class="text-center">关联子账号</th>
                                                 <th class="text-center">备注</th>
                                             </tr>
@@ -473,7 +476,7 @@
                                             <div id="queue-page"></div>
                                         </section>
                                     </div>
-                                    <!--坐席列表end-->
+                                    <!--排队条件列表end-->
                                     <!--子账号-->
                                     <div class="tab-pane fade" id="subAccount">
                                         <div  id="subAccount_home">
@@ -836,9 +839,12 @@
                 <div class="row margin-bottom-10">
                     <lable class="col-md-3 text-right line-height-32">关联子账号：</lable>
                     <div class="col-md-8 remove-padding-right">
-                        <select id="create_six_subId" class="sublist" name="subId" data-live-search="true" title="">
-                        </select>
+                        <input type="text" class="form-control" id="create_six_subId" value="" placeholder=""/>
                     </div>
+                    <%--<div class="col-md-8 remove-padding-right">--%>
+                        <%--<select id="create_six_subId" class="sublist" name="subId" data-live-search="true" title="">--%>
+                        <%--</select>--%>
+                    <%--</div>--%>
                 </div>
                 <div class="text-center">
                     <p class="error_msg_six" style="color: red"></p>
@@ -862,8 +868,9 @@
                     <label class="control-label" for="file_sub_accout_num">关联子账号：</label>
                     </div>
                     <div class="col-md-9 remove-padding">
-                    <select id="file_sub_accout_num" class="sublist" name="subId" data-live-search="true" title="">
-                    </select>
+                    <%--<select id="file_sub_accout_num" class="sublist" name="subId" data-live-search="true" title="">--%>
+                    <%--</select>--%>
+                        <input id="file_sub_accout_num"  class="form-control" type="text" name="subId" >
                     </div>
                 </div>
                 <div class="row">
@@ -987,7 +994,7 @@
 //                        showtoast("请先上线应用");
 //                    })
 //                }
-                getSubAccountByAppId();
+//                getSubAccountByAppId();
             }
             // 上传多个文件
             var cancelCancel=false;
@@ -1006,13 +1013,14 @@
                                 0 + '%'
                         );
                         var filename = data.files[0].name;
+                        var subId = $('#file_sub_accout_num').val();
                         var  re = /^.+(\.wav)$/i;
                         var result=  re.test(filename);
                         if(result){
                             if(data.files[0].size <= (5* 1024 * 1024)) {
 //                                ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
 //                                    if((response.data.fileTotalSize-response.data.fileRemainSize)>=data.files[0].size){
-                                        ajaxsync(ctx + "/console/app/file/play/verify/name",{csrfParameterName:csrfToken,'appId':appId,'name':filename},function(response1){
+                                        ajaxsync(ctx + "/console/app/file/play/verify/name",{csrfParameterName:csrfToken,'appId':appId,'name':filename,'subId':subId},function(response1){
                                             if(response1.data==0){
                                                 $('#progress').show();
                                                 $('#fileName').html(filename);
@@ -1231,7 +1239,7 @@
             showtoast("密码格式错误");
             return;
         }
-        var subId = $('#create_six_subId option:selected') .val();
+        var subId = $('#create_six_subId') .val();//$('#create_six_subId option:selected') .val();
         var params = {
             subId:subId,
             user:createSix.user,
@@ -1539,7 +1547,7 @@
         //获取数据总数
         var count = 0;
         var name = $('#name').val();
-        var subId = $('#voice_file_subId option:selected') .val();
+        var subId = $('#voice_file_subId') .val();//$('#voice_file_subId option:selected') .val();
         console.info(subId);
         ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':1,'pageSize':20,'subId':subId,csrfParameterName:csrfToken},function(response){
             if(response.success){
@@ -1584,7 +1592,7 @@
     var playTable = function(nowPage,listRows)
     {
         var name = $('#name').val();
-        var subId = $('#voice_file_subId option:selected') .val();
+        var subId = $('#voice_file_subId') .val();//$('#voice_file_subId option:selected') .val();
         ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':nowPage,'pageSize':listRows,'subId':subId,csrfParameterName:csrfToken},function(response){
             if(response.success){
                 var data =[];
@@ -1652,7 +1660,7 @@
         if(type=='queue'){
             queueList();
         }
-        getSubAccountByAppId();
+//        getSubAccountByAppId();
     });
 
 //    fileTotalSoze();
@@ -2136,7 +2144,6 @@
         );
     }
 
-
     /**
      * 分机分页
      */
@@ -2146,7 +2153,7 @@
         //获取数据总数
         var count = 0;
         var extensionNum = $('#extension_num').val();
-        var subId = $('#extension_subId option:selected') .val();
+        var subId = $('#extension_subId') .val();//$('#extension_subId option:selected') .val();
         var params = {"pageNo":1,"pageSize":10,"extensionNum":extensionNum,'subId':subId};
         ajaxsync(ctx + "/console/app/" + appId + "/app_extension/page" ,params,function(response) {
             if(response.success){
@@ -2175,7 +2182,7 @@
         var html = '';
         var data = [];
         var extensionNum = $('#extension_num').val();
-        var subId = $('#extension_subId option:selected') .val();
+        var subId = $('#extension_subId') .val();//$('#extension_subId option:selected') .val();
         var params = {"pageNo":nowPage,"pageSize":listRows,"extensionNum":extensionNum,'subId':subId};
         ajaxsync(ctx + "/console/app/" + appId + "/app_extension/page" ,params,function(response){
             if(response.success){
@@ -2187,7 +2194,6 @@
 
         // $('#playtable').find(".playtr").remove();["✔", "✘"],
         for(var i =0 ; i<data.length; i++){
-            console.info(data[i].subaccountId);
             html +='<tr id="extension-'+ data[i].id +'">' +
                     '<td class="">'+ data[i].id +'</td>' +
                     '<td class="">' + data[i].user + '</td>' +
@@ -2232,7 +2238,7 @@
         //获取数据总数
         var count = 0;
         var agentNum = $('#agent_num').val();
-        var subId = $('#agent_subId option:selected') .val();
+        var subId = $('#agent_subId') .val();//$('#agent_subId option:selected') .val();
         var params = {"pageNo":1,"pageSize":10,"agentNum":agentNum,"subId":subId};
         ajaxsync(ctx + "/console/app/" + appId + "/agent/page" ,params,function(response) {
             if(response.success){
@@ -2260,7 +2266,7 @@
         //获取数据总数
         var count = 0;
         var queueNum = $('#queue_num').val();
-        var subId = $('#queue_subId option:selected') .val();
+        var subId = $('#queue_subId') .val();//$('#queue_subId option:selected') .val();
         var params = {"pageNo":1,"pageSize":10,"queueNum":queueNum,"subId":subId};
         ajaxsync(ctx + "/console/app/" + appId + "/queue/page" ,params,function(response) {
             if(response.success){
@@ -2372,7 +2378,7 @@
         var html = '';
         var data = [];
         var agentNum = $('#agent_num').val();
-        var subId = $('#agent_subId option:selected') .val();
+        var subId = $('#agent_subId') .val();//$('#agent_subId option:selected') .val();
         var params = {"pageNo":nowPage,"pageSize":listRows,"agentNum":agentNum,"subId":subId};
         ajaxsync(ctx + "/console/app/" + appId + "/agent/page" ,params,function(response){
             if(response.success){
@@ -2415,7 +2421,7 @@
         var html = '';
         var data = [];
         var queueNum = $('#queue_num').val();
-        var subId = $('#queue_subId option:selected') .val();
+        var subId = $('#queue_subId') .val();//$('#queue_subId option:selected') .val();
         var params = {"pageNo":nowPage,"pageSize":listRows,"queueNum":queueNum,"subId":subId};
         ajaxsync(ctx + "/console/app/" + appId + "/queue/page" ,params,function(response){
             if(response.success){
@@ -2428,9 +2434,8 @@
         // $('#playtable').find(".playtr").remove();["✔", "✘"],
         for(var i =0 ; i<data.length; i++){
             html +='<tr id="queue-'+ data[i].id +'">' +
-                '<td class="text-center">'+ data[i].id +'</td>' +
-                '<td class="text-center">'+ data[i].whereExpression +'</td>' +
-                '<td class="text-center">'+ data[i].sortExpression +'</td>' +
+                '<td class="text-center"><span style="float:left;" >'+ data[i].whereExpression +'</span></td>' +
+                '<td class="text-center"><span style="float:left;" >'+ data[i].sortExpression +'</span></td>' +
                 '<td class="text-center">' + data[i].priority + '</td>' +
                 '<td class="text-center">' + data[i].queueTimeout + '</td>' +
                 '<td class="text-center">' + data[i].fetchTimeout + '</td>' +
@@ -2445,7 +2450,6 @@
 //
 //    });
     function getSubAccountByAppId(){
-        console.info(1)
         if(appId == null || appId.length==0){
             showtoast("应用标识异常，获取子账号列表失败");
         }else{
