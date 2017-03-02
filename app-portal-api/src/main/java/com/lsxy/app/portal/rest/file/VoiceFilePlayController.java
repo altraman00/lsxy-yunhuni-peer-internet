@@ -193,7 +193,22 @@ public class VoiceFilePlayController extends AbstractRestController {
     @RequestMapping("/plist")
     public RestResponse pageList(Integer pageNo,Integer pageSize,String name,String appId,String subId){
         Tenant tenant = getCurrentAccount().getTenant();
+        subId = getSubIdsByCerbId(subId);
         Page<VoiceFilePlay> page = voiceFilePlayService.pageList(pageNo,pageSize,name,appId,new String[]{tenant.getId()},null,null,null,subId);
         return RestResponse.success(page);
+    }
+
+    private String getSubIdsByCerbId(String cerbId){
+        StringBuilder stringBuilder = new StringBuilder();
+        if(org.apache.commons.lang3.StringUtils.isNoneEmpty(cerbId)){
+            List<ApiCertificateSubAccount> list = apiCertificateSubAccountService.getListByCerbId(cerbId);
+            for (int i = 0; i < list.size(); i++) {
+                stringBuilder.append( "'"+list.get(i).getId()+"'" );
+                if( (list.size()-1) != i){
+                    stringBuilder.append(",");
+                }
+            }
+        }
+        return stringBuilder.toString();
     }
 }
