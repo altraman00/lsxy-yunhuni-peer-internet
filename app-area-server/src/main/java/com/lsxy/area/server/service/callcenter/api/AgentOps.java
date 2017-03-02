@@ -322,8 +322,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             throw new RequestIllegalArgumentException();
         }
         try {
-            Document doc = DocumentHelper.parseText(enqueueXml);
-            if(!ivrActionService.validateXMLSchema(doc)){
+            if(!ivrActionService.validateXMLSchemaIgnoreResponse(enqueueXml)){
                 throw new RequestIllegalArgumentException();
             }
         } catch (DocumentException e) {
