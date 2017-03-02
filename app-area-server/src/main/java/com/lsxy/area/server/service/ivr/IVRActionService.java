@@ -618,4 +618,15 @@ public class IVRActionService {
         }
         return true;
     }
+
+    public boolean validateXMLSchemaIgnoreResponse(String xml) throws DocumentException {
+        try {
+            Document doc = DocumentHelper.parseText("<response>"+xml+"</response>");
+            Validator validator = schema.newValidator();
+            validator.validate(new DocumentSource(doc));
+        } catch (Throwable e) {
+            throw new DocumentException(e);
+        }
+        return true;
+    }
 }
