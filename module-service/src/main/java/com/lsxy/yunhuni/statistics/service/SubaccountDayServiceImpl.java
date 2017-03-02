@@ -121,7 +121,6 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
     }
 
     @Override
-    @Transactional
     public void dayStatistics(Date date){
         String dd = DateUtils.formatDate(date, "dd");
         int day = Integer.parseInt(dd);
@@ -151,11 +150,11 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
                 "LEFT JOIN " +
                 "(SELECT tenant_id,app_id,subaccount_id,SUM(cost_time_long) AS among_duration  " +
                 "FROM db_lsxy_bi_yunhuni.tb_bi_voice_cdr WHERE call_end_dt >= '" + statisticsDateStr + "'  AND call_end_dt < '" + nextDateStr + "' GROUP BY tenant_id,app_id,subaccount_id) b " +
-                "ON a.id = b.subaccount_id " +
+                "ON a.id = b.subaccount_id AND a.tenant_id = b.tenant_id AND a.app_id = b.app_id " +
                 "LEFT JOIN " +
                 "(SELECT tenant_id,app_id,subaccount_id,SUM(amount) AS among_amount " +
                 "FROM db_lsxy_bi_yunhuni.tb_bi_consume WHERE dt >= '" + statisticsDateStr + "' AND dt < '" + nextDateStr + "' GROUP BY tenant_id,app_id,subaccount_id) c " +
-                "ON a.id = c.subaccount_id " ;
+                "ON a.id = c.subaccount_id AND a.tenant_id = c.tenant_id AND a.app_id = c.app_id " ;
 
         Query query = getEm().createNativeQuery(sql);
         List result = query.getResultList();
