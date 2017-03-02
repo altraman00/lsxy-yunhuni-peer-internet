@@ -446,12 +446,16 @@
                                     <!--排队条件列表-->
                                     <div class="tab-pane fade" id="queue">
                                         <div class="form-group">
-                                            <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="ID" id="queue_num" /></div>
-                                            <div class="col-md-3 remove-padding" style="padding-left:15px;">
+                                            <div class="col-md-3 remove-padding">
+                                                <input type="text" class="form-control" placeholder="关联子账号" id="queue_subId" />
+                                                <%--<input type="text" class="form-control" placeholder="ID" id="queue_num" />--%>
+                                            </div>
+                                            <%--<div class="col-md-3 remove-padding" style="padding-left:15px;">--%>
                                                 <%--<select id="queue_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号"  >--%>
                                                 <%--</select>--%>
-                                                    <input type="text" class="form-control" placeholder="关联子账号" id="queue_subId" />
-                                                    <%--<input type="text" class="form-control " placeholder="子账号鉴权账号" id="subId"/>--%></div>
+                                                    <%--<input type="text" class="form-control" placeholder="关联子账号" id="queue_subId" />--%>
+                                                    <%--<input type="text" class="form-control " placeholder="子账号鉴权账号" id="subId"/>--%>
+                                        <%--</div>--%>
                                             <div class="col-md-2">
                                                 <button class="btn btn-primary" type="button" onclick="queueList()">查询</button>
                                             </div>
@@ -836,16 +840,16 @@
                     </div>
                     <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
                 </div>
-                <div class="row margin-bottom-10">
-                    <lable class="col-md-3 text-right line-height-32">关联子账号：</lable>
-                    <div class="col-md-8 remove-padding-right">
-                        <input type="text" class="form-control" id="create_six_subId" value="" placeholder=""/>
-                    </div>
+                <%--<div class="row margin-bottom-10">--%>
+                    <%--<lable class="col-md-3 text-right line-height-32">关联子账号：</lable>--%>
+                    <%--<div class="col-md-8 remove-padding-right">--%>
+                        <%--<input type="text" class="form-control" id="create_six_subId" value="" placeholder=""/>--%>
+                    <%--</div>--%>
                     <%--<div class="col-md-8 remove-padding-right">--%>
                         <%--<select id="create_six_subId" class="sublist" name="subId" data-live-search="true" title="">--%>
                         <%--</select>--%>
                     <%--</div>--%>
-                </div>
+                <%--</div>--%>
                 <div class="text-center">
                     <p class="error_msg_six" style="color: red"></p>
                 </div>
@@ -1253,7 +1257,20 @@
                 hideModal(id);
                 extensionList();
             }else{
-                showtoast(response.errorMsg);
+                var error = response.errorMsg;
+                var t1 ="message=";
+                var index = response.errorMsg.indexOf(t1);
+                if( index != -1){
+                    var t2 = "]";
+                    var t3 = response.errorMsg.substring( index + t1.length);
+                    var index2 = t3.indexOf( t2 );
+                    if(index2!=-1){
+                        error = t3.substring(0 , index2 );
+                    }else{
+                        error = t3;
+                    }
+                }
+                showtoast(error);
             }
         },"post");
     });
