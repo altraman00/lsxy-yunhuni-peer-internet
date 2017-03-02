@@ -8,6 +8,7 @@ import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
+import com.lsxy.area.server.util.SipUrlUtil;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
@@ -418,8 +419,8 @@ public class ConfServiceImpl implements ConfService {
                                     .setLineGatewayId(lineId)
                                     .setBusinessData(new MapBuilder<String,String>()
                                         .putIfNotEmpty(BusinessState.REF_RES_ID,state.getBusinessData().get(BusinessState.REF_RES_ID))
-                                        .putIfNotEmpty("from",oneTelnumber)
-                                        .putIfNotEmpty("to",to)
+                                        .putIfNotEmpty("from",SipUrlUtil.extractTelnum(oneTelnumber))
+                                        .putIfNotEmpty("to", SipUrlUtil.extractTelnum(to))
                                         .putIfNotEmpty("max_seconds",maxDuration==null?null:maxDuration.toString())//最大时间
                                         .putIfNotEmpty("conf_id",confId)//所属会议
                                         .putIfNotEmpty("play_file",playFile)//加入后在会议播放这个文件
