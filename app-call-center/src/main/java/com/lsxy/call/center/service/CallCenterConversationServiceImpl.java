@@ -53,20 +53,40 @@ public class CallCenterConversationServiceImpl extends AbstractService<CallCente
     @Override
     public CallCenterConversationDetail detail(String subaccountId, String ip, String appId, String conversationId) throws YunhuniApiException {
         if(StringUtils.isBlank(conversationId)){
-            throw new RequestIllegalArgumentException();
+            throw new RequestIllegalArgumentException(
+                    new ExceptionContext().put("appId",appId)
+                    .put("subaccountId",subaccountId)
+                    .put("ip",ip)
+                    .put("conversationId",conversationId)
+            );
         }
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("appId",appId)
+                            .put("subaccountId",subaccountId)
+                            .put("ip",ip)
+                            .put("conversationId",conversationId)
+            );
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("appId",appId)
+                                .put("subaccountId",subaccountId)
+                                .put("ip",ip)
+                                .put("conversationId",conversationId)
+                );
             }
         }
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
-            throw new AppServiceInvalidException();
+            throw new AppServiceInvalidException(
+                    new ExceptionContext().put("appId",appId)
+                            .put("subaccountId",subaccountId)
+                            .put("ip",ip)
+                            .put("conversationId",conversationId)
+            );
         }
         CallCenterConversation conversation = applicationContext.getBean(CallCenterConversationService.class).findById(conversationId);
         if(conversation == null){
@@ -108,16 +128,31 @@ public class CallCenterConversationServiceImpl extends AbstractService<CallCente
     public Page<CallCenterConversationDetail> conversationPageList(String subaccountId,String ip, String appId, int page, int size) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext()
+                            .put("appId",appId)
+                            .put("subaccountId",subaccountId)
+                            .put("ip",ip)
+            );
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext()
+                                .put("appId",appId)
+                                .put("subaccountId",subaccountId)
+                                .put("ip",ip)
+                );
             }
         }
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
-            throw new AppServiceInvalidException();
+            throw new AppServiceInvalidException(
+                    new ExceptionContext()
+                            .put("appId",appId)
+                            .put("subaccountId",subaccountId)
+                            .put("ip",ip)
+            );
         }
         Page<CallCenterConversation> queryResult = pageList("from CallCenterConversation obj where obj.appId=?1 and obj.state=?2 and obj.subaccountId=?3",
                 page,size,appId,CallCenterConversation.STATE_READY,subaccountId);

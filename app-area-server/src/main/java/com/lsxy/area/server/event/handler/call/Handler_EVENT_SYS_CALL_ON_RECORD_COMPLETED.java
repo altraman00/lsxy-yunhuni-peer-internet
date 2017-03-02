@@ -78,7 +78,7 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
 
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null");
+            throw new InvalidParamException("businessstate is null,call_id={}",call_id);
         }
 
         String record_id = UUIDGenerator.uuid();
@@ -98,8 +98,8 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
                     Long.parseLong((String)params.get("begin_time")),Long.parseLong((String)params.get("end_time"))
             ));
         }catch (Throwable t){
-            logger.info("发布RecordCompletedEvent失败,state={},params={}",state,params);
-            logger.error("发布RecordCompletedEvent失败",t);
+            logger.error(String.format("发布RecordCompletedEvent失败,appId=%s,callid=%s,params=%s",
+                    state.getAppId(),state.getId(),params),t);
         }
 
         if(canDoivr(state)){

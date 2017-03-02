@@ -67,7 +67,7 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
     }
 
     @Override
-    public Page<VoiceFilePlay> pageList(Integer pageNo, Integer pageSize, String name,String appId,String[] tenantId,Integer status,String startTime,String endTime) {
+    public Page<VoiceFilePlay> pageList(Integer pageNo, Integer pageSize, String name,String appId,String[] tenantId,Integer status,String startTime,String endTime,String subId) {
         String sql = " FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_play obj WHERE obj.deleted=0 ";
         if(StringUtils.isNotEmpty(name)){
             sql += " AND obj.name like '%"+name+"%' ";
@@ -87,6 +87,9 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
         }
         if(status!=null){
             sql += " AND obj.status='"+status+"' ";
+        }
+        if(StringUtils.isNotEmpty(subId)){
+            sql += " AND obj.subaccount_id='"+subId+"'";
         }
         Date date1 = null;
         if(StringUtil.isNotEmpty(startTime)){

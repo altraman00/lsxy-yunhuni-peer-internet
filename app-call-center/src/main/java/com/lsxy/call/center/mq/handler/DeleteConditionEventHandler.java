@@ -49,7 +49,7 @@ public class DeleteConditionEventHandler implements MQMessageHandler<DeleteCondi
                 message.getConditionId() == null ||
                 message.getTenantId() == null ||
                 message.getAppId() == null){
-            logger.info("处理CallCenter.DeleteConditionEvent出错，参数错误！");
+            logger.info("处理CallCenter.DeleteConditionEvent出错，参数错误！,message={}",message);
             return;
         }
         long start = System.currentTimeMillis();

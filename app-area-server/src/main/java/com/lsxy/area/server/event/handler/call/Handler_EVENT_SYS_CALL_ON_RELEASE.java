@@ -118,7 +118,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
 
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null");
+            throw new InvalidParamException("businessstate is null,call_id={}",call_id);
         }
         businessStateService.delete(call_id);
 
@@ -135,7 +135,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 callSessionService.update(callSession.getId(),updateSession);
             }
         }catch (Throwable t){
-            logger.error("更新会话记录失败",t);
+            logger.error(String.format("更新会话记录失败,appId=%s,callid=%s",state.getAppId(),state.getId()),t);
         }
         boolean isIVR = false;
 
@@ -163,7 +163,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                     voiceIvrService.update(voiceIvr.getId(),updateVoiceIvr);
                 }
             }catch (Throwable t){
-                logger.error("更新voiceIvr失败",t);
+                logger.error(String.format("更新voiceIvr失败,appId=%s,callid=%s",state.getAppId(),call_id),t);
             }
         }else if(!BusinessState.TYPE_IVR_DIAL.equals(state.getType())){
             try{
@@ -204,13 +204,13 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                                         .setCallTimeLong(callLongTime)
                                         .build());
                             }catch (Throwable t){
-                                logger.error("incrIntoRedis失败",t);
+                                logger.error(String.format("incrIntoRedis失败,appId=%s,callid=%s",state.getAppId(),call_id),t);
                             }
                         }
                     }
                 }
             }catch (Throwable t){
-                logger.error("更新CallCenter失败",t);
+                logger.error(String.format("更新CallCenter失败,appId=%s,callid=%s",state.getAppId(),state.getId()),t);
             }
         }
         //如果ivr主动方挂断，需要同时挂断正在连接的呼叫
@@ -294,7 +294,8 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                     }
                     curState = callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,reserve_state,true);
                 } catch (Throwable e) {
-                    logger.error("坐席挂机事件设置坐席状态失败agent="+agentId,e);
+                    logger.error(String.format("坐席挂机事件设置坐席状态失败,appId=%s,callid=%s,agentId=%s",
+                            state.getAppId(),call_id,agentId),e);
                 }
                 if(preState!=null && curState != null){
                     if(!preState.equals(curState)){
@@ -322,7 +323,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 rpcCaller.invoke(sessionContext, rpcrequest,true);
             }
         } catch (Throwable e) {
-            logger.error("调用失败",e);
+            logger.error(String.format("调用挂断失败失败,appId=%s,callid=%s",state_dial.getAppId(),state_dial.getId()),e);
         }
     }
 }
