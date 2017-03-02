@@ -329,7 +329,7 @@ public class ConversationService {
      */
     public String inviteAgent(String subaccountId,String appId,String ref_res_id,String initiator, String conversationId,String agentId,String agentName,String extension,
                          String systemNum,String diaplyNum,String agentPhone,String type,String user,
-                          Integer maxDuration, Integer maxDialDuration,Integer voiceMode) throws YunhuniApiException{
+                          Integer maxDuration, Integer maxDialDuration,Integer voiceMode,String user_data) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
         App app = appService.findById(appId);
         String from = null;
@@ -384,6 +384,7 @@ public class ConversationService {
                 .setId(callId)
                 .setType(BusinessState.TYPE_CC_INVITE_AGENT_CALL)
                 .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
+                .setUserdata(user_data)
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
