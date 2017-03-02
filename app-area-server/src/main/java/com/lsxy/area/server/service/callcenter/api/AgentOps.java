@@ -256,7 +256,11 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         if(extension == null){
             throw new ExtensionNotExistException();
         }
-        BusinessState state = businessStateService.get(agent);
+        BusinessState state = null;
+        String callId = agentIdCallReference.get(agent);
+        if(callId != null){
+            state = businessStateService.get(callId);
+        }
         //有正在处理的交谈
         if(state != null && (state.getClosed() == null || !state.getClosed())){
             //TODO 将其他交谈全部设置为保持（cti需要提供批量） 这里应该是阻塞调用好点
@@ -266,7 +270,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     state.getBusinessData().get(BusinessState.REF_RES_ID),state,
                     state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),maxAnswerSeconds,null);
             //坐席加入交谈成功事件中要呼叫这个号码
-            businessStateService.updateInnerField(conversationId,"invite_from",from!=null?from:"","invite_to",to);
+            businessStateService.updateInnerField(callId,"invite_from",from!=null?from:"","invite_to",to);
         }else{
             AgentLock agentLock = new AgentLock(redisCacheService,agent);
             if(!agentLock.lock()){
@@ -280,7 +284,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     throw new SystemBusyException();
                 }
                 try{
-                    String callId = conversationService.agentCall(subaccountId,appId,conversationId,agent,
+                    callId = conversationService.agentCall(subaccountId,appId,conversationId,agent,
                             callCenterAgent.getName(),
                             extension.getId(),from,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null,userData);
                     callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_FETCHING,true);
@@ -322,8 +326,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             throw new RequestIllegalArgumentException();
         }
         try {
-            Document doc = DocumentHelper.parseText(enqueueXml);
-            if(!ivrActionService.validateXMLSchema(doc)){
+            if(!ivrActionService.validateXMLSchemaIgnoreResponse(enqueueXml)){
                 throw new RequestIllegalArgumentException();
             }
         } catch (DocumentException e) {
@@ -399,7 +402,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     state.getBusinessData().get(BusinessState.REF_RES_ID),state,
                     state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),maxAnswerSeconds,null);
             //坐席加入交谈成功事件中要排队找坐席
-            businessStateService.updateInnerField(conversationId,"enqueue_xml",enqueueXml);
+            businessStateService.updateInnerField(callId,"enqueue_xml",enqueueXml);
         }else{
             AgentLock agentLock = new AgentLock(redisCacheService,agent);
             if(!agentLock.lock()){
@@ -415,10 +418,10 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                 try{
                     callId = conversationService.agentCall(subaccountId,appId,conversationId,agent,
                             callCenterAgent.getName(),
-                            extension.getId(),name,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null,null);
+                            extension.getId(),null,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null,null);
                     callCenterAgentService.state(app.getTenant().getId(),appId,agent,CallCenterAgent.STATE_FETCHING,true);
                     //坐席加入交谈成功事件中要排队找坐席
-                    businessStateService.updateInnerField(conversationId,"enqueue_xml",enqueueXml);
+                    businessStateService.updateInnerField(callId,"enqueue_xml",enqueueXml);
                     callCenterUtil.agentStateChangedEvent(subaccountId,callbackUrlUtil.get(app,subaccountId),agent,name,
                             CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,null);
                 }catch (Throwable t){
