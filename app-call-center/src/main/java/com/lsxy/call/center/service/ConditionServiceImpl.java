@@ -198,7 +198,7 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
     public Page<Condition> getPageByCondition(Integer pageNo,Integer pageSize,String tenantId, String appId, String subaccountId, String id) throws YunhuniApiException {
         String hql = " from Condition obj where obj.tenantId=?1 and obj.appId =?2 ";
         if(StringUtils.isNotEmpty(subaccountId)){
-            hql += " and obj.subaccountId = '"+subaccountId+"'";
+            hql += " and obj.subaccountId in( "+subaccountId+")";
         }
         if(StringUtils.isNotEmpty(id)){
             hql += " and obj.id like '%"+id+"%' ";
