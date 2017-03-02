@@ -10,6 +10,7 @@ import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
+import com.lsxy.area.server.util.SipUrlUtil;
 import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
 import com.lsxy.call.center.api.service.CallCenterConversationService;
@@ -396,8 +397,8 @@ public class ConversationService {
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(initiator))
                         .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,initiator)
                         .putIfNotEmpty(CallCenterUtil.VOICE_MODE_FIELD,voiceMode==null?CallCenterConversationMember.MODE_DEFAULT.toString():voiceMode.toString())
-                        .putIfNotEmpty("from",StringUtil.isEmpty(systemNum)?from:systemNum)
-                        .putIfNotEmpty("to",to)
+                        .putIfNotEmpty("from",SipUrlUtil.extractTelnum(StringUtil.isEmpty(systemNum)?from:systemNum))
+                        .putIfNotEmpty("to",SipUrlUtil.extractTelnum(to))
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
                 .build();
@@ -480,8 +481,8 @@ public class ConversationService {
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,callId)
                         .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,null)
                         .putIfNotEmpty(CallCenterUtil.VOICE_MODE_FIELD,voiceMode==null?CallCenterConversationMember.MODE_DEFAULT.toString():voiceMode.toString())
-                        .putIfNotEmpty("from",StringUtil.isEmpty(systemNum)?from:systemNum)
-                        .putIfNotEmpty("to",to)
+                        .putIfNotEmpty("from",SipUrlUtil.extractTelnum(StringUtil.isEmpty(systemNum)?from:systemNum))
+                        .putIfNotEmpty("to", SipUrlUtil.extractTelnum(to))
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
                 .build();
@@ -557,8 +558,8 @@ public class ConversationService {
                         .putIfNotEmpty(CallCenterUtil.CONVERSATION_FIELD,conversationId)
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(conversationId))
                         .putIfNotEmpty(CallCenterUtil.VOICE_MODE_FIELD,voiceMode==null?CallCenterConversationMember.MODE_DEFAULT.toString():voiceMode.toString())
-                        .putIfNotEmpty("from",oneTelnumber)
-                        .putIfNotEmpty("to",to)
+                        .putIfNotEmpty("from",SipUrlUtil.extractTelnum(oneTelnumber))
+                        .putIfNotEmpty("to",SipUrlUtil.extractTelnum(to))
                         .putIfNotEmpty("play_file",playFile)//加入后在交谈中播放这个文件
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
