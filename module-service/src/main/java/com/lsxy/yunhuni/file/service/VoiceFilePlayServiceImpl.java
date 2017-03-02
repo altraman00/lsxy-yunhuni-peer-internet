@@ -89,7 +89,7 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
             sql += " AND obj.status='"+status+"' ";
         }
         if(StringUtils.isNotEmpty(subId)){
-            sql += " AND obj.subaccount_id='"+subId+"'";
+            sql += " AND obj.subaccount_id in ("+subId+") ";
         }
         Date date1 = null;
         if(StringUtil.isNotEmpty(startTime)){
