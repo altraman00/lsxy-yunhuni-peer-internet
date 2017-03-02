@@ -483,7 +483,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             hql += " and obj.name like '%"+agentNum+"%'";
         }
         if(StringUtils.isNotEmpty(subaccountId)){
-            hql += " and obj.subaccountId ='"+ subaccountId+"' ";
+            hql += " and obj.subaccountId in ("+ subaccountId+") ";
         }
         page = this.pageList(hql, pageNo, pageSize, appId);
 

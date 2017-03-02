@@ -75,10 +75,10 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      */
     @RequestMapping("/verify/name")
     @ResponseBody
-    public RestResponse verify(HttpServletRequest request,String appId,String name){
+    public RestResponse verify(HttpServletRequest request,String appId,String name,String subId){
         String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/count/name?appId={1}&name={2}";
-        RestResponse countResponse =  RestRequest.buildSecurityRequest(token).get(uri,Long.class,appId,name);
+        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/count/name?appId={1}&name={2}&subId={3}";
+        RestResponse countResponse =  RestRequest.buildSecurityRequest(token).get(uri,Long.class,appId,name,subId);
         return countResponse;
     }
     /**

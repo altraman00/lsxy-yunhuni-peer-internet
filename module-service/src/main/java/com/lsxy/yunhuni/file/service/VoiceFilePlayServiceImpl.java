@@ -217,8 +217,12 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
         jdbcTemplate.update(sql, status, id);
     }
     @Override
-    public List<VoiceFilePlay> findByFileName(String tenantId, String appId, String name) {
-        return this.list("from VoiceFilePlay obj where obj.tenant.id = ?1 and obj.app.id=?2 and name = ?3 ",tenantId,appId,name);
+    public List<VoiceFilePlay> findByFileName(String tenantId, String appId, String name,String subId) {
+        if(StringUtils.isNotEmpty(subId)){
+            return this.list("from VoiceFilePlay obj where obj.tenant.id = ?1 and obj.app.id=?2 and name = ?3 and subaccountId=?4 ",tenantId,appId,name,subId);
+        }else{
+            return this.list("from VoiceFilePlay obj where obj.tenant.id = ?1 and obj.app.id=?2 and name = ?3 and subaccountId is null  ",tenantId,appId,name);
+        }
     }
 
     @Override

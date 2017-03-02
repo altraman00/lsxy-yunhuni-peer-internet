@@ -12,6 +12,8 @@ import java.util.List;
  * Created by liups on 2017/2/14.
  */
 public interface ApiCertificateSubAccountService extends BaseService<ApiCertificateSubAccount> {
+    List<ApiCertificateSubAccount> getListByCerbId(String certId);
+    ApiCertificateSubAccount findByCerbId(String certId);
     ApiCertificateSubAccount createSubAccount(ApiCertificateSubAccount subAccount);
 
     void deleteSubAccount(String tenantId,String appId,String subAccountId) throws InvocationTargetException, IllegalAccessException;

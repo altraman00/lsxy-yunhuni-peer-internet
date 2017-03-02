@@ -10,12 +10,16 @@ import com.lsxy.call.center.api.service.ConditionService;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * Created by zhangxb on 2016/10/21.
@@ -31,10 +35,27 @@ public class AppCallcenterController extends AbstractRestController {
     private CallCenterAgentService callCenterAgentService;
     @Reference(timeout=3000,check = false,lazy = true)
     private ConditionService conditionService;
+    @Autowired
+    private ApiCertificateSubAccountService apiCertificateSubAccountService;
+
+    private String getSubIdsByCerbId(String cerbId){
+        StringBuilder stringBuilder = new StringBuilder();
+        if(StringUtils.isNoneEmpty(cerbId)){
+            List<ApiCertificateSubAccount> list = apiCertificateSubAccountService.getListByCerbId(cerbId);
+            for (int i = 0; i < list.size(); i++) {
+                stringBuilder.append( "'"+list.get(i).getId()+"'" );
+                if( (list.size()-1) != i){
+                    stringBuilder.append(",");
+                }
+            }
+        }
+        return stringBuilder.toString();
+    }
     @RequestMapping("/{appId}/app_extension/page")
     public RestResponse listExtensions(HttpServletRequest request, @PathVariable String appId,
                                        @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
                                        @RequestParam(defaultValue = "20",required = false)  Integer pageSize,String extensionNum,String subId) throws YunhuniApiException {
+        subId = getSubIdsByCerbId(subId);
         Page page = appExtensionService.getPageByCondition(appId,extensionNum,subId,pageNo,pageSize);
         return RestResponse.success(page);
     }
@@ -42,6 +63,7 @@ public class AppCallcenterController extends AbstractRestController {
     public RestResponse listQueueCondition(HttpServletRequest request, @PathVariable String appId,
                                        @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
                                        @RequestParam(defaultValue = "20",required = false)  Integer pageSize,String queueNum,String subId) throws YunhuniApiException {
+        subId = getSubIdsByCerbId(subId);
         Page page = conditionService.getPageByCondition(pageNo,pageSize,getCurrentAccount().getTenant().getId(),appId,subId,queueNum);
         return RestResponse.success(page);
     }
@@ -49,6 +71,7 @@ public class AppCallcenterController extends AbstractRestController {
     public RestResponse page(HttpServletRequest request, @PathVariable String appId,
                              @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
                              @RequestParam(defaultValue = "20",required = false)  Integer pageSize,String agentNum,String subId) throws YunhuniApiException {
+        subId = getSubIdsByCerbId(subId);
         Page page  = callCenterAgentService.getPageForPotal(appId,pageNo,pageSize,agentNum,subId);
         return RestResponse.success(page);
     }
@@ -78,6 +101,13 @@ public class AppCallcenterController extends AbstractRestController {
     public RestResponse page(HttpServletRequest request, @PathVariable String appId, String subId,String user,String password) throws YunhuniApiException {
         if(StringUtils.isEmpty(subId)){
             subId = null;
+        }else {
+           ApiCertificateSubAccount apiCertificateSubAccount =  apiCertificateSubAccountService.findByCerbId(subId);
+           if(apiCertificateSubAccount != null){
+               subId = apiCertificateSubAccount.getId();
+           }else{
+               subId = null;
+           }
         }
         AppExtension appExtension = appExtensionService.create( appId, subId,new AppExtension(AppExtension.TYPE_SIP,user,password));
         if(appExtension != null) {
