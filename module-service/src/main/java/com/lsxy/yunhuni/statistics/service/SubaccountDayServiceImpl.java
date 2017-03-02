@@ -141,12 +141,17 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
         if(lastStatistics == null && staticsDate.getTime() > firstStatisticsDate.getTime()) {
             dayStatistics(preDate);
         }
+        //如果今天有统计数据了，则说明不用统计了
+        SubaccountDay todayStatistics = subaccountDayDao.findFirstByDt(staticsDate);
+        if(todayStatistics != null){
+            return;
+        }
 
         String sql = "SELECT REPLACE(UUID(), '-', '') AS id,a.app_id,a.tenant_id,a.id AS subaccount_id ,'"+statisticsDateStr+"' AS dt, "+ day +" AS day , IFNULL(c.among_amount,0) AS among_amount, IFNULL(b.among_duration,0) AS among_duration," +
                 "IFNULL((SELECT d.voice_used FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day d WHERE d.subaccount_id = a.id AND d.dt = '" + preDateStr + "'),0) + IFNULL(b.among_duration,0) AS voice_used, 0 AS msg_used ," +
                 "IFNULL((SELECT qu.value FROM db_lsxy_bi_yunhuni.tb_bi_cert_account_quota qu WHERE qu.type='CallQuota' AND qu.cert_account_id = a.id LIMIT 1),0) AS voice_quota_value, -1 AS msg_quota_value ," +
                 "'"+currentDateStr + "' AS create_time, '"+ currentDateStr + "' AS last_time," + " 0 AS deleted,0 AS sortno,0 AS version "+
-                "FROM (SELECT p.tenant_id ,s.app_id ,p.id FROM db_lsxy_bi_yunhuni.tb_bi_api_cert p INNER JOIN db_lsxy_bi_yunhuni.tb_bi_api_cert_subaccount s ON p.id = s.id WHERE p.deleted = 0 AND p.create_time < '" + nextDateStr +"') a " +
+                "FROM (SELECT p.tenant_id ,s.app_id ,p.id FROM db_lsxy_bi_yunhuni.tb_bi_api_cert p INNER JOIN db_lsxy_bi_yunhuni.tb_bi_api_cert_subaccount s ON p.id = s.id WHERE (p.deleted = 0 OR (p.deleted = 1 AND p.delete_time > '" + statisticsDateStr + "')) AND p.create_time < '" + nextDateStr +"') a " +
                 "LEFT JOIN " +
                 "(SELECT tenant_id,app_id,subaccount_id,SUM(cost_time_long) AS among_duration  " +
                 "FROM db_lsxy_bi_yunhuni.tb_bi_voice_cdr WHERE call_end_dt >= '" + statisticsDateStr + "'  AND call_end_dt < '" + nextDateStr + "' GROUP BY tenant_id,app_id,subaccount_id) b " +
