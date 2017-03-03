@@ -226,26 +226,32 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     public void telnumPlay(String id,Tenant tenant) {
         TelenumOrder temp = telenumOrderService.findById(id);
         //更新记录
-        temp.setStatus(TelenumOrder.Status_success);
-        telenumOrderService.save(temp);
+        BigDecimal tempAmount = new BigDecimal(0);
         List<TelenumOrderItem> list = telenumOrderItemService.findByTenantIdAndTelenumOrderId(tenant.getId(), temp.getId());
         for (int i = 0; i < list.size(); i++) {
-            ResourceTelenum resourceTelenum = list.get(i).getTelnum();
+            TelenumOrderItem telenumOrderItem = list.get(i);
+            ResourceTelenum resourceTelenum = telenumOrderItem.getTelnum();
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
             resourceTelenum.setTenantId(tenant.getId());
             resourceTelenum = resourceTelenumService.save(resourceTelenum);
             Date expireDate = DateUtils.getLastTimeOfMonth(new Date());
             ResourcesRent resourcesRent = new ResourcesRent(tenant,null,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),expireDate,ResourcesRent.RENT_STATUS_UNUSED);
             this.save(resourcesRent);
+
+            telenumOrderItem.setAmount(resourceTelenum.getAmount());
+            telenumOrderItemService.save(telenumOrderItem);
+            tempAmount = tempAmount.add(resourceTelenum.getAmount());
+            Consume consume = new Consume(new Date(), ConsumeCode.rent_number.name(),resourceTelenum.getAmount() , ConsumeCode.rent_number.getName(), "0", tenant.getId(),resourcesRent.getId());
+            consumeService.consume(consume);
+            //扣费
+            //号码月租费
+            BigDecimal cost = calCostService.calCost(ProductCode.rent_number_month.name(),tenant.getId());
+            Consume consume1 = new Consume(new Date(), ConsumeCode.rent_number_month.name(), cost, ConsumeCode.rent_number_month.getName(), "0", tenant.getId(),resourcesRent.getId());
+            consumeService.consume(consume1);
         }
-        //扣费
-        Consume consume = new Consume(new Date(), ConsumeCode.rent_number.name(), temp.getAmount(), ConsumeCode.rent_number.getName(), "0", tenant.getId(),null);
-        consumeService.consume(consume);
-        //号码月租费
-        BigDecimal cost = calCostService.calCost(ProductCode.rent_number_month.name(),tenant.getId());
-        BigDecimal bigDecimal = cost.multiply(new BigDecimal(list.size()));
-        Consume consume1 = new Consume(new Date(), ConsumeCode.rent_number_month.name(), bigDecimal, ConsumeCode.rent_number_month.getName(), "0", tenant.getId(),null);
-        consumeService.consume(consume1);
+        temp.setAmount(tempAmount);
+        temp.setStatus(TelenumOrder.Status_success);
+        telenumOrderService.save(temp);
     }
 
 

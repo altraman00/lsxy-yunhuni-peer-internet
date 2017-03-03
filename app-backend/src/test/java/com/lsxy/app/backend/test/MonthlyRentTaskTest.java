@@ -1,6 +1,7 @@
 package com.lsxy.app.backend.test;
 
 import com.lsxy.app.backend.MainClass;
+import com.lsxy.app.backend.task.*;
 import com.lsxy.framework.config.Constants;
 import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
@@ -10,6 +11,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.Date;
 
 /**
  * Created by liups on 2017/1/3.
@@ -45,6 +48,41 @@ public class MonthlyRentTaskTest {
     public void agentMonthTaskTest(){
         //执行语句
         callCenterStatisticsService.agentMonthTask();
+    }
+
+    @Autowired
+    ApiCallStatisticsTask apiCallStatisticsTask;
+    @Autowired
+    AppStatisticsTask appStatisticsTask;
+    @Autowired
+    ConsumeStatisticsTask consumeStatisticsTask;
+    @Autowired
+    RechargeStatisticsTask rechargeStatisticsTask;
+    @Autowired
+    VoiceCdrStatisticsTask voiceCdrStatisticsTask;
+
+    @Test
+    public void testApiStatitics(){
+        apiCallStatisticsTask.hourStatistics(new Date());
+        apiCallStatisticsTask.dayStatistics(new Date());
+        apiCallStatisticsTask.monthStatistics(new Date());
+
+        appStatisticsTask.hourStatistics(new Date());
+        appStatisticsTask.dayStatistics(new Date());
+        appStatisticsTask.monthStatistics(new Date());
+
+        consumeStatisticsTask.hourStatistics(new Date());
+        consumeStatisticsTask.dayStatistics(new Date());
+        consumeStatisticsTask.monthStatistics(new Date());
+
+        rechargeStatisticsTask.hourStatistics(new Date());
+        rechargeStatisticsTask.dayStatistics(new Date());
+        rechargeStatisticsTask.monthStatistics(new Date());
+
+        voiceCdrStatisticsTask.hourStatistics(new Date());
+        voiceCdrStatisticsTask.dayStatistics(new Date());
+        voiceCdrStatisticsTask.monthStatistics(new Date());
+
     }
 
 }
