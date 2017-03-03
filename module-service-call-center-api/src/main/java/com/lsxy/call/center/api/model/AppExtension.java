@@ -35,6 +35,15 @@ public class AppExtension extends IdEntity {
 
     private Boolean enable; //分机是否可用（不存到数据库）
 
+    public AppExtension() {
+    }
+
+    public AppExtension(String type, String user, String password) {
+        this.type = type;
+        this.user = user;
+        this.password = password;
+    }
+
     @Column(name = "app_id")
     public String getAppId() {
         return appId;

@@ -12,6 +12,8 @@ import java.util.List;
  * Created by liups on 2017/2/14.
  */
 public interface ApiCertificateSubAccountService extends BaseService<ApiCertificateSubAccount> {
+    List<ApiCertificateSubAccount> getListByCerbId(String certId);
+    ApiCertificateSubAccount findByCerbId(String certId);
     ApiCertificateSubAccount createSubAccount(ApiCertificateSubAccount subAccount);
 
     void deleteSubAccount(String tenantId,String appId,String subAccountId) throws InvocationTargetException, IllegalAccessException;
@@ -25,7 +27,7 @@ public interface ApiCertificateSubAccountService extends BaseService<ApiCertific
     Page<ApiCertificateSubAccount> pageListWithNotQuota(String appId,int pageNo, int pageSize);
 
     Page<ApiCertificateSubAccount> pageListWithQuotaByCondition(String appId,int pageNo, int pageSize,String certId,String remark,Integer  enabled);
-
+    List<ApiCertificateSubAccount> findByAppId(String appId);
     /**
      * 判断子账号是否一致
      * @param sub1

@@ -158,4 +158,9 @@ public class SubAccountController extends AbstractPortalController {
         }
         return RestResponse.success(page);
     }
+    @RequestMapping(value = "/by/{appId}/list")
+    @ResponseBody
+    public RestResponse findByAppId(HttpServletRequest request,@PathVariable String appId){
+        return getSubAccountList(request,appId);
+    }
 }

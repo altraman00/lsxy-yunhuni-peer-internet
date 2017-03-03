@@ -262,6 +262,32 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     }
 
     @Override
+    public Page<AppExtension> getPageByCondition(String appId, String extensionNum, String subaccountId, Integer pageNo, Integer pageSize) {
+        Page page;
+        if(StringUtils.isBlank(subaccountId)){
+            String hql = "from AppExtension obj where obj.appId=?1 ";
+            if(StringUtils.isNotEmpty(extensionNum)){
+                hql += " and obj.user like '%"+extensionNum+"%' ";
+            }
+            page = this.pageList(hql, pageNo, pageSize, appId);
+        }else{
+            String hql = "from AppExtension obj where obj.appId=?1 and obj.subaccountId in( "+subaccountId+")";
+            if(StringUtils.isNotEmpty(extensionNum)){
+                hql += " and obj.user like '%"+extensionNum+"%' ";
+            }
+            page = this.pageList(hql, pageNo, pageSize, appId);
+        }
+        List<AppExtension> result = page.getResult();
+        if(result != null && result.size() > 0){
+            for(AppExtension ext : result){
+                boolean enable = extensionState.getEnable(ext.getId());
+                ext.setEnable(enable);
+            }
+        }
+        return page;
+    }
+
+    @Override
     public AppExtension findOne(String appId, String extensionId,String subaccountId) throws YunhuniApiException{
         if(StringUtils.isBlank(appId)){
             logger.error("appId 不能为空");
