@@ -146,6 +146,7 @@
                                             <div class="col-md-3 text-right"><span class="text-label" ><strong>选择服务:</strong></span></div>
                                             <div class="col-md-9" >
                                                 <div class="btn app-tag active" data-app="voice"><i class="iconfont icon-call-voice"></i><span>语音</span></div>
+                                                <div class="btn app-tag" data-app="msg"><i class="iconfont icon-call-msg"></i><span>消息</span></div>
                                                 <div class="btn app-tag" data-app="call_center"><i class="iconfont icon-call-center" ></i><span>呼叫中心</span></div>
                                             </div>
                                         </div>
@@ -162,6 +163,14 @@
                                                 <div class="tips ml-36">
                                                     <p class="app-tips ">该选项开启后，将产生1000元的号码租用费以及100元/月的功能费，应用上线时开始收取，多个应用开启并上线会叠加收费</p>
                                                 </div>
+                                            </div>
+                                        </div>
+                                        <!--消息-->
+                                        <div class="form-group app-createbox none app-tap-child" data-child="msg" >
+                                            <lable class="col-md-3 text-right"></lable>
+                                            <div class="col-md-9" >
+                                                <p><input type="checkbox" name="isUssd" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isUssd=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">闪印</font>（不惧拦截，批量发送，迅速抢占手机屏幕）</p>
+                                                <p><input type="checkbox" name="isMsm" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isMsm=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">短信</font>（免开发的短信发送平台，接入即用）</p>
                                             </div>
                                         </div>
                                         <!--呼叫中心-->
