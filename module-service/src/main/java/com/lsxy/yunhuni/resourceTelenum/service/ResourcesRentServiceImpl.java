@@ -240,7 +240,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
 
             telenumOrderItem.setAmount(resourceTelenum.getAmount());
             telenumOrderItemService.save(telenumOrderItem);
-            tempAmount.add(resourceTelenum.getAmount());
+            tempAmount = tempAmount.add(resourceTelenum.getAmount());
             Consume consume = new Consume(new Date(), ConsumeCode.rent_number.name(),resourceTelenum.getAmount() , ConsumeCode.rent_number.getName(), "0", tenant.getId(),resourcesRent.getId());
             consumeService.consume(consume);
             //扣费
