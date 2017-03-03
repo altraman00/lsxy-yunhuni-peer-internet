@@ -15,6 +15,7 @@ import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.api.states.lock.AgentLock;
 import com.lsxy.call.center.api.states.state.AgentState;
 import com.lsxy.call.center.api.states.state.ExtensionState;
+import com.lsxy.call.center.api.utils.EnQueueDecoder;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -387,7 +388,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             //创建新的交谈，交谈创建成功事件中将坐席加入到新的交谈， 坐席加入交谈成功事件中呼叫外线，在振铃事件中把外线加入交谈 交谈正式开始
             conversationService.create(subaccountId,conversationId,
                     state.getBusinessData().get(BusinessState.REF_RES_ID),state,
-                    state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),maxAnswerSeconds,null);
+                    state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),maxAnswerSeconds,null,userData);
             //坐席加入交谈成功事件中要呼叫这个号码
             businessStateService.updateInnerField(callId,"invite_from",from!=null?from:"","invite_to",to);
         }else{
@@ -473,6 +474,14 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                             .put("appId",appId)
                             .put("enqueueXml",enqueueXml)
             );
+        }
+
+        EnQueue enQueue = null;
+
+        try{
+            enQueue = EnQueueDecoder.decode(enqueueXml);
+        }catch (Throwable t){
+            throw new RequestIllegalArgumentException();
         }
 
         if(maxAnswerSeconds == null || maxAnswerSeconds > ConversationService.MAX_DURATION){
@@ -597,7 +606,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             //创建新的交谈，交谈创建成功事件中将坐席加入到新的交谈， 坐席加入交谈成功事件中进行排队，在振铃事件中把排到的坐席加入交谈 交谈正式开始
             conversationService.create(subaccountId,conversationId,
                     state.getBusinessData().get(BusinessState.REF_RES_ID),state,
-                    state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),maxAnswerSeconds,null);
+                    state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),maxAnswerSeconds,null,enQueue.getUser_data());
             //坐席加入交谈成功事件中要排队找坐席
             businessStateService.updateInnerField(callId,"enqueue_xml",enqueueXml);
         }else{
@@ -627,12 +636,28 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                 try{
                     callId = conversationService.agentCall(subaccountId,appId,conversationId,agent,
                             callCenterAgent.getName(),
-                            extension.getId(),null,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null,null);
+                            extension.getId(),null,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null,enQueue.getUser_data());
                     agentState.setState(agent,CallCenterAgent.STATE_FETCHING);
                     //坐席加入交谈成功事件中要排队找坐席
                     businessStateService.updateInnerField(callId,"enqueue_xml",enqueueXml);
+                    CallCenter callCenter = new CallCenter();
+                    callCenter.setId(callId);
+                    callCenter.setTenantId(app.getTenant().getId());
+                    callCenter.setAppId(app.getId());
+                    callCenter.setFromNum(from);
+                    callCenter.setToNum(name);
+                    callCenter.setStartTime(new Date());
+                    callCenter.setType(""+CallCenter.CALL_UP);
+                    callCenter.setCost(BigDecimal.ZERO);
+                    callCenterBatchInserter.put(callCenter);
+                    try{
+                        callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(app.getTenant().getId(),app.getId(),
+                                new Date()).setCallOut(1L).build());
+                    }catch (Throwable t){
+                        logger.error("incrIntoRedis失败",t);
+                    }
                     callCenterUtil.agentStateChangedEvent(subaccountId,callbackUrlUtil.get(app,subaccountId),agent,name,
-                            CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,null);
+                            CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,enQueue.getUser_data());
                 }catch (Throwable t){
                     agentState.setState(agent,CallCenterAgent.STATE_IDLE);
                     throw t;
@@ -942,10 +967,10 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                 try{
                     callId = conversationService.agentCall(subaccountId,appId,conversationId,agent,
                             callCenterAgent.getName(),
-                            extension.getId(),null,extension.getTelnum(),extension.getType(),extension.getUser(),null,null,null,null);
+                            extension.getId(),null,extension.getTelnum(),extension.getType(),extension.getUser(),null,null,null,conversationState.getUserdata());
                     agentState.setState(agent,CallCenterAgent.STATE_FETCHING);
                     callCenterUtil.agentStateChangedEvent(subaccountId,callbackUrlUtil.get(app,subaccountId),agent,name,
-                            CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,null);
+                            CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,conversationState.getUserdata());
                 }catch (Throwable t){
                     agentState.setState(agent,CallCenterAgent.STATE_IDLE);
                     throw t;
