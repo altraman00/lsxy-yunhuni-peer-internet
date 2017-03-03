@@ -47,7 +47,7 @@ public interface AppExtensionService extends BaseService<AppExtension> {
     Page<AppExtension> getPage(String appId, Integer pageNo, Integer pageSize);
 
     Page<AppExtension> getPage(String appId,String subaccountId, Integer pageNo, Integer pageSize);
-
+    Page<AppExtension> getPageByCondition(String appId,String extensionNum,String subaccountId, Integer pageNo, Integer pageSize);
     /**
      * 获取一个分机
      * @param appId

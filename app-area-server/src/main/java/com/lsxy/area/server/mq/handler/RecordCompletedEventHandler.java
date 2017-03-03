@@ -1,7 +1,9 @@
 package com.lsxy.area.server.mq.handler;
 
 import com.lsxy.framework.mq.api.MQMessageHandler;
+import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.agentserver.RecordCompletedEvent;
+import com.lsxy.framework.mq.events.callcenter.CallCenterIncrCostEvent;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
 import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
+import java.math.BigDecimal;
 
 /**
  * 处理录音完成事件
@@ -30,6 +33,9 @@ public class RecordCompletedEventHandler implements MQMessageHandler<RecordCompl
     private VoiceFileRecordService voiceFileRecordService;
     @Autowired
     private CalCostService calCostService;
+
+    @Autowired
+    private MQService mqService;
 
     private long getTimelong(long start,long end){
         long second = end - start;
@@ -78,6 +84,7 @@ public class RecordCompletedEventHandler implements MQMessageHandler<RecordCompl
         }
         record.setTenantId(message.getTenantId());
         record.setAppId(message.getAppId());
+        record.setSubaccountId(message.getSubaccountId());
         record.setAreaId(message.getAreaId());
         record.setSessionId(message.getCallId());
         record.setSessionCode(message.getType());
@@ -87,6 +94,12 @@ public class RecordCompletedEventHandler implements MQMessageHandler<RecordCompl
         calCostService.recordConsumeCal(record);
         record.setSize(getRecordSize(message.getStarTime(),message.getEndTime()));
         voiceFileRecordService.insertRecord(record);
+
+        if(message.getCallCenterId()!=null){
+            if(record.getCost() != null && record.getCost().compareTo(BigDecimal.ZERO) == 1){
+                mqService.publish(new CallCenterIncrCostEvent(message.getCallCenterId(),record.getCost()));
+            }
+        }
 
     }
 }

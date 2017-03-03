@@ -1,5 +1,6 @@
 package com.lsxy.call.center.service;
 
+import com.alibaba.dubbo.common.utils.StringUtils;
 import com.lsxy.call.center.api.model.Condition;
 import com.lsxy.call.center.api.service.ConditionService;
 import com.lsxy.call.center.api.states.lock.ModifyConditionLock;
@@ -9,6 +10,7 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.mq.api.AbstractMQEvent;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.callcenter.CreateConditionEvent;
@@ -133,7 +135,13 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
         Condition condition = this.findOne(tenantId,appId,conditionId);
         ModifyConditionLock lock = new ModifyConditionLock(redisCacheService,condition.getId());
         if(!lock.lock()){
-            throw new SystemBusyException();
+            throw new SystemBusyException(
+                    new ExceptionContext()
+                            .put("tenantId",tenantId)
+                            .put("appId",appId)
+                            .put("conditionId",conditionId)
+                            .put("lock",false)
+            );
         }
         try {
             this.delete(conditionId);
@@ -149,23 +157,55 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
     @Override
     public Condition findOne(String tenantId,String appId,String conditionId) throws YunhuniApiException{
         if(conditionId == null){
-            throw new RequestIllegalArgumentException();
+            throw new RequestIllegalArgumentException(
+                    new ExceptionContext()
+                            .put("tenantId",tenantId)
+                            .put("appId",appId)
+                            .put("conditionId",conditionId)
+            );
         }
         if(tenantId == null){
-            throw new RequestIllegalArgumentException();
+            throw new RequestIllegalArgumentException(
+                    new ExceptionContext()
+                            .put("tenantId",tenantId)
+                            .put("appId",appId)
+                            .put("conditionId",conditionId)
+            );
         }
         if(appId == null){
-            throw new RequestIllegalArgumentException();
+            throw new RequestIllegalArgumentException(
+                    new ExceptionContext()
+                            .put("tenantId",tenantId)
+                            .put("appId",appId)
+                            .put("conditionId",conditionId)
+            );
         }
         Condition condition = this.findById(conditionId);
         if(condition == null){
-            throw new ConditionNotExistException();
+            throw new ConditionNotExistException(
+                    new ExceptionContext()
+                            .put("tenantId",tenantId)
+                            .put("appId",appId)
+                            .put("conditionId",conditionId)
+            );
         }
         if(!tenantId.equals(condition.getTenantId())){
-            throw new ConditionNotExistException();
+            throw new ConditionNotExistException(
+                    new ExceptionContext()
+                            .put("tenantId",tenantId)
+                            .put("appId",appId)
+                            .put("conditionId",conditionId)
+                            .put("condition",condition)
+            );
         }
         if(!appId.equals(condition.getAppId())){
-            throw new ConditionNotExistException();
+            throw new ConditionNotExistException(
+                    new ExceptionContext()
+                            .put("tenantId",tenantId)
+                            .put("appId",appId)
+                            .put("conditionId",conditionId)
+                            .put("condition",condition)
+            );
         }
         return condition;
     }
@@ -173,10 +213,18 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
     @Override
     public List<Condition> getAll(String tenantId, String appId) throws YunhuniApiException{
         if(tenantId == null){
-            throw new RequestIllegalArgumentException();
+            throw new RequestIllegalArgumentException(
+                    new ExceptionContext()
+                            .put("tenantId",tenantId)
+                            .put("appId",appId)
+            );
         }
         if(appId == null){
-            throw new RequestIllegalArgumentException();
+            throw new RequestIllegalArgumentException(
+                    new ExceptionContext()
+                            .put("tenantId",tenantId)
+                            .put("appId",appId)
+            );
         }
         return this.conditionDao.findByTenantIdAndAppId(tenantId,appId);
     }
@@ -184,11 +232,31 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
     @Override
     public List<Condition> getAll(String tenantId, String appId,String subaccountId) throws YunhuniApiException{
         if(tenantId == null){
-            throw new RequestIllegalArgumentException();
+            throw new RequestIllegalArgumentException(
+                    new ExceptionContext()
+                            .put("tenantId",tenantId)
+                            .put("appId",appId)
+                            .put("subaccountId",subaccountId)
+            );
         }
         if(appId == null){
-            throw new RequestIllegalArgumentException();
+            throw new RequestIllegalArgumentException(new ExceptionContext()
+                    .put("tenantId",tenantId)
+                    .put("appId",appId)
+                    .put("subaccountId",subaccountId));
         }
         return this.conditionDao.findByTenantIdAndAppIdAndSubaccountId(tenantId,appId,subaccountId);
+    }
+
+    @Override
+    public Page<Condition> getPageByCondition(Integer pageNo,Integer pageSize,String tenantId, String appId, String subaccountId, String id) throws YunhuniApiException {
+        String hql = " from Condition obj where obj.tenantId=?1 and obj.appId =?2 ";
+        if(StringUtils.isNotEmpty(subaccountId)){
+            hql += " and obj.subaccountId in( "+subaccountId+")";
+        }
+        if(StringUtils.isNotEmpty(id)){
+            hql += " and obj.id like '%"+id+"%' ";
+        }
+        return this.pageList(hql,pageNo,pageSize,tenantId,appId);
     }
 }

@@ -15,6 +15,7 @@ import com.lsxy.area.server.service.ivr.handler.HangupActionHandler;
 import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.HttpClientHelper;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.area.server.util.SipUrlUtil;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.api.tenant.model.Tenant;
@@ -240,7 +241,7 @@ public class IVRActionService {
                         .putIfNotEmpty("subaccount_id",subaccountId)
                         .putIfNotEmpty("type",type)//ivr_call   ivr_incoming
                         .putIfNotEmpty("call_id",call_id)
-                        .putIfNotEmpty("from",from)
+                        .putIfNotEmpty("from",SipUrlUtil.extractTelnum(from))
                         .putIfNotEmpty("user_data",user_data)
                         .build();
                 post.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
@@ -399,7 +400,7 @@ public class IVRActionService {
                     callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(tenant.getId(),app.getId(),
                             new Date()).setCallIn(1L).build());
                 }catch (Throwable t){
-                    logger.error("incrIntoRedis失败",t);
+                    logger.error(String.format("incrIntoRedis失败，appId=%s",app.getId()),t);
                 }
             }else{
                 VoiceIvr voiceIvr = new VoiceIvr();
@@ -413,7 +414,7 @@ public class IVRActionService {
                 voiceIvrBatchInserter.put(voiceIvr);
             }
         }catch (Throwable t){
-            logger.error("保存callsession失败",t);
+            logger.error(String.format("保存callsession失败,appId=%s,callid=%s",app.getId(),call_id),t);
         }
         String areaId = areaAndTelNumSelector.getAreaId(app);
         //保存业务数据，后续事件要用到
@@ -433,8 +434,8 @@ public class IVRActionService {
                         //TYPE_IVR_INCOMING 才需要等待应答标记
                         .put(IVR_ANSWER_WAITTING_FIELD,"1")
                         //incoming事件from 和 to是相反的
-                        .putIfNotEmpty("from",to)
-                        .putIfNotEmpty("to",from)
+                        .putIfNotEmpty("from",SipUrlUtil.extractTelnum(to))
+                        .putIfNotEmpty("to", SipUrlUtil.extractTelnum(from))
                         .putIfWhere(CallCenterUtil.CALLCENTER_FIELD,iscc,call_id)
                         .putIfWhere(CallCenterUtil.ISCC_FIELD,iscc,CallCenterUtil.ISCC_TRUE)
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
@@ -454,7 +455,7 @@ public class IVRActionService {
         try {
             rpcCaller.invoke(sessionContext, rpcrequest,true);
         } catch (Throwable e) {
-            logger.error("调用失败",e);
+            logger.error(String.format("调用应答失败,callid=%s",call_id),e);
         }
     }
 
@@ -574,7 +575,7 @@ public class IVRActionService {
                 rpcCaller.invoke(sessionContext, rpcrequest, true);
             }
         } catch (Throwable e) {
-            logger.error("调用失败",e);
+            logger.error(String.format("调用挂断失败,callid=%s",call_id),e);
         }
     }
     /**
@@ -611,6 +612,17 @@ public class IVRActionService {
 
     public boolean validateXMLSchema(Document doc) throws DocumentException {
         try {
+            Validator validator = schema.newValidator();
+            validator.validate(new DocumentSource(doc));
+        } catch (Throwable e) {
+            throw new DocumentException(e);
+        }
+        return true;
+    }
+
+    public boolean validateXMLSchemaIgnoreResponse(String xml) throws DocumentException {
+        try {
+            Document doc = DocumentHelper.parseText("<response>"+xml+"</response>");
             Validator validator = schema.newValidator();
             validator.validate(new DocumentSource(doc));
         } catch (Throwable e) {

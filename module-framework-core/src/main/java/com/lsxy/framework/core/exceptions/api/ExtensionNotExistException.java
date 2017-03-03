@@ -12,6 +12,14 @@ public class ExtensionNotExistException extends YunhuniApiException {
         super();
     }
 
+    public ExtensionNotExistException(String context) {
+        super(context);
+    }
+
+    public ExtensionNotExistException(ExceptionContext context){
+        super(context);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.ExtensionNotExist;

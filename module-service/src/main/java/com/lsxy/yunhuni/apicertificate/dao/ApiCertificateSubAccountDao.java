@@ -7,9 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by liups on 2017/2/14.
  */
 public interface ApiCertificateSubAccountDao extends BaseDaoInterface<ApiCertificateSubAccount, Serializable> {
+    List<ApiCertificateSubAccount> findByAppId(String appId);
+    ApiCertificateSubAccount findByCertId(String certId);
 }

@@ -47,7 +47,7 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_SUCCESS extends EventHandler {
         }
         BusinessState state = businessStateService.get(callId);
         if(state == null){
-            throw new InvalidParamException("businessstate is null");
+            throw new InvalidParamException("businessstate is null,call_id={}",callId);
         }
         if(StringUtils.isNotBlank(resId)){
             businessStateService.updateResId(callId,resId);

@@ -10,6 +10,7 @@ import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
+import com.lsxy.area.server.util.SipUrlUtil;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.api.tenant.service.TenantService;
@@ -262,8 +263,8 @@ public class DialActionHandler extends ActionHandler{
                         .putIfWhere(CallCenterUtil.ISCC_FIELD,isCC,CallCenterUtil.ISCC_TRUE)
                         .putIfWhere(CallCenterUtil.CALLCENTER_FIELD,isCC,callCenterId)
                         .putIfNotEmpty("ivr_call_id",ivr_call_id)
-                        .putIfNotEmpty("from",from)
-                        .putIfNotEmpty("to",to)
+                        .putIfNotEmpty("from",SipUrlUtil.extractTelnum(from))
+                        .putIfNotEmpty("to", SipUrlUtil.extractTelnum(to))
                         .put("max_seconds",max_seconds, ""+IVRActionService.MAX_DURATION_SEC)
                         .put("connect_mode",connect_mode,"1")
                         .putIfNotEmpty("volume1",volume1)

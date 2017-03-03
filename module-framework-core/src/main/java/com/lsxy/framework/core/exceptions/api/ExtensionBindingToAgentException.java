@@ -12,6 +12,14 @@ public class ExtensionBindingToAgentException extends YunhuniApiException {
         super();
     }
 
+    public ExtensionBindingToAgentException(String context) {
+        super(context);
+    }
+
+    public ExtensionBindingToAgentException(ExceptionContext context){
+        super(context);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.ExtensionBindingToAgent;
