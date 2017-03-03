@@ -859,6 +859,20 @@
                 <a class="sure modalSureSix" data-id="six">创建</a>
             </div>
         </div>
+        <!---创建分机--->
+        <div hidden>
+            <button href="#"  hidden class="btn btn-primary defind modalShow" data-id="playvoice" >试听</button>
+        </div>
+        <div class="modal-box application-detail-box"  id="modalplayvoice" style="display:none;">
+            <div class="title" id="modalplayvoice2">试听放音文件<a class="close_a modalCancel cancelplayvoice" data-id="playvoice" style="right: 5px;top: 5px"></a></div>
+            <div class="content" >
+                <div class="row margin-bottom-10">
+                    <div class="col-md-8 remove-padding-right" style="margin-top:10px;">
+                    <audio id="playvoicesrc" controls="controls" preload="true" src="" style="width: 250px;"></audio>
+                    </div>
+                </div>
+            </div>
+        </div>
 <!---上传文件--->
 <div class="modal-box application-detail-box application-file-box" id="modalfour" style="display:none ">
     <div class="modal-loadding loadding"></div>
@@ -912,6 +926,7 @@
         <%--<a class="sure modalSureFour modalCancel-app-down" data-id="four" >确认</a>--%>
     <%--</div>--%>
     </form:form>
+
 </div>
 
 
@@ -948,6 +963,10 @@
                 $('.modal-box .content input[type="number"]').css("height","30px");
                 $('#modalfive').css("height","450px");
                 $('#modalsix').css("height","330px");
+                $('#modalplayvoice').css("height","93px").css("width","380px");
+                $('#modalplayvoice2').css("padding","10px").css("margin-top","0px").css("height","36px")
+                    .css("font-size:","14px").css("line-height","normal").css("text-align","left").css("background-color","#0099cc").css("font-size","14px");
+
             })
         </script>
 
@@ -1615,18 +1634,22 @@
                 var data =[];
                 for(var j=0;j<response.data.result.length;j++){
                     var tempFile = response.data.result[j];
-                    var temp = [tempFile.id,
+                    console.info(tempFile)
+                    var temp = [
+                        tempFile.id,
                         tempFile.name,
-                        tempFile.status,resultFileSize(tempFile.size),
+                        tempFile.status,
+                        resultFileSize(tempFile.size),
                         tempFile.remark,
                         tempFile.reason?tempFile.reason:'',
                         tempFile.sync,
-                        tempFile.certId];
+                        tempFile.certId,
+                        tempFile.fileKey
+                    ];
                     data[j]=temp;
                 }
                 var html ='';
                 //数据列表
-                console.info(data);
                 for(var i = 0 ; i<data.length; i++){
                     html +='<tr class="playtr" id="play-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
                     if(data[i][2]==-1){
@@ -1639,7 +1662,7 @@
                     html+='<td>'+data[i][3]+'</td>';
                     html +='<td>'+(data[i][7] == null?'':data[i][7] )+'</td>';
                     html+='<td id="remark-a-'+data[i][0]+'">'+data[i][4]+'</td>';
-                    html+='<td class="operation"> <a onclick="delplay(this)" id="delete-'+data[i][0]+'" >删除</a> <span ></span> <a onclick="editremark(this)" id="remark-b-'+data[i][0]+'">修改备注</a> </td></tr>';
+                    html+='<td class="operation"> <a onclick="playvoice(\''+data[i][8]+'\')" >试听</a><span ></span> <a onclick="delplay(this)" id="delete-'+data[i][0]+'" >删除</a> <span ></span> <a onclick="editremark(this)" id="remark-b-'+data[i][0]+'">修改备注</a> </td></tr>';
                 }
                 $('#playtable').find(".playtr").remove();
                 $('#playtable').append(html);
@@ -1649,9 +1672,21 @@
         },"post");
 
     }
-
-
-
+    function playvoice(id){
+        console.info(id);
+        $('#playvoicesrc').attr("src",ctx + "/console/oss/voice?uri="+id);
+        $('button[data-id=playvoice]').click();
+    }
+    $('.cancelplayvoice').click(function(){
+        var audio = document.getElementById('playvoicesrc');
+        if(audio!==null){
+            //检测播放是否已暂停.audio.paused 在播放器播放时返回false.<span style="font-family: Arial, Helvetica, sans-serif;">在播放器暂停时返回true</span>
+            if(!audio.paused)
+            {
+                audio.pause();// 这个就是暂停//audio.play();// 这个就是播放
+            }
+        }
+    });
     $('#myTab li').click(function(){
         var type = $(this).attr('data-id');
         if(type=='voice'){
