@@ -39,7 +39,7 @@ public class AbstractAPIController {
             resultEx = ex;
         }
         if(resultEx instanceof YunhuniApiException){
-            failed = ApiGatewayResponse.failed(((YunhuniApiException) resultEx).getCode(),resultEx.getMessage());
+            failed = ApiGatewayResponse.failed(((YunhuniApiException) resultEx).getCode(),((YunhuniApiException) resultEx).getSimpleMessage());
         }else if(resultEx instanceof MethodArgumentNotValidException || resultEx instanceof JsonMappingException){
             failed = ApiGatewayResponse.failed(ApiReturnCodeEnum.IllegalArgument.getCode(), ApiReturnCodeEnum.IllegalArgument.getMsg());
         }else{

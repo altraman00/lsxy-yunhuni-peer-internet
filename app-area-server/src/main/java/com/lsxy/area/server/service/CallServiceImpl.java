@@ -147,20 +147,29 @@ public class CallServiceImpl implements CallService {
         String apiCmd = BusinessState.TYPE_DUO_CALL;
         String duocCallId;
         if(apiGwRedBlankNumService.isRedNum(to1) || apiGwRedBlankNumService.isRedNum(to2)){
-            throw new NumberNotAllowToCallException();
+            throw new NumberNotAllowToCallException(
+                    new ExceptionContext().put("to1",to1).put("to2",to2)
+            );
         }
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("appId",appId)
+            );
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("appId",appId)
+                        .put("ip",ip)
+                );
             }
         }
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.VoiceCallback)){
-            throw new AppServiceInvalidException();
+            throw new AppServiceInvalidException(
+                    new ExceptionContext().put("appId",appId)
+            );
         }
         //判断余额配额是否充足
         calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,apiCmd, app.getTenant().getId());
@@ -247,26 +256,37 @@ public class CallServiceImpl implements CallService {
     public void duoCallbackCancel(String subaccountId,String ip, String appId, String callId) throws YunhuniApiException{
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("appId",appId)
+            );
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("appId",appId)
+                        .put("ip",ip)
+                );
             }
         }
         BusinessState state = businessStateService.get(callId);
 
         if(state == null){
-            throw new SystemBusyException();
+            throw new CallNotExistsException(
+                    new ExceptionContext().put("appId",appId)
+                            .put("callId",callId)
+            );
         }
 
         if(state.getResId() == null){
-            throw new SystemBusyException();
+            throw new SystemBusyException(
+                    new ExceptionContext().put("appId",appId)
+                            .put("callId",callId)
+            );
         }
 
         if(state.getClosed()!= null && state.getClosed()){
-            throw new SystemBusyException();
+            throw new CallNotExistsException();
         }
 
         String areaId = areaAndTelNumSelector.getAreaId(app);
@@ -291,21 +311,38 @@ public class CallServiceImpl implements CallService {
         String apiCmd = BusinessState.TYPE_NOTIFY_CALL;
         String callId;
         if(apiGwRedBlankNumService.isRedNum(to)){
-            throw new NumberNotAllowToCallException();
+            throw new NumberNotAllowToCallException(
+                    new ExceptionContext().put("to",to)
+                            .put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("to",to)
+                            .put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("to",to)
+                                .put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                                .put("ip",ip)
+                );
             }
         }
 
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.VoiceDirectly)){
-            throw new AppServiceInvalidException();
+            throw new AppServiceInvalidException(
+                    new ExceptionContext().put("to",to)
+                            .put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
         //判断余额配额是否充足
         calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,apiCmd, app.getTenant().getId());
@@ -372,22 +409,39 @@ public class CallServiceImpl implements CallService {
     public String verifyCall(String subaccountId,String ip, String appId, String from, String to, Integer maxDialDuration, String verifyCode, String playFile, Integer repeat, String userData) throws YunhuniApiException {
 
         if(apiGwRedBlankNumService.isRedNum(to)){
-            throw new NumberNotAllowToCallException();
+            throw new NumberNotAllowToCallException(
+                    new ExceptionContext().put("to",to)
+                            .put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("to",to)
+                            .put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
 
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("to",to)
+                                .put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                                .put("ip",ip)
+                );
             }
         }
 
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.VoiceValidate)){
-            throw new AppServiceInvalidException();
+            throw new AppServiceInvalidException(
+                    new ExceptionContext().put("to",to)
+                            .put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
         //判断余额配额是否充足
         calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.captcha_call.getApiCmd(), app.getTenant().getId());

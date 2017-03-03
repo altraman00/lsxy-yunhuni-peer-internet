@@ -19,10 +19,7 @@ import javax.annotation.PostConstruct;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.*;
 
 /**
  * Redis操作方法
@@ -270,6 +267,17 @@ public class RedisCacheService {
 	    	logger.debug("get cache value:"+key+"=>"+result);
 	        return result;
 	    }
+
+		public String getAndSet(final String key,final String value) {
+			String result = (String) redisTemplate.boundValueOps(key).getAndSet(value);
+			return result;
+		}
+
+		public String getAndSet(final String key,final String value,long expires) {
+			String result = (String) redisTemplate.boundValueOps(key).getAndSet(value);
+			redisTemplate.expire(key,expires, TimeUnit.SECONDS);
+			return result;
+		}
 
 	    /**
 	     * @param pattern

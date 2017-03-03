@@ -51,7 +51,7 @@ public class HangupActionHandler extends ActionHandler{
                     rpcCaller.invoke(sessionContext, rpcrequest, true);
                 }
             } catch (Throwable e) {
-                logger.error("调用失败",e);
+                logger.error(String.format("调用拒绝失败,appId=%s,callid=%s",state.getAppId(),callId),e);
             }
         }else{
             //已应答调用挂断
@@ -67,7 +67,7 @@ public class HangupActionHandler extends ActionHandler{
                     rpcCaller.invoke(sessionContext, rpcrequest, true);
                 }
             } catch (Throwable e) {
-                logger.error("调用失败",e);
+                logger.error(String.format("调用挂断失败,appId=%s,callid=%s",state.getAppId(),callId),e);
             }
         }
 

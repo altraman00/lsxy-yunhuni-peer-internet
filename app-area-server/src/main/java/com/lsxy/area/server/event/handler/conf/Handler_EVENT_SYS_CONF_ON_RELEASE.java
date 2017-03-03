@@ -96,7 +96,7 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
         }
         BusinessState state = businessStateService.get(conf_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null");
+            throw new InvalidParamException("businessstate is null,call_id={}",conf_id);
         }
 
         businessStateService.delete(conf_id);
@@ -185,7 +185,7 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
                 meetingService.save(meeting);
             }
         }catch (Throwable t){
-            logger.error("更新会议记录失败",t);
+            logger.error(String.format("更新会议记录失败,appId=%s,callid=%s",state.getAppId(),state.getId()),t);
         }
     }
     private void handupParts(String confId) {
@@ -223,7 +223,7 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
             rpcCaller.invoke(sessionContext, rpcrequest,true);
         } catch (Throwable e) {
-            logger.error("会议结束自动挂断与会方={}失败",e);
+            logger.error(String.format("会议结束自动挂断与会方失败,appId=%s,callid=%s",state.getAppId(),callId),e);
         }
     }
 }

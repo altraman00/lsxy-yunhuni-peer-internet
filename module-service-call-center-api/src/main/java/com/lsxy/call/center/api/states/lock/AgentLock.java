@@ -5,7 +5,7 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 /**
  * Created by liuws on 2016/11/11.
  */
-public class AgentLock extends DistributeLock {
+public class AgentLock extends ReentrantLock {
 
 
     private static final String PREFIXED = "callcenter.agentlock_";
