@@ -10,6 +10,7 @@ import com.lsxy.area.server.test.TestIncomingZB;
 import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
+import com.lsxy.area.server.util.SipUrlUtil;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.*;
@@ -511,8 +512,8 @@ public class CallServiceImpl implements CallService {
                     .setAreaId(areaId)
                     .setLineGatewayId(lineId)
                     .setBusinessData(new MapBuilder<String,String>()
-                            .putIfNotEmpty("from",oneTelnumber)
-                            .putIfNotEmpty("to",to)
+                            .putIfNotEmpty("from",SipUrlUtil.extractTelnum(oneTelnumber))
+                            .putIfNotEmpty("to", SipUrlUtil.extractTelnum(to))
                             .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                             .build())
                     .build();

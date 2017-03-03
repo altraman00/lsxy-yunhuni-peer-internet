@@ -443,8 +443,8 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         }
                         if((conversationState.getClosed()== null || !conversationState.getClosed())){
                             //交谈开始事件
-                            callCenterUtil.conversationBeginEvent(state.getSubaccountId(),state.getCallBackUrl(),conversation_id,
-                                    CallCenterUtil.CONVERSATION_TYPE_QUEUE,queueId,call_id);
+                            callCenterUtil.conversationBeginEvent(conversationState.getSubaccountId(),conversationState.getCallBackUrl(),conversation_id,
+                                    CallCenterUtil.CONVERSATION_TYPE_QUEUE,queueId,call_id,conversationState.getUserdata());
                         }
                     }
                 }
@@ -566,8 +566,8 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
                     }
                     //交谈开始事件
-                    callCenterUtil.conversationBeginEvent(state.getSubaccountId(),state.getCallBackUrl(),conversationId,
-                            CallCenterUtil.CONVERSATION_TYPE_CALL_OUT,null,call_id);
+                    callCenterUtil.conversationBeginEvent(conversationState.getSubaccountId(),conversationState.getCallBackUrl(),conversationId,
+                            CallCenterUtil.CONVERSATION_TYPE_CALL_OUT,null,call_id,conversationState.getUserdata());
                 }
             }
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
@@ -607,7 +607,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                             conversationService.create(state.getSubaccountId(),conversationId,
                                     state.getBusinessData().get(BusinessState.REF_RES_ID),
                                     state,state.getTenantId(),state.getAppId(),
-                                    state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null);
+                                    state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null,state.getUserdata());
                             //坐席加入交谈成功事件中要呼叫这个号码
                             businessStateService.updateInnerField(conversationId,"invite_from",
                                     businessData.get("invite_from")!=null?businessData.get("invite_from"):"","invite_to",businessData.get("invite_to"));
@@ -620,7 +620,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                             conversationService.create(state.getSubaccountId(),conversationId,
                                     state.getBusinessData().get(BusinessState.REF_RES_ID),
                                     state,state.getTenantId(),state.getAppId(),
-                                    state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null);
+                                    state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null,state.getUserdata());
                             //坐席加入交谈成功事件中要呼叫这个号码
                             businessStateService.updateInnerField(conversationId,"enqueue_xml",
                                     businessData.get("enqueue_xml"));

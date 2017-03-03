@@ -93,7 +93,8 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
                     type = BusinessState.TYPE_CC_INVITE_OUT_CALL;
                 }
             }
-            mqService.publish(new RecordCompletedEvent(record_id,state.getBusinessData().get(CallCenterUtil.CALLCENTER_FIELD),state.getTenantId(),state.getAppId(),state.getSubaccountId(),state.getAreaId(),state.getId(),
+            mqService.publish(new RecordCompletedEvent(record_id,state.getBusinessData().get(CallCenterUtil.CALLCENTER_FIELD),
+                    state.getTenantId(),state.getAppId(),state.getSubaccountId(),state.getAreaId(),state.getId(),
                     ProductCode.changeApiCmdToProductCode(type).name(),(String)params.get("record_file"),
                     Long.parseLong((String)params.get("begin_time")),Long.parseLong((String)params.get("end_time"))
             ));
