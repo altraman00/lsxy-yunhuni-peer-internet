@@ -56,8 +56,9 @@ public class OssFileController extends AbstractPortalController {
     }
     @RequestMapping(value = "/voice" ,method = RequestMethod.GET)
     public void getVoice(HttpServletResponse response, @RequestParam String uri){
-//        String type = uri.substring(uri.lastIndexOf(".")+1, uri.length());
+        String name = uri.substring(uri.lastIndexOf("/")+1, uri.length());
         response.setContentType("'audio/x-wav"); //必须设置ContentType为image/图片类型
+        response.setHeader("Content-disposition", "attachment;filename="+name);
         handle(response,SystemConfig.getProperty("global.oss.aliyun.bucket"), uri);
     }
 
