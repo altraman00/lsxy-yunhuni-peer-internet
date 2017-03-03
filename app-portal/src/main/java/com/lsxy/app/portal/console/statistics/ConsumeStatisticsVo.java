@@ -12,6 +12,7 @@ public class ConsumeStatisticsVo {
     public static final String TYPE_DAY = "day";//日统计类型 按月查找输出 返回按月
     private String type = TYPE_MONTH;//类型统计类型 month day
     private String startTime = DateUtils.formatDate(new Date(),"yyyy-MM");//时间
+    private String startTime2 = DateUtils.formatDate(new Date(),"yyyy");//时间
     private String endTime = "";//比较时间
     private String appId = "-1";//应用编号
 
@@ -54,5 +55,13 @@ public class ConsumeStatisticsVo {
 
     public void setAppId(String appId) {
         this.appId = appId;
+    }
+
+    public String getStartTime2() {
+        return startTime2;
+    }
+
+    public void setStartTime2(String startTime2) {
+        this.startTime2 = startTime2;
     }
 }

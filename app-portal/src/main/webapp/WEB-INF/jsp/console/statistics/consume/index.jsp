@@ -86,7 +86,7 @@
                                     <!--月统计-->
                                     <div class="row yearform" >
                                         <div class="col-md-12">
-                                            <input type="text" class="datepicker  form-control currentYear date_block yearstart" value="2016"  />
+                                            <input type="text" class="datepicker  form-control currentYear date_block yearstart" value="${consumeStatisticsVo.startTime2}"  />
                                             <span class="yearcontrast"><span>对比</span><input type="text" class="datepicker currentYear form-control date_block yearend" /></span>
                                             <button class="btn btn-primary finddatebtn " data-id="year" >查询</button>
                                             <button class="btn btn-default compassbtn yearcbtn" data-id="year">对比</button>
