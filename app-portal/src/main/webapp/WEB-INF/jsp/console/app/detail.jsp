@@ -2340,16 +2340,19 @@
         var h;
         var h2;
         var enabled2;
+        var color ="text-center "
         if(enabled==1){//当前是启用，执行禁用
             state="disable/"+id;
             h="禁用";
             h2="启用";
             enabled2=0;
+            color +="text-danger";
         }else{//当前是禁用，执行启用
             state="enabled/"+id;
             h="启用";
             h2="禁用";
             enabled2=1;
+            color +="text-success";
         }
         ajaxsync(ctx + "/console/sub_account/"+state,{csrfParameterName:csrfToken},function(response){
             if(response.success){
@@ -2357,6 +2360,7 @@
                 $('#enable_'+id).html(h);
                 $('#enable_edit_'+id).html(h2);
                 $('#enable_edit_'+id).attr("data-state",enabled2);
+                $("#enable_"+id).attr("class",color);
             }else{
                 showtoast(h+"失败："+response.errorMsg);
             }
