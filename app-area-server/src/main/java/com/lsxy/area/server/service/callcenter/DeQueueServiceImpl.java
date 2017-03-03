@@ -129,11 +129,11 @@ public class DeQueueServiceImpl implements DeQueueService {
                         result.getAgent().getName(),result.getExtension().getId(),
                         state.getBusinessData().get("from"),state.getBusinessData().get("to"),
                         result.getExtension().getTelnum(),result.getExtension().getType(),
-                        result.getExtension().getUser(),conversationTimeout,result.getFetchTime(),enQueue.getVoice_mode());
+                        result.getExtension().getUser(),conversationTimeout,result.getFetchTime(),enQueue.getVoice_mode(),state.getUserdata());
         if(conversationId == null){//在现有的交谈上邀请座席，不需要创建交谈
             //开始创建交谈
             conversationService.create(state.getSubaccountId(),conversation,state.getBusinessData().get(BusinessState.REF_RES_ID),
-                    state,state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),conversationTimeout,enQueue.getHold_voice());
+                    state,state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),conversationTimeout,enQueue.getHold_voice(),state.getUserdata());
         }
 
         if(state.getBusinessData().get(CallCenterUtil.PLAYWAIT_FIELD) != null){
@@ -167,7 +167,7 @@ public class DeQueueServiceImpl implements DeQueueService {
 
         callCenterUtil.agentStateChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),result.getAgent().getId(),
                 result.getAgent().getName(),
-                CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
+                CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,state.getUserdata());
     }
 
     @Override
@@ -205,17 +205,18 @@ public class DeQueueServiceImpl implements DeQueueService {
             }
         }
 
-        if(state == null || (state.getClosed() != null && state.getClosed())){
-            logger.info("会话已关闭callid={}",callId);
-            return;
-        }
-        conversationService.stopPlayWait(state);
-
         callCenterUtil.sendQueueFailEvent(state.getSubaccountId(),state.getCallBackUrl(),
                 queueId,queueType,
                 state.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
                 CallCenterUtil.QUEUE_FAIL_TIMEOUT,
                 callId,null,state.getUserdata());
+
+        if(state == null || (state.getClosed() != null && state.getClosed())){
+            logger.info("会话已关闭callid={}",callId);
+            return;
+        }
+
+        conversationService.stopPlayWait(state);
 
         if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType()) ||
                 BusinessState.TYPE_IVR_CALL.equals(state.getType())){
@@ -259,18 +260,18 @@ public class DeQueueServiceImpl implements DeQueueService {
                         conversationState.getId(),conversationState.getResId());
             }
         }
-
-        if(state == null || (state.getClosed() != null && state.getClosed())){ 
-            logger.info("会话已关闭callid={}",callId);
-            return;
-        }
-        conversationService.stopPlayWait(state);
         
         callCenterUtil.sendQueueFailEvent(state.getSubaccountId(),state.getCallBackUrl(),
                 queueId,queueType,
                 state.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
                 CallCenterUtil.QUEUE_FAIL_ERROR,
                 callId,null,state.getUserdata());
+
+        if(state == null || (state.getClosed() != null && state.getClosed())){
+            logger.info("会话已关闭callid={}",callId);
+            return;
+        }
+        conversationService.stopPlayWait(state);
 
         if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType()) ||
                 BusinessState.TYPE_IVR_CALL.equals(state.getType())){

@@ -3,6 +3,7 @@ package com.lsxy.area.server.event.handler.conf;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.mq.api.MQService;
@@ -75,7 +76,9 @@ public class Handler_EVENT_SYS_CONF_ON_RECORD_COMPLETED extends EventHandler {
         }
 
         try{
-            mqService.publish(new RecordCompletedEvent(state.getTenantId(),state.getAppId(),state.getSubaccountId(),state.getAreaId(),state.getId(),
+            mqService.publish(new RecordCompletedEvent(state.getBusinessData().get(CallCenterUtil.CALLCENTER_FIELD),
+                    state.getTenantId(),
+                    state.getAppId(),state.getSubaccountId(),state.getAreaId(),state.getId(),
                     ProductCode.changeApiCmdToProductCode(state.getType()).name(),(String)params.get("record_file"),
                     Long.parseLong((String)params.get("begin_time")),Long.parseLong((String)params.get("end_time"))
             ));

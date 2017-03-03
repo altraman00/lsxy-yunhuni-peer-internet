@@ -79,18 +79,18 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
         subAccount.setRemark(subAccount.getRemark());
         subAccount.setExtensionPrefix(appService.getExtensionPrefixNum());
         this.save(subAccount);
+
         List<CertAccountQuota> subQuotas = new ArrayList<>();
         List<CertAccountQuota> quotas = subAccount.getQuotas();
         Collection<CertAccountQuota> setQuotas = getQuotasByApp(app,quotas);
         if(setQuotas != null){
             for(CertAccountQuota quota : setQuotas){
                 CertAccountQuota saveQ = new CertAccountQuota(tenantId,subAccount.getAppId(),subAccount.getId(),quota.getType(),quota.getValue(),quota.getRemark());
-                saveQ = certAccountQuotaService.save(saveQ);
+                certAccountQuotaService.save(saveQ);
                 subQuotas.add(saveQ);
             }
         }
         subAccount.setQuotas(subQuotas);
-        subAccount = this.save(subAccount);
         return subAccount;
     }
 

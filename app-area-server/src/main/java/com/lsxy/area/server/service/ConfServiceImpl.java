@@ -8,6 +8,7 @@ import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
+import com.lsxy.area.server.util.SipUrlUtil;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
@@ -205,7 +206,7 @@ public class ConfServiceImpl implements ConfService {
         }
 
         if(state.getClosed()!= null && state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConfNotExistsException();
         }
 
         if(!appId.equals(state.getAppId())){
@@ -336,8 +337,8 @@ public class ConfServiceImpl implements ConfService {
                                     .setLineGatewayId(lineId)
                                     .setBusinessData(new MapBuilder<String,String>()
                                         .putIfNotEmpty(BusinessState.REF_RES_ID,state.getBusinessData().get(BusinessState.REF_RES_ID))
-                                        .putIfNotEmpty("from",oneTelnumber)
-                                        .putIfNotEmpty("to",to)
+                                        .putIfNotEmpty("from",SipUrlUtil.extractTelnum(oneTelnumber))
+                                        .putIfNotEmpty("to", SipUrlUtil.extractTelnum(to))
                                         .putIfNotEmpty("max_seconds",maxDuration==null?null:maxDuration.toString())//最大时间
                                         .putIfNotEmpty("conf_id",confId)//所属会议
                                         .putIfNotEmpty("play_file",playFile)//加入后在会议播放这个文件
@@ -381,7 +382,7 @@ public class ConfServiceImpl implements ConfService {
         }
 
         if(state.getClosed()!= null && state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConfNotExistsException();
         }
 
         if(!appId.equals(state.getAppId())){
@@ -421,20 +422,28 @@ public class ConfServiceImpl implements ConfService {
         BusinessState call_state = businessStateService.get(callId);
         BusinessState conf_state = businessStateService.get(confId);
 
-        if(call_state ==null || call_state.getResId() == null){
+        if(call_state == null){
+            throw new CallNotExistsException();
+        }
+
+        if(call_state.getResId() == null){
             throw new SystemBusyException();
         }
 
         if(call_state.getClosed()!= null && call_state.getClosed()){
-            throw new SystemBusyException();
+            throw new CallNotExistsException();
         }
 
-        if(conf_state == null || conf_state.getResId() == null){
+        if(conf_state == null){
+            throw new ConfNotExistsException();
+        }
+
+        if(conf_state.getResId() == null){
             throw new SystemBusyException();
         }
 
         if(conf_state.getClosed()!= null && conf_state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConfNotExistsException();
         }
 
         if(!call_state.getAppId().equals(conf_state.getAppId())){
@@ -485,12 +494,16 @@ public class ConfServiceImpl implements ConfService {
 
         BusinessState conf_state = businessStateService.get(confId);
 
-        if(conf_state == null || conf_state.getResId() == null){
+        if(conf_state == null){
+            throw new ConfNotExistsException();
+        }
+
+        if(conf_state.getResId() == null){
             throw new SystemBusyException();
         }
 
         if(conf_state.getClosed()!= null && conf_state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConfNotExistsException();
         }
 
         if(!conf_state.getAppId().equals(appId)){
@@ -538,12 +551,16 @@ public class ConfServiceImpl implements ConfService {
 
         BusinessState conf_state = businessStateService.get(confId);
 
-        if(conf_state == null || conf_state.getResId() == null){
+        if(conf_state == null){
+            throw new ConfNotExistsException();
+        }
+
+        if(conf_state.getResId() == null){
             throw new SystemBusyException();
         }
 
         if(conf_state.getClosed()!= null && conf_state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConfNotExistsException();
         }
 
         if(!conf_state.getAppId().equals(appId)){
@@ -589,12 +606,16 @@ public class ConfServiceImpl implements ConfService {
 
         BusinessState conf_state = businessStateService.get(confId);
 
-        if(conf_state == null || conf_state.getResId() == null){
+        if(conf_state == null){
+            throw new ConfNotExistsException();
+        }
+
+        if(conf_state.getResId() == null){
             throw new SystemBusyException();
         }
 
         if(conf_state.getClosed()!= null && conf_state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConfNotExistsException();
         }
 
         if(!conf_state.getAppId().equals(appId)){
@@ -648,12 +669,16 @@ public class ConfServiceImpl implements ConfService {
         }
         BusinessState conf_state = businessStateService.get(confId);
 
-        if(conf_state == null || conf_state.getResId() == null){
+        if(conf_state == null){
+            throw new ConfNotExistsException();
+        }
+
+        if(conf_state.getResId() == null){
             throw new SystemBusyException();
         }
 
         if(conf_state.getClosed()!= null && conf_state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConfNotExistsException();
         }
 
         if(!conf_state.getAppId().equals(appId)){
@@ -699,20 +724,29 @@ public class ConfServiceImpl implements ConfService {
 
         BusinessState call_state = businessStateService.get(callId);
         BusinessState conf_state = businessStateService.get(confId);
-        if(call_state ==null || call_state.getResId() == null){
+
+        if(call_state == null){
+            throw new CallNotExistsException();
+        }
+
+        if(call_state.getResId() == null){
             throw new SystemBusyException();
         }
 
         if(call_state.getClosed()!= null && call_state.getClosed()){
-            throw new SystemBusyException();
+            throw new CallNotExistsException();
         }
 
-        if(conf_state == null || conf_state.getResId() == null){
+        if(conf_state == null){
+            throw new ConfNotExistsException();
+        }
+
+        if(conf_state.getResId() == null){
             throw new SystemBusyException();
         }
 
         if(conf_state.getClosed()!= null && conf_state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConfNotExistsException();
         }
 
         if(!call_state.getAppId().equals(conf_state.getAppId())){
@@ -745,20 +779,28 @@ public class ConfServiceImpl implements ConfService {
     public boolean confEnter(String call_id, String conf_id, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException {
         BusinessState call_state = businessStateService.get(call_id);
         BusinessState conf_state = businessStateService.get(conf_id);
-        if(call_state ==null || call_state.getResId() == null){
+        if(call_state == null){
+            throw new CallNotExistsException();
+        }
+
+        if(call_state.getResId() == null){
             throw new SystemBusyException();
         }
 
         if(call_state.getClosed()!= null && call_state.getClosed()){
-            throw new SystemBusyException();
+            throw new CallNotExistsException();
         }
 
-        if(conf_state == null || conf_state.getResId() == null){
+        if(conf_state == null){
+            throw new ConfNotExistsException();
+        }
+
+        if(conf_state.getResId() == null){
             throw new SystemBusyException();
         }
 
         if(conf_state.getClosed()!= null && conf_state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConfNotExistsException();
         }
 
         if(!call_state.getAppId().equals(conf_state.getAppId())){

@@ -154,7 +154,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 isIVR = true;
             }
         }
-        if(isIVR){
+        if(isIVR){//非呼叫中心的ivr 更新ivr表
             try{
                 VoiceIvr voiceIvr = voiceIvrService.findById(call_id);
                 if(voiceIvr != null){
@@ -165,7 +165,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             }catch (Throwable t){
                 logger.error("更新voiceIvr失败",t);
             }
-        }else if(!BusinessState.TYPE_IVR_DIAL.equals(state.getType())){
+        }else if(!BusinessState.TYPE_IVR_DIAL.equals(state.getType())){//非ivr dial
             try{
                 String callCenterId = conversationService.getCallCenter(state);
                 CallCenter callCenter = null;
@@ -177,7 +177,8 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                             state.getTenantId(),state.getAppId(),call_id,callCenter);
                 }
                 if(callCenter != null){
-                    if(conversationService.isCC(state)){
+                    if(conversationService.isCC(state) ||
+                            BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){//是呼叫中心ivr或者是呼叫中心坐席外呼
                         CallCenter updateCallcenter = new CallCenter();
                         updateCallcenter.setEndTime(new Date());
                         Long callLongTime  = null;
@@ -299,7 +300,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 if(preState!=null && curState != null){
                     if(!preState.equals(curState)){
                         callCenterUtil.agentStateChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),agentId,
-                                state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),preState, curState);
+                                state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),preState, curState,state.getUserdata());
                     }
                 }
                 agentIdCallReference.clear(agentId);

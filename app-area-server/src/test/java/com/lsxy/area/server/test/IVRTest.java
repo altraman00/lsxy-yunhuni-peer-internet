@@ -155,5 +155,19 @@ public class IVRTest {
         }
     }
 
+    @Test
+    public void test3() throws DocumentException {
+        System.out.println(ivrActionService.validateXMLSchemaIgnoreResponse("<enqueue\n" +
+                "        wait_voice=\"wait.wav\"\n" +
+                "        ring_mode=\"1\"\n" +
+                "        play_num=\"true\"\n" +
+                "        pre_num_voice=\"坐席.wav\"\n" +
+                "        post_num_voice=\"为您服务.wav\"\n" +
+                ">\n" +
+                "    <route>\n" +
+                "        <agent name=\"2019\" priority=\"11\" queue_timeout=\"60\" fetch_timeout=\"50\"></agent>\n" +
+                "    </route>\n" +
+                "</enqueue>"));;
+    }
 
 }
