@@ -1,5 +1,6 @@
 package com.lsxy.call.center.service;
 
+import com.alibaba.dubbo.common.utils.StringUtils;
 import com.lsxy.call.center.api.model.Condition;
 import com.lsxy.call.center.api.service.ConditionService;
 import com.lsxy.call.center.api.states.lock.ModifyConditionLock;
@@ -9,6 +10,7 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.mq.api.AbstractMQEvent;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.callcenter.CreateConditionEvent;
@@ -190,5 +192,17 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
             throw new RequestIllegalArgumentException();
         }
         return this.conditionDao.findByTenantIdAndAppIdAndSubaccountId(tenantId,appId,subaccountId);
+    }
+
+    @Override
+    public Page<Condition> getPageByCondition(Integer pageNo,Integer pageSize,String tenantId, String appId, String subaccountId, String id) throws YunhuniApiException {
+        String hql = " from Condition obj where obj.tenantId=?1 and obj.appId =?2 ";
+        if(StringUtils.isNotEmpty(subaccountId)){
+            hql += " and obj.subaccountId in( "+subaccountId+")";
+        }
+        if(StringUtils.isNotEmpty(id)){
+            hql += " and obj.id like '%"+id+"%' ";
+        }
+        return this.pageList(hql,pageNo,pageSize,tenantId,appId);
     }
 }

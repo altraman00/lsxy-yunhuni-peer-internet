@@ -50,6 +50,17 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
     }
 
     @Override
+    public List<ApiCertificateSubAccount> getListByCerbId(String certId) {
+        String hql = " from ApiCertificateSubAccount obj where obj.certId like '%"+certId+"%' ";
+        return this.list(hql);
+    }
+
+    @Override
+    public ApiCertificateSubAccount findByCerbId(String certId) {
+        return apiCertificateSubAccountDao.findByCertId(certId);
+    }
+
+    @Override
     public ApiCertificateSubAccount createSubAccount(ApiCertificateSubAccount subAccount) {
         App app = appService.findById(subAccount.getAppId());
         if(app == null){
@@ -213,6 +224,11 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
             }
         }
         return page;
+    }
+
+    @Override
+    public List<ApiCertificateSubAccount> findByAppId(String appId) {
+        return apiCertificateSubAccountDao.findByAppId(appId);
     }
 
     @Override
