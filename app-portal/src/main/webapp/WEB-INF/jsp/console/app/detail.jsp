@@ -1044,6 +1044,10 @@
 //                                ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
 //                                    if((response.data.fileTotalSize-response.data.fileRemainSize)>=data.files[0].size){
                                         ajaxsync(ctx + "/console/app/file/play/verify/name",{csrfParameterName:csrfToken,'appId':appId,'name':filename,'subId':subId},function(response1){
+                                            if(!response1.success){
+                                                showtoast(response1.errorMsg);
+                                                return ;
+                                            }
                                             if(response1.data==0){
                                                 $('#progress').show();
                                                 $('#fileName').html(filename);
@@ -2042,7 +2046,7 @@
         bootbox.dialog({
                 title: "提示",
                 message: '<div class="row">  ' +
-                '<div class="col-md-12 text-center">你确认要执行这操作吗？</div>  </div>',
+                '<div class="col-md-12 text-center">号码解绑后该号码可回到号码池中，不再与当前应用发生关联，确定要解绑该号码吗？</div>  </div>',
                 buttons: {
                     success: {
                         label: "确认",
