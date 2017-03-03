@@ -2046,7 +2046,7 @@
         bootbox.dialog({
                 title: "提示",
                 message: '<div class="row">  ' +
-                '<div class="col-md-12 text-center">号码解绑后该号码可回到号码池中，不再与当前应用发生关联，确定要解绑该号码吗？</div>  </div>',
+                '<div class="col-md-12 text-center">号码解绑后保留与应用的关联，但不再与当前子账号关联，确定要解绑该号码吗？</div>  </div>',
                 buttons: {
                     success: {
                         label: "确认",
