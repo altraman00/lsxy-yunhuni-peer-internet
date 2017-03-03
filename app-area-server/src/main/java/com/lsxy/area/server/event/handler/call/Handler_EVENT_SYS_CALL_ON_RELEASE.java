@@ -118,7 +118,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
 
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null");
+            throw new InvalidParamException("businessstate is null,call_id={}",call_id);
         }
         businessStateService.delete(call_id);
 
@@ -135,7 +135,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 callSessionService.update(callSession.getId(),updateSession);
             }
         }catch (Throwable t){
-            logger.error("更新会话记录失败",t);
+            logger.error(String.format("更新会话记录失败,appId=%s,callid=%s",state.getAppId(),state.getId()),t);
         }
         boolean isIVR = false;
 
@@ -154,7 +154,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 isIVR = true;
             }
         }
-        if(isIVR){
+        if(isIVR){//非呼叫中心的ivr 更新ivr表
             try{
                 VoiceIvr voiceIvr = voiceIvrService.findById(call_id);
                 if(voiceIvr != null){
@@ -163,9 +163,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                     voiceIvrService.update(voiceIvr.getId(),updateVoiceIvr);
                 }
             }catch (Throwable t){
-                logger.error("更新voiceIvr失败",t);
+                logger.error(String.format("更新voiceIvr失败,appId=%s,callid=%s",state.getAppId(),call_id),t);
             }
-        }else if(!BusinessState.TYPE_IVR_DIAL.equals(state.getType())){
+        }else if(!BusinessState.TYPE_IVR_DIAL.equals(state.getType())){//非ivr dial
             try{
                 String callCenterId = conversationService.getCallCenter(state);
                 CallCenter callCenter = null;
@@ -177,7 +177,8 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                             state.getTenantId(),state.getAppId(),call_id,callCenter);
                 }
                 if(callCenter != null){
-                    if(conversationService.isCC(state)){
+                    if(conversationService.isCC(state) ||
+                            BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){//是呼叫中心ivr或者是呼叫中心坐席外呼
                         CallCenter updateCallcenter = new CallCenter();
                         updateCallcenter.setEndTime(new Date());
                         Long callLongTime  = null;
@@ -204,13 +205,13 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                                         .setCallTimeLong(callLongTime)
                                         .build());
                             }catch (Throwable t){
-                                logger.error("incrIntoRedis失败",t);
+                                logger.error(String.format("incrIntoRedis失败,appId=%s,callid=%s",state.getAppId(),call_id),t);
                             }
                         }
                     }
                 }
             }catch (Throwable t){
-                logger.error("更新CallCenter失败",t);
+                logger.error(String.format("更新CallCenter失败,appId=%s,callid=%s",state.getAppId(),state.getId()),t);
             }
         }
         //如果ivr主动方挂断，需要同时挂断正在连接的呼叫
@@ -233,6 +234,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 Map<String,Object> notify_data = new MapBuilder<String,Object>()
                         .putIfNotEmpty("event","ivr.call_end")
                         .putIfNotEmpty("id",call_id)
+                        .putIfNotEmpty("subaccount_id",state.getSubaccountId())
                         .putIfNotEmpty("begin_time",begin_time)
                         .putIfNotEmpty("answer_time",answer_time)
                         .putIfNotEmpty("end_time",end_time)
@@ -264,6 +266,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                     Map<String, Object> notify_data = new MapBuilder<String, Object>()
                             .putIfNotEmpty("event", "ivr.connect_end")
                             .putIfNotEmpty("id", ivr_call_id)
+                            .putIfNotEmpty("subaccount_id",state.getSubaccountId())
                             .putIfNotEmpty("begin_time", System.currentTimeMillis())
                             .putIfNotEmpty("end_time", System.currentTimeMillis())
                             .putIfNotEmpty("error", "dial error")
@@ -292,12 +295,13 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                     }
                     curState = callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,reserve_state,true);
                 } catch (Throwable e) {
-                    logger.error("坐席挂机事件设置坐席状态失败agent="+agentId,e);
+                    logger.error(String.format("坐席挂机事件设置坐席状态失败,appId=%s,callid=%s,agentId=%s",
+                            state.getAppId(),call_id,agentId),e);
                 }
                 if(preState!=null && curState != null){
                     if(!preState.equals(curState)){
-                        callCenterUtil.agentStateChangedEvent(state.getCallBackUrl(),agentId,
-                                state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),preState, curState);
+                        callCenterUtil.agentStateChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),agentId,
+                                state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),preState, curState,state.getUserdata());
                     }
                 }
                 agentIdCallReference.clear(agentId);
@@ -320,7 +324,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 rpcCaller.invoke(sessionContext, rpcrequest,true);
             }
         } catch (Throwable e) {
-            logger.error("调用失败",e);
+            logger.error(String.format("调用挂断失败失败,appId=%s,callid=%s",state_dial.getAppId(),state_dial.getId()),e);
         }
     }
 }

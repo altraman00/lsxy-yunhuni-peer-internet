@@ -23,6 +23,7 @@ public class AppExtension extends IdEntity {
 
     private String appId;//    app_id               varchar(32) comment '所属应用ID',
     private String tenantId; //tenant_id   租户id
+    private String subaccountId;
     private String type;//    type                 varchar(30),
     private String user;//    user                 varchar(50) comment 'SIP注册用户名，全局唯一。格式是6到12位数字',
     private String password;//    password             varchar(50) comment 'SIP注册密码',
@@ -33,6 +34,15 @@ public class AppExtension extends IdEntity {
     private String ipaddr;  //SIP 网关IP地址与端口，默认5060，仅用于 type==2的情况
 
     private Boolean enable; //分机是否可用（不存到数据库）
+
+    public AppExtension() {
+    }
+
+    public AppExtension(String type, String user, String password) {
+        this.type = type;
+        this.user = user;
+        this.password = password;
+    }
 
     @Column(name = "app_id")
     public String getAppId() {
@@ -49,6 +59,15 @@ public class AppExtension extends IdEntity {
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+
+    @Column(name = "subaccount_id")
+    public String getSubaccountId() {
+        return subaccountId;
+    }
+
+    public void setSubaccountId(String subaccountId) {
+        this.subaccountId = subaccountId;
     }
 
     @Column(name = "type")

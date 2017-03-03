@@ -43,7 +43,7 @@ public class ConversationOpsController extends AbstractAPIController {
             logger.debug("CONVERSATION DISMISS API参数,accountId={},appId={},id={}",accountId,appId,id);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        boolean result = conversationOps.dismiss(ip,appId,id);
+        boolean result = conversationOps.dismiss(getSubaccountId(request),ip,appId,id);
         return ApiGatewayResponse.success(result);
     }
 
@@ -55,11 +55,11 @@ public class ConversationOpsController extends AbstractAPIController {
             logger.debug("CONVERSATION setVoiceMode API参数,accountId={},appId={},id={},name={},dto={}",accountId,appId,id,name,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        String agentId = callCenterAgentService.getId(appId,name);
+        String agentId = callCenterAgentService.getId(appId,getSubaccountId(request),name);
         if(agentId == null){
             throw new AgentNotExistException();
         }
-        boolean result = conversationOps.setVoiceMode(ip,appId,id,agentId,dto.getMode());
+        boolean result = conversationOps.setVoiceMode(getSubaccountId(request),ip,appId,id,agentId,dto.getMode());
         return ApiGatewayResponse.success(result);
     }
 
@@ -72,7 +72,7 @@ public class ConversationOpsController extends AbstractAPIController {
             logger.debug("CONVERSATION INVITE_AGENT API参数,accountId={},appId={},id={},dto={}",accountId,appId,id,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        return ApiGatewayResponse.success(conversationOps.inviteAgent(ip,appId,id,dto.getEnqueue(),dto.getMode()));
+        return ApiGatewayResponse.success(conversationOps.inviteAgent(getSubaccountId(request),ip,appId,id,dto.getEnqueue(),dto.getMode()));
     }
 
     @RequestMapping(value = "/{accountId}/callcenter/conversation/{id}/invite_out",method = RequestMethod.POST)
@@ -83,7 +83,7 @@ public class ConversationOpsController extends AbstractAPIController {
             logger.debug("CONVERSATION INVITE_OUT API参数,accountId={},appId={},id={},dto={}",accountId,appId,id,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        return ApiGatewayResponse.success(conversationOps.inviteOut(ip,appId,id,dto.getFrom(),
+        return ApiGatewayResponse.success(conversationOps.inviteOut(getSubaccountId(request),ip,appId,id,dto.getFrom(),
                 dto.getTo(),dto.getMaxDialDuration(),dto.getMaxCallDuration(),dto.getMode()));
     }
 
@@ -95,7 +95,7 @@ public class ConversationOpsController extends AbstractAPIController {
         }
         String ip = WebUtils.getRemoteAddress(request);
 
-        return ApiGatewayResponse.success(callCenterConversationService.detail(ip,appId,id));
+        return ApiGatewayResponse.success(callCenterConversationService.detail(getSubaccountId(request),ip,appId,id));
     }
 
     @RequestMapping(value = "/{accountId}/callcenter/conversation",method = RequestMethod.GET)
@@ -108,6 +108,6 @@ public class ConversationOpsController extends AbstractAPIController {
         }
         String ip = WebUtils.getRemoteAddress(request);
 
-        return ApiGatewayResponse.success(callCenterConversationService.pageList(ip,appId,page,size));
+        return ApiGatewayResponse.success(callCenterConversationService.conversationPageList(getSubaccountId(request),ip,appId,page,size));
     }
 }

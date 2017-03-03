@@ -66,7 +66,7 @@ public class Handler_EVENT_SYS_CONF_ON_PLAY_COMPLETED extends EventHandler {
         }
         BusinessState state = businessStateService.get(conf_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null");
+            throw new InvalidParamException("businessstate is null,call_id={}",conf_id);
         }
         if(logger.isDebugEnabled()){
             logger.info("conf_id={},state={}",conf_id,state);
@@ -106,6 +106,7 @@ public class Handler_EVENT_SYS_CONF_ON_PLAY_COMPLETED extends EventHandler {
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","conf.play_end")
                     .putIfNotEmpty("id",conf_id)
+                    .putIfNotEmpty("subaccount_id",state.getSubaccountId())
                     .putIfNotEmpty("begin_time",begin_time)
                     .putIfNotEmpty("end_time",end_time)
                     .putIfNotEmpty("user_data",user_data)

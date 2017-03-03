@@ -76,7 +76,7 @@ public class Handler_EVENT_SYS_CALL_ON_FAIL extends EventHandler{
 
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null");
+            throw new InvalidParamException("businessstate is null,call_id="+call_id);
         }
 
         if(BusinessState.TYPE_CC_INVITE_AGENT_CALL.equals(state.getType())){
@@ -91,6 +91,7 @@ public class Handler_EVENT_SYS_CALL_ON_FAIL extends EventHandler{
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","conf.join.fail")
                     .putIfNotEmpty("id",conf_id)
+                    .putIfNotEmpty("subaccount_id",state.getSubaccountId())
                     .putIfNotEmpty("time",System.currentTimeMillis())
                     .putIfNotEmpty("call_id",call_id)
                     .putIfNotEmpty("user_data",state.getUserdata())

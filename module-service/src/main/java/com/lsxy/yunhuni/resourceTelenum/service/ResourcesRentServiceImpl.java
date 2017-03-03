@@ -83,31 +83,30 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     @Autowired
     JdbcTemplate jdbcTemplate;
     @Override
-    public Page<ResourcesRent> pageListByTenantId(String userName,int pageNo, int pageSize)   {
-        Tenant tenant = null;
-        tenant = tenantService.findById(userName);
-        if(tenant==null){
-            tenant = tenantService.findTenantByUserName(userName);
-        }
-        if(tenant==null){
-            throw new RuntimeException("租户不存在");
-        }
-        String hql = "from ResourcesRent obj where obj.tenant.id=?1 and obj.rentStatus<>3 order by obj.createTime desc";
-        Page<ResourcesRent> page =  this.pageList(hql,pageNo,pageSize,tenant.getId());
+    public Page<ResourcesRent> pageListByTenantId(String tenantId,int pageNo, int pageSize)   {
+        String hql = "from ResourcesRent obj inner join fetch obj.resourceTelenum where obj.tenant.id=?1 and obj.rentStatus<>3 order by obj.createTime desc";
+        Page<ResourcesRent> page =  this.pageList(hql,pageNo,pageSize,tenantId);
         return page;
     }
 
     @Override
     public Page<ResourcesRent> findByAppId(String appId,int pageNo, int pageSize) {
-        String hql = "from ResourcesRent obj where obj.app.id=?1 and obj.rentStatus = 1 order by obj.lastTime desc";
-        return  this.pageList(hql,pageNo,pageSize,appId);
+        String hql = "from ResourcesRent obj inner join fetch obj.resourceTelenum where obj.app.id=?1 and obj.rentStatus = 1 order by obj.lastTime desc";
+        return  pageList(hql,pageNo,pageSize,appId);
+    }
+
+    @Override
+    public Page<ResourcesRent> findBySubaccount(String appId,String subaccountId,int pageNo, int pageSize) {
+        String hql = "from ResourcesRent obj inner join fetch obj.resourceTelenum where obj.app.id=?1 and obj.rentStatus = 1 and obj.resourceTelenum.subaccountId = ?2 order by obj.lastTime desc";
+        return  pageList(hql,pageNo,pageSize,appId,subaccountId);
     }
 
     @Override
     public List<ResourcesRent> findByAppId(String appId) {
-        String hql = "from ResourcesRent obj where obj.app.id=?1 and obj.rentStatus = 1 order by obj.lastTime desc";
+        String hql = "from ResourcesRent obj inner join fetch obj.resourceTelenum where obj.app.id=?1 and obj.rentStatus = 1 order by obj.lastTime desc";
         return this.list(hql,appId);
     }
+
 
     @Override
     public ResourcesRent findByResourceTelenumId(String id) {
@@ -217,6 +216,8 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
         this.save(resourcesRent);
         ResourceTelenum resourceTelenum =  resourcesRent.getResourceTelenum();
         resourceTelenum.setTenantId(null);
+        resourceTelenum.setAppId(null);
+        resourceTelenum.setSubaccountId(null);
         resourceTelenum.setStatus(ResourceTelenum.STATUS_FREE);
         resourceTelenumService.save(resourceTelenum);
     }
@@ -225,26 +226,32 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     public void telnumPlay(String id,Tenant tenant) {
         TelenumOrder temp = telenumOrderService.findById(id);
         //更新记录
-        temp.setStatus(TelenumOrder.Status_success);
-        telenumOrderService.save(temp);
+        BigDecimal tempAmount = new BigDecimal(0);
         List<TelenumOrderItem> list = telenumOrderItemService.findByTenantIdAndTelenumOrderId(tenant.getId(), temp.getId());
         for (int i = 0; i < list.size(); i++) {
-            ResourceTelenum resourceTelenum = list.get(i).getTelnum();
+            TelenumOrderItem telenumOrderItem = list.get(i);
+            ResourceTelenum resourceTelenum = telenumOrderItem.getTelnum();
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
             resourceTelenum.setTenantId(tenant.getId());
             resourceTelenum = resourceTelenumService.save(resourceTelenum);
             Date expireDate = DateUtils.getLastTimeOfMonth(new Date());
             ResourcesRent resourcesRent = new ResourcesRent(tenant,null,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),expireDate,ResourcesRent.RENT_STATUS_UNUSED);
             this.save(resourcesRent);
+
+            telenumOrderItem.setAmount(resourceTelenum.getAmount());
+            telenumOrderItemService.save(telenumOrderItem);
+            tempAmount = tempAmount.add(resourceTelenum.getAmount());
+            Consume consume = new Consume(new Date(), ConsumeCode.rent_number.name(),resourceTelenum.getAmount() , ConsumeCode.rent_number.getName(), "0", tenant.getId(),resourcesRent.getId());
+            consumeService.consume(consume);
+            //扣费
+            //号码月租费
+            BigDecimal cost = calCostService.calCost(ProductCode.rent_number_month.name(),tenant.getId());
+            Consume consume1 = new Consume(new Date(), ConsumeCode.rent_number_month.name(), cost, ConsumeCode.rent_number_month.getName(), "0", tenant.getId(),resourcesRent.getId());
+            consumeService.consume(consume1);
         }
-        //扣费
-        Consume consume = new Consume(new Date(), ConsumeCode.rent_number.name(), temp.getAmount(), ConsumeCode.rent_number.getName(), "0", tenant.getId(),null);
-        consumeService.consume(consume);
-        //号码月租费
-        BigDecimal cost = calCostService.calCost(ProductCode.rent_number_month.name(),tenant.getId());
-        BigDecimal bigDecimal = cost.multiply(new BigDecimal(list.size()));
-        Consume consume1 = new Consume(new Date(), ConsumeCode.rent_number_month.name(), bigDecimal, ConsumeCode.rent_number_month.getName(), "0", tenant.getId(),null);
-        consumeService.consume(consume1);
+        temp.setAmount(tempAmount);
+        temp.setStatus(TelenumOrder.Status_success);
+        telenumOrderService.save(temp);
     }
 
 
@@ -315,6 +322,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
         ResourcesRent rent = this.findById(rentId);
         ResourceTelenum resourceTelenum = rent.getResourceTelenum();
         resourceTelenum.setAppId(null);
+        resourceTelenum.setSubaccountId(null);
         resourceTelenumService.save(resourceTelenum);
         rent.setApp(null);
         rent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
@@ -324,6 +332,24 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
 
     @Override
     public String bindNumToAppAndGetAreaId(App app, List<String> nums , boolean isNeedCalled) {
+        return bindNumToAppOrSubAccountAndGetAreaId(app,nums,null,isNeedCalled);
+    }
+
+    @Override
+    public void bindNumToSubaccount(App app, List<String> nums, String subAccountId) {
+        bindNumToAppOrSubAccountAndGetAreaId(app,nums,subAccountId,false);
+    }
+
+    /**
+     * 绑定号码到app或子账号
+     * @param app
+     * @param nums
+     * @param subAccountId
+     * @param isNeedCalled
+     * @return
+     */
+    private String bindNumToAppOrSubAccountAndGetAreaId(App app, List<String> nums ,String subAccountId, boolean isNeedCalled) {
+        int[] statuses = {ResourcesRent.RENT_STATUS_UNUSED,ResourcesRent.RENT_STATUS_USING};
         String areaId = app.getOnlineAreaId();
         String tenantId = app.getTenant().getId();
         boolean isCalled = false;
@@ -333,13 +359,23 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                 if(resourceTelenum != null){
                     if(resourceTelenum.getStatus()== ResourceTelenum.STATUS_RENTED && tenantId.equals(resourceTelenum.getTenantId())){
                         //是这个租户，则查询租用记录，有没有正在用的
-                        ResourcesRent resourcesRent = resourcesRentDao.findByResourceTelenumIdAndRentStatus(resourceTelenum.getId(),ResourcesRent.RENT_STATUS_UNUSED);
+                        ResourcesRent resourcesRent = resourcesRentDao.findByResourceTelenumIdAndRentStatusIn(resourceTelenum.getId(),statuses);
                         if(resourcesRent == null){
                             throw new RuntimeException("找不到租用记录：" + resourceTelenum.getTelNumber());
                         }else if(!resourcesRent.getTenant().getId().equals(tenantId)){
                             throw new RuntimeException("号码租用记录数据出错：" + resourceTelenum.getTelNumber());
                         }else if(resourcesRent.getApp() != null){
-                            throw new TeleNumberBeOccupiedException("号码已经被应用占用：" + resourceTelenum.getTelNumber());
+                            //如果subAccountId子账号不为空，则，判断号码是否绑定了子账号
+                            if(resourcesRent.getApp().getId().equals(app.getId())){
+                                if(StringUtils.isBlank(resourceTelenum.getSubaccountId())){
+                                    if(StringUtils.isNotBlank(subAccountId)){
+                                        resourceTelenum.setSubaccountId(subAccountId);
+                                        resourceTelenumService.save( resourceTelenum);
+                                    }
+                                }
+                            }else{
+                                throw new TeleNumberBeOccupiedException("号码已经被应用占用：" + resourceTelenum.getTelNumber());
+                            }
                         }else{
                             if(StringUtils.isBlank(areaId)){
                                 // 将区域存到一个变量
@@ -357,6 +393,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                             this.save(resourcesRent);
                             //更新号码信息，设置应用
                             resourceTelenum.setAppId(app.getId());
+                            resourceTelenum.setSubaccountId(subAccountId);
                             resourceTelenumService.save( resourceTelenum);
                         }
                     }else{

@@ -9,7 +9,6 @@ import com.lsxy.call.center.api.service.CallCenterAgentService;
 import com.lsxy.framework.api.billing.model.Billing;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.core.exceptions.api.AppServiceInvalidException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
@@ -18,7 +17,6 @@ import com.lsxy.framework.mail.MailContentNullException;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.app.service.ServiceType;
 import com.lsxy.yunhuni.api.config.service.TenantConfigService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
@@ -133,7 +131,7 @@ public class TenantAppController {
             @RequestParam(defaultValue = "1") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(required = false) String name){
-        Page<VoiceFilePlay> page = voiceFilePlayService.pageList(pageNo,pageSize,name,appId,new String[]{tenant},1,null,null);
+        Page<VoiceFilePlay> page = voiceFilePlayService.pageList(pageNo,pageSize,name,appId,new String[]{tenant},1,null,null,null);
         return RestResponse.success(page);
     }
 
@@ -288,7 +286,7 @@ public class TenantAppController {
     public RestResponse<Page<AgentVO>> page(HttpServletRequest request, @PathVariable String appId,
                                    @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
                                    @RequestParam(defaultValue = "20",required = false)  Integer pageSize) throws YunhuniApiException {
-        Page page  = callCenterAgentService.getPage(appId,pageNo,pageSize);
+        Page page  = callCenterAgentService.getPageForPotal(appId,pageNo,pageSize,null,null);
         List<AgentVO> agentVOs = new ArrayList<>();
         List<CallCenterAgent> result = page.getResult();
         result.stream().forEach(agent -> agentVOs.add(AgentVO.changeCallCenterAgentToAgentVO(agent)));

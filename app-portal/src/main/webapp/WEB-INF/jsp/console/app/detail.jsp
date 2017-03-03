@@ -236,7 +236,12 @@
                                 <!--新的应用详情结束-->
                             <section class="panel panel-default pos-rlt clearfix application-tab">
                                 <ul id="myTab" class="nav nav-tabs">
-                                    <li class="active" data-id="play">
+                                    <c:if test="${app.serviceType=='call_center'}">
+                                        <li data-id="extension" class="active"><a href="#extension" data-toggle="tab">分机列表</a></li>
+                                        <li data-id="agent"><a href="#agent" data-toggle="tab">坐席列表</a></li>
+                                        <li data-id="queue"><a href="#queue" data-toggle="tab">排队条件</a></li>
+                                    </c:if>
+                                    <li <c:if test="${app.serviceType!='call_center'}">class="active" </c:if> data-id="play">
                                         <a href="#play" data-toggle="tab">
                                             放音媒体库
                                         </a>
@@ -244,20 +249,21 @@
                                     <li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>
                                     <!--号码绑定-->
                                     <li data-id="number"><a href="#number" data-toggle="tab">号码绑定</a></li>
-                                    <c:if test="${app.serviceType=='call_center'}">
-                                        <li data-id="extension"><a href="#extension" data-toggle="tab">分机列表</a></li>
-                                        <li data-id="agent"><a href="#agent" data-toggle="tab">坐席列表</a></li>
-                                    </c:if>
-
+                                    <li data-id="subAccount"><a href="#subAccount" data-toggle="tab">子账号</a></li>
                                     <li class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
-                                    <div class="tab-pane fade in active" id="play">
+                                    <div class="tab-pane fade<c:if test="${app.serviceType!='call_center'}"> in active</c:if>" id="play">
                                         <p class="application_info">
                                             当您的应用需要开通语音通知、自定义IVR或者云呼叫中心时，请上传语音文件至放音媒体库，语音文件均需要审核
                                         </p>
                                         <div class="form-group">
                                             <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="文件名" id="name"/></div>
+                                            <div class="col-md-3 remove-padding" style="padding-left:15px;">
+                                                <input type="text" class="form-control" placeholder="关联子账号" id="voice_file_subId"/>
+                                                <%--<select id="voice_file_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号" >--%>
+                                                <%--</select>--%>
+                                                <%--<input type="text" class="form-control " placeholder="子账号鉴权账号" id="subId"/>--%></div>
                                             <div class="col-md-1"><button class="btn btn-primary" type="button" onclick="upplay()">查询</button></div>
                                             <div class="col-md-8 sizebox  remove-padding " id="voiceFilePlay">
                                             </div>
@@ -269,7 +275,8 @@
                                                 <th width="20%">文件名</th>
                                                 <th width="10%">状态</th>
                                                 <th width="10%">大小</th>
-                                                <th width="35%">备注</th>
+                                                <th width="10%">关联子账号</th>
+                                                <th width="25%">备注</th>
                                                 <th width="20%">操作</th>
                                             </tr>
                                             </thead>
@@ -369,15 +376,28 @@
                                     <!--号码绑定end-->
 
                                     <!--分机列表-->
-                                    <div class="tab-pane fade" id="extension">
+                                    <div class="tab-pane fade<c:if test="${app.serviceType=='call_center'}"> in active</c:if>" id="extension">
+                                        <div class="form-group">
+                                            <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="分机号" id="extension_num" /></div>
+                                            <div class="col-md-3 remove-padding" style="padding-left:15px;">
+                                                <%--<select id="extension_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号"  >--%>
+                                                <%--</select>--%>
+                                                    <input type="text" class="form-control" placeholder="关联子账号" id="extension_subId" /></div>
+                                            <div class="col-md-2">
+                                                <button class="btn btn-primary" type="button" onclick="extensionList()">查询</button>
+                                                <button href="#"  class="btn btn-primary defind modalShow" data-id="six" >创建分机</button>
+                                            </div>
+                                        </div>
                                         <table class="table table-striped cost-table-history tablelist" id="extension-table">
                                             <thead>
                                             <tr>
                                                 <th class="">ID</th>
-                                                <th class="">账号</th>
+                                                <th class="">分机号</th>
                                                 <th class="">密码</th>
+                                                <th>关联子账号</th>
                                                 <th class="">状态</th>
                                                 <th class="">鉴权方式</th>
+                                                <th class="">操作</th>
                                             </tr>
                                             </thead>
                                             <tbody id="extension-list">
@@ -391,14 +411,27 @@
                                     <!--分机列表end-->
                                     <!--坐席列表-->
                                     <div class="tab-pane fade" id="agent">
-
+                                        <div class="form-group">
+                                            <div class="col-md-3 remove-padding">
+                                                <input type="text" class="form-control" placeholder="坐席名称（ID）" id="agent_num" /></div>
+                                            <div class="col-md-3 remove-padding" style="padding-left:15px;">
+                                                <%--<select id="agent_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号"  >--%>
+                                                <%--</select>--%>
+                                                    <input type="text" class="form-control" placeholder="关联子账号" id="agent_subId" /></div>
+                                                <%--<input type="text" class="form-control " placeholder="子账号鉴权账号" id="subId"/>--%>
+                                            <div class="col-md-2">
+                                                <button class="btn btn-primary" type="button" onclick="agentList()">查询</button>
+                                            </div>
+                                        </div>
                                         <table class="table table-striped cost-table-history tablelist" id="agent-table">
                                             <thead>
                                             <tr>
                                                 <th class="text-center">坐席名称（ID）</th>
                                                 <th class="text-center">技能组</th>
                                                 <th class="text-center">绑定分机</th>
+                                                <th class="text-center">关联子账号</th>
                                                 <th class="text-center">状态</th>
+                                                <th class="text-center">操作</th>
                                             </tr>
                                             </thead>
                                             <tbody id="agent-list">
@@ -410,7 +443,193 @@
                                         </section>
                                     </div>
                                     <!--坐席列表end-->
+                                    <!--排队条件列表-->
+                                    <div class="tab-pane fade" id="queue">
+                                        <div class="form-group">
+                                            <div class="col-md-3 remove-padding">
+                                                <input type="text" class="form-control" placeholder="关联子账号" id="queue_subId" />
+                                                <%--<input type="text" class="form-control" placeholder="ID" id="queue_num" />--%>
+                                            </div>
+                                            <%--<div class="col-md-3 remove-padding" style="padding-left:15px;">--%>
+                                                <%--<select id="queue_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号"  >--%>
+                                                <%--</select>--%>
+                                                    <%--<input type="text" class="form-control" placeholder="关联子账号" id="queue_subId" />--%>
+                                                    <%--<input type="text" class="form-control " placeholder="子账号鉴权账号" id="subId"/>--%>
+                                        <%--</div>--%>
+                                            <div class="col-md-2">
+                                                <button class="btn btn-primary" type="button" onclick="queueList()">查询</button>
+                                            </div>
+                                        </div>
+                                        <table class="table table-striped cost-table-history tablelist" id="queue-table">
+                                            <thead>
+                                            <tr>
+                                                <th class="text-center" >条件选择表达式</th>
+                                                <th class="text-center">排序表达式</th>
+                                                <th class="text-center" style="width: 20px">优先级</th>
+                                                <th class="text-center" style="width: 20px">等待超时时间（秒）</th>
+                                                <th class="text-center" style="width: 20px">接听超时时间（秒）</th>
+                                                <th class="text-center">关联子账号</th>
+                                                <th class="text-center">备注</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="queue-list">
 
+                                            </tbody>
+                                        </table>
+                                        <section class="panel panel-default yunhuni-personal">
+                                            <div id="queue-page"></div>
+                                        </section>
+                                    </div>
+                                    <!--排队条件列表end-->
+                                    <!--子账号-->
+                                    <div class="tab-pane fade" id="subAccount">
+                                        <div  id="subAccount_home">
+                                        <%--<p class="margin-bottom-20"></p>--%>
+                                        <p class="application_info">
+                                            1.子账号是壹耘平台提供给会员管理其客户的账号，会员可以使用子账号的各个功能，轻松地管理每一个独立的客户<br/>
+                                            2.子账号与指定的应用关联，请勿跨应用使用
+                                        </p>
+                                        <div class="form-group">
+                                            <div class="col-md-4 remove-padding"><input id="five_certId" type="text" class="form-control" placeholder="鉴权账号" /></div>
+                                            <div class="col-md-8">
+                                                <button class="btn btn-primary" type="button" onclick="subAccountList()">查询</button>
+                                                <button href="#"  class="btn btn-primary defind modalShow" data-id="five" >创建子账号</button>
+                                            </div>
+                                        </div>
+
+
+                                        <table class="table table-striped cost-table-history tablelist" id="subAccount-table">
+                                            <thead>
+                                            <tr>
+                                                <th class="text-center">鉴权账号</th>
+                                                <th class="text-center">密钥</th>
+                                                <th class="text-center">语音用量 /总量（分钟）</th>
+<%--<c:if test="${app.serviceType == 'call_center'}">--%>
+                                                <%--<th class="text-center">坐席用量 /总量（个）</th>--%>
+<%--</c:if>--%>
+                                                <th class="text-center">状态</th>
+                                                <th class="text-center">备注</th>
+                                                <th class="text-center">操作</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody >
+
+                                            </tbody>
+                                        </table>
+                                        <section class="panel panel-default yunhuni-personal">
+                                            <div id="subAccountpage"></div>
+                                        </section>
+                                        </div>
+                                        <div  id="subAccount_datail" hidden>
+                                            <div class="panel-body devbox remove-padding-left">
+                                                <h4 class="margin-bottom-20">子账号详情</h4>
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev">
+                                                        鉴权账号：
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p>
+                                                            {{certId}}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev">
+                                                        密钥：
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <p>
+                                                            {{secretKey}}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev line-height-32">
+                                                        回调地址：
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p>
+                                                            <input type="text" class="form-control" v-model="url" value="{{url}}" placeholder=""/>
+                                                        </p>
+                                                        <span>（子账号的回调地址优先级高于应用的回调地址）</span>
+                                                    </div>
+                                                </div>
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev">
+                                                        配置额度：
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p>（负数为额度不作限制，0则表示额度为0，正数为具体的使用额度限制）</p>
+                                                    </div>
+                                                </div>
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev line-height-32">语音(分钟)：</div>
+                                                    <div class="col-md-6">
+                                                        <p>
+                                                            <input type="text"  class="form-control"  v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
+                                                        </p>
+                                                    </div>
+                                                    <span class="col-md-1 line-height-32 text-left text-danger">*</span>
+                                                </div>
+                                                <%--<c:if test="${app.serviceType == 'call_center'}">--%>
+                                                <%--<div class="row margin-bottom-10">--%>
+                                                    <%--<div class="col-md-1 dev">--%>
+                                                        <%--坐席（个）：--%>
+                                                    <%--</div>--%>
+                                                    <%--<div class="col-md-6">--%>
+                                                        <%--<input type="text"  class="form-control"  v-model="seatNum" value="{{seatNum}}" placeholder=""/>--%>
+                                                    <%--</div>--%>
+                                                    <%--<span class="col-md-1 line-height-32 text-left text-danger">*</span>--%>
+                                                <%--</div>--%>
+                                                <%--</c:if>--%>
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev line-height-32">
+                                                        备注：
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <input type="text"  class="form-control"  v-model="remark" value="{{remark}}" placeholder=""/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row margin-bottom-20">
+                                                <div class="col-md-6">
+                                                    <button class="btn btn-primary" type="button" onclick="editSubAccount()">保存</button>
+                                                    <button class="btn btn-primary" type="button" onclick="tosubAccountHome1()">返回</button>
+                                                </div>
+                                            </div>
+                                            <p class="noticeInfo hr text-success"></p>
+                                            <p class="margin-bottom-20"></p>
+                                            <div class="row margin-bottom-20">
+                                                <div class="col-md-12">
+                                                    <a class="btn btn-primary" onclick="unallband2()" >全部解除绑定</a>
+                                                    <c:if test="${app.status==1}">
+                                                        <a class="btn btn-primary" id="call-number2" data-num-bind="">绑定号码</a>
+                                                    </c:if>
+                                                </div>
+                                            </div>
+
+                                            <table class="table table-striped cost-table-history tablelist" id="number-table2">
+                                                <thead>
+                                                <tr>
+                                                    <th class="text-center">号码</th>
+                                                    <th class="text-center">状态</th>
+                                                    <th class="text-center">可呼入</th>
+                                                    <th class="text-center">可呼出</th>
+                                                    <th class="text-center"><span class="text-center-l-fixed">归属地</span></th>
+                                                    <th class="text-center">有效期</th>
+                                                    <th class="text-center">操作</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody id="band-table2">
+
+                                                </tbody>
+                                            </table>
+                                            <section class="panel panel-default yunhuni-personal">
+                                                <div id="bandpage2"></div>
+                                            </section>
+                                        </div>
+                                    </div>
+                                    <!--子账号end-->
                                 </div>
                             </section>
 
@@ -547,7 +766,99 @@
         <a class="sure modalSureThree" data-id="three">确认</a>
     </div>
 </div>
+        <!---创建子账号--->
+        <div class="modal-box application-detail-box" id="modalfive" style="display:none ">
+            <div class="title">创建子账号<a class="close_a modalCancel cancelfive" data-id="five"></a></div>
+            <div class="content" id="createSubAccountFive" >
+                <p class="info info font14">
+                    1.创建子账号后，系统将会自动生成一个鉴权账号和密钥<br/>
+                    2.配额是会员提供给其客户使用服务的额度
+                </p>
+                <div class="row text-center">
+                    <lable class="col-md-3 text-right line-height-32">回调地址：</lable>
+                    <div class="col-md-8 remove-padding-right">
+                        <input type="text" class="form-control" v-model="url"  value="{{url}}" placeholder=""/>
+                    </div>
 
+                </div>
+                <div class="row margin-bottom-10">
+                    <span class="col-lg-offset-3 col-md-9 ">（子账号的回调地址优先级高于应用的回调地址）</span>
+                </div>
+                <div class="row margin-bottom-10">
+                    <lable class="col-md-3 text-right">配置额度：</lable>
+                    <div class="col-md-8 remove-padding-right">
+                        （负数为额度不作限制，0则表示额度为0，正数为具体的使用额度限制）
+                    </div>
+                </div>
+                <div class="row margin-bottom-10">
+                    <lable class="col-md-3 text-right line-height-32">语音（分钟）：</lable>
+                    <div class="col-md-8 remove-padding-right">
+                        <input type="text" class="form-control" v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
+                    </div>
+                    <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
+                </div>
+                <%--<c:if test="${app.serviceType == 'call_center'}">--%>
+                <%--<div class="row margin-bottom-10">--%>
+                    <%--<lable class="col-md-3 text-right line-height-32">坐席（个）：</lable>--%>
+                    <%--<div class="col-md-8 remove-padding-right">--%>
+                        <%--<input type="text" class="form-control" v-model="seatNum"  value="{{seatNum}}" placeholder="" />--%>
+                    <%--</div>--%>
+                    <%--<span class="col-md-1 line-height-32 text-left text-danger padding-left-5">*</span>--%>
+                <%--</div>--%>
+                <%--</c:if>--%>
+                <div class="row">
+                    <lable class="col-md-3 text-right line-height-32">备注：</lable>
+                    <div class="col-md-8 remove-padding-right">
+                        <input type="text" class="form-control" v-model="remark" value="{{remark}}" placeholder=""/>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">
+                <a class="cancel modalCancel cancelfive" data-id="five">返回</a>
+                <a class="sure modalSureFive" data-id="five">创建</a>
+            </div>
+        </div>
+        <!---创建分机--->
+        <div class="modal-box application-detail-box" id="modalsix" style="display:none;">
+            <div class="title">创建分机<a class="close_a modalCancel cancelsix" data-id="six"></a></div>
+            <div class="content" id="createSix" >
+                <br>
+                <div class="row margin-bottom-10">
+                    <lable class="col-md-3 text-right line-height-32">分机号：</lable>
+                    <div class="col-md-8 remove-padding-right">
+                        <input type="text" class="form-control" v-model="user"  value="{{user}}" placeholder=""/>
+                        <span>6-12的数字</span>
+                    </div>
+                    <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
+                </div>
+
+                <div class="row margin-bottom-10">
+                    <lable class="col-md-3 text-right line-height-32">分机密码：</lable>
+                    <div class="col-md-8 remove-padding-right">
+                        <input type="text" class="form-control" v-model="password" value="{{password}}" placeholder=""/>
+                        <span>6-12的数字</span>
+                    </div>
+                    <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
+                </div>
+                <%--<div class="row margin-bottom-10">--%>
+                    <%--<lable class="col-md-3 text-right line-height-32">关联子账号：</lable>--%>
+                    <%--<div class="col-md-8 remove-padding-right">--%>
+                        <%--<input type="text" class="form-control" id="create_six_subId" value="" placeholder=""/>--%>
+                    <%--</div>--%>
+                    <%--<div class="col-md-8 remove-padding-right">--%>
+                        <%--<select id="create_six_subId" class="sublist" name="subId" data-live-search="true" title="">--%>
+                        <%--</select>--%>
+                    <%--</div>--%>
+                <%--</div>--%>
+                <div class="text-center">
+                    <p class="error_msg_six" style="color: red"></p>
+                </div>
+            </div>
+            <div class="footer">
+                <a class="cancel modalCancel cancelsix" data-id="six">返回</a>
+                <a class="sure modalSureSix" data-id="six">创建</a>
+            </div>
+        </div>
 <!---上传文件--->
 <div class="modal-box application-detail-box application-file-box" id="modalfour" style="display:none ">
     <div class="modal-loadding loadding"></div>
@@ -556,12 +867,22 @@
         <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、16位）后再上传,单条语音最大支持 5M。</p>
         <form:form action="${ctx}/console/app/file/play/upload" method="post" id="uploadMianForm" enctype="multipart/form-data" target="hidden_frame">
             <div class="input-box ">
-                <div class="row  mt-10">
-                    <input type="hidden" name="appId" value="${app.id}">
-                    <div class="col-md-2">
-                        文件 :
+                <div class="row margin-bottom-10">
+                    <div class="col-md-3">
+                    <label class="control-label" for="file_sub_accout_num">关联子账号：</label>
                     </div>
-                    <div class="col-md-10">
+                    <div class="col-md-9 remove-padding">
+                    <%--<select id="file_sub_accout_num" class="sublist" name="subId" data-live-search="true" title="">--%>
+                    <%--</select>--%>
+                        <input id="file_sub_accout_num"  class="form-control" type="text" name="subId" >
+                    </div>
+                </div>
+                <div class="row">
+                    <input type="hidden" name="appId" value="${app.id}">
+                    <div class="col-md-3">
+                        <label>文件 :</label>
+                    </div>
+                    <div class="col-md-9 remove-padding" >
                         <span class="btn btn-success fileinput-button">
                         <i class="glyphicon glyphicon-plus"></i>
                         <span>选择文件</span>
@@ -594,9 +915,8 @@
 </div>
 
 
-
-
 <%@include file="/inc/footer.jsp"%>
+
 <script type="text/javascript">
     var appId = '${app.id}';
 </script>
@@ -612,7 +932,24 @@
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.fileupload-process.js"></script>
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.iframe-transport.js"></script>
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.fileupload-validate.js"></script>
+        <link rel="stylesheet" href="${resPrefixUrl }/js/dist/css/bootstrap-select.css">
+        <script src="${resPrefixUrl }/js/dist/js/bootstrap-select.js"></script>
 
+        <script>
+            $('.cancelfive').click(function(){
+                createSubAccountFive.init();
+            });
+            $('.cancelsix').click(function(){
+                createSix.init();
+            });
+            var appServiceType = '${app.serviceType}';
+            $(function () {
+                $('.modal-box .content input[type="text"]').css("height","30px");
+                $('.modal-box .content input[type="number"]').css("height","30px");
+                $('#modalfive').css("height","450px");
+                $('#modalsix').css("height","330px");
+            })
+        </script>
 
         <script>
             function saveCycle(){
@@ -661,11 +998,13 @@
 //                        showtoast("请先上线应用");
 //                    })
 //                }
+//                getSubAccountByAppId();
             }
             // 上传多个文件
             var cancelCancel=false;
             $(function(){
                 var Allfile = [],allFileLength = 0, errorFileArray = [];
+                var file_sub_accout_num = $('#file_sub_accout_num').val();
                 $('#fileupload').fileupload({
                     url: '${ctx}/console/app/file/play/upload',
                     maxFileSize: 5* 1024 * 1024,
@@ -678,13 +1017,14 @@
                                 0 + '%'
                         );
                         var filename = data.files[0].name;
+                        var subId = $('#file_sub_accout_num').val();
                         var  re = /^.+(\.wav)$/i;
                         var result=  re.test(filename);
                         if(result){
                             if(data.files[0].size <= (5* 1024 * 1024)) {
 //                                ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
 //                                    if((response.data.fileTotalSize-response.data.fileRemainSize)>=data.files[0].size){
-                                        ajaxsync(ctx + "/console/app/file/play/verify/name",{csrfParameterName:csrfToken,'appId':appId,'name':filename},function(response1){
+                                        ajaxsync(ctx + "/console/app/file/play/verify/name",{csrfParameterName:csrfToken,'appId':appId,'name':filename,'subId':subId},function(response1){
                                             if(response1.data==0){
                                                 $('#progress').show();
                                                 $('#fileName').html(filename);
@@ -817,8 +1157,176 @@
         },"post");
 
     });
-
-
+    function subAccountDatial(){
+        console.info("进入页面")
+    }
+    /**修改子账号**/
+    var editSubAccountFive = new Vue({
+        el:'#subAccount_datail',
+        data:{
+            id:'',
+            certId:'',
+            secretKey:'',
+            url:'',
+            remark:'',
+            voiceNum:'',
+            seatNum:''
+        },methods:{
+            initObj:function(obj){
+                this.id=obj.id;
+                this.certId=obj.certId;
+                this.secretKey = obj.secretKey;
+                this.url= obj.url;
+                this.remark=obj.remark;
+                this.voiceNum= obj.voiceNum;
+                this.seatNum=obj.seatNum;
+            },
+            initObj2:function(obj){
+                this.id=this.certId=this.secretKey = this.url= this.remark='';
+                this.voiceNum= this.seatNum=-1;
+            }
+        }
+    });
+    function editSubAccount(){
+        if(isNaN(editSubAccountFive.voiceNum) || isNaN(editSubAccountFive.seatNum) ||
+            editSubAccountFive.voiceNum=='' || editSubAccountFive.seatNum==''){
+            showtoast("配额参数必须为数字");
+            return;
+        }
+        var re = /^http[s]?:\/\/.+$/;
+        if(editSubAccountFive.url!=null&& editSubAccountFive.url.length >0 && !re.test(editSubAccountFive.url)){
+            showtoast("回调地址格式错误");
+            return;
+        }
+        if(editSubAccountFive.remark.length > 128){
+            showtoast("备注信息长度不能超过128");
+            return;
+        }
+        var params = {
+            'id':editSubAccountFive.id,
+            'url':editSubAccountFive.url,
+            'voiceNum':new Number(editSubAccountFive.voiceNum),
+            'seatNum':new Number(editSubAccountFive.seatNum),
+            'remark':editSubAccountFive.remark,
+            csrfParameterName:csrfToken
+        }
+        ajaxsync(ctx + "/console/sub_account/edit",params,function(response){
+            if(response.success){
+                showtoast("修改子账号成功");
+            }else{
+                showtoast(response.errorMsg);
+            }
+        },"post");
+    };
+    /*新增分机*/
+    var createSix = new Vue({
+        el:'#createSix',
+        data:{
+            user:'',
+            password:''
+        },
+        methods:{
+            init:function(){
+                this.user=this.password='';
+            }
+        }
+    });
+    $('.modalSureSix').click(function(){
+        var id = $(this).attr('data-id');
+        var t1 = /^[0-9]{6,12}$/;
+        if(createSix.user ==''||createSix.user.length <=0 || !t1.test(createSix.user)){
+            showtoast('分机号格式错误' );
+            return;
+        }
+//        var t2 = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,18}$/;
+        if(createSix.password =='' ||  createSix.password.length <= 0 || !t1.test(createSix.password)){
+            showtoast("密码格式错误");
+            return;
+        }
+        var subId = $('#create_six_subId') .val();//$('#create_six_subId option:selected') .val();
+        var params = {
+            subId:subId,
+            user:createSix.user,
+            password:createSix.password,
+            csrfParameterName:csrfToken
+        }
+        ajaxsync(ctx + "/console/app/"+appId+"/app_extension/new",params,function(response){
+            if(response.success){
+                showtoast("新增分机成功");
+                createSix.init();
+                hideModal(id);
+                extensionList();
+            }else{
+                var error = response.errorMsg;
+                var t1 ="message=";
+                var index = response.errorMsg.indexOf(t1);
+                if( index != -1){
+                    var t2 = "]";
+                    var t3 = response.errorMsg.substring( index + t1.length);
+                    var index2 = t3.indexOf( t2 );
+                    if(index2!=-1){
+                        error = t3.substring(0 , index2 );
+                    }else{
+                        error = t3;
+                    }
+                }
+                showtoast(error);
+            }
+        },"post");
+    });
+    /**
+     *新增子账号
+     */
+    var createSubAccountFive = new Vue({
+        el:'#createSubAccountFive',
+        data:{
+            url:'',
+            voiceNum:-1,
+            seatNum:-1,
+            remark:''
+        },
+        methods:{
+            init:function(){
+                this.url=this.remark='';
+                this.voiceNum=this.seatNum=-1;
+            }
+        }
+    });
+    $('.modalSureFive').click(function(){
+        var id = $(this).attr('data-id');
+        if(isNaN(createSubAccountFive.voiceNum) || isNaN(createSubAccountFive.seatNum) ||
+            createSubAccountFive.voiceNum=='' || createSubAccountFive.seatNum==''){
+            showtoast("配额参数必须为数字");
+            return;
+        }
+        var re = /^http[s]?:\/\/.+$/;
+        if(createSubAccountFive.url!=null&& createSubAccountFive.url.length >0 && !re.test(createSubAccountFive.url)){
+            showtoast("回调地址格式错误");
+            return;
+        }
+        if(createSubAccountFive.remark.length > 128){
+            showtoast("备注信息长度不能超过128");
+            return;
+        }
+        var params = {
+            'appId':appId,
+            'url':createSubAccountFive.url,
+            'voiceNum':createSubAccountFive.voiceNum,
+            'seatNum':createSubAccountFive.seatNum,
+            'remark':createSubAccountFive.remark,
+            csrfParameterName:csrfToken
+        }
+        ajaxsync(ctx + "/console/sub_account/new",params,function(response){
+           if(response.success){
+               showtoast("新增子账号成功");
+               createSubAccountFive.init();
+               hideModal(id);
+               subAccountList();
+           }else{
+               showtoast(response.errorMsg);
+           }
+        },"post");
+    });
 
     /**
      * 批量下载处理
@@ -932,6 +1440,7 @@
                                 $('#page' + currentPage + pagePlay.obj).click();
                             }else{
                                 $('#play-'+id).remove();
+                                $('#page0'+pagePlay.obj).hide();
                             }
                         }
                     }else{
@@ -942,13 +1451,106 @@
             }
         });
     }
+    function delAgent(id){
+        bootbox.setLocale("zh_CN");
+        bootbox.confirm("确认删除坐席", function(result) {
+            if(result){
+                ajaxsync(ctx + "/console/app/"+appId+"/agent/delete/"+id,{csrfParameterName:csrfToken},function(response){
+                    if(response.success){
+                        showtoast("删除成功");
+                        if(extensionPage){
+                            var currentPage;
+                            if(((agentPage.nowPage - 1) * agentPage.listRow +1) <= --agentPage.count){
+                                currentPage = agentPage.nowPage;
+                            }else {
+                                currentPage = agentPage.nowPage - 1;
+                            }
+                            if(currentPage>0){
+                                $('#page' + currentPage + agentPage.obj).click();
+                            }else{
+                                $('#extension-'+id).remove();
+                                $('#page0'+agentPage.obj).hide();
+                            }
+                        }
+                    }else{
+                        showtoast("删除失败");
+                    }
+                },"post");
 
+            }
+        });
+    }
+    function delExtension(id){
+        bootbox.setLocale("zh_CN");
+        bootbox.confirm("确认删除分机", function(result) {
+            if(result){
+                ajaxsync(ctx + "/console/app/"+appId+"/app_extension/delete/"+id,{csrfParameterName:csrfToken},function(response){
+                    if(response.success){
+                        showtoast("删除成功");
+                        if(extensionPage){
+                            var currentPage;
+                            if(((extensionPage.nowPage - 1) * extensionPage.listRow +1) <= --extensionPage.count){
+                                currentPage = extensionPage.nowPage;
+                            }else {
+                                currentPage = extensionPage.nowPage - 1;
+                            }
+                            if(currentPage>0){
+                                $('#page' + currentPage + extensionPage.obj).click();
+                            }else{
+                                $('#extension-'+id).remove();
+                                $('#page0'+subAccountPage.obj).hide();
+                            }
+                        }
+                    }else{
+                        showtoast("删除失败");
+                    }
+                },"post");
 
+            }
+        });
+    }
+    /**
+     * 删除操作
+     */
+    function delSubAccount(id){
+        bootbox.setLocale("zh_CN");
+        bootbox.confirm("确认删除子账号", function(result) {
+            if(result){
+                ajaxsync(ctx + "/console/sub_account/delete/"+id,{csrfParameterName:csrfToken},function(response){
+                    if(response.success){
+                        showtoast("删除成功");
+                        if(subAccountPage){
+                            var currentPage;
+                            if(((subAccountPage.nowPage - 1) * subAccountPage.listRow +1) <= --subAccountPage.count){
+                                currentPage = subAccountPage.nowPage;
+                            }else {
+                                currentPage = subAccountPage.nowPage - 1;
+                            }
+                            if(currentPage>0){
+                                $('#page' + currentPage + subAccountPage.obj).click();
+                            }else{
+                                $('#play-'+id).remove();
+                                $('#page0'+subAccountPage.obj).hide();
+                            }
+                        }
+                        console.info("进入-结束")
+                    }else{
+                        showtoast("删除失败");
+                    }
+                },"post");
+
+            }
+        });
+    }
 
 
     //默认加载放音文件分页
     $(function () {
-        upplay();
+        if('${app.serviceType}'=='call_center') {
+            extensionList();
+        }else{
+            upplay();
+        }
     });
     /**
      *触发放音文件分页
@@ -962,8 +1564,9 @@
         //获取数据总数
         var count = 0;
         var name = $('#name').val();
-
-        ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':1,'pageSize':20,csrfParameterName:csrfToken},function(response){
+        var subId = $('#voice_file_subId') .val();//$('#voice_file_subId option:selected') .val();
+        console.info(subId);
+        ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':1,'pageSize':20,'subId':subId,csrfParameterName:csrfToken},function(response){
             if(response.success){
                 count=response.data.totalCount;
             }else{
@@ -1006,16 +1609,24 @@
     var playTable = function(nowPage,listRows)
     {
         var name = $('#name').val();
-        ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':nowPage,'pageSize':listRows,csrfParameterName:csrfToken},function(response){
+        var subId = $('#voice_file_subId') .val();//$('#voice_file_subId option:selected') .val();
+        ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':nowPage,'pageSize':listRows,'subId':subId,csrfParameterName:csrfToken},function(response){
             if(response.success){
                 var data =[];
                 for(var j=0;j<response.data.result.length;j++){
                     var tempFile = response.data.result[j];
-                    var temp = [tempFile.id,tempFile.name,tempFile.status,resultFileSize(tempFile.size),tempFile.remark,tempFile.reason?tempFile.reason:'',tempFile.sync];
+                    var temp = [tempFile.id,
+                        tempFile.name,
+                        tempFile.status,resultFileSize(tempFile.size),
+                        tempFile.remark,
+                        tempFile.reason?tempFile.reason:'',
+                        tempFile.sync,
+                        tempFile.certId];
                     data[j]=temp;
                 }
                 var html ='';
                 //数据列表
+                console.info(data);
                 for(var i = 0 ; i<data.length; i++){
                     html +='<tr class="playtr" id="play-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
                     if(data[i][2]==-1){
@@ -1026,6 +1637,7 @@
                         html+='<td>待审核</td>';
                     }
                     html+='<td>'+data[i][3]+'</td>';
+                    html +='<td>'+(data[i][7] == null?'':data[i][7] )+'</td>';
                     html+='<td id="remark-a-'+data[i][0]+'">'+data[i][4]+'</td>';
                     html+='<td class="operation"> <a onclick="delplay(this)" id="delete-'+data[i][0]+'" >删除</a> <span ></span> <a onclick="editremark(this)" id="remark-b-'+data[i][0]+'">修改备注</a> </td></tr>';
                 }
@@ -1057,6 +1669,15 @@
         if(type=='agent'){
             agentList();
         }
+        if(type=='subAccount' ){
+            tosubAccountHome();
+            subAccountList();
+            $('#uploadButton').hide();
+        }
+        if(type=='queue'){
+            queueList();
+        }
+//        getSubAccountByAppId();
     });
 
 //    fileTotalSoze();
@@ -1066,6 +1687,8 @@
     var vue = new Vue({
         el: '#vue-application',
         data : {
+            isSubAccount:'0',
+            numUrl:'',
             isCall: ["✘", "✔"],
             phonelist:[],
             shop:[],
@@ -1104,22 +1727,35 @@
                 this.shop = s;
             },
             band:function () {
-                var list =  this.shop
-                console.log(list)
+                var list =  this.shop;
+                if(this.isSubAccount == 0){//应用下绑定
+                    // 绑定号码
+                    ajaxsync(ctx + "/console/telenum/callnum/num/bind/app/" + appId ,{nums:list.join(",")},function(response) {
+                        if(response.success){
+                            showtoast("绑定成功");
+                        }else{
+                            showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+                        }
+                    });
+                    // 成功隐藏
+                    $('#call-modal').modal('hide')
+                    //刷新号码绑定分页列表
+                    upnumber();
+                }else if (this.isSubAccount == 1){//子账号绑定
+                    // 绑定号码
+                    ajaxsync(ctx +this.numUrl ,{nums:list.join(",")},function(response) {
+                        if(response.success){
+                            showtoast("绑定成功");
+                        }else{
+                            showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+                        }
+                    });
+                    // 成功隐藏
+                    $('#call-modal').modal('hide')
+                    //刷新号码绑定分页列表
+                    upnumber2();
+                }
 
-                // 绑定号码
-                ajaxsync(ctx + "/console/telenum/callnum/num/bind/app/" + appId ,{nums:list.join(",")},function(response) {
-                    if(response.success){
-                        showtoast("绑定成功");
-                    }else{
-                        showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
-                    }
-                });
-
-                // 成功隐藏
-                $('#call-modal').modal('hide')
-                //刷新号码绑定分页列表
-                upnumber();
             },
             intersect:function () {
                 var point = Array.intersect(this.shop,this.page);
@@ -1140,7 +1776,7 @@
                 this.shopCheck = false
 
                 var data = [];
-                ajaxsync(ctx + "/console/telenum/callnum/num/unused/app/" + appId ,{pageNo:nowPage,pageSize:listRows},function(response) {
+                ajaxsync(ctx + "/console/telenum/callnum/num/unused/app/" + appId ,{ 'type':this.isSubAccount,'pageNo':nowPage,'pageSize':listRows},function(response) {
                     if(response.success){
                         data = response.data.result;
                     }else{
@@ -1203,15 +1839,23 @@
 
     $('#call-number').click(function () {
         vue.clear();  //重置数据
-        modalPage();
+        vue.isSubAccount =0;
+        modalPage(0);
         $('#call-modal').modal('show');
     });
-
+    $('#call-number2').click(function () {
+        vue.clear();  //重置数据
+        vue.isSubAccount =1;
+        var subId = $('#call-number2').attr("data-num-bind");
+        vue.numUrl= "/console/sub_account/num/bind/app/"+appId+"/"+subId;
+        modalPage(1);
+        $('#call-modal').modal('show');
+    });
     //分页
-    function modalPage() {
+    function modalPage(type) {
         //获取数据总数
         var count = 0;
-        var params = {"pageNo":1,"pageSize":10};
+        var params = {"pageNo":1,"pageSize":10,"type":type};
         ajaxsync(ctx + "/console/telenum/callnum/num/unused/app/" + appId ,params,function(response) {
             if(response.success){
                 count = response.data.totalCount;
@@ -1297,8 +1941,111 @@
         }
         $('#band-table').html(html);
     }
+    /**
+     *绑定号码分页
+     */
+    var bindNumPage2;
+    function upnumber2(){
+        //获取数据总数
+        var count = 0;
+        var subId = $('#call-number2').attr("data-num-bind");
+        var params = {"pageNo":1,"pageSize":10,'appId':appId,"subId":subId};
+        ajaxsync(ctx + "/console/sub_account/num/list"  ,params,function(response) {
+            if(response.success){
+                count = response.data.totalCount;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+            }
+        });
+        //每页显示数量
+        var listRow = 10;
+        //显示多少个分页按钮
+        var showPageCount = 5;
+        //指定id，创建分页标签
+        var pageId = 'bandpage';
+        //searchTable 为方法名
+        bindNumPage2 = new Page(count,listRow,showPageCount,pageId,numberTable2);
+        bindNumPage2.show();
+    }
 
+    /**
+     * 分页回调方法
+     * @param nowPage 当前页数
+     * @param listRows 每页显示多少条数据
+     * */
+    var numberTable2 = function(nowPage,listRows){
+        var html = '';
+        var data = [];
+        var subId = $('#call-number2').attr("data-num-bind");
+        ajaxsync(ctx + "/console/sub_account/num/list" ,{pageNo:nowPage,pageSize:listRows,'appId':appId,"subId":subId},function(response){
+            if(response.success){
+                data = response.data.result;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
+            }
+        },"get");
 
+        // $('#playtable').find(".playtr").remove();["✔", "✘"],
+        for(var i =0 ; i<data.length; i++){
+            html +='<tr id="rent-'+ data[i].rentId +'">' +
+                '<td class="text-center">'+data[i].num+'</td>' +
+                '<td class="text-center">' + (data[i].status == 0 ? '过期': '正常') + '</td>' +
+                '<td class="text-center">'+ (data[i].isCalled == 0 ? '✘': '✔') +'</td>' +
+                '<td class="text-center">'+ (data[i].isDialing == 0 ? '✘': '✔') +'</td>' +
+                '<td class="text-center"><span class="text-center-l-fixed">'+data[i].areaCode+'</span></td>' +
+                '<td class="text-center"> ' + data[i].expireTime + ' </td>' +
+                '<td class="text-center"><a onclick="unband2(\''+data[i].rentId+'\')">解除绑定</a></td>' +
+                '</tr>'
+        }
+        $('#band-table2').html(html);
+    }
+    /**
+     * 解除绑定
+     * */
+    function unband2(id) {
+        bootbox.setLocale("zh_CN");
+        bootbox.dialog({
+                title: "提示",
+                message: '<div class="row">  ' +
+                '<div class="col-md-12 text-center">你确认要执行这操作吗？</div>  </div>',
+                buttons: {
+                    success: {
+                        label: "确认",
+                        className: "btn-primary",
+                        callback: function () {
+                            var subId = $('#call-number2').attr("data-num-bind");
+                            ajaxsync(ctx + "/console/sub_account/unbind/one/"+ appId +"/"+subId+"/" + id ,null,function(response) {
+                                if(response.success){
+                                    showtoast("解除绑定成功")
+                                    if(bindNumPage2){
+                                        var currentPage;
+                                        if(((bindNumPage2.nowPage - 1) * bindNumPage2.listRow +1) <= --bindNumPage2.count){
+                                            currentPage = bindNumPage2.nowPage;
+                                        }else {
+                                            currentPage = bindNumPage2.nowPage - 1;
+                                        }
+                                        if(currentPage> 0){
+                                            $('#page' + currentPage + bindNumPage2.obj).click();
+                                        }else{
+                                            $('#rent-'+id).remove();
+                                            $('#page0'+bindNumPage2.obj).hide();
+                                        }
+                                    }
+                                }else{
+                                    showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+                                }
+                            });
+                            //异步加载数据，释放成功
+                        }
+                    },
+                    cancel:{
+                        label: "关闭",
+                        className: "btn-default",
+                    }
+                }
+            }
+        );
+    }
     /**
      * 解除绑定
      * */
@@ -1327,6 +2074,7 @@
                                                 $('#page' + currentPage + bindNumPage.obj).click();
                                             }else{
                                                 $('#rent-'+id).remove();
+                                                $('#page0'+bindNumPage.obj).hide();
                                             }
                                         }
                                     }else{
@@ -1378,8 +2126,40 @@
                 }
         );
     }
-
-
+    /**
+     * 解除全部绑定
+     * */
+    function unallband2() {
+        bootbox.setLocale("zh_CN");
+        bootbox.dialog({
+                title: "提示",
+                message: '<div class="row">  ' +
+                '<div class="col-md-12 text-center">你确认要执行这操作吗？</div>  </div>',
+                buttons: {
+                    success: {
+                        label: "确认",
+                        className: "btn-primary",
+                        callback: function () {
+                            var subId = $('#call-number2').attr("data-num-bind");
+                            ajaxsync(ctx + "/console/sub_account/unbind/all/" + appId + "/"+subId ,null,function(response) {
+                                if(response.success){
+                                    showtoast("全部解除绑定成功");
+                                    //异步加载数据，释放成功
+                                    upnumber2();
+                                }else{
+                                    showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+                                }
+                            });
+                        }
+                    },
+                    cancel:{
+                        label: "关闭",
+                        className: "btn-default",
+                    }
+                }
+            }
+        );
+    }
 
     /**
      * 分机分页
@@ -1389,7 +2169,9 @@
         $('#uploadButton').hide();
         //获取数据总数
         var count = 0;
-        var params = {"pageNo":1,"pageSize":10};
+        var extensionNum = $('#extension_num').val();
+        var subId = $('#extension_subId') .val();//$('#extension_subId option:selected') .val();
+        var params = {"pageNo":1,"pageSize":10,"extensionNum":extensionNum,'subId':subId};
         ajaxsync(ctx + "/console/app/" + appId + "/app_extension/page" ,params,function(response) {
             if(response.success){
                 count = response.data.totalCount;
@@ -1416,7 +2198,10 @@
     var extensionTable = function(nowPage,listRows){
         var html = '';
         var data = [];
-        ajaxsync(ctx + "/console/app/" + appId + "/app_extension/page" ,{pageNo:nowPage,pageSize:listRows},function(response){
+        var extensionNum = $('#extension_num').val();
+        var subId = $('#extension_subId') .val();//$('#extension_subId option:selected') .val();
+        var params = {"pageNo":nowPage,"pageSize":listRows,"extensionNum":extensionNum,'subId':subId};
+        ajaxsync(ctx + "/console/app/" + appId + "/app_extension/page" ,params,function(response){
             if(response.success){
                 data = response.data.result;
             }else{
@@ -1430,13 +2215,37 @@
                     '<td class="">'+ data[i].id +'</td>' +
                     '<td class="">' + data[i].user + '</td>' +
                     '<td class="">'+ data[i].password +'</td>' +
+                    '<td class="">'+ (data[i].certId == undefined ||data[i].certId== null ?'': data[i].certId) +'</td>' +
                     '<td class="">'+ (data[i].enable?'可用':'不可用') +'</td>' +
                     '<td class="">'+ (data[i].type==1?'SIP 终端':(data[i].type==2?'SIP 网关':(data[i].type==3?'普通电话':'未知类型'))) +'</td>' +
+                    '<td class=""><a href="javascript:delExtension(\''+data[i].id+'\')" >删除</a></td>' +
                     '</tr>'
         }
         $('#extension-list').html(html);
     }
-
+    var subAccountPage;
+    function subAccountList(){
+        var certId = $('#five_certId').val();
+        //获取数据总数
+        var count = 0;
+        var params = {"pageNo":1,"pageSize":10,"appId":appId,"certId":  certId};
+        ajaxsync(ctx + "/console/sub_account/list" ,params,function(response) {
+            if(response.success){
+                count = response.data.totalCount;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+            }
+        },"get");
+        //每页显示数量
+        var listRow = 20;
+        //显示多少个分页按钮
+        var showPageCount = 5;
+        //指定id，创建分页标签
+        var pageId = 'subAccountpage';
+        //searchTable 为方法名
+        subAccountPage = new Page(count,listRow,showPageCount,pageId,subAccountTable);
+        subAccountPage.show();
+    }
     /**
      * 坐席分页
      */
@@ -1445,7 +2254,9 @@
         $('#uploadButton').hide();
         //获取数据总数
         var count = 0;
-        var params = {"pageNo":1,"pageSize":10};
+        var agentNum = $('#agent_num').val();
+        var subId = $('#agent_subId') .val();//$('#agent_subId option:selected') .val();
+        var params = {"pageNo":1,"pageSize":10,"agentNum":agentNum,"subId":subId};
         ajaxsync(ctx + "/console/app/" + appId + "/agent/page" ,params,function(response) {
             if(response.success){
                 count = response.data.totalCount;
@@ -1463,7 +2274,118 @@
         agentPage = new Page(count,listRow,showPageCount,pageId,agentTable);
         agentPage.show();
     }
+    /**
+     * 坐席分页
+     */
+    var queuePage;
+    function queueList(){
+        $('#uploadButton').hide();
+        //获取数据总数
+        var count = 0;
+        var queueNum = $('#queue_num').val();
+        var subId = $('#queue_subId') .val();//$('#queue_subId option:selected') .val();
+        var params = {"pageNo":1,"pageSize":10,"queueNum":queueNum,"subId":subId};
+        ajaxsync(ctx + "/console/app/" + appId + "/queue/page" ,params,function(response) {
+            if(response.success){
+                count = response.data.totalCount;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+            }
+        },"get");
+        //每页显示数量
+        var listRow = 10;
+        //显示多少个分页按钮
+        var showPageCount = 5;
+        //指定id，创建分页标签
+        var pageId = 'queue-page';
+        //searchTable 为方法名
+        queuePage = new Page(count,listRow,showPageCount,pageId,queueTable);
+        queuePage.show();
+    }
+    var subAccountTable = function (nowPage,listRows) {
+        var certId = $('#five_certId').val();
+        var html = '';
+        var data = [];
+        ajaxsync(ctx + "/console/sub_account/list" ,{'pageNo':nowPage,'pageSize':listRows,'appId':appId,"certId":  certId},function(response){
+            if(response.success){
+                data = response.data.result;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
+            }
+        },"get");
+        for(var i =0 ; i<data.length; i++){
+            html +='<tr class="playtr" id="play-'+data[i].id+'">' +
+                '<td class="text-center">'+ data[i].certId +'</td>' +
+                '<td class="text-center">'+ data[i].secretKey +'</td>'+
+                '<td class="text-center">' + data[i].voiceNum + '</td>' ;
+//            if(appServiceType == 'call_center'){
+//                html += '<td class="text-center">' + data[i].seatNum + '</td>' ;
+//            }
+            var state = data[i].enabled == 1?"启用":"禁用";
+            var color = data[i].enabled == 1?"text-success":"text-danger";
+            var stateEdit = data[i].enabled == 1?"禁用":"启用";
+            var remark1 = data[i].remark !=null && data[i].remark.length>18 ? data[i].remark.substring(0,18)+"...": data[i].remark;
+            html+= '<td class="text-center '+color+'" id="enable_'+data[i].id+'" >' + state+ '</td>' +
+                '<td class="text-center">' + remark1 + '</td>' +
+                '<td class="text-center"> <a href="javascript:toSubAccountEnable(\''+data[i].id+'\')" data-state="'+data[i].enabled+'" id="enable_edit_'+data[i].id+'" >'+stateEdit+'</a>&nbsp;<a href="javascript:tosubAccountDatail(\''+data[i].id+'\')" >详情</a>&nbsp;<a href="javascript:delSubAccount(\''+data[i].id+'\')" >删除</a></td>' +
+                '</tr>'
+        }
 
+        $('#subAccount-table').find(".playtr").remove();
+        $('#subAccount-table').append(html);
+    }
+    function toSubAccountEnable(id,enabled){
+        var enabled = $('#enable_edit_'+id).attr("data-state");
+        var state ;
+        var h;
+        var h2;
+        var enabled2;
+        if(enabled==1){//当前是启用，执行禁用
+            state="disable/"+id;
+            h="禁用";
+            h2="启用";
+            enabled2=0;
+        }else{//当前是禁用，执行启用
+            state="enabled/"+id;
+            h="启用";
+            h2="禁用";
+            enabled2=1;
+        }
+        ajaxsync(ctx + "/console/sub_account/"+state,{csrfParameterName:csrfToken},function(response){
+            if(response.success){
+                showtoast(h+"成功");
+                $('#enable_'+id).html(h);
+                $('#enable_edit_'+id).html(h2);
+                $('#enable_edit_'+id).attr("data-state",enabled2);
+            }else{
+                showtoast(h+"失败："+response.errorMsg);
+            }
+        },"post");
+    }
+    function tosubAccountDatail(id){
+        ajaxsync(ctx + "/console/sub_account/get/"+id ,{},function(response){
+            if(response.success){
+                editSubAccountFive.initObj(response.data);
+                $('#subAccount_home').hide();
+                $('#subAccount_datail').show();
+                $('#call-number2').attr("data-num-bind",response.data.id);
+                upnumber2();
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
+            }
+        },"get");
+    }
+    function tosubAccountHome(){
+        $('#subAccount_datail').hide();
+        $('#subAccount_home').show();
+        editSubAccountFive.initObj2();
+    }
+    function tosubAccountHome1(){
+        $('#subAccount_datail').hide();
+        $('#subAccount_home').show();
+        editSubAccountFive.initObj2();
+        subAccountList();
+    }
     /**
      * 坐席分机分页回调方法
      * @param nowPage 当前页数
@@ -1472,7 +2394,10 @@
     var agentTable = function(nowPage,listRows){
         var html = '';
         var data = [];
-        ajaxsync(ctx + "/console/app/" + appId + "/agent/page" ,{pageNo:nowPage,pageSize:listRows},function(response){
+        var agentNum = $('#agent_num').val();
+        var subId = $('#agent_subId') .val();//$('#agent_subId option:selected') .val();
+        var params = {"pageNo":nowPage,"pageSize":listRows,"agentNum":agentNum,"subId":subId};
+        ajaxsync(ctx + "/console/app/" + appId + "/agent/page" ,params,function(response){
             if(response.success){
                 data = response.data.result;
             }else{
@@ -1496,14 +2421,88 @@
             html +='<tr id="agent-'+ data[i].name +'">' +
                     '<td class="text-center">'+ data[i].name +'</td>' +
                     '<td class="text-center">'+ skillStr +'</td>' +
-                    '<td class="text-center">'+ data[i].extension +'</td>' +
+                    '<td class="text-center">'+ (data[i].extension!=null?data[i].extension:'') +'</td>' +
+                     '<td class="text-center">'+ data[i].certId +'</td>' +
                     '<td class="text-center">' + data[i].state + '</td>' +
+                    '<td class="text-center"><a href="javascript:delAgent(\''+data[i].id+'\')" >删除</a></td>' +
                     '</tr>'
         }
         $('#agent-list').html(html);
     }
+    /**
+     * 坐席分机分页回调方法
+     * @param nowPage 当前页数
+     * @param listRows 每页显示多少条数据
+     * */
+    var queueTable = function(nowPage,listRows){
+        var html = '';
+        var data = [];
+        var queueNum = $('#queue_num').val();
+        var subId = $('#queue_subId') .val();//$('#queue_subId option:selected') .val();
+        var params = {"pageNo":nowPage,"pageSize":listRows,"queueNum":queueNum,"subId":subId};
+        ajaxsync(ctx + "/console/app/" + appId + "/queue/page" ,params,function(response){
+            if(response.success){
+                data = response.data.result;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
+            }
+        },"get");
 
-
+        // $('#playtable').find(".playtr").remove();["✔", "✘"],
+        for(var i =0 ; i<data.length; i++){
+            html +='<tr id="queue-'+ data[i].id +'">' +
+                '<td class="text-center"><span style="float:left;" >'+ data[i].whereExpression +'</span></td>' +
+                '<td class="text-center"><span style="float:left;" >'+ data[i].sortExpression +'</span></td>' +
+                '<td class="text-center">' + data[i].priority + '</td>' +
+                '<td class="text-center">' + data[i].queueTimeout + '</td>' +
+                '<td class="text-center">' + data[i].fetchTimeout + '</td>' +
+                '<td class="text-center">'+ data[i].certId +'</td>' +
+                '<td class="text-center">' + data[i].remark + '</td>' +
+                '</tr>'
+        }
+        $('#queue-list').html(html);
+    }
+//    $(document).ready(function () {
+//        $('.sublist').selectpicker('refresh');
+//
+//    });
+    function getSubAccountByAppId(){
+        if(appId == null || appId.length==0){
+            showtoast("应用标识异常，获取子账号列表失败");
+        }else{
+            ajaxsync(ctx + "/console/sub_account/by/"+appId+"/list" ,{},function(response) {
+                if(response.success){
+                    var list =  response.data;
+                    $("select.sublist[data-live-search=true] option").remove();
+                    var opt = '<option  class="get-class" value=""></option>';
+                    $("select.sublist[data-live-search=true]").append(opt);
+                    for(var i=0;i< list.length ;i++){
+                        var opt = '<option value="'+list[i].id+'" >'+list[i].certId+'</option>';
+                        $("select.sublist[data-live-search=true]").append(opt);
+                    }
+                    $("select.sublist[data-live-search=true]").selectpicker('refresh');
+//                    $("div.sublist option").remove();
+                    $("div.open").css("position","absolute");
+                    $("div.sublist button[data-id=file_sub_accout_num]").css("width","270px");
+                    $('div.sublist').each(function (index) {
+                        var len = $(this).children("button[data-id=file_sub_accout_num]").length;
+                        if(len >0 ){
+                            $(this).children("div.open").children("div.bs-searchbox").css("height","35px");
+                            $(this).children("div.open").children("div.bs-searchbox").children("input").css("height","30px");
+                        }
+                        var len2 = $(this).children("button[data-id=create_six_subId]").length;
+                        if(len2 >0){
+                            $(this).css("width","293px");
+                            $(this).children("div.open").children("div.bs-searchbox").css("height","35px");
+                            $(this).children("div.open").children("div.bs-searchbox").children("input").css("height","30px");
+                        }
+                    });
+                }else{
+                    showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+                }
+            });
+        }
+    }
 </script>
 
 </body>

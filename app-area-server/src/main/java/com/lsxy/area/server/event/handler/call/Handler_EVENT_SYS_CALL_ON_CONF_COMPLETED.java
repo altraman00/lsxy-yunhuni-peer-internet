@@ -82,7 +82,7 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
         }
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null");
+            throw new InvalidParamException("businessstate is null,call_id="+call_id);
         }
 
         if(logger.isDebugEnabled()){
@@ -150,6 +150,7 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","conf.quit")
                     .putIfNotEmpty("id",conf_id)
+                    .putIfNotEmpty("subaccount_id",state.getSubaccountId())
                     .putIfNotEmpty("join_time",begin_time)
                     .putIfNotEmpty("quit_time",end_time)
                     .putIfNotEmpty("call_id",call_id)
@@ -182,7 +183,7 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
                     rpcCaller.invoke(sessionContext, rpcrequest, true);
                 }
             } catch (Throwable e) {
-                logger.error("调用失败",e);
+                logger.error(String.format("调用挂断失败,appId=%s,callId=%s",state.getAppId(),state.getId()),e);
             }
         }
     }

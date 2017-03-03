@@ -49,12 +49,12 @@ public class DeleteConditionEventHandler implements MQMessageHandler<DeleteCondi
                 message.getConditionId() == null ||
                 message.getTenantId() == null ||
                 message.getAppId() == null){
-            logger.info("处理CallCenter.DeleteConditionEvent出错，参数错误！");
+            logger.info("处理CallCenter.DeleteConditionEvent出错，参数错误！,message={}",message);
             return;
         }
         long start = System.currentTimeMillis();
         List<String> agentIds = callCenterAgentService
-                                        .getAgentIdsByChannel(message.getTenantId(),message.getAppId(),message.getChannelId());
+                                        .getAgentIdsBySubaccountId(message.getTenantId(),message.getAppId(),message.getSubaccountId());
         //清空cAs
         cAs.delete(message.getConditionId());
         if(agentIds != null && agentIds.size() > 0){

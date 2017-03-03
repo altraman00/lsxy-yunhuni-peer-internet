@@ -69,7 +69,7 @@ public class Handler_EVENT_EXT_CALL_ON_FAIL extends EventHandler{
         }
         BusinessState state = businessStateService.get(callId);
         if(state == null){
-            throw new InvalidParamException("businessstate is null");
+            throw new InvalidParamException("businessstate is null,call_id="+callId);
         }
 
         //释放资源
@@ -120,7 +120,7 @@ public class Handler_EVENT_EXT_CALL_ON_FAIL extends EventHandler{
 
         String callBackUrl = state.getCallBackUrl();
         if(StringUtils.isBlank(callBackUrl)){
-            logger.info("回调地址callBackUrl为空");
+            logger.info("回调地址callBackUrl为空,appId={}",state.getAppId());
             return res;
         }
         //开始通知开发者
@@ -129,10 +129,11 @@ public class Handler_EVENT_EXT_CALL_ON_FAIL extends EventHandler{
         }
 
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                .put("event",event)
-                .put("id",callId)
-                .put("error","调用失败")
-                .put("user_data",state.getUserdata())
+                .putIfNotEmpty("event",event)
+                .putIfNotEmpty("id",callId)
+                .putIfNotEmpty("subaccount_id",state.getSubaccountId())
+                .putIfNotEmpty("error","调用失败")
+                .putIfNotEmpty("user_data",state.getUserdata())
                 .build();
         notifyCallbackUtil.postNotify(callBackUrl,notify_data,3);
 

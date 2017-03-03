@@ -5,8 +5,10 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
+import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
+import com.lsxy.area.server.util.SipUrlUtil;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
@@ -18,6 +20,7 @@ import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.app.service.ServiceType;
@@ -98,12 +101,21 @@ public class ConfServiceImpl implements ConfService {
     @Autowired
     private AreaAndTelNumSelector areaAndTelNumSelector;
 
+    @Autowired
+    private CallbackUrlUtil callbackUrlUtil;
+
+    @Autowired
+    private ApiCertificateSubAccountService apiCertificateSubAccountService;
+
     @Override
-    public String create(String ip, String appId, Integer maxDuration, Integer maxParts,
+    public String create(String subaccountId,String ip, String appId, Integer maxDuration, Integer maxParts,
                          Boolean recording, Boolean autoHangup, String bgmFile, String userData) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
         String tenantId = app.getTenant().getId();
 
@@ -111,18 +123,24 @@ public class ConfServiceImpl implements ConfService {
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                                .put("ip",ip)
+                );
             }
         }
 
         if(!appService.enabledService(tenantId,appId, ServiceType.SessionService)){
-            throw new AppServiceInvalidException();
+            throw new AppServiceInvalidException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
-        if(!isAmountEnough){
-            throw new BalanceNotEnoughException();
-        }
+        //判断余额配额是否充足
+        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
+
         //TODO
         String areaId = areaAndTelNumSelector.getAreaId(app);
 
@@ -152,11 +170,12 @@ public class ConfServiceImpl implements ConfService {
         BusinessState state = new BusinessState.Builder()
                                 .setTenantId(tenantId)
                                 .setAppId(app.getId())
+                                .setSubaccountId(subaccountId)
                                 .setId(confId)
                                 .setType(BusinessState.TYPE_SYS_CONF)
                                 .setUserdata(userData)
                                 .setAreaId(areaId)
-                                .setCallBackUrl(app.getUrl())
+                                .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                                 .setLineGatewayId(null)
                                 .setBusinessData(new MapBuilder<String,String>()
                                         .putIfNotEmpty("max_seconds",maxDuration == null?null:maxDuration.toString())//会议最大持续时长
@@ -170,39 +189,73 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean dismiss(String ip, String appId, String confId) throws YunhuniApiException {
+    public boolean dismiss(String subaccountId,String ip, String appId, String confId) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                                .put("ip",ip)
+                );
             }
         }
 
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
-            throw new AppServiceInvalidException();
+            throw new AppServiceInvalidException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
 
         BusinessState state = businessStateService.get(confId);
 
         if(state == null){
-            throw new ConfNotExistsException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         if(state.getResId() == null){
-            throw new SystemBusyException();
+            throw new SystemBusyException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         if(state.getClosed()!= null && state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         if(!appId.equals(state.getAppId())){
             //不能跨app操作
-            throw new ConfNotExistsException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
+        }
+
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,state.getSubaccountId())){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         String areaId = areaAndTelNumSelector.getAreaId(app);
@@ -223,63 +276,105 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public String invite(String ip, String appId, String confId,
+    public String invite(String subaccountId,String ip, String appId, String confId,
                          String from, String to, Integer maxDuration, Integer maxDialDuration,
                          Integer dialVoiceStopCond, String playFile, Integer voiceMode) throws YunhuniApiException{
 
         if(apiGwRedBlankNumService.isRedNum(to)){
-            throw new NumberNotAllowToCallException();
+            throw new NumberNotAllowToCallException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                    .put("appId",appId)
+                    .put("confId",confId)
+                    .put("to",to)
+            );
         }
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
         String tenantId = app.getTenant().getId();
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                                .put("confId",confId)
+                                .put("ip",ip)
+                );
             }
         }
 
         if(!appService.enabledService(tenantId,appId, ServiceType.SessionService)){
-            throw new AppServiceInvalidException();
+            throw new AppServiceInvalidException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
-
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
-        if(!isAmountEnough){
-            throw new BalanceNotEnoughException();
-        }
+        //判断余额配额是否充足
+        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
 
         BusinessState state = businessStateService.get(confId);
         if(state == null){
-            throw new ConfNotExistsException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         if(state.getResId() == null){
-            throw new SystemBusyException();
+            throw new SystemBusyException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         if(state.getClosed()!= null && state.getClosed()){
-            throw new ConfNotExistsException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         if(!appId.equals(state.getAppId())){
             //不能跨app操作
-            throw new ConfNotExistsException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
+        }
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,state.getSubaccountId())){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
         Integer maxParts = null;
         if(StringUtil.isNotEmpty(state.getBusinessData().get("max_parts"))){
             maxParts = Integer.parseInt(state.getBusinessData().get("max_parts"));
         }
         if(this.outOfParts(confId,maxParts)){
-            throw new OutOfConfMaxPartsException();
+            throw new OutOfConfMaxPartsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         String callId = UUIDGenerator.uuid();
 
         //TODO
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app, from,to);
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber();
 
@@ -316,15 +411,16 @@ public class ConfServiceImpl implements ConfService {
         BusinessState callstate = new BusinessState.Builder()
                                     .setTenantId(tenantId)
                                     .setAppId(app.getId())
+                                    .setSubaccountId(subaccountId)
                                     .setId(callId)
                                     .setType(BusinessState.TYPE_SYS_CONF)
-                                    .setCallBackUrl(app.getUrl())
+                                    .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                                     .setAreaId(areaId)
                                     .setLineGatewayId(lineId)
                                     .setBusinessData(new MapBuilder<String,String>()
                                         .putIfNotEmpty(BusinessState.REF_RES_ID,state.getBusinessData().get(BusinessState.REF_RES_ID))
-                                        .putIfNotEmpty("from",oneTelnumber)
-                                        .putIfNotEmpty("to",to)
+                                        .putIfNotEmpty("from",SipUrlUtil.extractTelnum(oneTelnumber))
+                                        .putIfNotEmpty("to", SipUrlUtil.extractTelnum(to))
                                         .putIfNotEmpty("max_seconds",maxDuration==null?null:maxDuration.toString())//最大时间
                                         .putIfNotEmpty("conf_id",confId)//所属会议
                                         .putIfNotEmpty("play_file",playFile)//加入后在会议播放这个文件
@@ -339,92 +435,194 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean join(String ip, String appId, String confId, String callId, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException{
+    public boolean join(String subaccountId,String ip, String appId, String confId, String callId, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException{
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                                .put("confId",confId)
+                                .put("ip",ip)
+                );
             }
         }
 
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
-            throw new AppServiceInvalidException();
+            throw new AppServiceInvalidException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
-        if(!isAmountEnough){
-            throw new BalanceNotEnoughException();
-        }
+        //判断余额配额是否充足
+        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
 
         BusinessState state = businessStateService.get(confId);
         if(state == null){
-            throw new ConfNotExistsException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         if(state.getResId() == null){
-            throw new SystemBusyException();
+            throw new SystemBusyException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         if(state.getClosed()!= null && state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         if(!appId.equals(state.getAppId())){
             //不能跨app操作
-            throw new ConfNotExistsException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
+        }
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,state.getSubaccountId())){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
         Integer maxParts = null;
         if(StringUtil.isNotEmpty(state.getBusinessData().get("max_parts"))){
             maxParts = Integer.parseInt(state.getBusinessData().get("max_parts"));
         }
         if(this.outOfParts(confId,maxParts)){
-            throw new OutOfConfMaxPartsException();
+            throw new OutOfConfMaxPartsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         return this.confEnter(callId,confId,maxDuration,playFile,voiceMode);
     }
 
     @Override
-    public boolean quit(String ip, String appId, String confId, String callId) throws YunhuniApiException {
+    public boolean quit(String subaccountId,String ip, String appId, String confId, String callId) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                                .put("confId",confId)
+                                .put("ip",ip)
+                );
             }
         }
 
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
-            throw new AppServiceInvalidException();
+            throw new AppServiceInvalidException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
         BusinessState call_state = businessStateService.get(callId);
         BusinessState conf_state = businessStateService.get(confId);
 
-        if(call_state ==null || call_state.getResId() == null){
-            throw new SystemBusyException();
+        if(call_state == null){
+            throw new CallNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+                            .put("call_id",callId)
+            );
+        }
+
+        if(call_state.getResId() == null){
+            throw new SystemBusyException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+                            .put("call_id",callId)
+            );
         }
 
         if(call_state.getClosed()!= null && call_state.getClosed()){
-            throw new SystemBusyException();
+            throw new CallNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+                            .put("call_id",callId)
+            );
         }
 
-        if(conf_state == null || conf_state.getResId() == null){
-            throw new SystemBusyException();
+        if(conf_state == null){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
+        }
+
+        if(conf_state.getResId() == null){
+            throw new SystemBusyException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         if(conf_state.getClosed()!= null && conf_state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         if(!call_state.getAppId().equals(conf_state.getAppId())){
             throw new IllegalArgumentException();
+        }
+
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,conf_state.getSubaccountId())){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
+        }
+
+        if(!apiCertificateSubAccountService.subaccountCheck(call_state.getSubaccountId(),conf_state.getSubaccountId())){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         String areaId = areaAndTelNumSelector.getAreaId(app);
@@ -445,30 +643,69 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean startPlay(String ip, String appId, String confId, List<String> playFiles) throws YunhuniApiException {
+    public boolean startPlay(String subaccountId,String ip, String appId, String confId, List<String> playFiles) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                                .put("confId",confId)
+                                .put("ip",ip)
+                );
             }
         }
 
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
-            throw new AppServiceInvalidException();
+            throw new AppServiceInvalidException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         BusinessState conf_state = businessStateService.get(confId);
 
-        if(conf_state == null || conf_state.getResId() == null){
-            throw new SystemBusyException();
+        if(conf_state == null){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
+        }
+
+        if(conf_state.getResId() == null){
+            throw new SystemBusyException(new ExceptionContext().put("subaccountId",subaccountId)
+                    .put("appId",appId)
+                    .put("confId",confId));
         }
 
         if(conf_state.getClosed()!= null && conf_state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConfNotExistsException(new ExceptionContext().put("subaccountId",subaccountId)
+                    .put("appId",appId)
+                    .put("confId",confId));
+        }
+
+        if(!conf_state.getAppId().equals(appId)){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
+        }
+
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,conf_state.getSubaccountId())){
+            throw new ConfNotExistsException(new ExceptionContext().put("subaccountId",subaccountId)
+                    .put("appId",appId)
+                    .put("confId",confId));
         }
 
         playFiles = playFileUtil.convertArray(app.getTenant().getId(),appId,playFiles);
@@ -490,30 +727,75 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean stopPlay(String ip, String appId, String confId) throws YunhuniApiException {
+    public boolean stopPlay(String subaccountId,String ip, String appId, String confId) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                                .put("confId",confId)
+                                .put("ip",ip)
+                );
             }
         }
 
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
-            throw new AppServiceInvalidException();
+            throw new AppServiceInvalidException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         BusinessState conf_state = businessStateService.get(confId);
 
-        if(conf_state == null || conf_state.getResId() == null){
-            throw new SystemBusyException();
+        if(conf_state == null){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
+        }
+
+        if(conf_state.getResId() == null){
+            throw new SystemBusyException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         if(conf_state.getClosed()!= null && conf_state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
+        }
+
+        if(!conf_state.getAppId().equals(appId)){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
+        }
+
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,conf_state.getSubaccountId())){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         String areaId = areaAndTelNumSelector.getAreaId(app);
@@ -533,30 +815,75 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean startRecord(String ip, String appId, String confId, Integer maxDuration) throws YunhuniApiException {
+    public boolean startRecord(String subaccountId,String ip, String appId, String confId, Integer maxDuration) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                                .put("confId",confId)
+                                .put("ip",ip)
+                );
             }
         }
 
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
-            throw new AppServiceInvalidException();
+            throw new AppServiceInvalidException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         BusinessState conf_state = businessStateService.get(confId);
 
-        if(conf_state == null || conf_state.getResId() == null){
-            throw new SystemBusyException();
+        if(conf_state == null){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
+        }
+
+        if(conf_state.getResId() == null){
+            throw new SystemBusyException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         if(conf_state.getClosed()!= null && conf_state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
+        }
+
+        if(!conf_state.getAppId().equals(appId)){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
+        }
+
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,conf_state.getSubaccountId())){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         Map<String,String> businessData = conf_state.getBusinessData();
@@ -585,29 +912,74 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean stopRecord(String ip, String appId, String confId) throws YunhuniApiException {
+    public boolean stopRecord(String subaccountId,String ip, String appId, String confId) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                                .put("confId",confId)
+                                .put("ip",ip)
+                );
             }
         }
 
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
-            throw new AppServiceInvalidException();
+            throw new AppServiceInvalidException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
         BusinessState conf_state = businessStateService.get(confId);
 
-        if(conf_state == null || conf_state.getResId() == null){
-            throw new SystemBusyException();
+        if(conf_state == null){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
+        }
+
+        if(conf_state.getResId() == null){
+            throw new SystemBusyException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         if(conf_state.getClosed()!= null && conf_state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
+        }
+
+        if(!conf_state.getAppId().equals(appId)){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
+        }
+
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,conf_state.getSubaccountId())){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         String areaId = areaAndTelNumSelector.getAreaId(app);
@@ -627,43 +999,101 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean setVoiceMode(String ip, String appId, String confId, String callId, Integer voiceMode) throws YunhuniApiException {
+    public boolean setVoiceMode(String subaccountId,String ip, String appId, String confId, String callId, Integer voiceMode) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                                .put("confId",confId)
+                                .put("ip",ip)
+                );
             }
         }
 
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
-            throw new AppServiceInvalidException();
+            throw new AppServiceInvalidException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         BusinessState call_state = businessStateService.get(callId);
         BusinessState conf_state = businessStateService.get(confId);
-        if(call_state ==null || call_state.getResId() == null){
-            throw new SystemBusyException();
+
+        if(call_state == null){
+            throw new CallNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+                            .put("call_id",callId)
+            );
+        }
+
+        if(call_state.getResId() == null){
+            throw new SystemBusyException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+                            .put("call_id",callId)
+            );
         }
 
         if(call_state.getClosed()!= null && call_state.getClosed()){
-            throw new SystemBusyException();
+            throw new CallNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+                            .put("call_id",callId)
+            );
         }
 
-        if(conf_state == null || conf_state.getResId() == null){
-            throw new SystemBusyException();
+        if(conf_state == null){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
+        }
+
+        if(conf_state.getResId() == null){
+            throw new SystemBusyException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         if(conf_state.getClosed()!= null && conf_state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
         }
 
         if(!call_state.getAppId().equals(conf_state.getAppId())){
             throw new IllegalArgumentException();
         }
+
+        if(!apiCertificateSubAccountService.subaccountCheck(subaccountId,conf_state.getSubaccountId())){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("confId",confId)
+            );
+        }
+
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
                 .putIfNotEmpty("call_res_id",call_state.getResId())
@@ -686,27 +1116,60 @@ public class ConfServiceImpl implements ConfService {
     public boolean confEnter(String call_id, String conf_id, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException {
         BusinessState call_state = businessStateService.get(call_id);
         BusinessState conf_state = businessStateService.get(conf_id);
-        if(call_state ==null || call_state.getResId() == null){
-            throw new SystemBusyException();
+        if(call_state == null){
+            throw new CallNotExistsException(
+                    new ExceptionContext().put("call_id",call_id)
+                            .put("conf_id",conf_id)
+            );
+        }
+
+        if(call_state.getResId() == null){
+            throw new SystemBusyException(
+                    new ExceptionContext().put("call_id",call_id)
+                            .put("conf_id",conf_id)
+            );
         }
 
         if(call_state.getClosed()!= null && call_state.getClosed()){
-            throw new SystemBusyException();
+            throw new CallNotExistsException(
+                    new ExceptionContext().put("call_id",call_id)
+                            .put("conf_id",conf_id)
+            );
         }
 
-        if(conf_state == null || conf_state.getResId() == null){
-            throw new SystemBusyException();
+        if(conf_state == null){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("call_id",call_id)
+                            .put("conf_id",conf_id)
+            );
+        }
+
+        if(conf_state.getResId() == null){
+            throw new SystemBusyException(
+                    new ExceptionContext().put("call_id",call_id)
+                            .put("conf_id",conf_id)
+            );
         }
 
         if(conf_state.getClosed()!= null && conf_state.getClosed()){
-            throw new SystemBusyException();
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("call_id",call_id)
+                            .put("conf_id",conf_id)
+            );
         }
 
         if(!call_state.getAppId().equals(conf_state.getAppId())){
             //不合法的参数
             throw new IllegalArgumentException();
         }
-
+        if(!apiCertificateSubAccountService.subaccountCheck(call_state.getSubaccountId(),conf_state.getSubaccountId())){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("call_id",call_id)
+                            .put("conf_id",conf_id)
+                            .put("call_subaccount",call_state.getSubaccountId())
+                            .put("conf_subaccount",conf_state.getSubaccountId())
+            );
+        }
         Map<String,String> call_business=call_state.getBusinessData();
         Map<String,String> conf_business=conf_state.getBusinessData();
 
@@ -805,7 +1268,7 @@ public class ConfServiceImpl implements ConfService {
         try{
             results = redisCacheService.smembers(key);
         }catch (Throwable t){
-            logger.error("获取会议成员失败",t);
+            logger.error(String.format("获取会议成员失败,confId=%s",confId),t);
         }
         return results;
     }
@@ -820,12 +1283,12 @@ public class ConfServiceImpl implements ConfService {
         try{
             results = redisCacheService.smembers(key);
         }catch (Throwable t){
-            logger.error("获取会议成员失败",t);
+            logger.error(String.format("获取会议成员失败,confId=%s",confId),t);
         }
         try{
             redisCacheService.del(key);
         }catch (Throwable t){
-            logger.info("删除会议成员缓存失败",t);
+            logger.error(String.format("删除会议成员缓存失败,confId=%s",confId),t);
         }
         return results;
     }

@@ -33,7 +33,7 @@ public class AgentOpsController extends AbstractAPIController {
             logger.debug("AGENT REJECT API参数,accountId={},appId={},name={},dto={}",accountId,appId,name,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        agentOps.reject(ip,appId,name,dto.getQueueId(),dto.getData());
+        agentOps.reject(getSubaccountId(request),ip,appId,name,dto.getQueueId(),dto.getData());
         return ApiGatewayResponse.success(true);
     }
 
@@ -45,7 +45,7 @@ public class AgentOpsController extends AbstractAPIController {
             logger.debug("AGENT CALLOUT API参数,accountId={},appId={},name={},dto={}",accountId,appId,name,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        agentOps.callOut(ip,appId,name,dto.getFrom(),dto.getTo(),dto.getMaxDialSeconds(),dto.getMaxAnswerSeconds());
+        agentOps.callOut(getSubaccountId(request),ip,appId,name,dto.getFrom(),dto.getTo(),dto.getMaxDialSeconds(),dto.getMaxAnswerSeconds(),dto.getUserData());
         return ApiGatewayResponse.success(true);
     }
 
@@ -57,7 +57,7 @@ public class AgentOpsController extends AbstractAPIController {
             logger.debug("AGENT CALLAGENT API参数,accountId={},appId={},name={},dto={}",accountId,appId,name,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        agentOps.callAgent(ip,appId,name,null,dto.getEnqueue(),null,null);
+        agentOps.callAgent(getSubaccountId(request),ip,appId,name,null,dto.getEnqueue(),null,null);
         return ApiGatewayResponse.success(true);
     }
 
@@ -90,7 +90,7 @@ public class AgentOpsController extends AbstractAPIController {
             logger.debug("AGENT SETVOICEMODE API参数,accountId={},appId={},name={},dto={}",accountId,appId,name,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        return ApiGatewayResponse.success(agentOps.setVoiceMode(appId,ip,name,dto.getConversationId(),dto.getMode()));
+        return ApiGatewayResponse.success(agentOps.setVoiceMode(getSubaccountId(request),appId,ip,name,dto.getConversationId(),dto.getMode()));
     }
 
     @RequestMapping(value = "/{accountId}/callcenter/agent/{name}/enter",method = RequestMethod.POST)
@@ -101,7 +101,7 @@ public class AgentOpsController extends AbstractAPIController {
             logger.debug("AGENT ENTER CONVERSATION API参数,accountId={},appId={},name={},dto={}",accountId,appId,name,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        return ApiGatewayResponse.success(agentOps.enter(appId,ip,name,dto.getConversationId(),dto.getMode(),dto.getHolding()));
+        return ApiGatewayResponse.success(agentOps.enter(getSubaccountId(request),appId,ip,name,dto.getConversationId(),dto.getMode(),dto.getHolding()));
     }
 
     @RequestMapping(value = "/{accountId}/callcenter/agent/{name}/exit",method = RequestMethod.POST)
@@ -112,7 +112,7 @@ public class AgentOpsController extends AbstractAPIController {
             logger.debug("AGENT EXIT CONVERSATION API参数,accountId={},appId={},name={},dto={}",accountId,appId,name,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        return ApiGatewayResponse.success(agentOps.exit(appId,ip,name,dto.getConversationId()));
+        return ApiGatewayResponse.success(agentOps.exit(getSubaccountId(request),appId,ip,name,dto.getConversationId()));
     }
 
     @RequestMapping(value = "/{accountId}/callcenter/agent/{name}/conversation",method = RequestMethod.GET)
@@ -122,6 +122,6 @@ public class AgentOpsController extends AbstractAPIController {
             logger.debug("AGENT CONVERSATION API参数,accountId={},appId={},name={}",accountId,appId,name);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        return ApiGatewayResponse.success(agentOps.conversations(appId,ip,name));
+        return ApiGatewayResponse.success(agentOps.conversations(getSubaccountId(request),appId,ip,name));
     }
 }

@@ -99,7 +99,7 @@ public class CallController extends AbstractAPIController{
             throw new RequestIllegalArgumentException();
         }
 
-        callId = callService.duoCallback(ip,appId,dto.getFrom1(),dto.getTo1(),dto.getFrom2(),dto.getTo2(),dto.getRing_tone(),dto.getRing_tone_mode(),dto.getMax_dial_duration(),
+        callId = callService.duoCallback(getSubaccountId(request),ip,appId,dto.getFrom1(),dto.getTo1(),dto.getFrom2(),dto.getTo2(),dto.getRing_tone(),dto.getRing_tone_mode(),dto.getMax_dial_duration(),
                 dto.getMax_call_duration(),dto.getRecording(),dto.getRecord_mode(),dto.getUser_data());
 
         Map<String,String> result = new HashMap<>();
@@ -112,7 +112,7 @@ public class CallController extends AbstractAPIController{
     public ApiGatewayResponse duoCallbackCancel(HttpServletRequest request, @RequestBody Map params, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         String ip = WebUtils.getRemoteAddress(request);
-        callService.duoCallbackCancel(ip,appId, (String)params.get("callId"));
+        callService.duoCallbackCancel(getSubaccountId(request),ip,appId, (String)params.get("callId"));
         return ApiGatewayResponse.success();
     }
 
@@ -141,7 +141,7 @@ public class CallController extends AbstractAPIController{
             throw new RequestIllegalArgumentException();
         }
 
-        String callId = callService.notifyCall(ip,appId, dto.getFrom(),dto.getTo(),dto.getPlay_file(),
+        String callId = callService.notifyCall(getSubaccountId(request),ip,appId, dto.getFrom(),dto.getTo(),dto.getPlay_file(),
                 dto.getPlay_content(),dto.getRepeat(),dto.getMax_dial_duration(),dto.getUser_data());
         Map<String,String> result = new HashMap<>();
         result.put("callId",callId);
@@ -158,7 +158,7 @@ public class CallController extends AbstractAPIController{
             logger.debug("VERIFY CALL API参数,appId={},dto={}",appId,dto);
         }
 
-        String callId = callService.verifyCall(ip,appId, dto.getFrom(),dto.getTo(),dto.getMaxDialDuration(),dto.getVerifyCode(),dto.getPlayFile(),dto.getRepeat(),dto.getUserData());
+        String callId = callService.verifyCall(getSubaccountId(request),ip,appId, dto.getFrom(),dto.getTo(),dto.getMaxDialDuration(),dto.getVerifyCode(),dto.getPlayFile(),dto.getRepeat(),dto.getUserData());
         Map<String,String> result = new HashMap<>();
         result.put("callId",callId);
         return ApiGatewayResponse.success(result);

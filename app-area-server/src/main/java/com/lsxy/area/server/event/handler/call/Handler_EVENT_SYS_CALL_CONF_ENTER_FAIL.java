@@ -97,7 +97,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_FAIL extends EventHandler{
         }
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null");
+            throw new InvalidParamException("businessstate is null,call_id={}",call_id);
         }
 
         if(logger.isDebugEnabled()){
@@ -152,6 +152,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_FAIL extends EventHandler{
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","conf.join.fail")
                     .putIfNotEmpty("id",conf_id)
+                    .putIfNotEmpty("subaccount_id",state.getSubaccountId())
                     .putIfNotEmpty("time",System.currentTimeMillis())
                     .putIfNotEmpty("call_id",call_id)
                     .putIfNotEmpty("user_data",state.getUserdata())
@@ -180,7 +181,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_FAIL extends EventHandler{
                 rpcCaller.invoke(sessionContext, rpcrequest, true);
             }
         } catch (Throwable e) {
-            logger.error("调用失败",e);
+            logger.error(String.format("调用挂断失败,appId=%s,callId=%s",state.getAppId(),state.getId()),e);
         }
     }
 }

@@ -2,6 +2,9 @@ package com.lsxy.yunhuni.product.service;
 
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.core.exceptions.api.BalanceNotEnoughException;
+import com.lsxy.framework.core.exceptions.api.QuotaNotEnoughException;
+import com.lsxy.yunhuni.api.apicertificate.service.CertAccountQuotaService;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.model.VoiceTimeUse;
 import com.lsxy.yunhuni.api.consume.service.CaptchaUseService;
@@ -44,6 +47,8 @@ public class CalCostServiceImpl implements CalCostService{
     VoiceTimeUseService voiceTimeUseService;
     @Autowired
     ProductItemService productItemService;
+    @Autowired
+    CertAccountQuotaService certAccountQuotaService;
 
     @Override
     public BigDecimal calCost(ProductItem productItem, String tenantId, Long time) {
@@ -197,7 +202,7 @@ public class CalCostServiceImpl implements CalCostService{
     }
 
     @Override
-    public boolean isCallTimeRemainOrBalanceEnough(String apiCmd, String tenantId) {
+    public boolean isCallTimeRemainOrBalanceEnough(String subaccountId,String apiCmd, String tenantId) throws BalanceNotEnoughException, QuotaNotEnoughException {
         //TODO 当需要时再加上余量判断（把注释打开）
         ProductCode productCode = ProductCode.changeApiCmdToProductCode(apiCmd);
         switch(productCode){
@@ -206,7 +211,13 @@ public class CalCostServiceImpl implements CalCostService{
 //                if(sms > 0){
 //                    return true;
 //                }else{
-                    return isBalanceEnough(tenantId);
+                    if(!isBalanceEnough(tenantId)){
+                        throw new BalanceNotEnoughException();
+                    }
+                    if(!certAccountQuotaService.isCallQuotaEnough(subaccountId)){
+                        throw new QuotaNotEnoughException();
+                    }
+                    return true;
 //                }
             }
             case sys_conf:{
@@ -214,7 +225,13 @@ public class CalCostServiceImpl implements CalCostService{
 //                if(conference > 0){
 //                    return true;
 //                }else{
-                    return isBalanceEnough(tenantId);
+                    if(!isBalanceEnough(tenantId)){
+                        throw new BalanceNotEnoughException();
+                    }
+                    if(!certAccountQuotaService.isCallQuotaEnough(subaccountId)){
+                        throw new QuotaNotEnoughException();
+                    }
+                    return true;
 //                }
             }
             default:{
@@ -222,7 +239,13 @@ public class CalCostServiceImpl implements CalCostService{
 //                if(voice > 0){
 //                    return true;
 //                }else{
-                    return isBalanceEnough(tenantId);
+                    if(!isBalanceEnough(tenantId)){
+                        throw new BalanceNotEnoughException();
+                    }
+                    if(!certAccountQuotaService.isCallQuotaEnough(subaccountId)){
+                        throw new QuotaNotEnoughException();
+                    }
+                    return true;
 //                }
             }
         }

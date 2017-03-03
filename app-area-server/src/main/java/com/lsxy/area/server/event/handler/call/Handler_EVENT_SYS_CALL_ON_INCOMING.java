@@ -5,12 +5,16 @@ import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.core.exceptions.api.BalanceNotEnoughException;
+import com.lsxy.framework.core.exceptions.api.ExceptionContext;
 import com.lsxy.framework.core.exceptions.api.NumberNotAllowToCallException;
+import com.lsxy.framework.core.exceptions.api.QuotaNotEnoughException;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.app.service.ServiceType;
@@ -75,6 +79,9 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
     @Autowired
     private CalCostService calCostService;
 
+    @Autowired
+    private ApiCertificateSubAccountService apiCertificateSubAccountService;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CALL_ON_INCOMING;
@@ -111,43 +118,44 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
 
         Tenant tenant = null;
         App app = null;
-
+        String subaccountId = null;
         if(testNum.equals(to.getTelNumber())){
             //被叫是公共测试号,根据主叫号查出应用
             TestNumBind testNumBind = testNumBindService.findByNumber(from);
             if(testNumBind == null){
-                logger.error("公共测试号={}找不到对应的app，from={}",testNum,from);
+                logger.info("公共测试号={}找不到对应的app，from={}",testNum,from);
                 return res;
             }
             tenant = testNumBind.getTenant();
             app = testNumBind.getApp();
             //已上线的应用不允许呼叫测试号码
             if(app != null && app.getStatus() != null && app.getStatus() == App.STATUS_ONLINE){
-                logger.error("已上线应用不允许呼叫测试号码");
+                logger.info("已上线应用不允许呼叫测试号码,appId={}",app.getId());
                 return res;
             }
         }else{
+            subaccountId = to.getSubaccountId(); //根据号码找到对应的子账号(如果是子账号的号码)
             //不是公共测试号，从号码资源池中查出被叫号码的应用
             if(StringUtils.isBlank(to.getAppId())){
-                logger.error("呼入号码没有绑定应用：{}",params);
+                logger.info("呼入号码没有绑定应用：{}",params);
             }
             app = appService.findById(to.getAppId());
             if(app == null){
-                logger.error("号码资源池中找不到被叫号码对应的应用：{}",params);
+                logger.info("号码资源池中找不到被叫号码对应的应用：{}",params);
                 return res;
             }
             tenant = app.getTenant();
-            if(app!= null && app.getStatus() == null || app.getStatus() == App.STATUS_OFFLINE){
-                logger.error("应用未上线");
+            if(app.getStatus() == null || app.getStatus() == App.STATUS_OFFLINE){
+                logger.info("应用未上线appId={}",app.getId());
                 return res;
             }
         }
         if(tenant == null){
-            logger.error("找不到对应的租户:{}",params);
+            logger.info("找不到对应的租户:{}",params);
             return res;
         }
         if(app == null){
-            logger.error("找不到对应的APP:{}", params);
+            logger.info("找不到对应的APP:{}", params);
             return res;
         }
         boolean isCallCenter = false;
@@ -163,17 +171,32 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 return res;
             }
         }
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(isCallCenter ?
-                ProductCode.call_center.getApiCmd():ProductCode.ivr_call.getApiCmd(), app.getTenant().getId());
-        if(!isAmountEnough){
+        if(subaccountId!=null){
+            ApiCertificateSubAccount subAccount = apiCertificateSubAccountService.findById(subaccountId);
+            if(subAccount == null){
+                logger.info("没有找到子账号{}",subaccountId);
+                return res;
+            }
+            if(!ApiCertificateSubAccount.ENABLED_TRUE.equals(subAccount.getEnabled())){
+                logger.info("子账号被禁用{}",subaccountId);
+                return res;
+            }
+        }
+        try {
+            calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,isCallCenter ?
+                    ProductCode.call_center.getApiCmd():ProductCode.ivr_call.getApiCmd(), app.getTenant().getId());
+        } catch (BalanceNotEnoughException e) {
             logger.info("[{}][{}]欠费，不能呼入",app.getId(),tenant.getId());
+            return res;
+        } catch (QuotaNotEnoughException e) {
+            logger.info("[{}][{}]配额不足，不能呼入",app.getId(),tenant.getId());
             return res;
         }
 
         if(logger.isDebugEnabled()){
             logger.debug("[{}][{}]开始处理ivr",tenant.getId(),app.getId());
         }
-        ivrActionService.doActionIfAccept(app,tenant,res_id,from,to.getTelNumber(),calledLine.getId(),isCallCenter);
+        ivrActionService.doActionIfAccept(subaccountId,app,tenant,res_id,from,to.getTelNumber(),calledLine.getId(),isCallCenter);
         return res;
     }
 
@@ -221,32 +244,50 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                         }else if(from.startsWith("010")){
                             checkBlackNum = from.substring(3);
                         }else{
-                            throw new RuntimeException(new NumberNotAllowToCallException());
+                            throw new RuntimeException(new NumberNotAllowToCallException(
+                                    new ExceptionContext().put("from",from)
+                                    .put("linegateway",lineGateway)
+                            ));
                         }
                     }else if(from.startsWith("1")){
                         if(from.length() == 11){
                             checkBlackNum = from;
                         }else{
-                            throw new RuntimeException(new NumberNotAllowToCallException());
+                            throw new RuntimeException(new NumberNotAllowToCallException(
+                                    new ExceptionContext().put("from",from)
+                                            .put("linegateway",lineGateway)
+                            ));
                         }
                     } else{
                         String areaCode = telNumLocationService.getAreaCodeOfTelephone(from);
                         if(StringUtils.isNotBlank(areaCode)){
                             checkBlackNum = from.substring(areaCode.length());
                         }else{
-                            throw new RuntimeException(new NumberNotAllowToCallException());
+                            throw new RuntimeException(new NumberNotAllowToCallException(
+                                    new ExceptionContext().put("from",from)
+                                            .put("linegateway",lineGateway)
+                            ));
                         }
                     }
                 }else{
-                    throw new RuntimeException(new NumberNotAllowToCallException());
+                    throw new RuntimeException(new NumberNotAllowToCallException(
+                            new ExceptionContext().put("from",from)
+                                    .put("linegateway",lineGateway)
+                    ));
                 }
             }else{
-                throw new RuntimeException(new NumberNotAllowToCallException());
+                throw new RuntimeException(new NumberNotAllowToCallException(
+                        new ExceptionContext().put("from",from)
+                                .put("linegateway",lineGateway)
+                ));
             }
         }
         boolean isBlackNum = apiGwRedBlankNumService.isBlackNum(checkBlackNum);
         if(isBlackNum){
-            throw new RuntimeException(new NumberNotAllowToCallException());
+            throw new RuntimeException(new NumberNotAllowToCallException(
+                    new ExceptionContext().put("from",from)
+                            .put("linegateway",lineGateway)
+            ));
         }
         return from;
     }

@@ -197,7 +197,6 @@
         <xs:choice minOccurs="1" maxOccurs="1">
             <xs:element name="route" type="route" minOccurs="1" maxOccurs="1"></xs:element>
         </xs:choice>
-        <xs:attribute name="channel" type="uuid"></xs:attribute>
         <xs:attribute name="conversation_level" type="positivenumber"></xs:attribute>
         <xs:attribute name="conversation_timeout" type="positivenumber"></xs:attribute>
         <xs:attribute name="choice" type="xs:string"></xs:attribute>
@@ -210,7 +209,7 @@
         <xs:attribute name="play_num" type="xs:boolean"></xs:attribute>
         <xs:attribute name="pre_num_voice" type="playfile"></xs:attribute>
         <xs:attribute name="post_num_voice" type="playfile"></xs:attribute>
-        <xs:attribute name="data" type="userdata"></xs:attribute>
+        <xs:attribute name="user_data" type="userdata"></xs:attribute>
     </xs:complexType>
 
     <xs:element name="response">

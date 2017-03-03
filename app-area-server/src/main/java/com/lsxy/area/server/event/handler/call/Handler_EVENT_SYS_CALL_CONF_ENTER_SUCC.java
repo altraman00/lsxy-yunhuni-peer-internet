@@ -114,7 +114,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         }
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null");
+            throw new InvalidParamException("businessstate is null,call_id="+call_id);
         }
 
         if(logger.isDebugEnabled()){
@@ -153,9 +153,9 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         conversationService.join(conversation_id,call_id);
         if(conversationState.getBusinessData().get("invite_to") != null){//邀请外线
             try{
-                conversationService.inviteOut(appId,conversationState.getBusinessData().get(BusinessState.REF_RES_ID),
+                conversationService.inviteOut(conversationState.getSubaccountId(),appId,conversationState.getBusinessData().get(BusinessState.REF_RES_ID),
                         conversation_id,conversationState.getBusinessData().get("invite_from"),
-                        conversationState.getBusinessData().get("invite_to"),null,null,null,null);
+                        conversationState.getBusinessData().get("invite_to"),null,null,null,null,conversationState.getUserdata());
                 businessStateService.deleteInnerField(conversation_id,"invite_to","invite_from");
             }catch (Throwable t){
                 conversationService.exit(conversation_id,call_id);
@@ -163,9 +163,10 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         }else if(conversationState.getBusinessData().get("enqueue_xml") != null){//排队
             try{
                 EnQueue enqueue = EnQueueDecoder.decode(conversationState.getBusinessData().get("enqueue_xml"));
-                enQueueService.lookupAgent(state.getTenantId(),state.getAppId(),
+                enQueueService.lookupAgent(state.getTenantId(),state.getAppId(),state.getSubaccountId(),
                         businessData.get(CallCenterUtil.AGENT_NAME_FIELD),call_id,enqueue,CallCenterUtil.QUEUE_TYPE_CALL_AGENT,conversation_id);
             }catch (Throwable t){
+                logger.info("排队找坐席出错",t);
                 conversationService.exit(conversation_id,call_id);
             }
         }
@@ -220,6 +221,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","conf.joined")
                     .putIfNotEmpty("id",conf_id)
+                    .putIfNotEmpty("subaccount_id",state.getSubaccountId())
                     .putIfNotEmpty("join_time",System.currentTimeMillis())
                     .putIfNotEmpty("call_id",call_id)
                     .putIfNotEmpty("part_uri",null)
@@ -262,10 +264,10 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
                 .build();
         try {
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD, params);
-            rpcCaller.invoke(sessionContext, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest,true);
             businessStateService.deleteInnerField(conf_id,"recording");
         } catch (Exception e) {
-            logger.error("会议创建自动录音：",e);
+            logger.error(String.format("会议创建自动录音失败，appId=%s,call_id=%s",state.getAppId(),state.getId()),e);
         }
     }
 }

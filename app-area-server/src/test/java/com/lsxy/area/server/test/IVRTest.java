@@ -79,7 +79,7 @@ public class IVRTest {
         String res_id = UUIDGenerator.uuid();
         String from = "13692206627";
         String to = "8675522730043";
-        ivrActionService.doActionIfAccept(app,tenant,res_id,from,to,null,false);
+        ivrActionService.doActionIfAccept(null,app,tenant,res_id,from,to,null,false);
 
         List<VoiceIvr> lists = (List<VoiceIvr>)voiceIvrService.list("from VoiceIvr order by createTime desc");
         System.out.println(lists.get(0).getId());
@@ -92,7 +92,7 @@ public class IVRTest {
 
     @Test
     public void ivrcall() throws YunhuniApiException {
-        ivrService.ivrCall("192.168.1.1","40288aca574060400157406427f20005","8675522730043","13692206627",45,900,null);
+        ivrService.ivrCall(null,"192.168.1.1","40288aca574060400157406427f20005","8675522730043","13692206627",45,900,null);
         List<VoiceIvr> lists = (List<VoiceIvr>)voiceIvrService.list("from VoiceIvr order by createTime desc");
         System.out.println(lists.get(0).getId());
         //下一步干嘛
@@ -131,7 +131,6 @@ public class IVRTest {
         String xml ="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<response>\n" +
                 "<enqueue\n" +
-                "        channel=\"40288ae2586b014801586b0171520000\"\n" +
                 "        wait_voice=\"3.wav\"\n" +
                 "        ring_mode=\"4\"\n" +
                 "        play_num=\"true\"\n" +
@@ -156,5 +155,19 @@ public class IVRTest {
         }
     }
 
+    @Test
+    public void test3() throws DocumentException {
+        System.out.println(ivrActionService.validateXMLSchemaIgnoreResponse("<enqueue\n" +
+                "        wait_voice=\"wait.wav\"\n" +
+                "        ring_mode=\"1\"\n" +
+                "        play_num=\"true\"\n" +
+                "        pre_num_voice=\"坐席.wav\"\n" +
+                "        post_num_voice=\"为您服务.wav\"\n" +
+                ">\n" +
+                "    <route>\n" +
+                "        <agent name=\"2019\" priority=\"11\" queue_timeout=\"60\" fetch_timeout=\"50\"></agent>\n" +
+                "    </route>\n" +
+                "</enqueue>"));;
+    }
 
 }

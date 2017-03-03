@@ -62,6 +62,7 @@ public class BusinessStateServiceImpl implements BusinessStateService {
             Map<String,String> datas = new MapBuilder<String,String>()
                     .putIfNotEmpty("tenantId",state.getTenantId())
                     .putIfNotEmpty("appId",state.getAppId())
+                    .putIfNotEmpty("subaccountId",state.getSubaccountId())
                     .putIfNotEmpty("id",state.getId())
                     .putIfNotEmpty("type",state.getType())
                     .putIfNotEmpty("userdata",state.getUserdata())
@@ -80,7 +81,7 @@ public class BusinessStateServiceImpl implements BusinessStateService {
             redisCacheService.hputAll(key, datas);
             redisCacheService.expire(key,EXPIRE_START);
         }catch (Throwable t){
-            logger.error("保存state失败",t);
+            logger.error(String.format("保存state失败,state=%s",state),t);
         }
     }
 
@@ -108,6 +109,9 @@ public class BusinessStateServiceImpl implements BusinessStateService {
                             break;
                         case "appId":
                             builder.setAppId(value);
+                            break;
+                        case "subaccountId":
+                            builder.setSubaccountId(value);
                             break;
                         case "id":
                             builder.setId(value);
@@ -139,7 +143,7 @@ public class BusinessStateServiceImpl implements BusinessStateService {
                 state = builder.build();
             }
         }catch (Throwable t){
-            logger.error("获取state失败",t);
+            logger.error(String.format("获取state失败,id=%s",id),t);
         }
         return state;
     }
@@ -152,13 +156,21 @@ public class BusinessStateServiceImpl implements BusinessStateService {
         return result;
     }
 
+    public String subaccountId(String id){
+        String result = (String)redisCacheService.hget(getKey(id),"subaccountId");
+        if(logger.isDebugEnabled()){
+            logger.debug("businessStateid={},subaccountId={}",id,result);
+        }
+        return result;
+    }
+
     private void updateField(String id,String field,String value){
         String key = getKey(id);
         try{
             redisCacheService.hput(key,field,value);
             redisCacheService.expire(key,EXPIRE_START);
         }catch (Throwable t){
-            logger.error("update business state 失败",t);
+            logger.error(String.format("update business state 失败,id=%s,field=%s,value=%s",id,field,value),t);
         }
     }
 
@@ -218,7 +230,7 @@ public class BusinessStateServiceImpl implements BusinessStateService {
                 redisCacheService.expire(key,EXPIRE_START);
             }
         }catch (Throwable t){
-            logger.error("update business state 失败",t);
+            logger.error(String.format("update business state 失败,id=%s,params=%s",id,params),t);
         }
     }
 
@@ -240,7 +252,7 @@ public class BusinessStateServiceImpl implements BusinessStateService {
             redisCacheService.hdel(key,fs);
             redisCacheService.expire(key,EXPIRE_START);
         }catch (Throwable t){
-            logger.error("delete business state field失败",t);
+            logger.error(String.format("delete business state field失败,id=%s,fields=%s",id,fields),t);
         }
     }
 
@@ -252,7 +264,7 @@ public class BusinessStateServiceImpl implements BusinessStateService {
                 redisCacheService.expire(getKey(id),EXPIRE_RELEASE);
             }
         }catch (Throwable t){
-            logger.error("删除state失败",t);
+            logger.error(String.format("删除state失败,id=%s",id),t);
         }
     }
 }

@@ -13,6 +13,14 @@ public class PlayFileNotExistsException extends YunhuniApiException {
         super();
     }
 
+    public PlayFileNotExistsException(String context) {
+        super(context);
+    }
+
+    public PlayFileNotExistsException(ExceptionContext context){
+        super(context);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.PlayFileNotExists;

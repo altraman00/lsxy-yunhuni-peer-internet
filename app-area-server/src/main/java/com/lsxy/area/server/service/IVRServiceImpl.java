@@ -9,6 +9,8 @@ import com.lsxy.area.server.batch.CallCenterBatchInserter;
 import com.lsxy.area.server.batch.CallSessionBatchInserter;
 import com.lsxy.area.server.batch.VoiceIvrBatchInserter;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
+import com.lsxy.area.server.util.CallbackUrlUtil;
+import com.lsxy.area.server.util.SipUrlUtil;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
@@ -99,21 +101,35 @@ public class IVRServiceImpl implements IVRService {
     @Autowired
     private CallCenterStatisticsService callCenterStatisticsService;
 
+    @Autowired
+    private CallbackUrlUtil callbackUrlUtil;
+
     @Override
-    public String ivrCall(String ip, String appId, String from, String to,
+    public String ivrCall(String subaccountId,String ip, String appId, String from, String to,
                           Integer maxDialDuration, Integer maxCallDuration, String userData) throws YunhuniApiException {
         if(apiGwRedBlankNumService.isRedNum(to)){
-            throw new NumberNotAllowToCallException();
+            throw new NumberNotAllowToCallException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("to",to)
+            );
         }
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
         String tenantId = app.getTenant().getId();
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                                .put("ip",ip)
+                );
             }
         }
 
@@ -121,22 +137,26 @@ public class IVRServiceImpl implements IVRService {
 
         if(app.getServiceType().equals(App.PRODUCT_CALL_CENTER)){
             if(!appService.enabledService(tenantId,app.getId(), ServiceType.CallCenter)){
-                throw new AppServiceInvalidException();
+                throw new AppServiceInvalidException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                );
             }
             isCallCenter = true;
         }else{
             if(!appService.enabledService(tenantId,app.getId(), ServiceType.IvrService)){
-                throw new AppServiceInvalidException();
+                throw new AppServiceInvalidException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                );
             }
         }
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.ivr_call.getApiCmd(), app.getTenant().getId());
-        if(!isAmountEnough){
-            throw new BalanceNotEnoughException();
-        }
+        //判断余额配额是否充足
+        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.ivr_call.getApiCmd(), app.getTenant().getId());
 
         //TODO
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app,from, to);
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app,from, to);
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber();
         String lineId = selector.getLineId();
@@ -157,7 +177,7 @@ public class IVRServiceImpl implements IVRService {
                 callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(tenantId,app.getId(),
                         new Date()).setCallOut(1L).build());
             }catch (Throwable t){
-                logger.error("incrIntoRedis失败",t);
+                logger.error(String.format("incrIntoRedis失败,appId=%s",app.getId()),t);
             }
         }else{
             VoiceIvr voiceIvr = new VoiceIvr();
@@ -201,15 +221,16 @@ public class IVRServiceImpl implements IVRService {
         BusinessState callstate = new BusinessState.Builder()
                                     .setTenantId(tenantId)
                                     .setAppId(appId)
+                                    .setSubaccountId(subaccountId)
                                     .setId(callId)
                                     .setType(BusinessState.TYPE_IVR_CALL)
-                                    .setCallBackUrl(app.getUrl())
+                                    .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                                     .setAreaId(areaId)
                                     .setLineGatewayId(lineId)
                                     .setUserdata(userData)
                                     .setBusinessData(new MapBuilder<String,String>()
-                                            .putIfNotEmpty("from",from)
-                                            .putIfNotEmpty("to",to)
+                                            .putIfNotEmpty("from",SipUrlUtil.extractTelnum(from))
+                                            .putIfNotEmpty("to", SipUrlUtil.extractTelnum(to))
                                             .putIfWhere(CallCenterUtil.CALLCENTER_FIELD,isCallCenter,callId)
                                             .putIfWhere(CallCenterUtil.ISCC_FIELD,isCallCenter,CallCenterUtil.ISCC_TRUE)
                                             .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())

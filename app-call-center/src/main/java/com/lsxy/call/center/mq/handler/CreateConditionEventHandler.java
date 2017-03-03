@@ -53,18 +53,18 @@ public class CreateConditionEventHandler implements MQMessageHandler<CreateCondi
         if(message.getConditionId() == null ||
                 message.getTenantId() == null ||
                 message.getAppId() == null){
-            logger.info("处理CallCenter.CreateConditionEvent出错，参数错误！");
+            logger.info("处理CallCenter.CreateConditionEvent出错，参数错误！,message={}",message);
             return;
         }
         Condition condition = conditionService.findById(message.getConditionId());
         if(condition == null){
-            logger.info("处理CallCenter.CreateConditionEvent出错，条件不存在！");
+            logger.info("处理CallCenter.CreateConditionEvent出错，条件不存在！,message={}",message);
             return;
         }
         //初始化CAs ACs
         long start = System.currentTimeMillis();
         List<String> agentIds = callCenterAgentService
-                                        .getAgentIdsByChannel(condition.getTenantId(),condition.getAppId(),condition.getChannelId());
+                                        .getAgentIdsBySubaccountId(condition.getTenantId(),condition.getAppId(),condition.getSubaccountId());
 
         if(agentIds != null && agentIds.size() > 0){
             for (String agentId : agentIds) {

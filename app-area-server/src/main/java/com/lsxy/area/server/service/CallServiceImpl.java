@@ -7,8 +7,10 @@ import com.lsxy.area.api.CallService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
+import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
+import com.lsxy.area.server.util.SipUrlUtil;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.*;
@@ -102,8 +104,11 @@ public class CallServiceImpl implements CallService {
     @Autowired
     private AreaAndTelNumSelector areaAndTelNumSelector;
 
+    @Autowired
+    private CallbackUrlUtil callbackUrlUtil;
+
     @Override
-    public String call(String from, String to, int maxAnswerSec, int maxRingSec) throws YunhuniApiException {
+    public String call(String subaccountId,String from, String to, int maxAnswerSec, int maxRingSec) throws YunhuniApiException {
 
         String callid = UUIDGenerator.uuid();
         String params = "to=%s&from=%s&maxAnswerSec=%d&maxRingSec=%d&callid=%s";
@@ -137,34 +142,40 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public String duoCallback(String ip,String appId,String from1,String to1,String from2,String to2,String ring_tone,Integer ring_tone_mode,
+    public String duoCallback(String subaccountId,String ip,String appId,String from1,String to1,String from2,String to2,String ring_tone,Integer ring_tone_mode,
                               Integer max_dial_duration,Integer max_call_duration ,Boolean recording,Integer record_mode,String user_data) throws YunhuniApiException {
         String apiCmd = BusinessState.TYPE_DUO_CALL;
         String duocCallId;
         if(apiGwRedBlankNumService.isRedNum(to1) || apiGwRedBlankNumService.isRedNum(to2)){
-            throw new NumberNotAllowToCallException();
+            throw new NumberNotAllowToCallException(
+                    new ExceptionContext().put("to1",to1).put("to2",to2)
+            );
         }
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("appId",appId)
+            );
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("appId",appId)
+                        .put("ip",ip)
+                );
             }
         }
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.VoiceCallback)){
-            throw new AppServiceInvalidException();
+            throw new AppServiceInvalidException(
+                    new ExceptionContext().put("appId",appId)
+            );
         }
-
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(apiCmd, app.getTenant().getId());
-        if(!isAmountEnough){
-            throw new BalanceNotEnoughException();
-        }
+        //判断余额配额是否充足
+        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,apiCmd, app.getTenant().getId());
 
         //TODO 获取号码
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app,true, from1,to1,from2, to2);
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app,true, from1,to1,from2, to2);
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber();
 
@@ -220,10 +231,11 @@ public class CallServiceImpl implements CallService {
             BusinessState cache = new BusinessState.Builder()
                                     .setTenantId(app.getTenant().getId())
                                     .setAppId(appId)
+                                    .setSubaccountId(subaccountId)
                                     .setId(duocCallId)
                                     .setType(apiCmd)
                                     .setUserdata(user_data)
-                                    .setCallBackUrl(app.getUrl())
+                                    .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                                     .setAreaId(areaId)
                                     .setLineGatewayId(lineId)
                                     .setBusinessData(data)
@@ -241,29 +253,40 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public void duoCallbackCancel(String ip, String appId, String callId) throws YunhuniApiException{
+    public void duoCallbackCancel(String subaccountId,String ip, String appId, String callId) throws YunhuniApiException{
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("appId",appId)
+            );
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("appId",appId)
+                        .put("ip",ip)
+                );
             }
         }
         BusinessState state = businessStateService.get(callId);
 
         if(state == null){
-            throw new SystemBusyException();
+            throw new CallNotExistsException(
+                    new ExceptionContext().put("appId",appId)
+                            .put("callId",callId)
+            );
         }
 
         if(state.getResId() == null){
-            throw new SystemBusyException();
+            throw new SystemBusyException(
+                    new ExceptionContext().put("appId",appId)
+                            .put("callId",callId)
+            );
         }
 
         if(state.getClosed()!= null && state.getClosed()){
-            throw new SystemBusyException();
+            throw new CallNotExistsException();
         }
 
         String areaId = areaAndTelNumSelector.getAreaId(app);
@@ -283,34 +306,48 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public String notifyCall(String ip, String appId, String from,String to,String play_file,List<List<Object>> play_content,
+    public String notifyCall(String subaccountId,String ip, String appId, String from,String to,String play_file,List<List<Object>> play_content,
                              Integer repeat,Integer max_dial_duration,String user_data) throws YunhuniApiException{
         String apiCmd = BusinessState.TYPE_NOTIFY_CALL;
         String callId;
         if(apiGwRedBlankNumService.isRedNum(to)){
-            throw new NumberNotAllowToCallException();
+            throw new NumberNotAllowToCallException(
+                    new ExceptionContext().put("to",to)
+                            .put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("to",to)
+                            .put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("to",to)
+                                .put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                                .put("ip",ip)
+                );
             }
         }
 
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.VoiceDirectly)){
-            throw new AppServiceInvalidException();
+            throw new AppServiceInvalidException(
+                    new ExceptionContext().put("to",to)
+                            .put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
+        //判断余额配额是否充足
+        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,apiCmd, app.getTenant().getId());
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(apiCmd, app.getTenant().getId());
-        if(!isAmountEnough){
-            throw new BalanceNotEnoughException();
-        }
-
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app, from,to);
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber();
 
@@ -349,10 +386,11 @@ public class CallServiceImpl implements CallService {
             BusinessState cache = new BusinessState.Builder()
                                     .setTenantId(app.getTenant().getId())
                                     .setAppId(app.getId())
+                                    .setSubaccountId(subaccountId)
                                     .setId(callId)
                                     .setType(apiCmd)
                                     .setUserdata(user_data)
-                                    .setCallBackUrl(app.getUrl())
+                                    .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                                     .setAreaId(areaId)
                                     .setLineGatewayId(lineId)
                                     .setBusinessData(data)
@@ -368,33 +406,47 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public String verifyCall(String ip, String appId, String from, String to, Integer maxDialDuration, String verifyCode, String playFile, Integer repeat, String userData) throws YunhuniApiException {
+    public String verifyCall(String subaccountId,String ip, String appId, String from, String to, Integer maxDialDuration, String verifyCode, String playFile, Integer repeat, String userData) throws YunhuniApiException {
 
         if(apiGwRedBlankNumService.isRedNum(to)){
-            throw new NumberNotAllowToCallException();
+            throw new NumberNotAllowToCallException(
+                    new ExceptionContext().put("to",to)
+                            .put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("to",to)
+                            .put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
 
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("to",to)
+                                .put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                                .put("ip",ip)
+                );
             }
         }
 
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.VoiceValidate)){
-            throw new AppServiceInvalidException();
+            throw new AppServiceInvalidException(
+                    new ExceptionContext().put("to",to)
+                            .put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
+        //判断余额配额是否充足
+        calCostService.isCallTimeRemainOrBalanceEnough(subaccountId,ProductCode.captcha_call.getApiCmd(), app.getTenant().getId());
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.captcha_call.getApiCmd(), app.getTenant().getId());
-        if(!isAmountEnough){
-            throw new BalanceNotEnoughException();
-        }
-
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app, from,to);
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber();
         String lineId = selector.getLineId();
@@ -452,15 +504,16 @@ public class CallServiceImpl implements CallService {
             BusinessState cache = new BusinessState.Builder()
                     .setTenantId(app.getTenant().getId())
                     .setAppId(app.getId())
+                    .setSubaccountId(subaccountId)
                     .setId(callId)
                     .setType(BusinessState.TYPE_VERIFY_CALL)
-                    .setCallBackUrl(app.getUrl())
+                    .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                     .setUserdata(userData)
                     .setAreaId(areaId)
                     .setLineGatewayId(lineId)
                     .setBusinessData(new MapBuilder<String,String>()
-                            .putIfNotEmpty("from",oneTelnumber)
-                            .putIfNotEmpty("to",to)
+                            .putIfNotEmpty("from",SipUrlUtil.extractTelnum(oneTelnumber))
+                            .putIfNotEmpty("to", SipUrlUtil.extractTelnum(to))
                             .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                             .build())
                     .build();

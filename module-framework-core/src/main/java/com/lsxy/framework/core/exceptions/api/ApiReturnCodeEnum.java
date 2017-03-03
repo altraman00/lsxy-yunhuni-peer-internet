@@ -31,6 +31,7 @@ public enum ApiReturnCodeEnum {
     BalanceNotEnough("010003","余额不足"),
     IPNotInWhiteList("010004","IP不在白名单内"),
     PlayFileNotExists("010005","放音文件不存在或未审核"),
+    QuotaNotEnough("010006","配额不足"),
     CallNotExists("020000","呼叫不存在"),
     NumberNotAllowToCall("020001","号码不允许呼叫"),
     NotAvailableLine("020002","没有可用线路"),
@@ -38,7 +39,7 @@ public enum ApiReturnCodeEnum {
     ConfNotExists("030100","会议不存在"),
     OutOfConfMaxParts("030101","超过最大与会数"),
     DuoCallbackNumIsSample("030500","双向回拔的号码不能是同一号码"),
-    ExtensionUserExist("040101","分机账号已存在"),
+    ExtensionUserExist("040101","分机号已存在"),
     ExtensionBindingToAgent("040102","分机已绑定座席"),
     ExtensionNotExist("040103","分机不存在"),
     ExtensionUnEnable("040104","分机不可用"),
@@ -46,13 +47,12 @@ public enum ApiReturnCodeEnum {
     AgentNotExist("040202","座席不存在"),
     AgentIsBusy("040203","座席正忙"),
     AgentExpired("040204","坐席不可用(过期)"),
-    ChannelNotExist("040301","通道不存在"),
-    ChannelCanNotDelete("040302","通道不能删除(请先删除排队条件)"),
     ConditionNotExist("040401","条件不存在"),
     ConditionExpression("040402","条件表达式错误"),
     ConversationNotExist("040501","交谈不存在"),
     OutOfConversationMaxParts("040502","超过最大交谈成员数"),
-    AgentNotConversationMember("040503","坐席不是交谈的成员")
+    AgentNotConversationMember("040503","坐席不是交谈的成员"),
+    QueueTaskNotExist("040601","排队任务不存在")
     ;
 
     private String code;

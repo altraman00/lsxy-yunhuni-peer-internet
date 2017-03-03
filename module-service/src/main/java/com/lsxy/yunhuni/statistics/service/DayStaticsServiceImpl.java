@@ -109,7 +109,7 @@ public class DayStaticsServiceImpl extends AbstractService<DayStatics> implement
             Date endDate = DateUtils.nextDate(startDate);
             BigDecimal recharge = rechargeService.getRechargeByTenantIdAndDate(tenantId,startDate,endDate);
             BigDecimal consume = consumeService.getConsumeByTenantIdAndDate(tenantId,startDate,endDate);
-            Map staticMap = voiceCdrService.getStaticCdr(tenantId, null, startDate, endDate);
+            Map staticMap = voiceCdrService.getStaticCdr(tenantId, null,null, startDate, endDate);
             Long callSum = (Long) staticMap.get("callSum");
             BigDecimal askSum = (BigDecimal) staticMap.get("askSum");
             BigDecimal costTimeLong = (BigDecimal) staticMap.get("costTimeLong");
@@ -134,7 +134,7 @@ public class DayStaticsServiceImpl extends AbstractService<DayStatics> implement
             Date startDate = nextDate(lastStaticsDate);
             Date endDate = DateUtils.nextDate(startDate);
             BigDecimal consume = consumeService.getConsumeByAppIdAndDate(appId,startDate,endDate);
-            Map staticMap = voiceCdrService.getStaticCdr(null, appId, startDate, endDate);
+            Map staticMap = voiceCdrService.getStaticCdr(null, appId,null, startDate, endDate);
             Long callSum = (Long) staticMap.get("callSum");
             BigDecimal askSum = (BigDecimal) staticMap.get("askSum");
             BigDecimal costTimeLong = (BigDecimal) staticMap.get("costTimeLong");

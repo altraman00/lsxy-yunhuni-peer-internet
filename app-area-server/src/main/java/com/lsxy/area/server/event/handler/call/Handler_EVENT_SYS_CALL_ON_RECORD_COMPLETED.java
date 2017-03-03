@@ -3,6 +3,7 @@ package com.lsxy.area.server.event.handler.call;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
@@ -77,7 +78,7 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
 
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            throw new InvalidParamException("businessstate is null");
+            throw new InvalidParamException("businessstate is null,call_id={}",call_id);
         }
 
         String record_id = UUIDGenerator.uuid();
@@ -92,13 +93,14 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
                     type = BusinessState.TYPE_CC_INVITE_OUT_CALL;
                 }
             }
-            mqService.publish(new RecordCompletedEvent(record_id,state.getTenantId(),state.getAppId(),state.getAreaId(),state.getId(),
+            mqService.publish(new RecordCompletedEvent(record_id,state.getBusinessData().get(CallCenterUtil.CALLCENTER_FIELD),
+                    state.getTenantId(),state.getAppId(),state.getSubaccountId(),state.getAreaId(),state.getId(),
                     ProductCode.changeApiCmdToProductCode(type).name(),(String)params.get("record_file"),
                     Long.parseLong((String)params.get("begin_time")),Long.parseLong((String)params.get("end_time"))
             ));
         }catch (Throwable t){
-            logger.info("发布RecordCompletedEvent失败,state={},params={}",state,params);
-            logger.error("发布RecordCompletedEvent失败",t);
+            logger.error(String.format("发布RecordCompletedEvent失败,appId=%s,callid=%s,params=%s",
+                    state.getAppId(),state.getId(),params),t);
         }
 
         if(canDoivr(state)){
@@ -134,6 +136,7 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
             Map<String, Object> notify_data = new MapBuilder<String, Object>()
                     .putIfNotEmpty("event", "ivr.record_end")
                     .putIfNotEmpty("id", call_id)
+                    .putIfNotEmpty("subaccount_id",state.getSubaccountId())
                     .putIfNotEmpty("begin_time", begin_time)
                     .putIfNotEmpty("end_time", end_time)
                     .putIfNotEmpty("error", params.get("error"))

@@ -3,6 +3,7 @@ package com.lsxy.call.center.api.service;
 import com.lsxy.call.center.api.model.Condition;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
+import com.lsxy.framework.core.utils.Page;
 
 import java.util.List;
 
@@ -19,5 +20,7 @@ public interface ConditionService extends BaseService<Condition> {
 
     public List<Condition> getAll(String tenantId, String appId) throws YunhuniApiException;
 
-    public List<Condition> getAll(String tenantId, String appId,String channelId) throws YunhuniApiException;
+    public List<Condition> getAll(String tenantId, String appId,String subaccountId) throws YunhuniApiException;
+
+    Page<Condition> getPageByCondition(Integer pageNo,Integer pageSize,String tenantId, String appId, String subaccountId,String id) throws YunhuniApiException;
 }

@@ -7,6 +7,6 @@ import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
  */
 public interface IVRService {
 
-    public String ivrCall(String ip,String appId,String from,String to,Integer maxDialDuration,
+    public String ivrCall(String subaccountId,String ip,String appId,String from,String to,Integer maxDialDuration,
                           Integer maxCallDuration, String userData) throws YunhuniApiException;
 }

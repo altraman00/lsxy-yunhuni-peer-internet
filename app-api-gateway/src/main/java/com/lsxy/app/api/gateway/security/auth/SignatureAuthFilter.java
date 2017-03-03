@@ -1,5 +1,6 @@
 package com.lsxy.app.api.gateway.security.auth;
 
+import com.lsxy.app.api.gateway.util.Constants;
 import com.lsxy.app.api.gateway.util.SpringContextHolder;
 import com.lsxy.framework.core.utils.StringUtil;
 import org.apache.commons.lang3.time.DateUtils;
@@ -67,7 +68,7 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
         }
         //TODO 测试环境暗码凭证生成
         if((req.getHeader("MASKCODE")!=null && "kj38kghl6d93kgj8".equals(req.getHeader("MASKCODE")))){
-            RestToken codeToken = new RestToken("MASKCODE", null, new Date(), null, null);
+            RestToken codeToken = new RestToken("MASKCODE", null, new Date(), null,null, null);
             //认证成功，设置认证token
             SecurityContextHolder.getContext().setAuthentication(codeToken);
             chain.doFilter(req, resp);
@@ -144,6 +145,9 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
             if(successfulAuthentication instanceof RestToken){
                 RestToken restToken = (RestToken) successfulAuthentication;
                 tenantId = restToken.getTenantId();
+                if(restToken.getSubaccountId()!=null){
+                    request.setAttribute(Constants.SUBACCOUNT,restToken.getSubaccountId());
+                }
             }
             getSaveApiLogTask().invokeApiSaveDB(req.getRequestURI(),req.getMethod(),appid, payload, contentType, signature,tenantId,certID);
 

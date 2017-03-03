@@ -73,8 +73,6 @@ public class CallCenterUtil {
     public static final String AGENT_PRENUMVOICE_FIELD = "AGENT_PRENUMVOICE";
     /**坐席播放工号后的音存放的字段**/
     public static final String AGENT_POSTNUMVOICE_FIELD = "AGENT_POSTNUMVOICE";
-    /**通道id存放的字段**/
-    public static final String CHANNEL_ID_FIELD = "CHANNEL_ID";
     /**条件id存放的字段**/
     public static final String CONDITION_ID_FIELD = "CONDITION_ID";
 
@@ -103,7 +101,7 @@ public class CallCenterUtil {
     /**
      * 排队失败事件
      */
-    public void sendQueueFailEvent(String url,String queueId,String type,String channelId,String conditionId,
+    public void sendQueueFailEvent(String subaccountId,String url,String queueId,String type,String conditionId,
                                    String cause,String origin_call_id,String agent_call_id,
                                    String userData){
        try{
@@ -118,8 +116,8 @@ public class CallCenterUtil {
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","callcenter.queue.fail")
                     .putIfNotEmpty("id",queueId)
+                    .putIfNotEmpty("subaccount_id",subaccountId)
                     .putIfNotEmpty("type",type)
-                    .putIfNotEmpty("channel_id",channelId)
                     .putIfNotEmpty("condition_id",conditionId)
                     .putIfNotEmpty("agent_name",agent.getName())
                     .putIfNotEmpty("cause",cause)
@@ -137,7 +135,7 @@ public class CallCenterUtil {
     /**
      * 排队成功事件
      */
-    public void sendQueueSuccessEvent(String url,String queueId,String type,String channelId,String conditionId,
+    public void sendQueueSuccessEvent(String subaccountId,String url,String queueId,String type,String conditionId,
                                    String origin_call_id,String agent_call_id,
                                    String userData){
         try{
@@ -152,8 +150,8 @@ public class CallCenterUtil {
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","callcenter.queue.success")
                     .putIfNotEmpty("id",queueId)
+                    .putIfNotEmpty("subaccount_id",subaccountId)
                     .putIfNotEmpty("type",type)
-                    .putIfNotEmpty("channel_id",channelId)
                     .putIfNotEmpty("condition_id",conditionId)
                     .putIfNotEmpty("agent_name",agent.getName())
                     .putIfNotEmpty("origin_call_id",origin_call_id)
@@ -170,7 +168,7 @@ public class CallCenterUtil {
     /**
      * 排队选中坐席事件
      */
-    public void sendQueueSelectedAgentEvent(String url,String queueId,String type,String channelId,String conditionId,
+    public void sendQueueSelectedAgentEvent(String subaccountId,String url,String queueId,String type,String conditionId,
                                       String origin_call_id,String agent_call_id,
                                       String userData){
         try{
@@ -185,8 +183,8 @@ public class CallCenterUtil {
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","callcenter.queue.select")
                     .putIfNotEmpty("id",queueId)
+                    .putIfNotEmpty("subaccount_id",subaccountId)
                     .putIfNotEmpty("type",type)
-                    .putIfNotEmpty("channel_id",channelId)
                     .putIfNotEmpty("condition_id",conditionId)
                     .putIfNotEmpty("agent_name",agent.getName())
                     .putIfNotEmpty("origin_call_id",origin_call_id)
@@ -203,7 +201,7 @@ public class CallCenterUtil {
     /**
      * 坐席状态改变事件
      */
-    public void agentStateChangedEvent(String url,String agent_id,String agentName,String previous_state,String latest_state){
+    public void agentStateChangedEvent(String subaccountId,String url,String agent_id,String agentName,String previous_state,String latest_state,String userData){
         try{
             if(latest_state == null){
                 latest_state = callCenterAgentService.getState(agent_id);
@@ -211,9 +209,11 @@ public class CallCenterUtil {
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","callcenter.agent.state_changed")
                     .putIfNotEmpty("name",agentName)
+                    .putIfNotEmpty("subaccount_id",subaccountId)
                     .putIfNotEmpty("previous_state",previous_state)
                     .putIfNotEmpty("latest_state",latest_state)
                     .putIfNotEmpty("current_time",System.currentTimeMillis())
+                    .putIfNotEmpty("user_data",userData)
                     .build();
             notifyCallbackUtil.postNotify(url,notify_data,null,3);
         }catch (Throwable t){
@@ -224,21 +224,23 @@ public class CallCenterUtil {
     /**
      * 坐席进入交谈事件
      */
-    public void agentEnterConversationEvent(String url,String agent_id,String agentName,String conversation){
+    public void agentEnterConversationEvent(String subaccountId,String url,String agent_id,String agentName,String conversation,String userData){
         try{
             String latest_state = null;
             try{
                 latest_state = callCenterAgentService.getState(agent_id);
             }catch (Throwable t){
-                logger.info("获取坐席状态失败",t);
+                logger.error(String.format("获取坐席状态失败,agentId=%s",agent_id),t);
             }
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","callcenter.agent.conversation_changed")
                     .putIfNotEmpty("name",agentName)
+                    .putIfNotEmpty("subaccount_id",subaccountId)
                     .putIfNotEmpty("type","enter")
                     .putIfNotEmpty("conversation_id",conversation)
                     .putIfNotEmpty("latest_state",latest_state)
                     .putIfNotEmpty("current_time",System.currentTimeMillis())
+                    .putIfNotEmpty("user_data",userData)
                     .build();
             notifyCallbackUtil.postNotify(url,notify_data,null,3);
         }catch (Throwable t){
@@ -249,21 +251,23 @@ public class CallCenterUtil {
     /**
      * 坐席退出交谈事件
      */
-    public void agentExitConversationEvent(String url,String agent_id,String agentName,String conversation){
+    public void agentExitConversationEvent(String subaccountId,String url,String agent_id,String agentName,String conversation,String userData){
         try{
             String latest_state = null;
             try{
                 latest_state = callCenterAgentService.getState(agent_id);
             }catch (Throwable t){
-                logger.info("获取坐席状态失败",t);
+                logger.error(String.format("获取坐席状态失败,agentId=%s",agent_id),t);
             }
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","callcenter.agent.conversation_changed")
                     .putIfNotEmpty("name",agentName)
+                    .putIfNotEmpty("subaccount_id",subaccountId)
                     .putIfNotEmpty("type","exit")
                     .putIfNotEmpty("conversation_id",conversation)
                     .putIfNotEmpty("latest_state",latest_state)
                     .putIfNotEmpty("current_time",System.currentTimeMillis())
+                    .putIfNotEmpty("user_data",userData)
                     .build();
             notifyCallbackUtil.postNotify(url,notify_data,null,3);
         }catch (Throwable t){
@@ -274,15 +278,16 @@ public class CallCenterUtil {
     /**
      * 交谈开始事件
      */
-    public void conversationBeginEvent(String url,String conversation,String type,String queue_id,String channel_id,String agent_call_id){
+    public void conversationBeginEvent(String subaccountId,String url,String conversation,String type,String queue_id,String agent_call_id,String userData){
         try{
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","callcenter.conversation.begin")
                     .putIfNotEmpty("id",conversation)
+                    .putIfNotEmpty("subaccount_id",subaccountId)
                     .putIfNotEmpty("type",type)
                     .putIfNotEmpty("queue_id",queue_id)
-                    .putIfNotEmpty("channel_id",channel_id)
                     .putIfNotEmpty("agent_call_id",agent_call_id)
+                    .putIfNotEmpty("user_data",userData)
                     .build();
             notifyCallbackUtil.postNotify(url,notify_data,null,3);
         }catch (Throwable t){
@@ -296,16 +301,16 @@ public class CallCenterUtil {
      * @param conversation
      * @param type
      * @param queue_id
-     * @param channel_id
      * @param agent_call_id
      */
-    public void conversationEndEvent(String url,String conversation,String type,Long begin_time,
+    public void conversationEndEvent(String subaccountId,String url,String conversation,String type,Long begin_time,
                                       String record_file,String record_duration,String end_reason,
-                                      String queue_id,String channel_id,String agent_call_id){
+                                      String queue_id,String agent_call_id,String userData){
         try{
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","callcenter.conversation.end")
                     .putIfNotEmpty("id",conversation)
+                    .putIfNotEmpty("subaccount_id",subaccountId)
                     .putIfNotEmpty("type",type)
                     .putIfNotEmpty("begin_time",begin_time)
                     .putIfNotEmpty("end_time",System.currentTimeMillis())
@@ -313,8 +318,8 @@ public class CallCenterUtil {
                     .putIfNotEmpty("record_duration",record_duration)
                     .putIfNotEmpty("end_reason",end_reason)
                     .putIfNotEmpty("queue_id",queue_id)
-                    .putIfNotEmpty("channel_id",channel_id)
                     .putIfNotEmpty("agent_call_id",agent_call_id)
+                    .putIfNotEmpty("user_data",userData)
                     .build();
             notifyCallbackUtil.postNotify(url,notify_data,null,3);
         }catch (Throwable t){
@@ -322,11 +327,13 @@ public class CallCenterUtil {
         }
     }
 
-    public void conversationPartsChangedEvent(String url,String conversation){
+    public void conversationPartsChangedEvent(String subaccountId,String url,String conversation,String userData){
         try{
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","callcenter.conversation.parts_changed")
                     .putIfNotEmpty("id",conversation)
+                    .putIfNotEmpty("subaccount_id",subaccountId)
+                    .putIfNotEmpty("user_data",userData)
                     .build();
             notifyCallbackUtil.postNotify(url,notify_data,null,3);
         }catch (Throwable t){

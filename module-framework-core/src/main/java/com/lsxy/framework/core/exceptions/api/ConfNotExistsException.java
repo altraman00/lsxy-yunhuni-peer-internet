@@ -12,6 +12,14 @@ public class ConfNotExistsException extends YunhuniApiException {
         super();
     }
 
+    public ConfNotExistsException(String context) {
+        super(context);
+    }
+
+    public ConfNotExistsException(ExceptionContext context){
+        super(context);
+    }
+
     @Override
     public ApiReturnCodeEnum getApiExceptionEnum() {
         return ApiReturnCodeEnum.ConfNotExists;

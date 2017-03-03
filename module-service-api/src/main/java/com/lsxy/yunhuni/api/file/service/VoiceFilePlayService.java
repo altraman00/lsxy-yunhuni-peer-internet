@@ -19,7 +19,7 @@ public interface VoiceFilePlayService extends BaseService<VoiceFilePlay> {
      * @param name 文件名字
      * @return
      */
-    public Page<VoiceFilePlay> pageList(Integer pageNo,Integer pageSize,String name,String appId,String[] tenantId,Integer status,String startTime,String endTime);
+    public Page<VoiceFilePlay> pageList(Integer pageNo,Integer pageSize,String name,String appId,String[] tenantId,Integer status,String startTime,String endTime,String subId);
 
     /**
      * 根据文件名获取应用已审核的文件
@@ -73,7 +73,7 @@ public interface VoiceFilePlayService extends BaseService<VoiceFilePlay> {
      * @param name
      * @return
      */
-    List<VoiceFilePlay> findByFileName(String tenantId, String appId, String name);
+    List<VoiceFilePlay> findByFileName(String tenantId, String appId, String name,String subId);
 
     /**
      * 将同步状态更新为
