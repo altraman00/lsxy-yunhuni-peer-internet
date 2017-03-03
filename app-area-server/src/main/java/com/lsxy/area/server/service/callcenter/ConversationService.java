@@ -10,6 +10,7 @@ import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
+import com.lsxy.area.server.util.SipUrlUtil;
 import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
 import com.lsxy.call.center.api.service.CallCenterConversationService;
@@ -218,7 +219,7 @@ public class ConversationService {
      * @throws YunhuniApiException
      */
     public String create(String subaccountId,String id,String ref_res_id,
-                         BusinessState initiator,String tenantId,String appId, String areaId,String callBackUrl, Integer maxDuration,String hold_voice) throws YunhuniApiException {
+                         BusinessState initiator,String tenantId,String appId, String areaId,String callBackUrl, Integer maxDuration,String hold_voice,String user_data) throws YunhuniApiException {
         if(maxDuration == null || maxDuration > MAX_DURATION){
             maxDuration = MAX_DURATION;
         }
@@ -244,6 +245,7 @@ public class ConversationService {
                 .setType(BusinessState.TYPE_CC_CONVERSATION)
                 .setCallBackUrl(callBackUrl)
                 .setAreaId(areaId)
+                .setUserdata(user_data)
                 .setBusinessData(new MapBuilder<String,String>()
                         .putIfNotEmpty(BusinessState.REF_RES_ID,ref_res_id)
                         .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,initiator.getId())//交谈发起者的callid
@@ -405,8 +407,8 @@ public class ConversationService {
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(initiator))
                         .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,initiator)
                         .putIfNotEmpty(CallCenterUtil.VOICE_MODE_FIELD,voiceMode==null?CallCenterConversationMember.MODE_DEFAULT.toString():voiceMode.toString())
-                        .putIfNotEmpty("from",StringUtil.isEmpty(systemNum)?from:systemNum)
-                        .putIfNotEmpty("to",to)
+                        .putIfNotEmpty("from",SipUrlUtil.extractTelnum(StringUtil.isEmpty(systemNum)?from:systemNum))
+                        .putIfNotEmpty("to",SipUrlUtil.extractTelnum(to))
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
                 .build();
@@ -489,8 +491,8 @@ public class ConversationService {
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,callId)
                         .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,null)
                         .putIfNotEmpty(CallCenterUtil.VOICE_MODE_FIELD,voiceMode==null?CallCenterConversationMember.MODE_DEFAULT.toString():voiceMode.toString())
-                        .putIfNotEmpty("from",StringUtil.isEmpty(systemNum)?from:systemNum)
-                        .putIfNotEmpty("to",to)
+                        .putIfNotEmpty("from",SipUrlUtil.extractTelnum(StringUtil.isEmpty(systemNum)?from:systemNum))
+                        .putIfNotEmpty("to", SipUrlUtil.extractTelnum(to))
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
                 .build();
@@ -513,7 +515,7 @@ public class ConversationService {
      */
     public String inviteOut(String subaccountId,String appId,String ref_res_id, String conversationId,
                               String from, String to, Integer maxDuration, Integer maxDialDuration,
-                              String playFile, Integer voiceMode) throws YunhuniApiException{
+                              String playFile, Integer voiceMode,String userData) throws YunhuniApiException{
         App app = appService.findById(appId);
         AreaAndTelNumSelector.Selector selector =
                 areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app,from,to);
@@ -559,6 +561,7 @@ public class ConversationService {
                 .setId(callId)
                 .setType(BusinessState.TYPE_CC_INVITE_OUT_CALL)
                 .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
+                .setUserdata(userData)
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
@@ -566,8 +569,8 @@ public class ConversationService {
                         .putIfNotEmpty(CallCenterUtil.CONVERSATION_FIELD,conversationId)
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(conversationId))
                         .putIfNotEmpty(CallCenterUtil.VOICE_MODE_FIELD,voiceMode==null?CallCenterConversationMember.MODE_DEFAULT.toString():voiceMode.toString())
-                        .putIfNotEmpty("from",oneTelnumber)
-                        .putIfNotEmpty("to",to)
+                        .putIfNotEmpty("from",SipUrlUtil.extractTelnum(oneTelnumber))
+                        .putIfNotEmpty("to",SipUrlUtil.extractTelnum(to))
                         .putIfNotEmpty("play_file",playFile)//加入后在交谈中播放这个文件
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
@@ -941,7 +944,7 @@ public class ConversationService {
             callCenterUtil.agentExitConversationEvent(call_state.getSubaccountId(),call_state.getCallBackUrl(),
                     call_state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD),
                     call_state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),
-                    conversationId);
+                    conversationId,call_state.getUserdata());
         }
 
         if(callConversationService.size(callId) > 0){
@@ -1041,9 +1044,9 @@ public class ConversationService {
             callCenterUtil.agentEnterConversationEvent(state.getSubaccountId(),state.getCallBackUrl(),
                     businessData.get(CallCenterUtil.AGENT_ID_FIELD),
                     businessData.get(CallCenterUtil.AGENT_NAME_FIELD),
-                    conversation_id);
+                    conversation_id,state.getUserdata());
         }
-        callCenterUtil.conversationPartsChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),conversation_id);
+        callCenterUtil.conversationPartsChangedEvent(conversationState.getSubaccountId(),conversationState.getCallBackUrl(),conversation_id,conversationState.getUserdata());
     }
 
     private void hangup(String res_id,String call_id,String area_id){

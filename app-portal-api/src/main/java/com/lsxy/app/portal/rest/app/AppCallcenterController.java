@@ -2,7 +2,6 @@ package com.lsxy.app.portal.rest.app;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
@@ -13,8 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by zhangxb on 2016/10/21.
@@ -41,7 +38,7 @@ public class AppCallcenterController extends AbstractRestController {
     public RestResponse page(HttpServletRequest request, @PathVariable String appId,
                              @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
                              @RequestParam(defaultValue = "20",required = false)  Integer pageSize) throws YunhuniApiException {
-        Page page  = callCenterAgentService.getPage(appId,pageNo,pageSize);
+        Page page  = callCenterAgentService.getPageForPotal(appId,pageNo,pageSize);
         return RestResponse.success(page);
     }
 

@@ -10,6 +10,7 @@ import com.lsxy.area.server.batch.CallSessionBatchInserter;
 import com.lsxy.area.server.batch.VoiceIvrBatchInserter;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.util.CallbackUrlUtil;
+import com.lsxy.area.server.util.SipUrlUtil;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
@@ -228,8 +229,8 @@ public class IVRServiceImpl implements IVRService {
                                     .setLineGatewayId(lineId)
                                     .setUserdata(userData)
                                     .setBusinessData(new MapBuilder<String,String>()
-                                            .putIfNotEmpty("from",from)
-                                            .putIfNotEmpty("to",to)
+                                            .putIfNotEmpty("from",SipUrlUtil.extractTelnum(from))
+                                            .putIfNotEmpty("to", SipUrlUtil.extractTelnum(to))
                                             .putIfWhere(CallCenterUtil.CALLCENTER_FIELD,isCallCenter,callId)
                                             .putIfWhere(CallCenterUtil.ISCC_FIELD,isCallCenter,CallCenterUtil.ISCC_TRUE)
                                             .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())

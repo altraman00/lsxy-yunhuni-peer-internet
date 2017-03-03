@@ -3,6 +3,7 @@ package com.lsxy.area.server.event.handler.call;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
@@ -92,7 +93,8 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
                     type = BusinessState.TYPE_CC_INVITE_OUT_CALL;
                 }
             }
-            mqService.publish(new RecordCompletedEvent(record_id,state.getTenantId(),state.getAppId(),state.getSubaccountId(),state.getAreaId(),state.getId(),
+            mqService.publish(new RecordCompletedEvent(record_id,state.getBusinessData().get(CallCenterUtil.CALLCENTER_FIELD),
+                    state.getTenantId(),state.getAppId(),state.getSubaccountId(),state.getAreaId(),state.getId(),
                     ProductCode.changeApiCmdToProductCode(type).name(),(String)params.get("record_file"),
                     Long.parseLong((String)params.get("begin_time")),Long.parseLong((String)params.get("end_time"))
             ));

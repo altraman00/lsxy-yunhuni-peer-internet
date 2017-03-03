@@ -101,7 +101,7 @@ public class AgentController extends AbstractAPIController {
         if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
-        Page page  = callCenterAgentService.getPage(appId,getSubaccountId(request),pageNo,pageSize);
+        Page page  = callCenterAgentService.getPageForApiGW(appId,getSubaccountId(request),pageNo,pageSize);
         List<AgentVO> agentVOs = new ArrayList<>();
         List<CallCenterAgent> result = page.getResult();
         result.stream().forEach(agent -> agentVOs.add(AgentVO.changeCallCenterAgentToAgentVO(agent)));
