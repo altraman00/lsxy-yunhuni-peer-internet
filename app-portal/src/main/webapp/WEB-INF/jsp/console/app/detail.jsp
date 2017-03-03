@@ -290,7 +290,7 @@
                                     </div>
                                     <div class="tab-pane fade" id="voice">
                                         <p class="application_info">
-                                            1.每个账号默认允许免费存储7天内的录音文件，超过7天的录音文件系统自动删除。<br/>
+                                            1.每个账号默认允许免费存储7天内的录音文件，超过指定配置周期的录音文件系统将自动删除。<br/>
                                             2.会员可以自行配置存储周期，修改存储周期后，文件存储按1元/G/月收费，每个月底进行扣费。<br/>
                                             3.录音文件可在详单查询内下载。
                                         </p>
@@ -2054,7 +2054,7 @@
         bootbox.dialog({
                     title: "提示",
                     message: '<div class="row">  ' +
-                    '<div class="col-md-12 text-center">你确认要执行这操作吗？</div>  </div>',
+                    '<div class="col-md-12 text-center">号码解绑后该号码可回到号码池中，不再与当前应用发生关联，确定要解绑该号码吗？</div>  </div>',
                     buttons: {
                         success: {
                             label: "确认",
