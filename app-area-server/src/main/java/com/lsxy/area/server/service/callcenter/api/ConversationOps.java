@@ -225,6 +225,7 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
                 .setResId(null)
                 .setType(BusinessState.TYPE_CC_CONVERSATION_SHADOW_CALL)
                 .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
+                .setUserdata(conversation_state.getUserdata())
                 .setAreaId(conversation_state.getAreaId())
                 .setLineGatewayId(conversation_state.getLineGatewayId())
                 .setBusinessData(new MapBuilder<String,String>()
@@ -312,6 +313,6 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
         }
         return conversationService.inviteOut(subaccountId,appId,
                     conversation_state.getBusinessData().get(BusinessState.REF_RES_ID),
-                    conversationId,from,to,maxDuration,maxDial,null,voiceMode);
+                    conversationId,from,to,maxDuration,maxDial,null,voiceMode,conversation_state.getUserdata());
     }
 }
