@@ -27,6 +27,7 @@ public class MsgSendRecord extends IdEntity {
     private String operator;
     private String msg;
     private String tempId;
+    private String supplierTempId;
     private String tempArgs;
     private Date sendTime;
     private BigDecimal msgCost;
@@ -136,6 +137,15 @@ public class MsgSendRecord extends IdEntity {
 
     public void setTempId(String tempId) {
         this.tempId = tempId;
+    }
+
+    @Column(name = "supplier_temp_id")
+    public String getSupplierTempId() {
+        return supplierTempId;
+    }
+
+    public void setSupplierTempId(String supplierTempId) {
+        this.supplierTempId = supplierTempId;
     }
 
     @Column(name = "temp_args")
