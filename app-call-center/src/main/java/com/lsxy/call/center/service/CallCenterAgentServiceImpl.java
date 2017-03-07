@@ -443,6 +443,26 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
+    public CallCenterAgent getSimple(String appId,String subaccountId, String agentName) throws YunhuniApiException {
+        if(StringUtils.isBlank(appId)){
+            throw new RequestIllegalArgumentException(
+                    new ExceptionContext().put("appId",appId)
+                            .put("agentName",agentName)
+                            .put("subaccountId",subaccountId)
+            );
+        }
+        if(StringUtils.isBlank(agentName)){
+            throw new RequestIllegalArgumentException(
+                    new ExceptionContext().put("appId",appId)
+                            .put("agentName",agentName)
+                            .put("subaccountId",subaccountId)
+            );
+        }
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndSubaccountIdAndName(appId,subaccountId, agentName);
+        return agent;
+    }
+
+    @Override
     public String getId(String appId, String agentName) throws YunhuniApiException {
         CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId, agentName);
         if(agent == null){
