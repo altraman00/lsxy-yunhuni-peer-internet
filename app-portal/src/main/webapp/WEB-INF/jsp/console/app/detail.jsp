@@ -429,7 +429,7 @@
                                                     <input type="text" class="form-control" placeholder="关联子账号" id="template_subId" /></div>
                                             <div class="col-md-2">
                                                 <button class="btn btn-primary" type="button" onclick="extensionList()">查询</button>
-                                                <button href="#"  class="btn btn-primary defind modalShow" data-id="six" >新增模板</button>
+                                                <button href="#"  class="btn btn-primary defind modalShow" data-id="seven" >新增模板</button>
                                             </div>
                                         </div>
                                         <table class="table table-striped cost-table-history tablelist" id="template-table">
@@ -924,6 +924,64 @@
                 <a class="sure modalSureFive" data-id="five">创建</a>
             </div>
         </div>
+        <!---创建模板--->
+        <div class="modal-box application-detail-box" id="modalseven" style="display:none;">
+            <div class="title">创建模板<a class="close_a modalCancel cancelseven" data-id="seven"></a></div>
+            <div class="content" id="createSeven" >
+                <br>
+                <div class="row margin-bottom-10">
+                    <lable class="col-md-3 text-right line-height-32">模板类型：</lable>
+                    <div class="col-md-8 remove-padding-right">
+                        <input type="radio" id="ussd" checked value="ussd" v-model="type" name="type">
+                        <label for="ussd">闪印</label>
+                        <input type="radio" id="sms" value="sms" v-model="type" name="type">
+                        <label for="sms">短信</label>
+                        <br>
+                    </div>
+                    <%--<span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>--%>
+                </div>
+                <div class="row margin-bottom-10">
+                    <lable class="col-md-3 text-right line-height-32">模板名称：</lable>
+                    <div class="col-md-8 remove-padding-right">
+                        <input type="text" class="form-control" v-model="name" value="{{name}}" placeholder=""/>
+                        <span>仅供识别</span>
+                    </div>
+                    <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
+                </div>
+                <div class="row margin-bottom-10">
+                    <lable class="col-md-3 text-right line-height-32">模板内容：</lable>
+                    <div  class="col-md-8 remove-padding-right" style="height:115px;">
+                        <div style="position:relative;margin:0;padding:0;">
+                        <textarea class="form-control" v-model="content"  placeholder="" style="height:86px;position:absolute;margin:0;padding:2px "
+                        id="template_content" onkeydown="checkMaxInput(this,62)" onkeyup="checkMaxInput(this,62)" onfocus="checkMaxInput(this,62)" onblur="checkMaxInput(this,62);"
+                        >{{content}}</textarea>
+                            <div id="template_contentmsg" class="note" style="position:absolute;line-height:147px;padding:3px 250px;height: 0px"><font color="#777">62/62</font></div>
+                        </div>
+                        <span style="position:absolute;line-height:184px;padding:3px 3px;height: 0px">
+                            例：【壹耘】您的验证码是#*#,请在#*#分钟内完成输</span>
+                        <span style="position:absolute;line-height:215px;padding:3px 3px;height: 0px">
+                            入内容不允许超过62个字符（包括变量）</span>
+                    </div>
+                    <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
+                </div>
+                <div class="row margin-bottom-10">
+                    <lable class="col-md-3 text-right line-height-32">使用场景说明：</lable>
+                    <div class="col-md-8 remove-padding-right" style="height:130px;">
+                        <div style="position:relative;margin:0;padding:0">
+                        <textarea class="form-control" v-model="remark" placeholder="" style="height:130px;position:absolute;margin:0;padding:2px "
+                                  id="template_remark" onkeydown="checkMaxInput(this,100)" onkeyup="checkMaxInput(this,100)" onfocus="checkMaxInput(this,100)" onblur="checkMaxInput(this,100);"
+                        >{{remark}}</textarea>
+                        </div>
+                        <div id="template_remarkmsg" class="note" style="position:absolute;line-height:235px;padding:3px 235px;height: 0px"><font color="#777">100/100</font></div>
+                    </div>
+                    <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
+                </div>
+            </div>
+            <div class="footer">
+                <a class="cancel modalCancel cancelseven" data-id="seven">返回</a>
+                <a class="sure modalSureSeven" data-id="seven">创建</a>
+            </div>
+        </div>
         <!---创建分机--->
         <div class="modal-box application-detail-box" id="modalsix" style="display:none;">
             <div class="title">创建分机<a class="close_a modalCancel cancelsix" data-id="six"></a></div>
@@ -1040,7 +1098,43 @@
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.fileupload-validate.js"></script>
 <link rel="stylesheet" href="${resPrefixUrl }/js/dist/css/bootstrap-select.css">
 <script src="${resPrefixUrl }/js/dist/js/bootstrap-select.js"></script>
+        <script type="text/javascript">
+            //多行文本输入框剩余字数计算
+            function checkMaxInput(obj, maxLen) {
+                if (obj == null || obj == undefined || obj == "") {
+                    return;
+                }
+                if (maxLen == null || maxLen == undefined || maxLen == "") {
+                    maxLen = 100;
+                }
 
+                var strResult;
+                var $obj = $(obj);
+                var newid = $obj.attr("id") + 'msg';
+
+                if (obj.value.length > maxLen) { //如果输入的字数超过了限制
+                    obj.value = obj.value.substring(0, maxLen); //就去掉多余的字
+                    $('#'+newid).html((maxLen - obj.value.length)+"/"+maxLen );
+//                    strResult = '<span id="' + newid + '" class=\'Max_msg\' ><br/>剩(' + (maxLen - obj.value.length) + ')字</span>'; //计算并显示剩余字数
+                } else {
+                    $('#'+newid).html((maxLen - obj.value.length)+"/"+maxLen );
+//                    strResult = '<span id="' + newid + '" class=\'Max_msg\' ><br/>剩(' + (maxLen - obj.value.length) + ')字</span>'; //计算并显示剩余字数
+                }
+
+//                var $msg = $("#" + newid);
+//                if ($msg.length == 0) {
+//                    $obj.after(strResult);
+//                }
+//                else {
+//                    $msg.html(strResult);
+//                }
+            }
+
+            //清空剩除字数提醒信息
+            function resetMaxmsg() {
+//                $("span.Max_msg").remove();
+            }
+        </script>
         <script>
             $('.cancelfive').click(function(){
                 createSubAccountFive.init();
@@ -1048,12 +1142,17 @@
             $('.cancelsix').click(function(){
                 createSix.init();
             });
+            $('.cancelseven').click(function(){
+                createSeven.init();
+            });
             var appServiceType = '${app.serviceType}';
             $(function () {
                 $('.modal-box .content input[type="text"]').css("height","30px");
                 $('.modal-box .content input[type="number"]').css("height","30px");
                 $('#modalfive').css("height","450px");
                 $('#modalsix').css("height","330px");
+                $('#modalseven').css("height","510px");
+//                $('#modalseven textarea.form-control').css("height","75px");
             })
         </script>
 
@@ -1324,6 +1423,52 @@
             }
         },"post");
     };
+    /*新增模板*/
+    var createSeven = new Vue({
+        el:'#createSeven',
+        data:{
+            type:'ussd',
+            name:'',
+            content:'',
+            remark:''
+        },
+        methods:{
+            init:function(){
+                this.type='ussd';
+                this.name=this.content=this.remark='';
+            }
+        }
+    });
+    $('.modalSureSeven').click(function(){
+        var id = $(this).attr('data-id');
+        if(createSeven.content ==''||createSeven.content.length <=0 || createSeven.content.length>62){
+            showtoast('模板内容格式错误' );
+            return;
+        }
+        if(createSeven.remark =='' ||  createSeven.remark.length <= 0 || createSeven.remark.length>100){
+            showtoast("使用场景说明格式错误");
+            return;
+        }
+        var subId = $('#create_six_subId') .val();//$('#create_six_subId option:selected') .val();
+        var params = {
+            type:createSeven.type,
+            name:createSeven.name,
+            content:createSeven.content,
+            remark:createSeven.remark,
+            csrfParameterName:csrfToken
+        }
+        ajaxsync(ctx + "/console/app/"+appId+"/app_template/new",params,function(response){
+            if(response.success){
+                showtoast("新增模板");
+                createSeven.init();
+                hideModal(id);
+                templateList();
+            }else{
+                var error = response.errorMsg;
+                showtoast(error);
+            }
+        },"post");
+    });
     /*新增分机*/
     var createSix = new Vue({
         el:'#createSix',
