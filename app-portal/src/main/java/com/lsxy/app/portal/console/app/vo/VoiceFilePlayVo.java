@@ -2,6 +2,7 @@ package com.lsxy.app.portal.console.app.vo;
 
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
+import sun.nio.ch.FileKey;
 
 /**
  * Created by zhangxb on 2017/3/1.
@@ -16,8 +17,9 @@ public class VoiceFilePlayVo{
     private Integer sync;
     private String certId;
     private String subaccountId;
+    private String fileKey;
 
-    public VoiceFilePlayVo(String id, String name, Integer status, Long size, String remark, String reason, Integer sync, String certId, String subaccountId) {
+    public VoiceFilePlayVo(String id, String name, Integer status, Long size, String remark, String reason, Integer sync, String certId, String subaccountId,String fileKey) {
         this.id = id;
         this.name = name;
         this.status = status;
@@ -27,10 +29,19 @@ public class VoiceFilePlayVo{
         this.sync = sync;
         this.certId = certId;
         this.subaccountId = subaccountId;
+        this.fileKey = fileKey;
     }
     public static VoiceFilePlayVo changeAppVoiceFileToVoiceFileVO(VoiceFilePlay ext, ApiCertificateSubAccount apiCertificateSubAccount){
         String certId = apiCertificateSubAccount!=null ? apiCertificateSubAccount.getCertId() :"";
-        return new VoiceFilePlayVo(ext.getId(),ext.getName(),ext.getStatus(),ext.getSize(),ext.getRemark(),ext.getReason(),ext.getSync(),certId,ext.getSubaccountId());
+        return new VoiceFilePlayVo(ext.getId(),ext.getName(),ext.getStatus(),ext.getSize(),ext.getRemark(),ext.getReason(),ext.getSync(),certId,ext.getSubaccountId(), ext.getFileKey());
+    }
+
+    public String getFileKey() {
+        return fileKey;
+    }
+
+    public void setFileKey(String fileKey) {
+        this.fileKey = fileKey;
     }
 
     public String getSubaccountId() {

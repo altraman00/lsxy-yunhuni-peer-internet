@@ -40,13 +40,11 @@ public class AppCallcenterController extends AbstractRestController {
 
     private String getSubIdsByCerbId(String cerbId){
         StringBuilder stringBuilder = new StringBuilder();
-        if(StringUtils.isNoneEmpty(cerbId)){
-            List<ApiCertificateSubAccount> list = apiCertificateSubAccountService.getListByCerbId(cerbId);
-            for (int i = 0; i < list.size(); i++) {
-                stringBuilder.append( "'"+list.get(i).getId()+"'" );
-                if( (list.size()-1) != i){
-                    stringBuilder.append(",");
-                }
+        List<ApiCertificateSubAccount> list = apiCertificateSubAccountService.getListByCerbId(cerbId);
+        for (int i = 0; i < list.size(); i++) {
+            stringBuilder.append("'" + list.get(i).getId() + "'");
+            if ((list.size() - 1) != i) {
+                stringBuilder.append(",");
             }
         }
         return stringBuilder.toString();
@@ -55,7 +53,14 @@ public class AppCallcenterController extends AbstractRestController {
     public RestResponse listExtensions(HttpServletRequest request, @PathVariable String appId,
                                        @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
                                        @RequestParam(defaultValue = "20",required = false)  Integer pageSize,String extensionNum,String subId) throws YunhuniApiException {
-        subId = getSubIdsByCerbId(subId);
+        if(StringUtils.isNotEmpty(subId)){
+            String subId1 = getSubIdsByCerbId(subId);
+            if(StringUtils.isEmpty(subId1)){
+                return RestResponse.success(new Page((pageNo-1)*pageSize,pageNo*pageSize,pageSize,null));
+            }else{
+                subId = subId1;
+            }
+        }
         Page page = appExtensionService.getPageByCondition(appId,extensionNum,subId,pageNo,pageSize);
         return RestResponse.success(page);
     }
@@ -63,7 +68,14 @@ public class AppCallcenterController extends AbstractRestController {
     public RestResponse listQueueCondition(HttpServletRequest request, @PathVariable String appId,
                                        @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
                                        @RequestParam(defaultValue = "20",required = false)  Integer pageSize,String queueNum,String subId) throws YunhuniApiException {
-        subId = getSubIdsByCerbId(subId);
+        if(StringUtils.isNotEmpty(subId)){
+            String subId1 = getSubIdsByCerbId(subId);
+            if(StringUtils.isEmpty(subId1)){
+                return RestResponse.success(new Page((pageNo-1)*pageSize,pageNo*pageSize,pageSize,null));
+            }else{
+                subId = subId1;
+            }
+        }
         Page page = conditionService.getPageByCondition(pageNo,pageSize,getCurrentAccount().getTenant().getId(),appId,subId,queueNum);
         return RestResponse.success(page);
     }
@@ -71,7 +83,14 @@ public class AppCallcenterController extends AbstractRestController {
     public RestResponse page(HttpServletRequest request, @PathVariable String appId,
                              @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
                              @RequestParam(defaultValue = "20",required = false)  Integer pageSize,String agentNum,String subId) throws YunhuniApiException {
-        subId = getSubIdsByCerbId(subId);
+        if(StringUtils.isNotEmpty(subId)){
+            String subId1 = getSubIdsByCerbId(subId);
+            if(StringUtils.isEmpty(subId1)){
+                return RestResponse.success(new Page((pageNo-1)*pageSize,pageNo*pageSize,pageSize,null));
+            }else{
+                subId = subId1;
+            }
+        }
         Page page  = callCenterAgentService.getPageForPotal(appId,pageNo,pageSize,agentNum,subId);
         return RestResponse.success(page);
     }

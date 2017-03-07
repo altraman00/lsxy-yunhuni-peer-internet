@@ -144,7 +144,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         //5位编号
         Long incr5 = redisCacheService.getHashOps(APP_CC_NUM_KEY).increment(APP_CC_NUM_FIELD5, 1L);
         //初始始值是10001,因为redis的incr是从1开始的，所以都加上10000
-        long num5 = incr5 + 10000;
+        long num5 = incr5 + 20000;//新的规则是改为2开始，以免和普通手机号有冲突
         //5位编号到59999为止
         if(num5 <= 59999){
             return num5;
@@ -159,7 +159,18 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         if(num7 <= 7999999){
             return num7;
         }
-        //TODO 8位9位
+
+        long num8 = num7 - 7999999 + 80000000;
+        //        8位编号到89999999为止
+        if(num8 <= 89999999){
+            return num8;
+        }
+
+        long num9 = num8 - 89999999 + 9000000000L;
+        //        9开头到9999999999为止
+        if(num9 <= 9999999999L){
+            return num9;
+        }
         throw new RuntimeException("编号已满，请联系管理员");
     }
 
