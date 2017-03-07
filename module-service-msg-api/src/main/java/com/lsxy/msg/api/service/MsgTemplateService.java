@@ -12,5 +12,7 @@ public interface MsgTemplateService extends BaseService<MsgTemplate> {
 
     Page<MsgTemplate> getPageForGW(String appId, String subaccountId, Integer pageNo, Integer pageSize);
 
-    MsgTemplate findByTempIdForGW(String appId, String subaccountId, String tempId);
+    MsgTemplate findByTempId(String appId, String subaccountId, String tempId, boolean isGW);
+
+    void deleteMsgTemplate(String appId, String subaccountId, String tempId, boolean isGW);
 }

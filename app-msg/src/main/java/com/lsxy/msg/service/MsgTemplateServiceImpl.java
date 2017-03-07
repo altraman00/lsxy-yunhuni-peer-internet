@@ -3,6 +3,8 @@ package com.lsxy.msg.service;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.exceptions.api.RequestIllegalArgumentException;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.msg.api.model.MsgTemplate;
 import com.lsxy.msg.api.service.MsgTemplateService;
@@ -59,11 +61,31 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
     }
 
     @Override
-    public MsgTemplate findByTempIdForGW(String appId, String subaccountId, String tempId){
-        return msgTemplateDao.findByAppIdAndSubaccountIdAndTempId(appId,subaccountId,tempId);
+    public MsgTemplate findByTempId(String appId, String subaccountId, String tempId, boolean isGW){
+        if(StringUtils.isNotBlank(subaccountId) || isGW){
+            return msgTemplateDao.findByAppIdAndSubaccountIdAndTempId(appId,subaccountId,tempId);
+        }else{
+            return msgTemplateDao.findByAppIdAndTempId(appId,tempId);
+        }
     }
 
-    public void deleteMsgTemplate(String appId){
+    @Override
+    public void deleteMsgTemplate(String appId, String subaccountId, String tempId, boolean isGW){
+        if(StringUtils.isNotBlank(subaccountId) || isGW){
+            msgTemplateDao.deleteByAppIdAndSubaccountIdAndTempId(appId,subaccountId,tempId);
+        }else {
+            msgTemplateDao.deleteByAppIdAndTempId(appId,tempId);
+        }
+    }
+
+    public void updateMsgTemplate(MsgTemplate msgTemplate,boolean isGW) throws YunhuniApiException {
+        String tempId = msgTemplate.getTempId();
+        if(StringUtils.isBlank(tempId) || StringUtils.isBlank(msgTemplate.getAppId())){
+            throw new RequestIllegalArgumentException();
+        }
+        if (StringUtils.isNotBlank(msgTemplate.getSubaccountId()) || isGW) {
+//            msgTemplateDao.updateMsgTemplate()
+        }
 
     }
 
