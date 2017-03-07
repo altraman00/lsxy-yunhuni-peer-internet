@@ -50,6 +50,17 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
     }
 
     @Override
+    public List<ApiCertificateSubAccount> getListByCerbId(String certId) {
+        String hql = " from ApiCertificateSubAccount obj where obj.certId like '%"+certId+"%' ";
+        return this.list(hql);
+    }
+
+    @Override
+    public ApiCertificateSubAccount findByCerbId(String certId) {
+        return apiCertificateSubAccountDao.findByCertId(certId);
+    }
+
+    @Override
     public ApiCertificateSubAccount createSubAccount(ApiCertificateSubAccount subAccount) {
         App app = appService.findById(subAccount.getAppId());
         if(app == null){
@@ -68,18 +79,18 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
         subAccount.setRemark(subAccount.getRemark());
         subAccount.setExtensionPrefix(appService.getExtensionPrefixNum());
         this.save(subAccount);
+
         List<CertAccountQuota> subQuotas = new ArrayList<>();
         List<CertAccountQuota> quotas = subAccount.getQuotas();
         Collection<CertAccountQuota> setQuotas = getQuotasByApp(app,quotas);
         if(setQuotas != null){
             for(CertAccountQuota quota : setQuotas){
                 CertAccountQuota saveQ = new CertAccountQuota(tenantId,subAccount.getAppId(),subAccount.getId(),quota.getType(),quota.getValue(),quota.getRemark());
-                saveQ = certAccountQuotaService.save(saveQ);
+                certAccountQuotaService.save(saveQ);
                 subQuotas.add(saveQ);
             }
         }
         subAccount.setQuotas(subQuotas);
-        subAccount = this.save(subAccount);
         return subAccount;
     }
 
@@ -213,6 +224,11 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
             }
         }
         return page;
+    }
+
+    @Override
+    public List<ApiCertificateSubAccount> findByAppId(String appId) {
+        return apiCertificateSubAccountDao.findByAppId(appId);
     }
 
     @Override

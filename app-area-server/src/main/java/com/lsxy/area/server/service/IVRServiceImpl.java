@@ -10,6 +10,7 @@ import com.lsxy.area.server.batch.CallSessionBatchInserter;
 import com.lsxy.area.server.batch.VoiceIvrBatchInserter;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.util.CallbackUrlUtil;
+import com.lsxy.area.server.util.SipUrlUtil;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
@@ -107,17 +108,28 @@ public class IVRServiceImpl implements IVRService {
     public String ivrCall(String subaccountId,String ip, String appId, String from, String to,
                           Integer maxDialDuration, Integer maxCallDuration, String userData) throws YunhuniApiException {
         if(apiGwRedBlankNumService.isRedNum(to)){
-            throw new NumberNotAllowToCallException();
+            throw new NumberNotAllowToCallException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("to",to)
+            );
         }
         App app = appService.findById(appId);
         if(app == null){
-            throw new AppNotFoundException();
+            throw new AppNotFoundException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+            );
         }
         String tenantId = app.getTenant().getId();
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
+                throw new IPNotInWhiteListException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                                .put("ip",ip)
+                );
             }
         }
 
@@ -125,12 +137,18 @@ public class IVRServiceImpl implements IVRService {
 
         if(app.getServiceType().equals(App.PRODUCT_CALL_CENTER)){
             if(!appService.enabledService(tenantId,app.getId(), ServiceType.CallCenter)){
-                throw new AppServiceInvalidException();
+                throw new AppServiceInvalidException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                );
             }
             isCallCenter = true;
         }else{
             if(!appService.enabledService(tenantId,app.getId(), ServiceType.IvrService)){
-                throw new AppServiceInvalidException();
+                throw new AppServiceInvalidException(
+                        new ExceptionContext().put("subaccountId",subaccountId)
+                                .put("appId",appId)
+                );
             }
         }
 
@@ -159,7 +177,7 @@ public class IVRServiceImpl implements IVRService {
                 callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(tenantId,app.getId(),
                         new Date()).setCallOut(1L).build());
             }catch (Throwable t){
-                logger.error("incrIntoRedis失败",t);
+                logger.error(String.format("incrIntoRedis失败,appId=%s",app.getId()),t);
             }
         }else{
             VoiceIvr voiceIvr = new VoiceIvr();
@@ -211,8 +229,8 @@ public class IVRServiceImpl implements IVRService {
                                     .setLineGatewayId(lineId)
                                     .setUserdata(userData)
                                     .setBusinessData(new MapBuilder<String,String>()
-                                            .putIfNotEmpty("from",from)
-                                            .putIfNotEmpty("to",to)
+                                            .putIfNotEmpty("from",SipUrlUtil.extractTelnum(from))
+                                            .putIfNotEmpty("to", SipUrlUtil.extractTelnum(to))
                                             .putIfWhere(CallCenterUtil.CALLCENTER_FIELD,isCallCenter,callId)
                                             .putIfWhere(CallCenterUtil.ISCC_FIELD,isCallCenter,CallCenterUtil.ISCC_TRUE)
                                             .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())

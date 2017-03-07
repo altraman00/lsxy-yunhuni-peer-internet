@@ -24,6 +24,10 @@ public class AgentCallOutInputDTO extends CommonDTO {
     @JsonProperty("max_answer_seconds")
     private Integer maxAnswerSeconds;
 
+    @Size(max = 128)
+    @JsonProperty("user_data")
+    private String userData;
+
     public String getTo() {
         return to;
     }
@@ -54,5 +58,13 @@ public class AgentCallOutInputDTO extends CommonDTO {
 
     public void setMaxAnswerSeconds(Integer maxAnswerSeconds) {
         this.maxAnswerSeconds = maxAnswerSeconds;
+    }
+
+    public String getUserData() {
+        return userData;
+    }
+
+    public void setUserData(String userData) {
+        this.userData = userData;
     }
 }

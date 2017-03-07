@@ -1,5 +1,6 @@
 package com.lsxy.app.portal.rest.file;
 
+import com.alibaba.dubbo.common.utils.StringUtils;
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.mq.events.portal.VoiceFilePlayDeleteEvent;
 import com.lsxy.framework.api.tenant.model.Account;
@@ -9,6 +10,8 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.oss.OSSService;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.framework.api.billing.service.BillingService;
@@ -34,9 +37,9 @@ import java.util.List;
 public class VoiceFilePlayController extends AbstractRestController {
     private static final Logger logger = LoggerFactory.getLogger(VoiceFilePlayController.class);
     @Autowired
-    VoiceFilePlayService voiceFilePlayService;
+    private VoiceFilePlayService voiceFilePlayService;
     @Autowired
-    AppService appService;
+    private AppService appService;
     @Autowired
     private BillingService billingService;
     @Autowired
@@ -45,6 +48,8 @@ public class VoiceFilePlayController extends AbstractRestController {
     private CalBillingService calBillingService;
     @Autowired
     private MQService mqService;
+    @Autowired
+    private ApiCertificateSubAccountService apiCertificateSubAccountService;
     /**
      * 根据放音文件id删除放音文件
      * @param id
@@ -91,8 +96,18 @@ public class VoiceFilePlayController extends AbstractRestController {
      * @return
      */
     @RequestMapping("/count/name")
-    public RestResponse countName(String appId,String name){
-        List list = voiceFilePlayService.findByFileName(getCurrentAccount().getTenant().getId(),appId,name);
+    public RestResponse countName(String appId,String name,String subId){
+        if(StringUtils.isNotEmpty(subId)){
+            ApiCertificateSubAccount apiCertificateSubAccount = apiCertificateSubAccountService.findByCerbId( subId );
+            if(apiCertificateSubAccount == null){
+                return RestResponse.failed("","子账号不存在");
+            }else{
+                subId = apiCertificateSubAccount.getId();
+            }
+        }else{
+            subId = null;
+        }
+        List list = voiceFilePlayService.findByFileName(getCurrentAccount().getTenant().getId(),appId,name,subId);
         return RestResponse.success(list.size());
     }
     /**
@@ -101,7 +116,7 @@ public class VoiceFilePlayController extends AbstractRestController {
      * @return
      */
     @RequestMapping("/create")
-    public RestResponse createVoiceFilePlay(VoiceFilePlay voiceFilePlay,String appId) throws InvocationTargetException, IllegalAccessException {
+    public RestResponse createVoiceFilePlay(VoiceFilePlay voiceFilePlay,String appId,String subId) throws InvocationTargetException, IllegalAccessException {
         //将对象保存数据库
         if(logger.isDebugEnabled()) {
             logger.debug("开始创建放音文件记录，应用{}，记录{}", appId, voiceFilePlay);
@@ -111,7 +126,17 @@ public class VoiceFilePlayController extends AbstractRestController {
         if(logger.isDebugEnabled()) {
             logger.debug("判断应用{}是否有重名文件{}", appId, voiceFilePlay.getName());
         }
-        List<VoiceFilePlay> list = voiceFilePlayService.findByFileName(getCurrentAccount().getTenant().getId(),appId,voiceFilePlay.getName());
+        if(StringUtils.isNotEmpty(subId)){
+            ApiCertificateSubAccount apiCertificateSubAccount = apiCertificateSubAccountService.findByCerbId( subId );
+            if(apiCertificateSubAccount == null){
+                return RestResponse.failed("","子账号不存在");
+            }else{
+                subId = apiCertificateSubAccount.getId();
+            }
+        }else{
+            subId = null;
+        }
+        List<VoiceFilePlay> list = voiceFilePlayService.findByFileName(getCurrentAccount().getTenant().getId(),appId,voiceFilePlay.getName(),subId);
         if(list!=null) {
             for (int i = 0; i < list.size(); i++) {
                 if(logger.isDebugEnabled()) {
@@ -131,8 +156,9 @@ public class VoiceFilePlayController extends AbstractRestController {
         voiceFilePlay.setApp(app);
         voiceFilePlay.setTenant(account.getTenant());
         voiceFilePlay.setStatus(VoiceFilePlay.STATUS_WAIT);
+        voiceFilePlay.setSubaccountId(subId);
         voiceFilePlay = voiceFilePlayService.save(voiceFilePlay);
-        //更新账户表
+                //更新账户表
 //        Billing billing = billingService.findBillingByUserName(getCurrentAccountUserName());
 //        billing.setFileRemainSize(billing.getFileRemainSize()-voiceFilePlay.getSize());
 //        billingService.save(billing);
@@ -165,9 +191,29 @@ public class VoiceFilePlayController extends AbstractRestController {
      * @return
      */
     @RequestMapping("/plist")
-    public RestResponse pageList(Integer pageNo,Integer pageSize,String name,String appId){
+    public RestResponse pageList(Integer pageNo,Integer pageSize,String name,String appId,String subId){
         Tenant tenant = getCurrentAccount().getTenant();
-        Page<VoiceFilePlay> page = voiceFilePlayService.pageList(pageNo,pageSize,name,appId,new String[]{tenant.getId()},null,null,null);
+        if(org.apache.commons.lang3.StringUtils.isNotEmpty(subId)){
+            String subId1 = getSubIdsByCerbId(subId);
+            if(org.apache.commons.lang3.StringUtils.isEmpty(subId1)){
+                return RestResponse.success(new Page((pageNo-1)*pageSize,pageNo*pageSize,pageSize,null));
+            }else{
+                subId = subId1;
+            }
+        }
+        Page<VoiceFilePlay> page = voiceFilePlayService.pageList(pageNo,pageSize,name,appId,new String[]{tenant.getId()},null,null,null,subId);
         return RestResponse.success(page);
+    }
+
+    private String getSubIdsByCerbId(String cerbId){
+        StringBuilder stringBuilder = new StringBuilder();
+        List<ApiCertificateSubAccount> list = apiCertificateSubAccountService.getListByCerbId(cerbId);
+        for (int i = 0; i < list.size(); i++) {
+            stringBuilder.append( "'"+list.get(i).getId()+"'" );
+            if( (list.size()-1) != i){
+                stringBuilder.append(",");
+            }
+        }
+        return stringBuilder.toString();
     }
 }

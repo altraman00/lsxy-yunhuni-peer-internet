@@ -130,10 +130,10 @@ public class VoiceFilePlayController extends AbstractRestController {
                     for (int i = 0; i < tList.size(); i++) {
                         tenantId[i] = tList.get(i).getId();
                     }
-                    page = voiceFilePlayService.pageList(pageNo, pageSize, null, null, tenantId,status, startTime, endTime);
+                    page = voiceFilePlayService.pageList(pageNo, pageSize, null, null, tenantId,status, startTime, endTime,null);
                 }
             }else{
-                page = voiceFilePlayService.pageList(pageNo, pageSize, null, null, new String[]{},status, startTime, endTime);
+                page = voiceFilePlayService.pageList(pageNo, pageSize, null, null, new String[]{},status, startTime, endTime,null);
             }
             restResponse = RestResponse.success(page);
         }else{

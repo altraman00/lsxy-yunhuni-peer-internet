@@ -10,6 +10,7 @@ import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
+import com.lsxy.area.server.util.SipUrlUtil;
 import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
 import com.lsxy.call.center.api.service.CallCenterConversationService;
@@ -31,6 +32,7 @@ import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import org.apache.commons.lang.ArrayUtils;
@@ -130,7 +132,7 @@ public class ConversationService {
                 enqueue = JSONUtil2.fromJson(ccQueue.getEnqueue(),BaseEnQueue.class);
             }
         }catch (Throwable t){
-            logger.error("获取排队信息失败 ",t);
+            logger.error(String.format("获取排队信息失败,queueId=%s",queueId),t);
         }
         return enqueue;
     }
@@ -217,7 +219,7 @@ public class ConversationService {
      * @throws YunhuniApiException
      */
     public String create(String subaccountId,String id,String ref_res_id,
-                         BusinessState initiator,String tenantId,String appId, String areaId,String callBackUrl, Integer maxDuration,String hold_voice) throws YunhuniApiException {
+                         BusinessState initiator,String tenantId,String appId, String areaId,String callBackUrl, Integer maxDuration,String hold_voice,String user_data) throws YunhuniApiException {
         if(maxDuration == null || maxDuration > MAX_DURATION){
             maxDuration = MAX_DURATION;
         }
@@ -243,6 +245,7 @@ public class ConversationService {
                 .setType(BusinessState.TYPE_CC_CONVERSATION)
                 .setCallBackUrl(callBackUrl)
                 .setAreaId(areaId)
+                .setUserdata(user_data)
                 .setBusinessData(new MapBuilder<String,String>()
                         .putIfNotEmpty(BusinessState.REF_RES_ID,ref_res_id)
                         .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,initiator.getId())//交谈发起者的callid
@@ -264,7 +267,7 @@ public class ConversationService {
             conversation.setStartTime(new Date());
             callCenterConversationBatchInserter.put(conversation);
         }catch (Throwable t){
-            logger.error("保存CallCenterConversation失败",t);
+            logger.error(String.format("保存CallCenterConversation失败，appId=%s,id=%s",appId,id),t);
         }
         return id;
     }
@@ -280,16 +283,25 @@ public class ConversationService {
     public boolean dismiss(String appId, String conversationId) throws YunhuniApiException {
         BusinessState state = businessStateService.get(conversationId);
         if(state == null || (state.getClosed() != null && state.getClosed())){
-            throw new ConversationNotExistException();
+            throw new ConversationNotExistException(
+                    new ExceptionContext().put("conversationId",conversationId)
+                            .put("appId",appId)
+            );
         }
 
         if(state.getResId() == null){
-            throw new SystemBusyException();
+            throw new SystemBusyException(
+                    new ExceptionContext().put("conversationId",conversationId)
+                            .put("appId",appId)
+            );
         }
 
         if(!appId.equals(state.getAppId())){
             //不能跨app操作
-            throw new ConversationNotExistException();
+            throw new ConversationNotExistException(
+                    new ExceptionContext().put("conversationId",conversationId)
+                            .put("appId",appId)
+            );
         }
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",state.getResId())
@@ -328,7 +340,7 @@ public class ConversationService {
      */
     public String inviteAgent(String subaccountId,String appId,String ref_res_id,String initiator, String conversationId,String agentId,String agentName,String extension,
                          String systemNum,String diaplyNum,String agentPhone,String type,String user,
-                          Integer maxDuration, Integer maxDialDuration,Integer voiceMode) throws YunhuniApiException{
+                          Integer maxDuration, Integer maxDialDuration,Integer voiceMode,String user_data) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
         App app = appService.findById(appId);
         String from = null;
@@ -383,6 +395,7 @@ public class ConversationService {
                 .setId(callId)
                 .setType(BusinessState.TYPE_CC_INVITE_AGENT_CALL)
                 .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
+                .setUserdata(user_data)
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
@@ -394,8 +407,8 @@ public class ConversationService {
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(initiator))
                         .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,initiator)
                         .putIfNotEmpty(CallCenterUtil.VOICE_MODE_FIELD,voiceMode==null?CallCenterConversationMember.MODE_DEFAULT.toString():voiceMode.toString())
-                        .putIfNotEmpty("from",StringUtil.isEmpty(systemNum)?from:systemNum)
-                        .putIfNotEmpty("to",to)
+                        .putIfNotEmpty("from",SipUrlUtil.extractTelnum(StringUtil.isEmpty(systemNum)?from:systemNum))
+                        .putIfNotEmpty("to",SipUrlUtil.extractTelnum(to))
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
                 .build();
@@ -405,7 +418,7 @@ public class ConversationService {
 
     public String agentCall(String subaccountId,String appId,String conversationId,String agentId,String agentName,String extension,
                               String systemNum,String agentPhone,String type,String user,
-                              Integer maxDuration, Integer maxDialDuration,Integer voiceMode) throws YunhuniApiException{
+                              Integer maxDuration, Integer maxDialDuration,Integer voiceMode,String userData) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
         App app = appService.findById(appId);
         String from = null;
@@ -422,7 +435,13 @@ public class ConversationService {
             to = selector.getToUri();
         }else{
             areaId = areaAndTelNumSelector.getAreaId(app);
-            //TODO 获取平台号码
+            if(StringUtil.isEmpty(systemNum)){
+                ResourceTelenum resourceTelenum =
+                        areaAndTelNumSelector.getTelnumber(subaccountId,app);
+                if(resourceTelenum!=null){
+                    systemNum = resourceTelenum.getTelNumber();
+                }
+            }
             from = (systemNum) + "@"+areaId+".area.oneyun.com";
             to = user + "@" + sip_address;
         }
@@ -462,17 +481,18 @@ public class ConversationService {
                 .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
+                .setUserdata(userData)
                 .setBusinessData(new MapBuilder<String,String>()
                         .putIfNotEmpty(BusinessState.REF_RES_ID,null)
                         .putIfNotEmpty(CallCenterUtil.CONVERSATION_FIELD,conversationId)
                         .putIfNotEmpty(CallCenterUtil.AGENT_ID_FIELD,agentId)
                         .putIfNotEmpty(CallCenterUtil.AGENT_NAME_FIELD,agentName)
                         .putIfNotEmpty(CallCenterUtil.AGENT_EXTENSION_FIELD,extension)
-                        .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,null)
+                        .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,callId)
                         .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,null)
                         .putIfNotEmpty(CallCenterUtil.VOICE_MODE_FIELD,voiceMode==null?CallCenterConversationMember.MODE_DEFAULT.toString():voiceMode.toString())
-                        .putIfNotEmpty("from",StringUtil.isEmpty(systemNum)?from:systemNum)
-                        .putIfNotEmpty("to",to)
+                        .putIfNotEmpty("from",SipUrlUtil.extractTelnum(StringUtil.isEmpty(systemNum)?from:systemNum))
+                        .putIfNotEmpty("to", SipUrlUtil.extractTelnum(to))
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
                 .build();
@@ -495,7 +515,7 @@ public class ConversationService {
      */
     public String inviteOut(String subaccountId,String appId,String ref_res_id, String conversationId,
                               String from, String to, Integer maxDuration, Integer maxDialDuration,
-                              String playFile, Integer voiceMode) throws YunhuniApiException{
+                              String playFile, Integer voiceMode,String userData) throws YunhuniApiException{
         App app = appService.findById(appId);
         AreaAndTelNumSelector.Selector selector =
                 areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app,from,to);
@@ -541,6 +561,7 @@ public class ConversationService {
                 .setId(callId)
                 .setType(BusinessState.TYPE_CC_INVITE_OUT_CALL)
                 .setCallBackUrl(callbackUrlUtil.get(app,subaccountId))
+                .setUserdata(userData)
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
@@ -548,8 +569,8 @@ public class ConversationService {
                         .putIfNotEmpty(CallCenterUtil.CONVERSATION_FIELD,conversationId)
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(conversationId))
                         .putIfNotEmpty(CallCenterUtil.VOICE_MODE_FIELD,voiceMode==null?CallCenterConversationMember.MODE_DEFAULT.toString():voiceMode.toString())
-                        .putIfNotEmpty("from",oneTelnumber)
-                        .putIfNotEmpty("to",to)
+                        .putIfNotEmpty("from",SipUrlUtil.extractTelnum(oneTelnumber))
+                        .putIfNotEmpty("to",SipUrlUtil.extractTelnum(to))
                         .putIfNotEmpty("play_file",playFile)//加入后在交谈中播放这个文件
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
@@ -564,7 +585,10 @@ public class ConversationService {
     public boolean join(String conversationId, String callId, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException{
 
         if(this.outOfParts(conversationId)){
-            throw new OutOfConversationMaxPartsException();
+            throw new OutOfConversationMaxPartsException(
+                    new ExceptionContext().put("conversationId",conversationId)
+                            .put("call_id",callId)
+            );
         }
         if(sismember(conversationId, callId)){
             return true;
@@ -580,12 +604,25 @@ public class ConversationService {
         }
         BusinessState call_state = businessStateService.get(call_id);
 
-        if(call_state ==null || call_state.getResId() == null){
-            throw new SystemBusyException();
+        if(call_state == null){
+            throw new CallNotExistsException(
+                    new ExceptionContext().put("conversationId",conversation_id)
+                            .put("call_id",call_id)
+            );
+        }
+
+        if(call_state.getResId() == null){
+            throw new SystemBusyException(
+                    new ExceptionContext().put("conversationId",conversation_id)
+                            .put("call_id",call_id)
+            );
         }
 
         if(call_state.getClosed()!= null && call_state.getClosed()){
-            throw new CallNotExistsException();
+            throw new CallNotExistsException(
+                    new ExceptionContext().put("conversationId",conversation_id)
+                            .put("call_id",call_id)
+            );
         }
 
         BusinessState conversation_state = businessStateService.get(conversation_id);
@@ -599,16 +636,32 @@ public class ConversationService {
             return false;
         }
 
-        if(conversation_state == null || conversation_state.getResId() == null){
-            throw new SystemBusyException();
+        if(conversation_state == null){
+            throw new ConversationNotExistException(
+                    new ExceptionContext().put("conversationId",conversation_id)
+                            .put("call_id",call_id)
+            );
+        }
+
+        if(conversation_state.getResId() == null){
+            throw new SystemBusyException(
+                    new ExceptionContext().put("conversationId",conversation_id)
+                            .put("call_id",call_id)
+            );
         }
 
         if(conversation_state.getClosed()!= null && conversation_state.getClosed()){
-            throw new ConversationNotExistException();
+            throw new ConversationNotExistException(
+                    new ExceptionContext().put("conversationId",conversation_id)
+                            .put("call_id",call_id)
+            );
         }
 
         if(!apiCertificateSubAccountService.subaccountCheck(call_state.getSubaccountId(),conversation_state.getSubaccountId())){
-            throw new ConversationNotExistException();
+            throw new ConversationNotExistException(
+                    new ExceptionContext().put("conversationId",conversation_id)
+                            .put("call_id",call_id)
+            );
         }
 
         Map<String,String> call_business=call_state.getBusinessData();
@@ -728,33 +781,69 @@ public class ConversationService {
         try {
             rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Exception e) {
-            logger.error("启动交谈录音失败",e);
+            logger.error(String.format("启动交谈录音失败,conversationId=%s",state.getId()),e);
         }
     }
 
     public boolean setVoiceMode(String conversationId, String callId, Integer voiceMode) throws YunhuniApiException {
         if(voiceMode ==null){
-            throw new RequestIllegalArgumentException();
+            throw new RequestIllegalArgumentException(
+                    new ExceptionContext().put("conversation_id",conversationId)
+                    .put("call_id",callId)
+                    .put("voice_mode",voiceMode)
+            );
         }
         if(!ArrayUtils.contains(CallCenterConversationMember.MODE_ARRAY,voiceMode)){
-            throw new RequestIllegalArgumentException();
+            throw new RequestIllegalArgumentException(
+                    new ExceptionContext().put("conversation_id",conversationId)
+                            .put("call_id",callId)
+                            .put("voice_mode",voiceMode)
+            );
         }
         BusinessState call_state = businessStateService.get(callId);
-        if(call_state ==null || call_state.getResId() == null){
-            throw new SystemBusyException();
+
+        if(call_state == null){
+            throw new CallNotExistsException(
+                    new ExceptionContext().put("conversation_id",conversationId)
+                            .put("call_id",callId)
+            );
+        }
+
+        if(call_state.getResId() == null){
+            throw new SystemBusyException(
+                    new ExceptionContext().put("conversation_id",conversationId)
+                            .put("call_id",callId)
+            );
         }
 
         if(call_state.getClosed()!= null && call_state.getClosed()){
-            throw new CallNotExistsException();
+            throw new CallNotExistsException(
+                    new ExceptionContext().put("conversation_id",conversationId)
+                            .put("call_id",callId)
+            );
         }
 
         BusinessState conversation_state = businessStateService.get(conversationId);
-        if(conversation_state == null || conversation_state.getResId() == null){
-            throw new SystemBusyException();
+
+        if(conversation_state == null){
+            throw new ConfNotExistsException(
+                    new ExceptionContext().put("conversation_id",conversationId)
+                            .put("call_id",callId)
+            );
+        }
+
+        if(conversation_state.getResId() == null){
+            throw new SystemBusyException(
+                    new ExceptionContext().put("conversation_id",conversationId)
+                            .put("call_id",callId)
+            );
         }
 
         if(conversation_state.getClosed()!= null && conversation_state.getClosed()){
-            throw new ConversationNotExistException();
+            throw new ConversationNotExistException(
+                    new ExceptionContext().put("conversation_id",conversationId)
+                            .put("call_id",callId)
+            );
         }
 
         if(!call_state.getAppId().equals(conversation_state.getAppId())){
@@ -762,7 +851,10 @@ public class ConversationService {
         }
 
         if(!this.sismember(conversationId,callId)){
-            throw new AgentNotConversationMemberException();
+            throw new AgentNotConversationMemberException(
+                    new ExceptionContext().put("conversation_id",conversationId)
+                            .put("call_id",callId)
+            );
         }
 
         Map<String,Object> params = new MapBuilder<String,Object>()
@@ -809,7 +901,7 @@ public class ConversationService {
         try{
             mqService.publish(new ConversationMemberExitEvent(conversationId,callId));
         }catch (Throwable t){
-            logger.error("设置交谈成员的结束时间失败",t);
+            logger.error(String.format("设置交谈成员的结束时间失败,conversationId=%s,callid=%s",conversationId,callId),t);
         }
         //交谈成员递减
         this.decrPart(conversationId,callId);
@@ -823,7 +915,7 @@ public class ConversationService {
                     String holdvoice = conversation_state.getBusinessData().get(CallCenterUtil.HOLD_VOICE_FIELD);
                     try {
                         holdvoice = playFileUtil.convert(conversation_state.getTenantId(),conversation_state.getAppId(),holdvoice);
-                    } catch (Throwable e) {
+                    } catch (YunhuniApiException e) {
                         logger.error("调用失败",e);
                     }
                     if(StringUtil.isNotBlank(holdvoice)){
@@ -838,7 +930,7 @@ public class ConversationService {
                         try {
                             rpcCaller.invoke(sessionContext, rpcrequest,true);
                         } catch (Throwable t) {
-                            logger.error("调用失败",t);
+                            logger.error(String.format("调用交谈放音失败,conversationId=%s",conversationId),t);
                         }
                     }
                 }
@@ -852,7 +944,7 @@ public class ConversationService {
             callCenterUtil.agentExitConversationEvent(call_state.getSubaccountId(),call_state.getCallBackUrl(),
                     call_state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD),
                     call_state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),
-                    conversationId);
+                    conversationId,call_state.getUserdata());
         }
 
         if(callConversationService.size(callId) > 0){
@@ -952,9 +1044,9 @@ public class ConversationService {
             callCenterUtil.agentEnterConversationEvent(state.getSubaccountId(),state.getCallBackUrl(),
                     businessData.get(CallCenterUtil.AGENT_ID_FIELD),
                     businessData.get(CallCenterUtil.AGENT_NAME_FIELD),
-                    conversation_id);
+                    conversation_id,state.getUserdata());
         }
-        callCenterUtil.conversationPartsChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),conversation_id);
+        callCenterUtil.conversationPartsChangedEvent(conversationState.getSubaccountId(),conversationState.getCallBackUrl(),conversation_id,conversationState.getUserdata());
     }
 
     private void hangup(String res_id,String call_id,String area_id){
@@ -969,7 +1061,7 @@ public class ConversationService {
                 rpcCaller.invoke(sessionContext, rpcrequest, true);
             }
         } catch (Throwable e) {
-            logger.error("调用失败",e);
+            logger.error(String.format("调用挂断失败,callid=%s",call_id),e);
         }
     }
 
@@ -980,7 +1072,7 @@ public class ConversationService {
         try {
             boolean isPlayWait = this.isPlayWait(state);
             if(logger.isDebugEnabled()){
-                logger.info("停止播放排队录音isPlayWait={}",isPlayWait);
+                logger.info("停止播放排队录音appId={},conversationId={},isPlayWait={}",state.getAppId(),state.getId(),isPlayWait);
             }
             if(isPlayWait){
                 Map<String, Object> params = new MapBuilder<String,Object>()
@@ -994,7 +1086,7 @@ public class ConversationService {
                 }
             }
         } catch (Throwable e) {
-            logger.error("调用失败",e);
+            logger.error(String.format("停止播放排队录音失败,conversationId=%s",state.getId()),e);
         }
     }
 
@@ -1012,7 +1104,7 @@ public class ConversationService {
         try {
             rpcCaller.invoke(sessionContext, rpcrequest, true);
         } catch (Throwable e) {
-            logger.error("调用失败",e);
+            logger.error(String.format("交谈停止放音失败,conversationId=%s",conversation_id),e);
         }
     }
 
@@ -1108,7 +1200,7 @@ public class ConversationService {
         try{
             results = redisCacheService.zRange(key,0,-1);
         }catch (Throwable t){
-            logger.error("获取交谈成员失败",t);
+            logger.error(String.format("获取交谈成员失败,conversationId=%s",conversationId),t);
         }
         return results;
     }
@@ -1122,12 +1214,12 @@ public class ConversationService {
         try{
             results = redisCacheService.zRange(key,0,-1);
         }catch (Throwable t){
-            logger.error("获取交谈成员失败",t);
+            logger.error(String.format("获取交谈成员失败,conversationId=%s",conversationId),t);
         }
         try{
             redisCacheService.del(key);
         }catch (Throwable t){
-            logger.info("删除交谈成员缓存失败",t);
+            logger.error(String.format("删除交谈成员缓存失败,conversationId=%s",conversationId),t);
         }
         return results;
     }
