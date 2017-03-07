@@ -22,7 +22,7 @@ public class MsgSendRecord extends IdEntity {
     private String subaccountId;
     private String taskId;
     private String taskName;
-    private Integer sendType;
+    private String sendType;
     private String supplierId;
     private String operator;
     private String msg;
@@ -95,11 +95,11 @@ public class MsgSendRecord extends IdEntity {
     }
 
     @Column(name = "send_type")
-    public Integer getSendType() {
+    public String getSendType() {
         return sendType;
     }
 
-    public void setSendType(Integer sendType) {
+    public void setSendType(String sendType) {
         this.sendType = sendType;
     }
 

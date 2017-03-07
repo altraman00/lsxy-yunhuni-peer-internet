@@ -18,6 +18,8 @@ public class MsgTemplate extends IdEntity {
     private String tenantId;
     private String appId;
     private String subaccountId;
+    private String name;
+    private String type;
     private String content;
     private Integer status;
     private Boolean sync;
@@ -59,6 +61,24 @@ public class MsgTemplate extends IdEntity {
 
     public void setSubaccountId(String subaccountId) {
         this.subaccountId = subaccountId;
+    }
+
+    @Column(name = "name")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Column(name = "type")
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     @Column(name = "content")

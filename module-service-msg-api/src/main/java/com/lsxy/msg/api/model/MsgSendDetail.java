@@ -28,7 +28,7 @@ public class MsgSendDetail extends IdEntity {
     private String tempArgs;
     private Date sendTime;
     private BigDecimal msgCost;
-    private Integer sendType;
+    private String sendType;
     private String supplierId;
     private String operator;
     private Integer state;
@@ -144,11 +144,11 @@ public class MsgSendDetail extends IdEntity {
     }
 
     @Column(name = "send_type")
-    public Integer getSendType() {
+    public String getSendType() {
         return sendType;
     }
 
-    public void setSendType(Integer sendType) {
+    public void setSendType(String sendType) {
         this.sendType = sendType;
     }
 

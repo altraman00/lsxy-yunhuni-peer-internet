@@ -21,7 +21,7 @@ public class MsgUserRequest extends IdEntity {
     private String appId;
     private String subaccountId;
     private String taskName;
-    private Integer sendType;
+    private String sendType;
     private String msg;
     private String tempId;
     private String tempArgs;
@@ -82,11 +82,11 @@ public class MsgUserRequest extends IdEntity {
     }
 
     @Column(name = "send_type")
-    public Integer getSendType() {
+    public String getSendType() {
         return sendType;
     }
 
-    public void setSendType(Integer sendType) {
+    public void setSendType(String sendType) {
         this.sendType = sendType;
     }
 
