@@ -40,7 +40,7 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
     @Override
     public MsgTemplate createTemplate(MsgTemplate msgTemplate){
         msgTemplate.setTempId(getMsgTempNum());
-        msgTemplate.setStatus(1);
+        msgTemplate.setStatus(MsgTemplate.STATUS_WAIT);
         this.save(msgTemplate);
         return msgTemplate;
     }
@@ -84,13 +84,14 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
         msgSupplierTemplateService.deleteMsgTemplate(appId, subaccountId, tempId, isGW);
     }
 
+    @Override
     public void updateMsgTemplate(MsgTemplate msgTemplate,boolean isGW) throws YunhuniApiException {
         String tempId = msgTemplate.getTempId();
         if(StringUtils.isBlank(tempId) || StringUtils.isBlank(msgTemplate.getAppId())){
             throw new RequestIllegalArgumentException();
         }
         if (StringUtils.isNotBlank(msgTemplate.getSubaccountId()) || isGW) {
-//            msgTemplateDao.updateMsgTemplate()
+//            msgTemplateDao.updateMsgTemplate(msg);
         }
 
     }

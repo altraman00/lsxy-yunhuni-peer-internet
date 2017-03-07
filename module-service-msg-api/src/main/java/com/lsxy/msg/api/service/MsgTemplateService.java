@@ -1,6 +1,7 @@
 package com.lsxy.msg.api.service;
 
 import com.lsxy.framework.api.base.BaseService;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.msg.api.model.MsgTemplate;
 
@@ -17,4 +18,6 @@ public interface MsgTemplateService extends BaseService<MsgTemplate> {
     MsgTemplate findByTempId(String appId, String subaccountId, String tempId, boolean isGW);
 
     void deleteMsgTemplate(String appId, String subaccountId, String tempId, boolean isGW) throws InvocationTargetException, IllegalAccessException;
+
+    void updateMsgTemplate(MsgTemplate msgTemplate, boolean isGW) throws YunhuniApiException;
 }
