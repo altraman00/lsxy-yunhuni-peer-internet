@@ -22,7 +22,6 @@ public class MsgTemplate extends IdEntity {
     private String type;
     private String content;
     private Integer status;
-    private Boolean sync;
     private String reason;
     private String remark;
     private String lastUserName;
@@ -97,15 +96,6 @@ public class MsgTemplate extends IdEntity {
 
     public void setStatus(Integer status) {
         this.status = status;
-    }
-
-    @Column(name = "sync")
-    public Boolean getSync() {
-        return sync;
-    }
-
-    public void setSync(Boolean sync) {
-        this.sync = sync;
     }
 
     @Column(name = "reason")
