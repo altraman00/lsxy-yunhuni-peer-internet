@@ -33,26 +33,30 @@ local agent
 local agent_locked = false
 
 --判断坐席状态,给坐席上锁
-agent = array_to_map(redis.call('HGETALL',agent_state_key))
-redis.log(redis.LOG_WARNING,agent['state'])
-redis.log(redis.LOG_WARNING,agent['extension'])
-redis.log(redis.LOG_WARNING,agent['lastRegTime'])
-if(agent and agent['state'] == idle
-        and agent['extension'] and agent['lastRegTime']
-        and (agent['lastRegTime'] + agent_reg_expire) >= cur_time)
-then
-    local extension = array_to_map(redis.call('HGETALL',extension_state_key_prefix..agent['extension']))
-    redis.log(redis.LOG_WARNING,extension['enable'])
-    if(extension and extension['enable'] and extension['enable'] == extension_enable)
+local ok = redis.call('setnx',agent_lock_key, lock_info)
+redis.log(redis.LOG_WARNING,ok)
+if ok == 1 then
+    agent = array_to_map(redis.call('HGETALL',agent_state_key))
+    redis.log(redis.LOG_WARNING,agent['state'])
+    redis.log(redis.LOG_WARNING,agent['extension'])
+    redis.log(redis.LOG_WARNING,agent['lastRegTime'])
+    if(agent and agent['state'] == idle
+            and agent['extension'] and agent['lastRegTime']
+            and (agent['lastRegTime'] + agent_reg_expire) >= cur_time)
     then
-        local ok = redis.call('setnx',agent_lock_key, lock_info)
-        redis.log(redis.LOG_WARNING,ok)
-        if ok == 1 then
+        local extension = array_to_map(redis.call('HGETALL',extension_state_key_prefix..agent['extension']))
+        redis.log(redis.LOG_WARNING,extension['enable'])
+        if(extension and extension['enable'] and extension['enable'] == extension_enable)
+        then
             redis.call('EXPIRE', agent_lock_key, '60')
             agent_locked = true
         end
     end
+    if(agent_locked == false) then
+        redis.call('del', agent_lock_key)
+    end
 end
+
 
 --坐席不可用，加锁失败
 if(agent_locked == false) then
