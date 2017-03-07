@@ -7,6 +7,7 @@ import com.lsxy.framework.core.exceptions.api.RequestIllegalArgumentException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.msg.api.model.MsgTemplate;
+import com.lsxy.msg.api.service.MsgSupplierTemplateService;
 import com.lsxy.msg.api.service.MsgTemplateService;
 import com.lsxy.msg.dao.MsgTemplateDao;
 import org.apache.commons.lang.StringUtils;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Created by liups on 2017/3/1.
@@ -27,6 +29,8 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
     MsgTemplateDao msgTemplateDao;
     @Autowired
     private RedisCacheService redisCacheService;
+    @Autowired
+    MsgSupplierTemplateService msgSupplierTemplateService;
 
     @Override
     public BaseDaoInterface<MsgTemplate, Serializable> getDao() {
@@ -37,7 +41,6 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
     public MsgTemplate createTemplate(MsgTemplate msgTemplate){
         msgTemplate.setTempId(getMsgTempNum());
         msgTemplate.setStatus(1);
-        msgTemplate.setSync(false);
         this.save(msgTemplate);
         return msgTemplate;
     }
@@ -70,12 +73,15 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
     }
 
     @Override
-    public void deleteMsgTemplate(String appId, String subaccountId, String tempId, boolean isGW){
+    public void deleteMsgTemplate(String appId, String subaccountId, String tempId, boolean isGW) throws InvocationTargetException, IllegalAccessException {
         if(StringUtils.isNotBlank(subaccountId) || isGW){
-            msgTemplateDao.deleteByAppIdAndSubaccountIdAndTempId(appId,subaccountId,tempId);
+            MsgTemplate msgTemplate = msgTemplateDao.findByAppIdAndSubaccountIdAndTempId(appId, subaccountId, tempId);
+            this.delete(msgTemplate);
         }else {
-            msgTemplateDao.deleteByAppIdAndTempId(appId,tempId);
+            MsgTemplate msgTemplate = msgTemplateDao.findByAppIdAndTempId(appId,tempId);
+            this.delete(msgTemplate);
         }
+        msgSupplierTemplateService.deleteMsgTemplate(appId, subaccountId, tempId, isGW);
     }
 
     public void updateMsgTemplate(MsgTemplate msgTemplate,boolean isGW) throws YunhuniApiException {
