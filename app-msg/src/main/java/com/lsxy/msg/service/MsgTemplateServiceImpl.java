@@ -3,9 +3,11 @@ package com.lsxy.msg.service;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.msg.api.model.MsgTemplate;
 import com.lsxy.msg.api.service.MsgTemplateService;
 import com.lsxy.msg.dao.MsgTemplateDao;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,7 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
         return this.msgTemplateDao;
     }
 
+    @Override
     public MsgTemplate createTemplate(MsgTemplate msgTemplate){
         msgTemplate.setTempId(getMsgTempNum());
         msgTemplate.setStatus(1);
@@ -41,4 +44,27 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
         long num = 10000 + redisCacheService.incr(MSG_TEMP_NUM);
         return num + "";
     }
+
+    @Override
+    public Page<MsgTemplate> getPageForGW(String appId, String subaccountId, Integer pageNo, Integer pageSize){
+        Page<MsgTemplate> page;
+        if(StringUtils.isBlank(subaccountId)){
+            String hql = "from MsgTemplate obj where obj.appId=?1 and obj.subaccountId is null ";
+            page = this.pageList(hql,pageNo,pageSize,appId);
+        }else{
+            String hql = "from MsgTemplate obj where obj.appId=?1 and obj.subaccountId = ?2 ";
+            page = this.pageList(hql,pageNo,pageSize,appId,subaccountId);
+        }
+        return page;
+    }
+
+    @Override
+    public MsgTemplate findByTempIdForGW(String appId, String subaccountId, String tempId){
+        return msgTemplateDao.findByAppIdAndSubaccountIdAndTempId(appId,subaccountId,tempId);
+    }
+
+    public void deleteMsgTemplate(String appId){
+
+    }
+
 }
