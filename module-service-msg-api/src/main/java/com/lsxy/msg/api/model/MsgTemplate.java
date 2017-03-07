@@ -14,6 +14,9 @@ import javax.persistence.Table;
 @Where(clause = "deleted=0")
 @Table(schema = "db_lsxy_bi_yunhuni", name = "tb_bi_msg_template")
 public class MsgTemplate extends IdEntity {
+    public static final int STATUS_PASS = 1;
+    public static final int STATUS_WAIT = 0;
+    public static final int STATUS_FAIL = -1;
     private String tempId;
     private String tenantId;
     private String appId;
