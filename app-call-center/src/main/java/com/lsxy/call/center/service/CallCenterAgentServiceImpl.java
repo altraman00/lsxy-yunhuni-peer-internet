@@ -745,7 +745,9 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             success = true;
             return state;
         }finally {
-            agentLock.unlock();
+            if(agentLock!=null){
+                agentLock.unlock();
+            }
             //这里一定要在unlock后再 坐席找排队，因为lua脚本里的坐席lock不支持可重入
             if(success && state.contains(CallCenterAgent.STATE_IDLE)){
                 try{
