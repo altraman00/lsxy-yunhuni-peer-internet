@@ -6,7 +6,9 @@ package com.lsxy.yunhuni.api.apicertificate.model;
  */
 public enum  CertAccountQuotaType {
     CallQuota("通话时长配额",CertAccountQuota.CALTYPE_SUM),
-    AgentQuota("坐席在线个数配额",CertAccountQuota.CALTYPE_COUNT);
+    AgentQuota("坐席在线个数配额",CertAccountQuota.CALTYPE_COUNT),
+    SmsQuota("短信条数配额",CertAccountQuota.SMS_COUNT),
+    UssdQuota("闪印条数配额",CertAccountQuota.USSD_COUNT);
 
     private String name;
     private Integer calType;

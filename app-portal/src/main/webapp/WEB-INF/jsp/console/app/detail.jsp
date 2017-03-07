@@ -122,6 +122,8 @@
                                                                 <c:if test="${app.isVoiceValidate=='1'}">语音验证码&nbsp;</c:if>
                                                                 <c:if test="${app.isIvrService=='1'}">自定义IVR&nbsp;</c:if>
                                                                 <c:if test="${app.isCallCenter==1}">呼叫中心&nbsp;</c:if>
+                                                                <c:if test="${app.isMsm=='1'}">短信&nbsp;</c:if>
+                                                                <c:if test="${app.isUssd==1}">闪印&nbsp;</c:if>
                                                             </p>
                                                         </div>
                                                     </div>
@@ -236,24 +238,29 @@
                                 <!--新的应用详情结束-->
                             <section class="panel panel-default pos-rlt clearfix application-tab">
                                 <ul id="myTab" class="nav nav-tabs">
-                                    <c:if test="${app.serviceType=='call_center'}">
+                                    <c:if test="${app.serviceType == 'voice'}"><%--语音--%>
+                                        <li class="active" data-id="play"><a href="#play" data-toggle="tab">放音媒体库</a></li>
+                                        <li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>
+                                        <li data-id="number"><a href="#number" data-toggle="tab">号码绑定</a></li>
+                                        <li data-id="subAccount"><a href="#subAccount" data-toggle="tab">子账号</a></li>
+                                    </c:if>
+                                    <c:if test="${app.serviceType == 'msg'}"><%--消息--%>
+                                        <li data-id="template" class="active"><a href="#template" data-toggle="tab">模板列表</a></li>
+                                        <li data-id="subAccount" ><a href="#subAccount" data-toggle="tab">子账号</a></li>
+                                    </c:if>
+                                    <c:if test="${app.serviceType == 'call_center'}"><%--呼叫中心--%>
                                         <li data-id="extension" class="active"><a href="#extension" data-toggle="tab">分机列表</a></li>
                                         <li data-id="agent"><a href="#agent" data-toggle="tab">坐席列表</a></li>
                                         <li data-id="queue"><a href="#queue" data-toggle="tab">排队条件</a></li>
+                                        <li data-id="play"><a href="#play" data-toggle="tab">放音媒体库</a></li>
+                                        <li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>
+                                        <li data-id="number"><a href="#number" data-toggle="tab">号码绑定</a></li>
+                                        <li data-id="subAccount"><a href="#subAccount" data-toggle="tab">子账号</a></li>
                                     </c:if>
-                                    <li <c:if test="${app.serviceType!='call_center'}">class="active" </c:if> data-id="play">
-                                        <a href="#play" data-toggle="tab">
-                                            放音媒体库
-                                        </a>
-                                    </li>
-                                    <li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>
-                                    <!--号码绑定-->
-                                    <li data-id="number"><a href="#number" data-toggle="tab">号码绑定</a></li>
-                                    <li data-id="subAccount"><a href="#subAccount" data-toggle="tab">子账号</a></li>
                                     <li class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
-                                    <div class="tab-pane fade<c:if test="${app.serviceType!='call_center'}"> in active</c:if>" id="play">
+                                    <div class="tab-pane fade<c:if test="${app.serviceType=='voice'}"> in active</c:if>" id="play">
                                         <p class="application_info">
                                             当您的应用需要开通语音通知、自定义IVR或者云呼叫中心时，请上传语音文件至放音媒体库，语音文件均需要审核
                                         </p>
@@ -261,9 +268,7 @@
                                             <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="文件名" id="name"/></div>
                                             <div class="col-md-3 remove-padding" style="padding-left:15px;">
                                                 <input type="text" class="form-control" placeholder="关联子账号" id="voice_file_subId"/>
-                                                <%--<select id="voice_file_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号" >--%>
-                                                <%--</select>--%>
-                                                <%--<input type="text" class="form-control " placeholder="子账号鉴权账号" id="subId"/>--%></div>
+                                            </div>
                                             <div class="col-md-1"><button class="btn btn-primary" type="button" onclick="upplay()">查询</button></div>
                                             <div class="col-md-8 sizebox  remove-padding " id="voiceFilePlay">
                                             </div>
@@ -374,7 +379,6 @@
                                         </section>
                                     </div>
                                     <!--号码绑定end-->
-
                                     <!--分机列表-->
                                     <div class="tab-pane fade<c:if test="${app.serviceType=='call_center'}"> in active</c:if>" id="extension">
                                         <div class="form-group">
@@ -382,7 +386,7 @@
                                             <div class="col-md-3 remove-padding" style="padding-left:15px;">
                                                 <%--<select id="extension_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号"  >--%>
                                                 <%--</select>--%>
-                                                    <input type="text" class="form-control" placeholder="关联子账号" id="extension_subId" /></div>
+                                                <input type="text" class="form-control" placeholder="关联子账号" id="extension_subId" /></div>
                                             <div class="col-md-2">
                                                 <button class="btn btn-primary" type="button" onclick="extensionList()">查询</button>
                                                 <button href="#"  class="btn btn-primary defind modalShow" data-id="six" >创建分机</button>
@@ -406,6 +410,45 @@
                                         </table>
                                         <section class="panel panel-default yunhuni-personal">
                                             <div id="extension-page"></div>
+                                        </section>
+                                    </div>
+                                    <!--分机列表end-->
+                                    <!--模板列表-->
+                                    <div class="tab-pane fade<c:if test="${app.serviceType=='msg'}"> in active</c:if>" id="template">
+                                        <p class="application_info">
+                                            1.提交模板申请前，请仔细阅读文档：模板使用说明</br>
+                                            2.短信模板只能在所属应用下使用，不允许跨应用使用</br>
+                                            3.会员需进行公司认证，并审核通过后才能新增模板</br>
+                                            4.会员在进行闪印和短信的测试时，可以使用平台提供测试模板
+                                        </p>
+                                        <div class="form-group">
+                                            <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="模板名称" id="template_num" /></div>
+                                            <div class="col-md-3 remove-padding" style="padding-left:15px;">
+                                                <%--<select id="extension_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号"  >--%>
+                                                <%--</select>--%>
+                                                    <input type="text" class="form-control" placeholder="关联子账号" id="template_subId" /></div>
+                                            <div class="col-md-2">
+                                                <button class="btn btn-primary" type="button" onclick="extensionList()">查询</button>
+                                                <button href="#"  class="btn btn-primary defind modalShow" data-id="six" >新增模板</button>
+                                            </div>
+                                        </div>
+                                        <table class="table table-striped cost-table-history tablelist" id="template-table">
+                                            <thead>
+                                            <tr>
+                                                <th class="">模板编号</th>
+                                                <th class="">模板类型</th>
+                                                <th class="">模板名称</th>
+                                                <th>内容</th>
+                                                <th class="">状态</th>
+                                                <th class="">操作</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="template-list">
+
+                                            </tbody>
+                                        </table>
+                                        <section class="panel panel-default yunhuni-personal">
+                                            <div id="template-page"></div>
                                         </section>
                                     </div>
                                     <!--分机列表end-->
@@ -496,17 +539,22 @@
                                                 <button href="#"  class="btn btn-primary defind modalShow" data-id="five" >创建子账号</button>
                                             </div>
                                         </div>
-
-
                                         <table class="table table-striped cost-table-history tablelist" id="subAccount-table">
                                             <thead>
                                             <tr>
                                                 <th class="text-center">鉴权账号</th>
                                                 <th class="text-center">密钥</th>
-                                                <th class="text-center">语音用量 /总量（分钟）</th>
-<%--<c:if test="${app.serviceType == 'call_center'}">--%>
-                                                <%--<th class="text-center">坐席用量 /总量（个）</th>--%>
-<%--</c:if>--%>
+                                                <c:if test="${app.serviceType == 'voice'}">
+                                                    <th class="text-center">语音用量 /总量（分钟）</th>
+                                                </c:if>
+                                                <c:if test="${app.serviceType == 'call_center'}">
+                                                    <th class="text-center">语音用量 /总量（分钟）</th>
+                                                    <%--<th class="text-center">坐席用量 /总量（个）</th>--%>
+                                               </c:if>
+                                               <c:if test="${app.serviceType == 'msg'}">
+                                                   <th class="text-center">闪印用量 /配额（条）</th>
+                                                   <th class="text-center">短信用量/配额（条）</th>
+                                               </c:if>
                                                 <th class="text-center">状态</th>
                                                 <th class="text-center">备注</th>
                                                 <th class="text-center">操作</th>
@@ -562,26 +610,57 @@
                                                         <p>（负数为额度不作限制，0则表示额度为0，正数为具体的使用额度限制）</p>
                                                     </div>
                                                 </div>
-                                                <div class="row margin-bottom-10">
-                                                    <div class="col-md-1 dev line-height-32">语音(分钟)：</div>
-                                                    <div class="col-md-6">
-                                                        <p>
-                                                            <input type="text"  class="form-control"  v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
-                                                        </p>
+                                                <c:if test="${app.serviceType == 'voice'}">
+                                                    <div class="row margin-bottom-10">
+                                                        <div class="col-md-1 dev line-height-32">语音(分钟)：</div>
+                                                        <div class="col-md-6">
+                                                            <p>
+                                                                <input type="text"  class="form-control"  v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
+                                                            </p>
+                                                        </div>
+                                                        <span class="col-md-1 line-height-32 text-left text-danger">*</span>
                                                     </div>
-                                                    <span class="col-md-1 line-height-32 text-left text-danger">*</span>
-                                                </div>
-                                                <%--<c:if test="${app.serviceType == 'call_center'}">--%>
-                                                <%--<div class="row margin-bottom-10">--%>
-                                                    <%--<div class="col-md-1 dev">--%>
-                                                        <%--坐席（个）：--%>
+                                                </c:if>
+                                                <c:if test="${app.serviceType == 'call_center'}">
+                                                    <div class="row margin-bottom-10">
+                                                        <div class="col-md-1 dev line-height-32">语音(分钟)：</div>
+                                                        <div class="col-md-6">
+                                                            <p>
+                                                                <input type="text"  class="form-control"  v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
+                                                            </p>
+                                                        </div>
+                                                        <span class="col-md-1 line-height-32 text-left text-danger">*</span>
+                                                    </div>
+                                                    <%--<div class="row margin-bottom-10">--%>
+                                                        <%--<div class="col-md-1 dev line-height-32">坐席（个）：</div>--%>
+                                                        <%--<div class="col-md-6">--%>
+                                                            <%--<p>--%>
+                                                                <%--<input type="text"  class="form-control"  v-model="seatNum" value="{{seatNum}}" placeholder=""/>--%>
+                                                            <%--</p>--%>
+                                                        <%--</div>--%>
+                                                        <%--<span class="col-md-1 line-height-32 text-left text-danger">*</span>--%>
                                                     <%--</div>--%>
-                                                    <%--<div class="col-md-6">--%>
-                                                        <%--<input type="text"  class="form-control"  v-model="seatNum" value="{{seatNum}}" placeholder=""/>--%>
-                                                    <%--</div>--%>
-                                                    <%--<span class="col-md-1 line-height-32 text-left text-danger">*</span>--%>
-                                                <%--</div>--%>
-                                                <%--</c:if>--%>
+                                                </c:if>
+                                                <c:if test="${app.serviceType == 'msg'}">
+                                                    <div class="row margin-bottom-10">
+                                                        <div class="col-md-1 dev line-height-32">闪印（条）：</div>
+                                                        <div class="col-md-6">
+                                                            <p>
+                                                                <input type="text"  class="form-control"  v-model="ussdNum" value="{{ussdNum}}" placeholder=""/>
+                                                            </p>
+                                                        </div>
+                                                        <span class="col-md-1 line-height-32 text-left text-danger">*</span>
+                                                    </div>
+                                                    <div class="row margin-bottom-10">
+                                                        <div class="col-md-1 dev line-height-32">短信（条）：</div>
+                                                        <div class="col-md-6">
+                                                            <p>
+                                                                <input type="text"  class="form-control"  v-model="smsNum" value="{{smsNum}}" placeholder=""/>
+                                                            </p>
+                                                        </div>
+                                                        <span class="col-md-1 line-height-32 text-left text-danger">*</span>
+                                                    </div>
+                                                </c:if>
                                                 <div class="row margin-bottom-10">
                                                     <div class="col-md-1 dev line-height-32">
                                                         备注：
@@ -597,36 +676,38 @@
                                                     <button class="btn btn-primary" type="button" onclick="tosubAccountHome1()">返回</button>
                                                 </div>
                                             </div>
-                                            <p class="noticeInfo hr text-success"></p>
-                                            <p class="margin-bottom-20"></p>
-                                            <div class="row margin-bottom-20">
-                                                <div class="col-md-12">
-                                                    <a class="btn btn-primary" onclick="unallband2()" >全部解除绑定</a>
-                                                    <c:if test="${app.status==1}">
-                                                        <a class="btn btn-primary" id="call-number2" data-num-bind="">绑定号码</a>
-                                                    </c:if>
+                                            <c:if test="${app.serviceType == 'voice' ||app.serviceType == 'call_center' }">
+                                                <p class="noticeInfo hr text-success"></p>
+                                                <p class="margin-bottom-20"></p>
+                                                <div class="row margin-bottom-20">
+                                                    <div class="col-md-12">
+                                                        <a class="btn btn-primary" onclick="unallband2()" >全部解除绑定</a>
+                                                        <c:if test="${app.status==1}">
+                                                            <a class="btn btn-primary" id="call-number2" data-num-bind="">绑定号码</a>
+                                                        </c:if>
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <table class="table table-striped cost-table-history tablelist" id="number-table2">
-                                                <thead>
-                                                <tr>
-                                                    <th class="text-center">号码</th>
-                                                    <th class="text-center">状态</th>
-                                                    <th class="text-center">可呼入</th>
-                                                    <th class="text-center">可呼出</th>
-                                                    <th class="text-center"><span class="text-center-l-fixed">归属地</span></th>
-                                                    <th class="text-center">有效期</th>
-                                                    <th class="text-center">操作</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody id="band-table2">
+                                                <table class="table table-striped cost-table-history tablelist" id="number-table2">
+                                                    <thead>
+                                                    <tr>
+                                                        <th class="text-center">号码</th>
+                                                        <th class="text-center">状态</th>
+                                                        <th class="text-center">可呼入</th>
+                                                        <th class="text-center">可呼出</th>
+                                                        <th class="text-center"><span class="text-center-l-fixed">归属地</span></th>
+                                                        <th class="text-center">有效期</th>
+                                                        <th class="text-center">操作</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody id="band-table2">
 
-                                                </tbody>
-                                            </table>
-                                            <section class="panel panel-default yunhuni-personal">
-                                                <div id="bandpage2"></div>
-                                            </section>
+                                                    </tbody>
+                                                </table>
+                                                <section class="panel panel-default yunhuni-personal">
+                                                    <div id="bandpage2"></div>
+                                                </section>
+                                            </c:if>
                                         </div>
                                     </div>
                                     <!--子账号end-->
@@ -790,22 +871,47 @@
                         （负数为额度不作限制，0则表示额度为0，正数为具体的使用额度限制）
                     </div>
                 </div>
-                <div class="row margin-bottom-10">
-                    <lable class="col-md-3 text-right line-height-32">语音（分钟）：</lable>
-                    <div class="col-md-8 remove-padding-right">
-                        <input type="text" class="form-control" v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
+                <c:if test="${app.serviceType == 'voice'}">
+                    <div class="row margin-bottom-10">
+                        <lable class="col-md-3 text-right line-height-32">语音（分钟）：</lable>
+                        <div class="col-md-8 remove-padding-right">
+                            <input type="text" class="form-control" v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
+                        </div>
+                        <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
                     </div>
-                    <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
-                </div>
-                <%--<c:if test="${app.serviceType == 'call_center'}">--%>
-                <%--<div class="row margin-bottom-10">--%>
-                    <%--<lable class="col-md-3 text-right line-height-32">坐席（个）：</lable>--%>
-                    <%--<div class="col-md-8 remove-padding-right">--%>
-                        <%--<input type="text" class="form-control" v-model="seatNum"  value="{{seatNum}}" placeholder="" />--%>
+                </c:if>
+                <c:if test="${app.serviceType == 'call_center'}">
+                    <div class="row margin-bottom-10">
+                        <lable class="col-md-3 text-right line-height-32">语音（分钟）：</lable>
+                        <div class="col-md-8 remove-padding-right">
+                            <input type="text" class="form-control" v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
+                        </div>
+                        <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
+                    </div>
+                    <%--<div class="row margin-bottom-10">--%>
+                        <%--<lable class="col-md-3 text-right line-height-32">坐席（个）：</lable>--%>
+                        <%--<div class="col-md-8 remove-padding-right">--%>
+                            <%--<input type="text" class="form-control" v-model="seatNum" value="{{seatNum}}" placeholder=""/>--%>
+                        <%--</div>--%>
+                        <%--<span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>--%>
                     <%--</div>--%>
-                    <%--<span class="col-md-1 line-height-32 text-left text-danger padding-left-5">*</span>--%>
-                <%--</div>--%>
-                <%--</c:if>--%>
+                </c:if>
+                <c:if test="${app.serviceType == 'msg'}">
+                    <div class="row margin-bottom-10">
+                        <lable class="col-md-3 text-right line-height-32">闪印（条）：</lable>
+                        <div class="col-md-8 remove-padding-right">
+                            <input type="text" class="form-control" v-model="ussdNum" value="{{ussdNum}}" placeholder=""/>
+                        </div>
+                        <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
+                    </div>
+                    <div class="row margin-bottom-10">
+                        <lable class="col-md-3 text-right line-height-32">短信（条）：</lable>
+                        <div class="col-md-8 remove-padding-right">
+                            <input type="text" class="form-control" v-model="smsNum" value="{{smsNum}}" placeholder=""/>
+                        </div>
+                        <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
+                    </div>
+                </c:if>
                 <div class="row">
                     <lable class="col-md-3 text-right line-height-32">备注：</lable>
                     <div class="col-md-8 remove-padding-right">
@@ -932,8 +1038,8 @@
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.fileupload-process.js"></script>
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.iframe-transport.js"></script>
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.fileupload-validate.js"></script>
-        <link rel="stylesheet" href="${resPrefixUrl }/js/dist/css/bootstrap-select.css">
-        <script src="${resPrefixUrl }/js/dist/js/bootstrap-select.js"></script>
+<link rel="stylesheet" href="${resPrefixUrl }/js/dist/css/bootstrap-select.css">
+<script src="${resPrefixUrl }/js/dist/js/bootstrap-select.js"></script>
 
         <script>
             $('.cancelfive').click(function(){
@@ -992,13 +1098,6 @@
                         showtoast("非常抱歉，本站的上传文件功能，暂时不支持IE9及以下的浏览器版本，请更换或者升级浏览器");
                     })
                 }
-//                var appStatus = $("#appStatus").val();
-//                if(appStatus == 2){
-//                    $('#uploadButtonA').unbind("click").bind("click",function(){
-//                        showtoast("请先上线应用");
-//                    })
-//                }
-//                getSubAccountByAppId();
             }
             // 上传多个文件
             var cancelCancel=false;
@@ -1157,9 +1256,6 @@
         },"post");
 
     });
-    function subAccountDatial(){
-        console.info("进入页面")
-    }
     /**修改子账号**/
     var editSubAccountFive = new Vue({
         el:'#subAccount_datail',
@@ -1170,7 +1266,10 @@
             url:'',
             remark:'',
             voiceNum:'',
-            seatNum:''
+            seatNum:'',
+            ussdNum:'',
+            smsNum:'',
+            ussdNum:''
         },methods:{
             initObj:function(obj){
                 this.id=obj.id;
@@ -1180,16 +1279,21 @@
                 this.remark=obj.remark;
                 this.voiceNum= obj.voiceNum;
                 this.seatNum=obj.seatNum;
+                this.smsNum = obj.smsNum;
+                this.ussdNum = obj.ussdNum;
             },
             initObj2:function(obj){
                 this.id=this.certId=this.secretKey = this.url= this.remark='';
-                this.voiceNum= this.seatNum=-1;
+                this.voiceNum= this.seatNum=this.ussdNum=this.smsNum=-1;
             }
         }
     });
     function editSubAccount(){
-        if(isNaN(editSubAccountFive.voiceNum) || isNaN(editSubAccountFive.seatNum) ||
-            editSubAccountFive.voiceNum=='' || editSubAccountFive.seatNum==''){
+        if(isNaN(editSubAccountFive.voiceNum) ||editSubAccountFive.voiceNum==''||
+            isNaN(editSubAccountFive.seatNum) ||editSubAccountFive.seatNum==''||
+            isNaN(editSubAccountFive.ussdNum) ||editSubAccountFive.ussdNum==''||
+            isNaN(editSubAccountFive.smsNum) ||editSubAccountFive.smsNum==''
+        ){
             showtoast("配额参数必须为数字");
             return;
         }
@@ -1207,6 +1311,8 @@
             'url':editSubAccountFive.url,
             'voiceNum':new Number(editSubAccountFive.voiceNum),
             'seatNum':new Number(editSubAccountFive.seatNum),
+            'ussdNum':new Number(editSubAccountFive.ussdNum),
+            'smsNum':new Number(editSubAccountFive.smsNum),
             'remark':editSubAccountFive.remark,
             csrfParameterName:csrfToken
         }
@@ -1283,19 +1389,24 @@
             url:'',
             voiceNum:-1,
             seatNum:-1,
+            ussdNum:-1,
+            smsNum:-1,
             remark:''
         },
         methods:{
             init:function(){
                 this.url=this.remark='';
-                this.voiceNum=this.seatNum=-1;
+                this.voiceNum=this.seatNum=this.smsNum=this.ussdNum=-1;
             }
         }
     });
     $('.modalSureFive').click(function(){
         var id = $(this).attr('data-id');
-        if(isNaN(createSubAccountFive.voiceNum) || isNaN(createSubAccountFive.seatNum) ||
-            createSubAccountFive.voiceNum=='' || createSubAccountFive.seatNum==''){
+        if(isNaN(createSubAccountFive.voiceNum) || createSubAccountFive.voiceNum==''||
+            isNaN(createSubAccountFive.seatNum) ||createSubAccountFive.seatNum=='' ||
+            isNaN(createSubAccountFive.smsNum) ||createSubAccountFive.smsNum=='' ||
+            isNaN(createSubAccountFive.ussdNum) ||createSubAccountFive.ussdNum==''
+        ){
             showtoast("配额参数必须为数字");
             return;
         }
@@ -1313,6 +1424,8 @@
             'url':createSubAccountFive.url,
             'voiceNum':createSubAccountFive.voiceNum,
             'seatNum':createSubAccountFive.seatNum,
+            'smsNum':createSubAccountFive.smsNum,
+            'ussdNum':createSubAccountFive.ussdNum,
             'remark':createSubAccountFive.remark,
             csrfParameterName:csrfToken
         }
@@ -1543,22 +1656,11 @@
         });
     }
 
-
-    //默认加载放音文件分页
-    $(function () {
-        if('${app.serviceType}'=='call_center') {
-            extensionList();
-        }else{
-            upplay();
-        }
-    });
     /**
      *触发放音文件分页
      */
     var pagePlay ;
-    function voiceRecordTab(){
-        $('#uploadButton').hide();
-    }
+
     function upplay(){
         $('#uploadButton').show();
         //获取数据总数
@@ -1649,40 +1751,43 @@
         },"post");
 
     }
-
-
-
+    //默认加载放音文件分页
+    $(function () {
+        var type = $('#myTab li[class=active]').attr('data-id');
+        updateList(type);
+    });
     $('#myTab li').click(function(){
         var type = $(this).attr('data-id');
-        if(type=='voice'){
-            voiceRecordTab();
-        }
+        updateList(type);
+    });
+    function updateList(type){
         if(type=='play'){
             upplay();
-        }
-        if(type=='number'){
-            upnumber();
-        }
-        if(type=='extension'){
-            extensionList();
-        }
-        if(type=='agent'){
-            agentList();
-        }
-        if(type=='subAccount' ){
-            tosubAccountHome();
-            subAccountList();
+            $('#uploadButton').show();
+        }else{
+            if(type=='voice'){
+                //录音文件暂时没文件
+            }
+            if(type=='number'){
+                upnumber();
+            }
+            if(type=='extension'){
+                extensionList();
+            }
+            if(type=='agent'){
+                agentList();
+            }
+            if(type=='subAccount' ){
+                tosubAccountHome();
+                subAccountList();
+            }
+            if(type=='queue'){
+                queueList();
+            }
+            //除了放音文件标签外，其他都不显示上传放音文件按钮
             $('#uploadButton').hide();
         }
-        if(type=='queue'){
-            queueList();
-        }
-//        getSubAccountByAppId();
-    });
-
-//    fileTotalSoze();
-
-
+    }
     // 号码绑定
     var vue = new Vue({
         el: '#vue-application',
@@ -1889,7 +1994,6 @@
      *绑定号码分页
      */
     function upnumber(){
-        $('#uploadButton').hide();
         //获取数据总数
         var count = 0;
         var params = {"pageNo":1,"pageSize":10};
@@ -2166,7 +2270,7 @@
      */
     var extensionPage;
     function extensionList(){
-        $('#uploadButton').hide();
+
         //获取数据总数
         var count = 0;
         var extensionNum = $('#extension_num').val();
@@ -2251,7 +2355,6 @@
      */
     var agentPage;
     function agentList(){
-        $('#uploadButton').hide();
         //获取数据总数
         var count = 0;
         var agentNum = $('#agent_num').val();
@@ -2279,7 +2382,6 @@
      */
     var queuePage;
     function queueList(){
-        $('#uploadButton').hide();
         //获取数据总数
         var count = 0;
         var queueNum = $('#queue_num').val();
@@ -2316,11 +2418,16 @@
         for(var i =0 ; i<data.length; i++){
             html +='<tr class="playtr" id="play-'+data[i].id+'">' +
                 '<td class="text-center">'+ data[i].certId +'</td>' +
-                '<td class="text-center">'+ data[i].secretKey +'</td>'+
-                '<td class="text-center">' + data[i].voiceNum + '</td>' ;
-//            if(appServiceType == 'call_center'){
+                '<td class="text-center">'+ data[i].secretKey +'</td>';
+            if(appServiceType=='msg'){
+                html += '<td class="text-center">' + data[i].ussdNum + '</td>' ;
+                html += '<td class="text-center">' + data[i].smsNum + '</td>' ;
+            }else if(appServiceType=='call_center'){
+                html += '<td class="text-center">' + data[i].voiceNum + '</td>' ;
 //                html += '<td class="text-center">' + data[i].seatNum + '</td>' ;
-//            }
+            }else if(appServiceType=='voice'){
+                html += '<td class="text-center">' + data[i].voiceNum + '</td>' ;
+            }
             var state = data[i].enabled == 1?"启用":"禁用";
             var color = data[i].enabled == 1?"text-success":"text-danger";
             var stateEdit = data[i].enabled == 1?"禁用":"启用";
