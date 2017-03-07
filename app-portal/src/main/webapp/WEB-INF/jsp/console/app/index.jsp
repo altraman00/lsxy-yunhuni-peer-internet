@@ -160,9 +160,9 @@
                                                     <%--<p><input type="checkbox" name="isRecording" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if>  <c:if test="${app.isRecording=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">通话录音</font>（提供通话录音、录音存储管理等功能）</p>--%>
                                                 <p><input type="checkbox" name="isVoiceValidate" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceValidate=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">语音验证码</font>（通过电话直呼到用户手机并语音播报验证码）</p>
                                                 <p><input type="checkbox" name="isIvrService" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isIvrService=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">自定义IVR</font>（即互动式语音应答，可根据IVR交互协议完成更加复杂的通讯业务功能）</p>
-                                                <div class="tips ml-36">
-                                                    <p class="app-tips ">该选项开启后，将产生1000元的号码租用费以及100元/月的功能费，应用上线时开始收取，多个应用开启并上线会叠加收费</p>
-                                                </div>
+                                                <%--<div class="tips ml-36">--%>
+                                                    <%--<p class="app-tips ">该选项开启后，将产生1000元的号码租用费以及100元/月的功能费，应用上线时开始收取，多个应用开启并上线会叠加收费</p>--%>
+                                                <%--</div>--%>
                                             </div>
                                         </div>
                                         <!--消息-->
