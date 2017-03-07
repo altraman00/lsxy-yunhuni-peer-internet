@@ -684,19 +684,23 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         if(logger.isDebugEnabled()){
             logger.info("[{}][{}]agent={},state={}",tenantId,appId,agentId,state);
         }
-        AgentLock agentLock = new AgentLock(redisCacheService, agentId);
-        boolean lock = agentLock.lock();
-        if(!lock){
-            //获取锁失败
-            throw new SystemBusyException(
-                    new ExceptionContext()
-                            .put("tenantId",tenantId)
-                            .put("appId",appId)
-                            .put("agentId",agentId)
-                            .put("state",state)
-                            .put("force",force)
-            );
+        AgentLock agentLock = null;
+
+        if(!force){
+            agentLock = new AgentLock(redisCacheService, agentId);
+            if(!agentLock.lock()){
+                //获取锁失败
+                throw new SystemBusyException(
+                        new ExceptionContext()
+                                .put("tenantId",tenantId)
+                                .put("appId",appId)
+                                .put("agentId",agentId)
+                                .put("state",state)
+                                .put("force",force)
+                );
+            }
         }
+        boolean success = false;
         try{
             if(!force){
                 String curState = agentState.getState(agentId);
@@ -713,20 +717,23 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                     );
                 }
             }
+
             if(state == null){
                 state = CallCenterAgent.STATE_IDLE;
             }
             agentState.setState(agentId,state);
-            if(state.contains(CallCenterAgent.STATE_IDLE)){
+            success = true;
+            return state;
+        }finally {
+            agentLock.unlock();
+            //这里一定要在unlock后再 坐席找排队，因为lua脚本里的坐席lock不支持可重入
+            if(success && state.contains(CallCenterAgent.STATE_IDLE)){
                 try{
                     enQueueService.lookupQueue(tenantId,appId,null,agentId);
                 }catch (Throwable t){
                     logger.info("座席空闲，查找排队出错:{}",t);
                 }
             }
-            return state;
-        }finally {
-            agentLock.unlock();
         }
     }
 
