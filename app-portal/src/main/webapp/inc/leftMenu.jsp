@@ -17,7 +17,7 @@
 	}
 %>
 
-<aside class="bg-Green lter aside hidden-print <%= name %> " id="nav" style="width:184px">
+<aside class="bg-Green lter aside hidden-print <%= name %> " id="nav" >
 <section class="w-f">
 	<header class="head bg_green lter text-center clearfix">
 		<a id='togglerMiniSidebar' href="#nav" data-toggle="class:nav-xs" class="text-center btn btn_b">
