@@ -5,6 +5,7 @@ import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.msg.api.model.MsgTemplate;
 import com.lsxy.yunhuni.api.app.model.AppOnlineAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,20 +25,18 @@ import static com.lsxy.framework.web.rest.RestRequest.buildSecurityRequest;
 @RequestMapping("/console/msg_template")
 public class MsgTemplateController extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(MsgTemplateController.class);
-//    @RequestMapping("/plist")
-//    public RestResponse getPage(HttpServletRequest request,@RequestParam(defaultValue = "1") int pageNo, @RequestParam(defaultValue = "20") int pageSize, @RequestParam String appId, String name, String subId ){
-//        String token = getSecurityToken(request);
-//        String url = PortalConstants.REST_PREFIX_URL + "/rest/msg_template";
-//        RestResponse<AppOnlineAction> response =  buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
-//
-//        Page page = msgTemplateService.getPageByCondition(pageNo,pageSize,appId,name,subId);
-//        return RestResponse.success(page);
-//    }
+    @RequestMapping("/plist")
+    public RestResponse getPage(HttpServletRequest request,@RequestParam(defaultValue = "1") int pageNo, @RequestParam(defaultValue = "20") int pageSize, @RequestParam String appId, String name, String subId ){
+        String token = getSecurityToken(request);
+        String url = PortalConstants.REST_PREFIX_URL + "/rest/msg_template/plist";
+        RestResponse response =  buildSecurityRequest(token).getPage(url,MsgTemplate.class,appId);
+        return response;
+    }
 //    @RequestMapping(value = "/new")
 //    public RestResponse create(HttpServletRequest request, String appId, String type, String name, String content, String remark){
-//        Account account = getCurrentAccount();
-//        MsgTemplate msgTemplate = new MsgTemplate(account.getTenant().getId(),appId,name,type,content,remark);
-//        msgTemplateService.save(msgTemplate);
+//        String token = getSecurityToken(request);
+//        String url = PortalConstants.REST_PREFIX_URL + "/rest/msg_template/new";
+//        RestResponse response =  buildSecurityRequest(token).post(url,String.class,appId);
 //        return RestResponse.success("成功");
 //    }
 //    @RequestMapping(value = "/eidt/{id}")
