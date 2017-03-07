@@ -96,9 +96,6 @@ for i=1,adleAgentTotal do
 	local ok = redis.call('setnx',agent_lock_key_prefix..agent_id, lock_info)
 	redis.log(redis.LOG_WARNING,ok)
 	if ok == 1 then
-		redis.call('HSET',agent_state_key_prefix..agent_id,'lastTime',cur_time)
-		redis.call('HSET',agent_state_key_prefix..agent_id,'state',fetching)
-		redis.call('DEL', agent_lock_key_prefix..agent_id)
 		local agent = array_to_map(redis.call('HGETALL',agent_state_key_prefix..agent_id))
 		redis.log(redis.LOG_WARNING,agent['state'])
 		redis.log(redis.LOG_WARNING,agent['extension'])
