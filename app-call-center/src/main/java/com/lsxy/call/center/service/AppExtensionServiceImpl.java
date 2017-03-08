@@ -378,4 +378,9 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
         }
         return exs;
     }
+
+    @Override
+    public AppExtension getByUser(String user) {
+        return appExtensionDao.findByUser(user);
+    }
 }

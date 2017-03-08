@@ -416,7 +416,7 @@ public class ConversationService {
         return callId;
     }
 
-    public String agentCall(String subaccountId,String appId,String conversationId,String agentId,String agentName,String extension,
+    public String agentCall(String subaccountId,String appId,String ref_res_id,String conversationId,String agentId,String agentName,String extension,
                               String systemNum,String agentPhone,String type,String user,
                               Integer maxDuration, Integer maxDialDuration,Integer voiceMode,String userData) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
@@ -463,7 +463,7 @@ public class ConversationService {
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
                 .put("areaId",areaId)
-                .putIfNotEmpty(BusinessState.REF_RES_ID,null)
+                .putIfNotEmpty(BusinessState.REF_RES_ID,ref_res_id)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
         try {
@@ -483,7 +483,7 @@ public class ConversationService {
                 .setLineGatewayId(lineId)
                 .setUserdata(userData)
                 .setBusinessData(new MapBuilder<String,String>()
-                        .putIfNotEmpty(BusinessState.REF_RES_ID,null)
+                        .putIfNotEmpty(BusinessState.REF_RES_ID,ref_res_id)
                         .putIfNotEmpty(CallCenterUtil.CONVERSATION_FIELD,conversationId)
                         .putIfNotEmpty(CallCenterUtil.AGENT_ID_FIELD,agentId)
                         .putIfNotEmpty(CallCenterUtil.AGENT_NAME_FIELD,agentName)

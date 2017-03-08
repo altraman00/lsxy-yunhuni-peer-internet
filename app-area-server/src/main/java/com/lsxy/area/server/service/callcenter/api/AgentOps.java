@@ -383,6 +383,9 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         }
         //有正在处理的交谈
         if(state != null && (state.getClosed() == null || !state.getClosed())){
+            if(state.getBusinessData().get("invite_to") != null){
+                throw new SystemBusyException();
+            }
             //TODO 将其他交谈全部设置为保持（cti需要提供批量） 这里应该是阻塞调用好点
 
             //创建新的交谈，交谈创建成功事件中将坐席加入到新的交谈， 坐席加入交谈成功事件中呼叫外线，在振铃事件中把外线加入交谈 交谈正式开始
@@ -414,7 +417,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     );
                 }
                 try{
-                    callId = conversationService.agentCall(subaccountId,appId,conversationId,agent,
+                    callId = conversationService.agentCall(subaccountId,appId,null,conversationId,agent,
                             callCenterAgent.getName(),
                             extension.getId(),from,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null,userData);
                     agentState.setState(agent,CallCenterAgent.STATE_FETCHING);
@@ -601,6 +604,9 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         }
         //有正在处理的交谈
         if(state != null && (state.getClosed() == null || !state.getClosed())){
+            if(state.getBusinessData().get("enqueue_xml") != null){
+                throw new SystemBusyException();
+            }
             //TODO 将其他交谈全部设置为保持（cti需要提供批量） 这里应该是阻塞调用好点
 
             //创建新的交谈，交谈创建成功事件中将坐席加入到新的交谈， 坐席加入交谈成功事件中进行排队，在振铃事件中把排到的坐席加入交谈 交谈正式开始
@@ -634,7 +640,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     );
                 }
                 try{
-                    callId = conversationService.agentCall(subaccountId,appId,conversationId,agent,
+                    callId = conversationService.agentCall(subaccountId,appId,null,conversationId,agent,
                             callCenterAgent.getName(),
                             extension.getId(),null,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null,enQueue.getUser_data());
                     agentState.setState(agent,CallCenterAgent.STATE_FETCHING);
@@ -965,7 +971,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     );
                 }
                 try{
-                    callId = conversationService.agentCall(subaccountId,appId,conversationId,agent,
+                    callId = conversationService.agentCall(subaccountId,appId,conversationState.getBusinessData().get(BusinessState.REF_RES_ID),conversationId,agent,
                             callCenterAgent.getName(),
                             extension.getId(),null,extension.getTelnum(),extension.getType(),extension.getUser(),null,null,null,conversationState.getUserdata());
                     agentState.setState(agent,CallCenterAgent.STATE_FETCHING);
