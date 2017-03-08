@@ -40,13 +40,13 @@ public class ResultAllMass extends BaseResult {
             } else {
                 this.no.addAll(resultMass.getBadPhones());//接口失败。全部号码失败。没存数据库。
             }
-            if( !SUCCESS.equals( resultMass.getResultCode() )) {
+            if( !MsgConstant.SUCCESS.equals( resultMass.getResultCode() )) {
                 this.resultDesc = resultMass.getResultDesc();
             }
         }
 
         if( this.pendingNum > 0){
-            this.resultCode = SUCCESS;
+            this.resultCode = MsgConstant.SUCCESS;
         }else{
             this.resultCode = "-1";
         }

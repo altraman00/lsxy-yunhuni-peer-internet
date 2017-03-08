@@ -1,9 +1,8 @@
 package com.lsxy.msg.supplier.paopaoyu;
 
+import com.lsxy.msg.supplier.model.MsgConstant;
 import com.lsxy.msg.supplier.model.ResultOne;
 import net.sf.json.JSONObject;
-
-import static com.lsxy.msg.supplier.model.BaseResult.OTHER_ERROR_CODE;
 
 /**
  * 泡泡鱼单发结果处理
@@ -24,12 +23,12 @@ public class PaoPaoYuResultOne extends ResultOne {
             resultDesc = resp.getString("result_desc");
             //翻译为中文
             resultDesc = PaoPaoYuResultCode.getPaoPaoYuResult( resultCode , resultDesc );
-            resultCode = OTHER_ERROR_CODE;
+            resultCode = MsgConstant.OTHER_ERROR_CODE;
         }
         this.resultCode = resultCode;
         this.resultDesc = resultDesc;
         this.taskId = taskId;
-        this.handlers = handler_paopaoyu;
+        this.handlers = PaoPaoYuConstant.handler_paopaoyu;
     }
 
 }
