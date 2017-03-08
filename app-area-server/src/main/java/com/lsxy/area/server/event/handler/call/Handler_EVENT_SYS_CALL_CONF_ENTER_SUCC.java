@@ -10,11 +10,14 @@ import com.lsxy.area.server.service.callcenter.CallConversationService;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
+import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.model.EnQueue;
-import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
-import com.lsxy.call.center.api.service.CallCenterConversationService;
-import com.lsxy.call.center.api.service.EnQueueService;
+import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.api.utils.EnQueueDecoder;
+import com.lsxy.framework.core.exceptions.api.AgentNotExistException;
+import com.lsxy.framework.core.exceptions.api.ExceptionContext;
+import com.lsxy.framework.core.exceptions.api.ExtensionNotExistException;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -24,6 +27,7 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
+import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.session.model.Meeting;
 import com.lsxy.yunhuni.api.session.model.MeetingMember;
@@ -70,9 +74,6 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
     private ConfService confService;
 
     @Autowired
-    private ConversationService conversationService;
-
-    @Autowired
     private CallConversationService callConversationService;
 
     @Reference(lazy = true,check = false,timeout = 3000)
@@ -83,6 +84,15 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
 
     @Reference(lazy = true,check = false,timeout = 3000)
     private EnQueueService enQueueService;
+
+    @Reference(timeout=3000,check = false,lazy = true)
+    private AppExtensionService appExtensionService;
+
+    @Reference(timeout=3000,check = false,lazy = true)
+    private CallCenterAgentService callCenterAgentService;
+
+    @Autowired
+    private ConversationService conversationService;
 
     @Autowired
     private RPCCaller rpcCaller;
@@ -169,6 +179,30 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
                 logger.info("排队找坐席出错",t);
                 conversationService.exit(conversation_id,call_id);
             }
+        }else if(state.getBusinessData().get("direct_agent") != null){//直拨坐席
+            String agentId = state.getBusinessData().get("direct_agent");
+            String from_extension = state.getBusinessData().get("direct_from");
+            try{
+                CallCenterAgent agent = callCenterAgentService.findById(agentId);
+                if(agent == null){
+                    throw new AgentNotExistException(new ExceptionContext().put("agentId",agentId));
+                }
+                //TODO 坐席加锁
+                if(agent.getExtension() == null){
+                    throw new ExtensionNotExistException(new ExceptionContext().put("agentId",agentId));
+                }
+                AppExtension appExtension = appExtensionService.findById(agent.getExtension());
+                //呼叫被叫
+                conversationService.inviteAgent(state.getSubaccountId(),state.getAppId(),state.getResId(),call_id,
+                        conversation_id,agent.getId(),
+                        agent.getName(),agent.getExtension(),null,from_extension,appExtension.getTelnum(),
+                        appExtension.getType(),appExtension.getUser(),ConversationService.MAX_DURATION,45,null,null);
+            }catch (Throwable t){
+                logger.info("",t);
+                conversationService.exit(conversation_id,call_id);
+            }
+        }else if(state.getBusinessData().get("direct_out") != null){//直拨外线
+            String out = state.getBusinessData().get("direct_out");
         }
     }
 

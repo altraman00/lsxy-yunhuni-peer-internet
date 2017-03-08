@@ -153,9 +153,6 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
     private CallCenterBatchInserter callCenterBatchInserter;
 
     @Autowired
-    private VoiceIvrBatchInserter voiceIvrBatchInserter;
-
-    @Autowired
     private CallbackUrlUtil callbackUrlUtil;
 
     @Autowired
@@ -341,7 +338,15 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                         }
                         //主叫调用应答
                         answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app));
-                        //应答成功创建会议 未
+
+                        businessStateService.updateInnerField(
+                                //直拨被叫-坐席分机
+                                "direct_agent",to_agentId,
+                                //直拨主叫
+                                "direct_from",from_extensionnum
+                        );
+
+                        //应答成功创建会议 ok
 
                         //会议创建成功后将call加入会议   ok
 
@@ -350,10 +355,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                         //振铃事件将被叫加入会议 ok
 
 
-                        //呼叫被叫
-//                        conversationService.inviteAgent(subaccountId,app.getId(),res_id,call_id,conversationId,to_agent.getId(),
-//                                to_agent.getName(),to_agent.getExtension(),null,from_extensionnum,to_appExtension.getTelnum(),
-//                                to_appExtension.getType(),to_appExtension.getUser(),ConversationService.MAX_DURATION,45,null,null);
+
                     }catch (Throwable t){
                         logger.info("",t);
                     }finally {

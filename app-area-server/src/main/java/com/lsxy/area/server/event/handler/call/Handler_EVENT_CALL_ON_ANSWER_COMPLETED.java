@@ -1,15 +1,30 @@
 package com.lsxy.area.server.event.handler.call;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.CallCenterUtil;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
+import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.call.center.api.model.CallCenterAgent;
+import com.lsxy.call.center.api.service.AppExtensionService;
+import com.lsxy.call.center.api.service.CallCenterAgentService;
+import com.lsxy.framework.core.exceptions.api.AgentNotExistException;
+import com.lsxy.framework.core.exceptions.api.ExceptionContext;
+import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
+import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
+import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
 import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
@@ -35,6 +50,12 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
     private AppService appService;
 
     @Autowired
+    private RPCCaller rpcCaller;
+
+    @Autowired
+    private SessionContext sessionContext;
+
+    @Autowired
     private BusinessStateService businessStateService;
 
     @Autowired
@@ -45,6 +66,12 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
 
     @Autowired
     private CallCenterStatisticsService callCenterStatisticsService;
+
+    @Autowired
+    private ConversationService conversationService;
+
+    @Autowired
+    private CallbackUrlUtil callbackUrlUtil;
 
     @Override
     public String getEventName() {
@@ -83,11 +110,46 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
         }catch (Throwable t){
             logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
         }
-        //删除等待应答标记
-        businessStateService.deleteInnerField(call_id,IVRActionService.IVR_ANSWER_WAITTING_FIELD);
-        ivrActionService.doAction(call_id,null);
+
+        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
+            String conversationId = state.getBusinessData().get(CallCenterUtil.CONVERSATION_FIELD);
+            try{
+                App app = appService.findById(state.getId());
+                //分机直拨
+                if(state.getBusinessData().get("direct_agent") != null ||
+                        state.getBusinessData().get("direct_out") != null
+                        ){//直拨坐席
+                    conversationService.create(state.getSubaccountId(),conversationId,
+                            state.getResId(),state,state.getTenantId(),state.getAppId(),
+                            state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null,state.getUserdata());
+                }
+            }catch (Throwable t){
+                logger.info("",t);
+                hangup(state.getResId(),call_id,state.getAreaId());
+            }
+        }else{
+            //删除等待应答标记
+            businessStateService.deleteInnerField(call_id,IVRActionService.IVR_ANSWER_WAITTING_FIELD);
+            ivrActionService.doAction(call_id,null);
+        }
+
         return res;
     }
 
+    private void hangup(String res_id,String call_id,String area_id){
+        Map<String, Object> params = new MapBuilder<String,Object>()
+                .putIfNotEmpty("res_id",res_id)
+                .putIfNotEmpty("user_data",call_id)
+                .put("areaId",area_id)
+                .build();
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
+        try {
+            if(!businessStateService.closed(call_id)) {
+                rpcCaller.invoke(sessionContext, rpcrequest, true);
+            }
+        } catch (Throwable e) {
+            logger.error(String.format("调用挂断失败,callid=%s",call_id),e);
+        }
+    }
 
 }
