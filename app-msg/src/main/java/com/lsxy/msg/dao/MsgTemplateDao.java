@@ -9,4 +9,11 @@ import java.io.Serializable;
  * Created by liups on 2017/3/1.
  */
 public interface MsgTemplateDao extends BaseDaoInterface<MsgTemplate, Serializable> {
+    MsgTemplate findByAppIdAndSubaccountIdAndTempId(String appId, String subaccountId, String tempId);
+
+    MsgTemplate findByAppIdAndTempId(String appId, String tempId);
+
+    void deleteByAppIdAndSubaccountIdAndTempId(String appId, String subaccountId, String tempId);
+
+    void deleteByAppIdAndTempId(String appId, String tempId);
 }

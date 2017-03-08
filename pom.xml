@@ -122,7 +122,7 @@
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-mq</artifactId>
-                <version>1.2.5-RC2</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
             <groupId>com.lsxy</groupId>
@@ -199,7 +199,7 @@
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-oss</artifactId>
-                <version>1.2.5-RC2</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -333,7 +333,7 @@
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-monitor</artifactId>
-                <version>1.2.5-RC2</version>
+                <version>${project.version}</version>
             </dependency>
 
         </dependencies>

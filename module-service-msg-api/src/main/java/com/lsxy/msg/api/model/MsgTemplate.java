@@ -14,6 +14,9 @@ import javax.persistence.Table;
 @Where(clause = "deleted=0")
 @Table(schema = "db_lsxy_bi_yunhuni", name = "tb_bi_msg_template")
 public class MsgTemplate extends IdEntity {
+    public static final int STATUS_PASS = 1;
+    public static final int STATUS_WAIT = 0;
+    public static final int STATUS_FAIL = -1;
     private String tempId;
     private String tenantId;
     private String appId;
@@ -22,7 +25,6 @@ public class MsgTemplate extends IdEntity {
     private String type;
     private String content;
     private Integer status;
-    private Boolean sync;
     private String reason;
     private String remark;
     private String lastUserName;
@@ -110,15 +112,6 @@ public class MsgTemplate extends IdEntity {
 
     public void setStatus(Integer status) {
         this.status = status;
-    }
-
-    @Column(name = "sync")
-    public Boolean getSync() {
-        return sync;
-    }
-
-    public void setSync(Boolean sync) {
-        this.sync = sync;
     }
 
     @Column(name = "reason")

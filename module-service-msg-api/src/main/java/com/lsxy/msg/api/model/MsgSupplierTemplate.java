@@ -14,16 +14,16 @@ import javax.persistence.Table;
 @Where(clause = "deleted=0")
 @Table(schema = "db_lsxy_bi_yunhuni", name = "tb_bi_msg_supplier_template")
 public class MsgSupplierTemplate extends IdEntity {
+    public static final int STATUS_PASS = 1;
+    public static final int STATUS_WAIT = 0;
+    public static final int STATUS_FAIL = -1;
     private String tempId;
     private String tenantId;
     private String appId;
     private String subaccountId;
     private String supplierId;
     private String supplierTempId;
-    private String content;
     private Integer status;
-    private Boolean sync;
-    private String reason;
     private String remark;
     private String lastUserName;
 
@@ -81,15 +81,6 @@ public class MsgSupplierTemplate extends IdEntity {
         this.supplierTempId = supplierTempId;
     }
 
-    @Column(name = "content")
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
     @Column(name = "status")
     public Integer getStatus() {
         return status;
@@ -97,24 +88,6 @@ public class MsgSupplierTemplate extends IdEntity {
 
     public void setStatus(Integer status) {
         this.status = status;
-    }
-
-    @Column(name = "sync")
-    public Boolean getSync() {
-        return sync;
-    }
-
-    public void setSync(Boolean sync) {
-        this.sync = sync;
-    }
-
-    @Column(name = "reason")
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
     }
 
     @Column(name = "remark")
