@@ -8,6 +8,7 @@ import com.lsxy.framework.core.exceptions.api.BalanceNotEnoughException;
 import com.lsxy.framework.core.exceptions.api.ExceptionContext;
 import com.lsxy.framework.core.exceptions.api.NumberNotAllowToCallException;
 import com.lsxy.framework.core.exceptions.api.QuotaNotEnoughException;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
@@ -103,16 +104,45 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         String res_id = (String)params.get("res_id");
         String from_uri = (String)params.get("from_uri");//主叫sip地址
         String to_uri = (String)params.get("to_uri");//被叫号码sip地址
-        String begin_time = (String)params.get("begin_time");
+
+        if(isExtensionNum(from_uri)){//是坐席分机呼入
+            //判断主叫分机是否存在，不合法直接拒绝
+
+            //根据分机找到坐席，找不到坐席直接拒绝
+
+            //坐席加锁，加锁失败直接拒绝
+
+            //判断坐席状态是否是空闲，非空闲直接拒绝
+
+            //设置坐席状态为fetching
+
+            if(isShortNum(to_uri)){//被叫是分机短号
+                //判断被叫分机是否存在
+
+            }else if(isOut(to_uri)){//被叫是外线
+
+            }else if(isHotNum(to_uri)){//被叫是热线号码
+
+            }
+            //finally 坐席解锁
+        }else{
+            //是外线呼入,进入ivr流程
+            doIvrAction(res_id,from_uri,to_uri,params);
+        }
+        return res;
+    }
+
+
+    private void doIvrAction(String res_id,String from_uri,String to_uri,Map<String,Object> params){
         ResourceTelenum to = resourceTelenumService.findNumByCallUri(to_uri);//被叫号码
         if(to ==null){
-            logger.info("被叫号码不存在{}",request);
-            return null;
+            logger.info("被叫号码不存在{}",params);
+            return;
         }
         LineGateway calledLine = telnumToLineGatewayService.getCalledLineByNumber(to.getTelNumber());
         if(calledLine == null){
-            logger.info("线路不存在{}",request);
-            return null;
+            logger.info("线路不存在{}",params);
+            return;
         }
         String from = resolveFromTelNum(from_uri,calledLine);//主叫号码
 
@@ -124,14 +154,14 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             TestNumBind testNumBind = testNumBindService.findByNumber(from);
             if(testNumBind == null){
                 logger.info("公共测试号={}找不到对应的app，from={}",testNum,from);
-                return res;
+                return;
             }
             tenant = testNumBind.getTenant();
             app = testNumBind.getApp();
             //已上线的应用不允许呼叫测试号码
             if(app != null && app.getStatus() != null && app.getStatus() == App.STATUS_ONLINE){
                 logger.info("已上线应用不允许呼叫测试号码,appId={}",app.getId());
-                return res;
+                return;
             }
         }else{
             subaccountId = to.getSubaccountId(); //根据号码找到对应的子账号(如果是子账号的号码)
@@ -142,44 +172,44 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             app = appService.findById(to.getAppId());
             if(app == null){
                 logger.info("号码资源池中找不到被叫号码对应的应用：{}",params);
-                return res;
+                return;
             }
             tenant = app.getTenant();
             if(app.getStatus() == null || app.getStatus() == App.STATUS_OFFLINE){
                 logger.info("应用未上线appId={}",app.getId());
-                return res;
+                return;
             }
         }
         if(tenant == null){
             logger.info("找不到对应的租户:{}",params);
-            return res;
+            return;
         }
         if(app == null){
             logger.info("找不到对应的APP:{}", params);
-            return res;
+            return;
         }
         boolean isCallCenter = false;
         if(app.getServiceType().equals(App.PRODUCT_CALL_CENTER)){
             if(!appService.enabledService(tenant.getId(),app.getId(), ServiceType.CallCenter)){
                 logger.info("[{}][{}]没有开通呼叫中心",tenant.getId(),app.getId());
-                return res;
+                return;
             }
             isCallCenter = true;
         }else{
             if(!appService.enabledService(tenant.getId(),app.getId(), ServiceType.IvrService)){
                 logger.info("[{}][{}]没有开通ivr",tenant.getId(),app.getId());
-                return res;
+                return;
             }
         }
         if(subaccountId!=null){
             ApiCertificateSubAccount subAccount = apiCertificateSubAccountService.findById(subaccountId);
             if(subAccount == null){
                 logger.info("没有找到子账号{}",subaccountId);
-                return res;
+                return;
             }
             if(!ApiCertificateSubAccount.ENABLED_TRUE.equals(subAccount.getEnabled())){
                 logger.info("子账号被禁用{}",subaccountId);
-                return res;
+                return;
             }
         }
         try {
@@ -187,17 +217,71 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                     ProductCode.call_center.getApiCmd():ProductCode.ivr_call.getApiCmd(), app.getTenant().getId());
         } catch (BalanceNotEnoughException e) {
             logger.info("[{}][{}]欠费，不能呼入",app.getId(),tenant.getId());
-            return res;
+            return;
         } catch (QuotaNotEnoughException e) {
             logger.info("[{}][{}]配额不足，不能呼入",app.getId(),tenant.getId());
-            return res;
+            return;
         }
 
         if(logger.isDebugEnabled()){
             logger.debug("[{}][{}]开始处理ivr",tenant.getId(),app.getId());
         }
         ivrActionService.doActionIfAccept(subaccountId,app,tenant,res_id,from,to.getTelNumber(),calledLine.getId(),isCallCenter);
-        return res;
+    }
+
+    public static String extractTelnum(String sip){
+        if(StringUtil.isBlank(sip)){
+            return "";
+        }
+        int index = sip.indexOf("@");
+        if(index <=0){
+            index = sip.length();
+        }
+        if(logger.isDebugEnabled()){
+            logger.info("{}====》{}",sip,sip.substring(0,index).replace("sip:",""));
+        }
+        return sip.substring(0,index).replace("sip:","");
+    }
+
+    /***
+     * 判断是不是分机号
+     * @param uri
+     * @return
+     */
+    private boolean isExtensionNum(String uri){
+        boolean result = false;
+        String telnum = extractTelnum(uri);
+        if(telnum.length()>=6){
+
+        }
+        return false;
+    }
+
+    /**
+     * 判断是否是分机短号
+     * @param uri
+     * @return
+     */
+    private boolean isShortNum(String uri){
+        return false;
+    }
+
+    /**
+     * 判断是不是热线号码
+     * @param uri
+     * @return
+     */
+    private boolean isHotNum(String uri){
+        return false;
+    }
+
+    /**
+     * 判断是不是外线号码
+     * @param uri
+     * @return
+     */
+    private boolean isOut(String uri){
+        return false;
     }
 
     private String resolveFromTelNum(String from,LineGateway lineGateway){
