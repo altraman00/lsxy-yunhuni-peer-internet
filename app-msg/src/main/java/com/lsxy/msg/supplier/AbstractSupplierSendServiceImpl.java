@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by liups on 2017/3/8.
  */
-public class AbstractSupplierSendServiceImpl implements SupplierSendService {
+public abstract class AbstractSupplierSendServiceImpl implements SupplierSendService {
 
     @Override
     public ResultOne ussdSendOne(String tempId, List<String> tempArgs, String msg, String mobile) {
@@ -36,4 +36,5 @@ public class AbstractSupplierSendServiceImpl implements SupplierSendService {
     public PaoPaoYuMassNofity getTask(String taskId) {
         return null;
     }
+
 }

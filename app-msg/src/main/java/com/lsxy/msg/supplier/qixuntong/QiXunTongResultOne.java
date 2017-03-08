@@ -27,6 +27,6 @@ public class QiXunTongResultOne extends ResultOne {
         this.resultCode = resultCode;
         this.resultDesc = resultDesc;
         this.taskId = taskId;
-        this.handlers = QiXunTongConstant.handler_qixuntong;
+        this.handlers = QiXunTongConstant.QixuntongCode;
     }
 }

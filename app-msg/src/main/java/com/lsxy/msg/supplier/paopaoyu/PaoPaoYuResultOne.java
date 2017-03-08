@@ -28,7 +28,7 @@ public class PaoPaoYuResultOne extends ResultOne {
         this.resultCode = resultCode;
         this.resultDesc = resultDesc;
         this.taskId = taskId;
-        this.handlers = PaoPaoYuConstant.handler_paopaoyu;
+        this.handlers = PaoPaoYuConstant.PaopaoyuCode;
     }
 
 }

@@ -8,6 +8,6 @@ public class PaoPaoYuConstant {
     public static final String PaoPaoYuNumRegexStr = ",";//泡泡鱼多号码已，分割
     public static final String PaoPaoYuParamRegexStr = ";";//多参数用分号分割
     public static final String paopaoyu_replace_symbol = "#*#";
-    public static final String handler_paopaoyu = "PaoPaoYu";
+    public static final String PaopaoyuCode = "PaoPaoYu";
     public static final String PaoaoyuTimePartten = "yyyyMMddHHmmss";
 }

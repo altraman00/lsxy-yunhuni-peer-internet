@@ -8,5 +8,5 @@ public class QiXunTongConstant {
     public static final String QiXunTongNumRegexStr = ",";//企讯通多号码已，分割
     public static final String QiXunTongParamRegexStr = ";";//多参数用分号分割
     public static final String qixuntong_replace_symbol = "#P#";
-    public static final String handler_qixuntong = "QiXunTong";
+    public static final String QixuntongCode = "QiXunTong";
 }

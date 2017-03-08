@@ -40,6 +40,16 @@ public class PaoPaoYuServiceImpl extends AbstractSupplierSendServiceImpl {
     }
 
     @Override
+    public String getSupplierCode() {
+        return PaoPaoYuConstant.PaopaoyuCode;
+    }
+
+    @Override
+    public int getMaxSendNum() {
+        return PaoPaoYuConstant.PaoPaoYuMaxNum;
+    }
+
+    @Override
     public ResultOne ussdSendOne(String tempId, List<String> tempArgs, String msg, String mobile) {
         String tempArgsStr = StringUtils.join(tempArgs, PaoPaoYuConstant.PaoPaoYuParamRegexStr);
         String result =  getPaoPaoYuClient().send( mobile , tempId , tempArgsStr,"0");

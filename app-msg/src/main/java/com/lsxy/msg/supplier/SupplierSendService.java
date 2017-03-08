@@ -20,4 +20,8 @@ public interface SupplierSendService {
     ResultMass smsSendMass(String taskName,String tempId,List<String> tempArgs,String msg, List<String> mobiles,Date sendTime);
 
     PaoPaoYuMassNofity getTask(String taskId);
+
+    String getSupplierCode();
+
+    int getMaxSendNum();
 }

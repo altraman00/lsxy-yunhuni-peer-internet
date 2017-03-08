@@ -52,4 +52,14 @@ public class QiXunTongServiceImpl extends AbstractSupplierSendServiceImpl {
         return new QiXunTongResultMass(result,mobilesStr);
     }
 
+    @Override
+    public String getSupplierCode() {
+        return QiXunTongConstant.QixuntongCode;
+    }
+
+    @Override
+    public int getMaxSendNum() {
+        return QiXunTongConstant.QiXunTongMaxNum;
+    }
+
 }
