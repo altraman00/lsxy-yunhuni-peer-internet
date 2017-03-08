@@ -43,7 +43,7 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
     public MsgTemplate createTemplate(MsgTemplate msgTemplate){
         msgTemplate.setTempId(getMsgTempNum());
         msgTemplate.setStatus(MsgTemplate.STATUS_WAIT);
-        this.save(msgTemplate);
+        msgTemplate = this.save(msgTemplate);
         return msgTemplate;
     }
 

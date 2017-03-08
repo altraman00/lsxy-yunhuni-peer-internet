@@ -260,6 +260,7 @@
                                     <li class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
+                                    <!-- 放音文件-->
                                     <div class="tab-pane fade<c:if test="${app.serviceType=='voice'}"> in active</c:if>" id="play">
                                         <p class="application_info">
                                             当您的应用需要开通语音通知、自定义IVR或者云呼叫中心时，请上传语音文件至放音媒体库，语音文件均需要审核
@@ -293,6 +294,7 @@
                                         </section>
 
                                     </div>
+                                    <!-- 录音文件-->
                                     <div class="tab-pane fade" id="voice">
                                         <p class="application_info">
                                             1.每个账号默认允许免费存储7天内的录音文件，超过指定配置周期的录音文件系统将自动删除。<br/>
@@ -421,35 +423,134 @@
                                             3.会员需进行公司认证，并审核通过后才能新增模板</br>
                                             4.会员在进行闪印和短信的测试时，可以使用平台提供测试模板
                                         </p>
-                                        <div class="form-group">
-                                            <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="模板名称" id="template_num" /></div>
-                                            <div class="col-md-3 remove-padding" style="padding-left:15px;">
-                                                <%--<select id="extension_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号"  >--%>
-                                                <%--</select>--%>
+                                        <div id="template_home">
+                                            <div class="form-group">
+                                                <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="模板名称" id="template_num" /></div>
+                                                <div class="col-md-3 remove-padding" style="padding-left:15px;">
+                                                    <%--<select id="extension_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号"  >--%>
+                                                    <%--</select>--%>
                                                     <input type="text" class="form-control" placeholder="关联子账号" id="template_subId" /></div>
-                                            <div class="col-md-2">
-                                                <button class="btn btn-primary" type="button" onclick="extensionList()">查询</button>
-                                                <button href="#"  class="btn btn-primary defind modalShow" data-id="seven" >新增模板</button>
+                                                <div class="col-md-2">
+                                                    <button class="btn btn-primary" type="button" onclick="templateList()">查询</button>
+                                                    <button href="#"  class="btn btn-primary defind modalShow" data-id="seven" >新增模板</button>
+                                                </div>
+                                            </div>
+                                            <table class="table table-striped cost-table-history tablelist" id="template-table">
+                                                <thead>
+                                                <tr>
+                                                    <th class="">模板编号</th>
+                                                    <th class="">模板类型</th>
+                                                    <th class="">模板名称</th>
+                                                    <th>内容</th>
+                                                    <th>关联子账号</th>
+                                                    <th class="">状态</th>
+                                                    <th class="">操作</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody id="template-list">
+
+                                                </tbody>
+                                            </table>
+                                            <section class="panel panel-default yunhuni-personal">
+                                                <div id="template-page"></div>
+                                            </section>
+                                        </div>
+                                        <div id="template_detail" hidden>
+                                            <div class="panel-body devbox remove-padding-left">
+                                                <h4 class="margin-bottom-20">模板详情</h4>
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev">
+                                                        模板编号：
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p>
+                                                            <input type="text" class="form-control"  disabled value="{{tempId}}">
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev">
+                                                        模板类型：
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <p>
+                                                            <input type="radio" id="ussd2" disabled value="ussd" v-model="type" name="type">
+                                                            <label for="ussd2">闪印</label>
+                                                            <input type="radio" id="sms2" disabled value="sms" v-model="type" name="type">
+                                                            <label for="sms2">短信</label>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev line-height-32">
+                                                        模板名称：
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p>
+                                                            <input v-if="isShow(1,0)" type="text" class="form-control" disabled value="{{name}}" placeholder=""/>
+                                                            <input v-if="isShow(-1)" type="text" class="form-control" v-model="name" value="{{name}}" placeholder=""/>
+                                                        </p>
+                                                        <span>仅供识别</span>
+                                                    </div>
+                                                </div>
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev line-height-32">
+                                                        模板内容：
+                                                    </div>
+                                                    <div class="col-md-6" v-if="isShow(-1)">
+                                                        <div style="height: 70px;position:relative;margin:0;padding:0">
+                                                        <textarea class="form-control" v-model="content" placeholder="" style="height:70px;position:absolute;margin:0;padding:2px "
+                                                                  id="template_content2" onkeydown="checkMaxInput(this,60)" onkeyup="checkMaxInput(this,60)" onfocus="checkMaxInput(this,60)" onblur="checkMaxInput(this,60);"
+                                                        >{{content}}</textarea>
+                                                            <div id="template_content2msg" class="note" style="position:absolute;line-height:117px;padding:3px 555px;height: 0px"><font color="#777">{{contentlength}}/60</font></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6" v-if="isShow(1,0)" >
+                                                        <textarea  type="text"  class="form-control"  readonly placeholder="">{{content}}</textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev line-height-32">
+                                                        备注：
+                                                    </div>
+                                                    <div class="col-md-6" v-if="isShow(-1)">
+                                                        <div style="height: 70px;position:relative;margin:0;padding:0">
+                                                        <textarea class="form-control" v-model="remark" placeholder="" style="height:70px;position:absolute;margin:0;padding:2px "
+                                                                  id="template_remark2" onkeydown="checkMaxInput(this,100)" onkeyup="checkMaxInput(this,100)" onfocus="checkMaxInput(this,100)" onblur="checkMaxInput(this,100);"
+                                                        >{{remark}}</textarea>
+                                                            <div id="template_remark2msg" class="note" style="position:absolute;line-height:117px;padding:3px 555px;height: 0px"><font color="#777">{{remarklength}}/100</font></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6" v-if="isShow(1,0)">
+                                                        <textarea  type="text"  class="form-control"  readonly placeholder="">{{remark}}</textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev">
+                                                        状态：
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p v-if="isShow(1)">审核已通过</p>
+                                                        <p v-if="isShow(-1)">审核不通过！</p>
+                                                        <p v-if="isShow(0)">待审核</p>
+                                                    </div>
+                                                </div>
+                                                <div class="row margin-bottom-10" v-if="isShow(-1)">
+                                                    <div class="col-md-1 dev line-height-32">
+                                                        原因：
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <textarea type="text"  class="form-control" readonly placeholder="">{{reason}}</textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row margin-bottom-20">
+                                                <div class="col-md-6">
+                                                    <button v-if="state==-1" class="btn btn-primary" type="button" onclick="editSevenPost()">重新提交</button>
+                                                    <button class="btn btn-primary" type="button" onclick="totemplateHome()">返回</button>
+                                                </div>
                                             </div>
                                         </div>
-                                        <table class="table table-striped cost-table-history tablelist" id="template-table">
-                                            <thead>
-                                            <tr>
-                                                <th class="">模板编号</th>
-                                                <th class="">模板类型</th>
-                                                <th class="">模板名称</th>
-                                                <th>内容</th>
-                                                <th class="">状态</th>
-                                                <th class="">操作</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody id="template-list">
-
-                                            </tbody>
-                                        </table>
-                                        <section class="panel panel-default yunhuni-personal">
-                                            <div id="template-page"></div>
-                                        </section>
                                     </div>
                                     <!--分机列表end-->
                                     <!--坐席列表-->
@@ -1462,6 +1563,76 @@
             }
         }
     });
+    /*修改模板*/
+    var editSeven = new Vue({
+        el:'#template_detail',
+        data:{
+            id:'',
+            tempId:'',
+            type:'',
+            name:'',
+            content:'',
+            contentlength:'',
+            remark:'',
+            remarklength:'',
+            state:'',
+            reason:''
+        },
+        methods:{
+            isShow:function(state1,state2){
+                var flag ;
+                if(state2 != undefined ){
+                    flag = this.state == state1 ||this.state == state2 ?true:false;
+                }else{
+                    flag = this.state == state1 ?true:false;
+                }
+                return flag;
+            },
+            init:function(){
+                this.id=this.tempId=this.type=this.name=this.content=this.remark=this.reason='';
+                this.state=-1;
+                this.remarklength=60;
+                this.contentlength=100;
+            },initObj:function(obj){
+                this.id=obj.id;
+                this.tempId=obj.tempId;
+                this.type=obj.type;
+                this.name=obj.name;
+                this.content=obj.content;
+                this.remark=obj.remark;
+                this.state = obj.status;
+                this.reason = obj.reason;
+                this.remarklength=obj.remark!=null?(100- new Number(obj.remark.length)):100;
+                this.contentlength=obj.content!=null?(60- new Number(obj.content.length)):60;
+            }
+        }
+    });
+    function editSevenPost(){
+        if(editSeven.content ==''||editSeven.content.length <=0 || editSeven.content.length>62){
+            showtoast('模板内容格式错误' );
+            return;
+        }
+        if(editSeven.remark =='' ||  editSeven.remark.length <= 0 || editSeven.remark.length>100){
+            showtoast("使用场景说明格式错误");
+            return;
+        }
+        var params = {
+            appId:appId,
+            name:editSeven.name,
+            content:editSeven.content,
+            remark:editSeven.remark,
+            csrfParameterName:csrfToken
+        }
+        ajaxsync(ctx + "/console/msg_template/edit/"+editSeven.id,params,function(response){
+            if(response.success){
+                showtoast("修改模板成功");
+                editSeven.state=0;
+            }else{
+                var error = response.errorMsg;
+                showtoast(error);
+            }
+        },"post");
+    };
     $('.modalSureSeven').click(function(){
         var id = $(this).attr('data-id');
         if(createSeven.content ==''||createSeven.content.length <=0 || createSeven.content.length>62){
@@ -1474,15 +1645,17 @@
         }
         var subId = $('#create_six_subId') .val();//$('#create_six_subId option:selected') .val();
         var params = {
+            appId:appId,
             type:createSeven.type,
             name:createSeven.name,
             content:createSeven.content,
             remark:createSeven.remark,
             csrfParameterName:csrfToken
         }
-        ajaxsync(ctx + "/console/app/"+appId+"/app_template/new",params,function(response){
+        ajaxsync(ctx + "/console/msg_template/new",params,function(response){
+            console.info(response);
             if(response.success){
-                showtoast("新增模板");
+                showtoast("新增模板成功");
                 createSeven.init();
                 hideModal(id);
                 templateList();
@@ -1761,6 +1934,35 @@
             }
         });
     }
+    function delTemplate(id){
+        bootbox.setLocale("zh_CN");
+        bootbox.confirm("确认删除模板", function(result) {
+            if(result){
+                ajaxsync(ctx + "/console/msg_template/delete/"+id,{csrfParameterName:csrfToken},function(response){
+                    if(response.success){
+                        showtoast("删除成功");
+                        if(templatePage){
+                            var currentPage;
+                            if(((templatePage.nowPage - 1) * templatePage.listRow +1) <= --templatePage.count){
+                                currentPage = templatePage.nowPage;
+                            }else {
+                                currentPage = templatePage.nowPage - 1;
+                            }
+                            if(currentPage>0){
+                                $('#page' + currentPage + templatePage.obj).click();
+                            }else{
+                                $('#template-'+id).remove();
+                                $('#page0'+templatePage.obj).hide();
+                            }
+                        }
+                    }else{
+                        showtoast("删除失败");
+                    }
+                },"post");
+
+            }
+        });
+    }
     function delExtension(id){
         bootbox.setLocale("zh_CN");
         bootbox.confirm("确认删除分机", function(result) {
@@ -1779,7 +1981,7 @@
                                 $('#page' + currentPage + extensionPage.obj).click();
                             }else{
                                 $('#extension-'+id).remove();
-                                $('#page0'+subAccountPage.obj).hide();
+                                $('#page0'+extensionPage.obj).hide();
                             }
                         }
                     }else{
@@ -1970,6 +2172,10 @@
             }
             if(type=='queue'){
                 queueList();
+            }
+            if(type=='template'){
+                totemplateHome();
+                templateList();
             }
             //除了放音文件标签外，其他都不显示上传放音文件按钮
             $('#uploadButton').hide();
@@ -2451,7 +2657,63 @@
             }
         );
     }
+    /**
+     * 模板分页
+     */
+    var templatePage;
+    function templateList(){
 
+        //获取数据总数
+        var count = 0;
+        var templateNum = $('#template_num').val();
+        var subId = $('#tempate_subId') .val();//$('#extension_subId option:selected') .val();
+        var params = {"pageNo":1,"pageSize":10,"name":templateNum,'subId':subId,'appId':appId};
+        ajaxsync(ctx + "/console/msg_template/plist" ,params,function(response) {
+            if(response.success){
+                count = response.data.totalCount;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+            }
+        },"get");
+        //每页显示数量
+        var listRow = 10;
+        //显示多少个分页按钮
+        var showPageCount = 5;
+        //指定id，创建分页标签
+        var pageId = 'template-page';
+        //searchTable 为方法名
+        templatePage = new Page(count,listRow,showPageCount,pageId,templateTable);
+        templatePage.show();
+    }
+    var templateTable = function(nowPage,listRows){
+        var html = '';
+        var data = [];
+        var templateNum = $('#template_num').val();
+        var subId = $('#template_subId') .val();//$('#extension_subId option:selected') .val();
+        var params = {"pageNo":nowPage,"pageSize":listRows,"name":templateNum,'subId':subId,'appId':appId};
+        ajaxsync(ctx + "/console/msg_template/plist" ,params,function(response){
+            if(response.success){
+                data = response.data.result;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
+            }
+        },"get");
+        for(var i =0 ; i<data.length; i++){
+            html +='<tr id="template-'+ data[i].id +'">' +
+                '<td class="">' + data[i].tempId + '</td>' +
+                '<td class="">'+ (data[i].type == 'sms'?'短信':( data[i].type=='ussd'?'闪印':'未知')) +'</td>' +
+                '<td class="">'+ data[i].name +'</td>' +
+                '<td class="">'+ (data[i].content) +'</td>' +
+                '<td class="">'+ (data[i].certId) +'</td>';
+            var state = data[i].state=='1'?'审核已通过':(data[i].state=='0'?'待审核':(data[i].state=='-1'?'审核不通过！':'未知')) ;
+            var color = data[i].enabled == 1?"text-success":"text-danger";
+            var reason = data[i].reason==null?'':data[i].reason;
+            html+= '<td class="text-center '+color+'" id="enable_'+data[i].id+'" title="审核不通过原因:'+reason+'">' + state+ '</td>' +
+                '<td class="text-center"><a href="javascript:totemplateDetail(\''+data[i].id+'\')" >详情</a>&nbsp;<a href="javascript:delTemplate(\''+data[i].id+'\')" >删除</a></td>' +
+                '</tr>'
+        }
+        $('#template-list').html(html);
+    }
     /**
      * 分机分页
      */
@@ -2660,6 +2922,18 @@
             }
         },"post");
     }
+
+    function totemplateDetail(id){
+        ajaxsync(ctx + "/console/msg_template/get/"+id ,{},function(response){
+            if(response.success){
+                editSeven.initObj(response.data);
+                $('#template_home').hide();
+                $('#template_detail').show();
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
+            }
+        },"get");
+    }
     function tosubAccountDatail(id){
         ajaxsync(ctx + "/console/sub_account/get/"+id ,{},function(response){
             if(response.success){
@@ -2672,6 +2946,12 @@
                 showtoast(response.errorMsg?response.errorMsg:'数据异常');
             }
         },"get");
+    }
+    function totemplateHome(){
+        $('#template_detail').hide();
+        $('#template_home').show();
+        editSeven.init();
+        templateList();
     }
     function tosubAccountHome(){
         $('#subAccount_datail').hide();
