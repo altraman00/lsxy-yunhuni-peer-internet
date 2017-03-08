@@ -83,8 +83,11 @@
                                             <td scope="row">${s.index+1}</td>
                                             <td>${result.name}</td>
                                             <td>${result.id}</td>
-                                            <td><c:if test="${result.serviceType=='call_center'}">呼叫中心</c:if>
-                                                <c:if test="${result.serviceType=='voice'}">语音服务</c:if></td>
+                                            <td>
+                                                <c:if test="${result.serviceType=='msg'}">消息</c:if>
+                                                <c:if test="${result.serviceType=='call_center'}">呼叫中心</c:if>
+                                                <c:if test="${result.serviceType=='voice'}">语音</c:if>
+                                            </td>
                                             <td ><c:if test="${result.status==1}"><span style="color:#9dc940;"  id="statusapp-${result.id}">已上线</span></c:if>
                                             <c:if test="${result.status==2}"><span style="color:#ff0000;" id="statusapp-${result.id}">未上线</span></c:if>
                                             </td>
