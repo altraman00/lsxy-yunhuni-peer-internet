@@ -11,13 +11,16 @@ import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.service.*;
+import com.lsxy.call.center.api.states.lock.AgentLock;
+import com.lsxy.call.center.api.states.state.AgentState;
+import com.lsxy.call.center.api.states.state.ExtensionState;
 import com.lsxy.call.center.api.utils.EnQueueDecoder;
-import com.lsxy.framework.core.exceptions.api.AgentNotExistException;
-import com.lsxy.framework.core.exceptions.api.ExceptionContext;
-import com.lsxy.framework.core.exceptions.api.ExtensionNotExistException;
+import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -34,6 +37,7 @@ import com.lsxy.yunhuni.api.session.model.MeetingMember;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import com.lsxy.yunhuni.api.session.service.MeetingMemberService;
 import com.lsxy.yunhuni.api.session.service.MeetingService;
+import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -41,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
 
@@ -99,6 +104,18 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
 
     @Autowired
     private SessionContext sessionContext;
+
+    @Autowired
+    private ExtensionState extensionState;
+
+    @Autowired
+    private AgentState agentState;
+
+    @Autowired
+    private RedisCacheService redisCacheService;
+
+    @Autowired
+    private CallCenterUtil callCenterUtil;
 
     @Override
     public String getEventName() {
@@ -187,16 +204,89 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
                 if(agent == null){
                     throw new AgentNotExistException(new ExceptionContext().put("agentId",agentId));
                 }
-                //TODO 坐席加锁
-                if(agent.getExtension() == null){
-                    throw new ExtensionNotExistException(new ExceptionContext().put("agentId",agentId));
+                //获取坐席状态
+                AgentState.Model aState = agentState.get(agentId);
+                if(aState == null || aState.getState() == null){
+                    throw new AgentNotExistException(
+                            new ExceptionContext()
+                                    .put("appId",appId)
+                                    .put("agentId",agentId)
+                                    .put("agentstate",aState)
+                    );
                 }
-                AppExtension appExtension = appExtensionService.findById(agent.getExtension());
-                //呼叫被叫
-                conversationService.inviteAgent(state.getSubaccountId(),state.getAppId(),state.getResId(),call_id,
-                        conversation_id,agent.getId(),
-                        agent.getName(),agent.getExtension(),null,from_extension,appExtension.getTelnum(),
-                        appExtension.getType(),appExtension.getUser(),ConversationService.MAX_DURATION,45,null,null);
+                if(aState.getExtension() == null){
+                    throw new ExtensionNotExistException(
+                            new ExceptionContext()
+                                    .put("appId",appId)
+                                    .put("agentName",agent.getName())
+                                    .put("agentId",agentId)
+                                    .put("agentstate",aState)
+                    );
+                }
+                //座席没有报道
+                if (aState.getLastRegTime() + AgentState.REG_EXPIRE < System.currentTimeMillis()) {
+                    throw new AgentExpiredException(
+                            new ExceptionContext()
+                                    .put("appId",appId)
+                                    .put("agentName",agent.getName())
+                                    .put("agentId",agentId)
+                                    .put("agentstate",aState)
+                    );
+                }
+                ExtensionState.Model eState = extensionState.get(aState.getExtension());
+                //分机不可用
+                if(eState == null || !ExtensionState.Model.ENABLE_TRUE.equals(eState.getEnable())){
+                    throw new ExtensionUnEnableException(
+                            new ExceptionContext()
+                                    .put("appId",appId)
+                                    .put("agentName",agent.getName())
+                                    .put("agentId",agentId)
+                                    .put("extension_id",aState.getExtension())
+                                    .put("extensionState",eState)
+                    );
+                }
+                AppExtension extension = appExtensionService.findById(aState.getExtension());
+                if(extension == null){
+                    throw new ExtensionNotExistException(
+                            new ExceptionContext()
+                                    .put("appId",appId)
+                                    .put("agentName",agent.getName())
+                                    .put("agentId",agent.getId())
+                                    .put("extension_id",aState.getExtension())
+                    );
+                }
+                //坐席加锁，加锁失败直接拒绝
+                AgentLock agentLock = new AgentLock(redisCacheService,agentId);
+                if(!agentLock.lock()){
+                    logger.info("坐席加锁失败,id={}",agentId);
+                    throw new SystemBusyException();
+                }
+                try{
+                    //判断坐席状态是否是空闲，非空闲直接拒绝
+                    if(!CallCenterAgent.STATE_IDLE.equals(agentState.getState(agentId))){
+                        throw new SystemBusyException(
+                                new ExceptionContext()
+                                        .put("appId",appId)
+                                        .put("agentName",agent.getName())
+                                        .put("agentId",agentId)
+                                        .put("extension_id",aState.getExtension())
+                        );
+                    }
+                    try{
+                        conversationService.inviteAgent(state.getSubaccountId(),state.getAppId(),state.getResId(),call_id,
+                                        conversation_id,agent.getId(),
+                                        agent.getName(),agent.getExtension(),null,from_extension,extension.getTelnum(),
+                                        extension.getType(),extension.getUser(),ConversationService.MAX_DURATION,45,null,null);
+                        agentState.setState(agentId,CallCenterAgent.STATE_FETCHING);
+                        callCenterUtil.agentStateChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),agent.getId(),agent.getName(),
+                                CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,state.getUserdata());
+                    }catch (Throwable t){
+                        agentState.setState(agentId,CallCenterAgent.STATE_IDLE);
+                        throw t;
+                    }
+                }finally {
+                    agentLock.unlock();
+                }
             }catch (Throwable t){
                 logger.info("",t);
                 conversationService.exit(conversation_id,call_id);
