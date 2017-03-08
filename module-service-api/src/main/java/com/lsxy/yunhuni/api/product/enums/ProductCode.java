@@ -16,7 +16,9 @@ public enum ProductCode {
     rent_number_month("rent_number_month","号码月租费"),
     call_center("cc_incoming,conversation,invite_agent_call,invite_out_call,agent_call,out_call","呼叫中心-IP线路"),
     call_center_sip("","呼叫中心-电话线路"),
-    call_center_month("call_center_month","呼叫中心-坐席月租费");
+    call_center_month("call_center_month","呼叫中心-坐席月租费"),
+    msg_ussd("","闪印"),
+    msg_sms("","短信");
 
     /*
         apiCmd是指编码或业务程运行中的标识符（注：apiCmd不会存到数据库，只有产品计费项标识符才会被存数据库，取值为notify_call.name();等）。
@@ -40,15 +42,6 @@ public enum ProductCode {
         for(ProductCode value:values){
             if(value.getApiCmd().contains(apiCmd)){
                 return value;
-            }
-        }
-        return null;
-    }
-    public static String getApiCmdByRemark(String remark){
-        ProductCode[] values = ProductCode.values();
-        for(ProductCode value:values){
-            if(value.getRemark().equals(remark)){
-                return value.name();
             }
         }
         return null;

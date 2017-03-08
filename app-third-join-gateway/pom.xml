@@ -75,6 +75,21 @@
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-monitor</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-service-msg-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-dubbo</artifactId>
+        </dependency>
+
+        <!--  暂时将app-msg放到这个模块启动-->
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>app-msg</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
