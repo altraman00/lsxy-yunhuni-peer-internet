@@ -578,6 +578,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                         .putIfNotEmpty("from", SipUrlUtil.extractTelnum(from))
                         .putIfNotEmpty("to", SipUrlUtil.extractTelnum(to))
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,call_id)
+                        .put(IVRActionService.IVR_ANSWER_WAITTING_FIELD,"1")
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
                 .build();

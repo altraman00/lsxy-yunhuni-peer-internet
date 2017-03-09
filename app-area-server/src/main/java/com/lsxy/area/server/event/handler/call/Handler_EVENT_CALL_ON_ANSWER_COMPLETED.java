@@ -117,7 +117,8 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
         }catch (Throwable t){
             logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
         }
-
+        //删除等待应答标记
+        businessStateService.deleteInnerField(call_id,IVRActionService.IVR_ANSWER_WAITTING_FIELD);
         if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
             //分机直拨
             String conversationId = state.getBusinessData().get(CallCenterUtil.CONVERSATION_FIELD);
@@ -139,6 +140,7 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
                     Map<String, Object> receive_params = new MapBuilder<String,Object>()
                             .putIfNotEmpty("res_id",state.getResId())
                             .putIfNotEmpty("valid_keys","0123456789")
+                            .putIfNotEmpty("max_keys","12")
                             .putIfNotEmpty("finish_keys","")
                             .putIfNotEmpty("first_key_timeout","10")
                             .putIfNotEmpty("continues_keys_timeout","3")
@@ -156,8 +158,6 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
                 hangup(state.getResId(),call_id,state.getAreaId());
             }
         }else{
-            //删除等待应答标记
-            businessStateService.deleteInnerField(call_id,IVRActionService.IVR_ANSWER_WAITTING_FIELD);
             ivrActionService.doAction(call_id,null);
         }
 
