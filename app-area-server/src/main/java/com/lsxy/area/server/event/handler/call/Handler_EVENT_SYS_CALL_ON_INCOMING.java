@@ -83,7 +83,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
 
     private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_SYS_CALL_ON_INCOMING.class);
 
-    private static final Pattern EXTENSION_PATERN = Pattern.compile("^[2-9]\\d{6,10}$");
+    private static final Pattern EXTENSION_PATERN = Pattern.compile("^([2-9]|100)\\d{6,10}$");
 
     @Autowired
     private AppService appService;
@@ -168,7 +168,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
     public String getEventName() {
         return Constants.EVENT_SYS_CALL_ON_INCOMING;
     }
-
+    
     /**
      * 呼叫呼入事件处理
      * @param request
