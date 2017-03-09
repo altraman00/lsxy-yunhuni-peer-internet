@@ -69,4 +69,6 @@ public interface AppExtensionService extends BaseService<AppExtension> {
     void logout(String user);
 
     List<Map<String,Object>> exs(String appId);
+
+    AppExtension getByUser(String user);
 }
