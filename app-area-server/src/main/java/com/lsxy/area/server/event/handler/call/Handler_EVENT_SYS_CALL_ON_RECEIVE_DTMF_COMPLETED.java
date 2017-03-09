@@ -1,17 +1,36 @@
 package com.lsxy.area.server.event.handler.call;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.CallCenterUtil;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.area.server.util.SipUrlUtil;
+import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.call.center.api.model.CallCenterAgent;
+import com.lsxy.call.center.api.service.AppExtensionService;
+import com.lsxy.call.center.api.service.CallCenterAgentService;
+import com.lsxy.call.center.api.states.lock.AgentLock;
+import com.lsxy.call.center.api.states.state.AgentState;
+import com.lsxy.call.center.api.states.state.ExtensionState;
+import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.framework.core.utils.UUIDGenerator;
+import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
+import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -32,6 +51,13 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
     @Autowired
     private AppService appService;
 
+
+    @Autowired
+    private RPCCaller rpcCaller;
+
+    @Autowired
+    private SessionContext sessionContext;
+
     @Autowired
     private BusinessStateService businessStateService;
 
@@ -40,6 +66,27 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
 
     @Autowired
     private IVRActionService ivrActionService;
+
+    @Autowired
+    private ConversationService conversationService;
+
+    @Autowired
+    private ApiGwRedBlankNumService apiGwRedBlankNumService;
+
+    @Reference(timeout=3000,check = false,lazy = true)
+    private AppExtensionService appExtensionService;
+
+    @Reference(timeout=3000,check = false,lazy = true)
+    private CallCenterAgentService callCenterAgentService;
+    
+    @Autowired
+    private ExtensionState extensionState;
+
+    @Autowired
+    private AgentState agentState;
+
+    @Autowired
+    private RedisCacheService redisCacheService;
 
     @Override
     public String getEventName() {
@@ -74,31 +121,205 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
             logger.debug("call_id={},state={}",call_id,state);
         }
 
-        Long begin_time = null;
-        Long end_time = null;
-        if(params.get("begin_time") != null){
-            begin_time = (Long.parseLong(params.get("begin_time").toString())) * 1000;
-        }
-        if(params.get("end_time") != null){
-            end_time = (Long.parseLong(params.get("end_time").toString())) * 1000;
-        }
-        if(StringUtils.isNotBlank(state.getCallBackUrl())){
-            Map<String, Object> notify_data = new MapBuilder<String, Object>()
-                    .putIfNotEmpty("event", "ivr.get_end")
-                    .putIfNotEmpty("id", call_id)
-                    .putIfNotEmpty("subaccount_id",state.getSubaccountId())
-                    .putIfNotEmpty("begin_time", begin_time)
-                    .putIfNotEmpty("end_time", end_time)
-                    .putIfNotEmpty("error", params.get("error"))
-                    .putIfNotEmpty("keys", params.get("keys"))
-                    .build();
-            notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
-        }
-        ivrActionService.doAction(call_id,new MapBuilder<String,Object>()
-                .putIfNotEmpty("keys",params.get("keys"))
-                .putIfNotEmpty("error",params.get("error"))
-                .build());
+        String keys = (String)params.get("keys");
+        String error = (String)params.get("error");
 
+        if(StringUtil.isNotBlank(error)){
+            logger.info("收码失败id={},error={}",call_id,error);
+        }
+
+        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
+            //分机短号
+            String from_extensionnum = state.getBusinessData().get("direct_hot");
+            //分机前缀
+            String extension_prefix = state.getBusinessData().get("direct_extension_prefix");
+            String to = keys;
+            String conversationId = UUIDGenerator.uuid();
+            try{
+                if(from_extensionnum == null || StringUtil.isNotBlank(error) || StringUtils.isBlank(to)){
+                    throw new IllegalArgumentException();
+                }
+                //判断是呼给外线 还是 其他分机
+                if(SipUrlUtil.isHotNum(to)){//不允许呼给热线
+                    throw new NumberNotAllowToCallException(new ExceptionContext()
+                            .put("number",to)
+                            .put("callid",call_id)
+                    );
+                }
+                if(SipUrlUtil.isShortNum(extension_prefix,to)){//被叫是分机短号
+                    //流程：会议创建成功后将call加入会议，加入会议成功事件 呼叫被叫，振铃事件将被叫加入会议
+                    AgentLock to_agentLock = null;
+                    try{
+                        //判断被叫分机是否存在
+                        String to_extensionnum = extension_prefix + to;//被叫号码要为长号码
+                        if(logger.isDebugEnabled()){
+                            logger.info("直拨分机，to={}",to_extensionnum);
+                        }
+                        //不能自己呼给自己
+                        if(to_extensionnum.equals(extension_prefix+from_extensionnum)){
+                            throw new NumberNotAllowToCallException(
+                                    new ExceptionContext()
+                                    .put("from",extension_prefix+from_extensionnum)
+                                    .put("to",to_extensionnum)
+                            );
+                        }
+                        //判断主叫分机是否存在，不合法直接拒绝
+                        AppExtension to_appExtension = appExtensionService.getByUser(to_extensionnum);
+                        if(to_appExtension == null){
+                            throw new ExtensionNotExistException(
+                                    new ExceptionContext()
+                                    .put("extension_user",to_extensionnum)
+                            );
+                        }
+                        //根据分机找到坐席，找不到坐席直接拒绝
+                        ExtensionState.Model to_eState = extensionState.get(to_appExtension.getId());
+                        if(to_eState == null){
+                            throw new ExtensionNotExistException(
+                                    new ExceptionContext()
+                                            .put("extension_id",to_appExtension.getId())
+                            );
+                        }
+                        if(!to_eState.getEnable().equals(ExtensionState.Model.ENABLE_TRUE)){
+                            throw new ExtensionUnEnableException(
+                                    new ExceptionContext()
+                                            .put("extension_state",to_eState)
+                            );
+                        }
+                        String to_agentId = to_eState.getAgent();
+                        if(StringUtil.isBlank(to_agentId)){
+                            throw new AgentNotExistException(
+                                    new ExceptionContext()
+                                            .put("extension_state",to_eState)
+                            );
+                        }
+                        CallCenterAgent to_agent = callCenterAgentService.findById(to_agentId);
+                        if(to_agent == null){
+                            throw new AgentNotExistException(
+                                    new ExceptionContext()
+                                            .put("agentId",to_agentId)
+                            );
+                        }
+                        AgentState.Model to_aState = agentState.get(to_agentId);
+                        if(to_aState == null){
+                            throw new AgentNotExistException(
+                                    new ExceptionContext()
+                                            .put("agentId",to_agentId)
+                            );
+                        }
+                        if(to_aState.getLastRegTime() + AgentState.REG_EXPIRE < System.currentTimeMillis()){
+                            throw new AgentExpiredException(
+                                    new ExceptionContext()
+                                            .put("agentstate",to_aState)
+                            );
+                        }
+                        //坐席加锁，加锁失败直接拒绝
+                        to_agentLock = new AgentLock(redisCacheService,to_agentId);
+                        if(!to_agentLock.lock()){
+                            throw new SystemBusyException(
+                                    new ExceptionContext()
+                                            .put("agentid",to_agentId)
+                            );
+                        }
+                        //判断坐席状态是否是空闲，非空闲直接拒绝
+                        if(!CallCenterAgent.STATE_IDLE.equals(agentState.getState(to_agentId))){
+                            throw new SystemBusyException(
+                                    new ExceptionContext()
+                                            .put("agentid",to_agentId)
+                                            .put("state",agentState.getState(to_agentId))
+                            );
+                        }
+                        conversationService.create(state.getSubaccountId(),conversationId, CallCenterUtil.CONVERSATION_TYPE_CALL_AGENT,
+                                state.getResId(),state,state.getTenantId(),state.getAppId(),
+                                state.getAreaId(),state.getCallBackUrl(), ConversationService.MAX_DURATION,null,state.getUserdata());
+                        businessStateService.updateInnerField(
+                                call_id,
+                                //直拨被叫-坐席分机
+                                "direct_agent",to_agentId,
+                                //直拨主叫
+                                "direct_from",from_extensionnum
+                        );
+                    }catch (Throwable t){
+                        logger.info("",t);
+                    }finally {
+                        //finally 坐席解锁
+                        if(to_agentLock!=null){
+                            try{
+                                to_agentLock.unlock();
+                            }catch (Throwable t){
+                                logger.info("",t);
+                            }
+                        }
+                    }
+                }else if(SipUrlUtil.isOut(to)) {//被叫是外线
+                    if(logger.isDebugEnabled()){
+                        logger.info("直拨外线，to={}",to);
+                    }
+                    boolean isRedNum = apiGwRedBlankNumService.isRedNum(to);
+                    if(isRedNum){
+                        throw new NumberNotAllowToCallException(
+                                new ExceptionContext()
+                                        .put("to",to)
+                                        .put("isRedNum",isRedNum)
+                        );
+                    }
+                    conversationService.create(state.getSubaccountId(),conversationId, CallCenterUtil.CONVERSATION_TYPE_CALL_AGENT,
+                            state.getResId(),state,state.getTenantId(),state.getAppId(),
+                            state.getAreaId(),state.getCallBackUrl(), ConversationService.MAX_DURATION,null,state.getUserdata());
+                    businessStateService.updateInnerField(call_id,
+                            //直拨被叫-外线
+                            "direct_out",to
+                    );
+                }else{
+                    throw new NumberNotAllowToCallException(new ExceptionContext()
+                            .put("number",to)
+                            .put("callid",call_id)
+                    );
+                }
+            }catch (Throwable t){
+                hangup(state.getResId(),call_id,state.getAreaId());
+            }
+        }else{
+            Long begin_time = null;
+            Long end_time = null;
+            if(params.get("begin_time") != null){
+                begin_time = (Long.parseLong(params.get("begin_time").toString())) * 1000;
+            }
+            if(params.get("end_time") != null){
+                end_time = (Long.parseLong(params.get("end_time").toString())) * 1000;
+            }
+            if(StringUtils.isNotBlank(state.getCallBackUrl())){
+                Map<String, Object> notify_data = new MapBuilder<String, Object>()
+                        .putIfNotEmpty("event", "ivr.get_end")
+                        .putIfNotEmpty("id", call_id)
+                        .putIfNotEmpty("subaccount_id",state.getSubaccountId())
+                        .putIfNotEmpty("begin_time", begin_time)
+                        .putIfNotEmpty("end_time", end_time)
+                        .putIfNotEmpty("error", params.get("error"))
+                        .putIfNotEmpty("keys", params.get("keys"))
+                        .build();
+                notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
+            }
+            ivrActionService.doAction(call_id,new MapBuilder<String,Object>()
+                    .putIfNotEmpty("keys",keys)
+                    .putIfNotEmpty("error",error)
+                    .build());
+        }
         return res;
+    }
+
+    private void hangup(String res_id,String call_id,String area_id){
+        Map<String, Object> params = new MapBuilder<String,Object>()
+                .putIfNotEmpty("res_id",res_id)
+                .putIfNotEmpty("user_data",call_id)
+                .put("areaId",area_id)
+                .build();
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
+        try {
+            if(!businessStateService.closed(call_id)) {
+                rpcCaller.invoke(sessionContext, rpcrequest, true);
+            }
+        } catch (Throwable e) {
+            logger.error(String.format("调用挂断失败,callid=%s",call_id),e);
+        }
     }
 }
