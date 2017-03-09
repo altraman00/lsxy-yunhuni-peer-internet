@@ -360,7 +360,13 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                     }
 
                 }else if(isOut(to_uri)){//被叫是外线
-
+                    String to = extractTelnum(to_uri);
+                    //主叫调用应答
+                    answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app));
+                    businessStateService.updateInnerField(
+                            //直拨被叫-外线
+                            "direct_out",to
+                    );
                 }
             }catch (Throwable t){
                 logger.info("",t);

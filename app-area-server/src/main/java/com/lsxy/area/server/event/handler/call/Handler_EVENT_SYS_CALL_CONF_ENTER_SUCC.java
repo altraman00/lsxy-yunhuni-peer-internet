@@ -200,6 +200,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
             String agentId = state.getBusinessData().get("direct_agent");
             String from_extension = state.getBusinessData().get("direct_from");
             try{
+                businessStateService.deleteInnerField(state.getId(),"direct_agent","direct_from");
                 CallCenterAgent agent = callCenterAgentService.findById(agentId);
                 if(agent == null){
                     throw new AgentNotExistException(new ExceptionContext().put("agentId",agentId));
@@ -294,6 +295,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         }else if(state.getBusinessData().get("direct_out") != null){//直拨外线
             String out = state.getBusinessData().get("direct_out");
             try {
+                businessStateService.deleteInnerField(state.getId(),"direct_out");
                 conversationService.inviteOut(state.getSubaccountId(),state.getAppId(),state.getResId(),conversation_id,null,out,
                         null,null,null,null,conversationState.getUserdata());
             } catch (YunhuniApiException e) {
