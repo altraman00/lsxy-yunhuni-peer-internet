@@ -3,11 +3,15 @@ package com.lsxy.msg.service;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.msg.api.model.MsgTemplate;
+import com.lsxy.msg.api.model.MsgUserRequest;
 import com.lsxy.msg.api.service.MsgSendService;
 import com.lsxy.msg.api.service.MsgTemplateService;
+import com.lsxy.msg.api.service.MsgUserRequestService;
 import com.lsxy.msg.supplier.SupplierSelector;
 import com.lsxy.msg.supplier.SupplierSendService;
-import com.lsxy.msg.supplier.model.*;
+import com.lsxy.msg.supplier.common.*;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -15,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,13 +37,19 @@ public class MsgSendServiceImpl implements MsgSendService {
     TelnumLocationService telnumLocationService;
     @Autowired
     SupplierSelector supplierSelector;
-
+    @Autowired
+    AppService appService;
+    @Autowired
+    MsgUserRequestService msgUserRequestService;
 
     @Override
-    public String sendUssd(String tenantId,String appId,String accountId,String mobile, String tempId, String tempArgs) {
+    public String sendUssd(String ip,String appId,String subaccountId,String mobile, String tempId, String tempArgs) {
+        App app = appService.findById(appId);
+        //TODO 判断红黑名单
+
         tempId = tempId.trim();
         tempArgs = tempArgs.trim();
-        MsgTemplate temp = msgTemplateService.findByTempId(appId, accountId, tempId, true);
+        MsgTemplate temp = msgTemplateService.findByTempId(appId, subaccountId, tempId, true);
         String tempContent = temp.getContent();
 
         if(temp == null){
@@ -78,15 +89,20 @@ public class MsgSendServiceImpl implements MsgSendService {
         //开始发送
         //处理发送结果
         if(MsgConstant.SUCCESS.equals( resultOne.getResultCode() )) {
-            //TODO 获取余额，扣费
+            //TODO 获取费用
             //TODO 插入数据库
+            MsgUserRequest msgUserRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,MsgConstant.MSG_USSD,msg,tempId,tempArgs,
+                    new Date(),false,1L,MsgUserRequest.STATE_WAIT,1L,null);
+//            msgUserRequestService.save
+//            msgUserRequestService.saveByResultOne();
+            //TODO 扣费
         }
         logger.info("发送器："+resultOne.getHandlers()+"|发送类型：单发闪印|手机号码："+mobile+"|模板id："+tempId+"|模板参数："+tempArgs+"|短信内容："+msg+"|发送结果："+resultOne.toString2());
-        return resultOne.toString();
+        return key;
     }
 
     @Override
-    public String sendMassUssd(String tenantId,String appId,String subaccountId,String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) {
+    public String sendUssdMass(String ip, String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) {
         if(StringUtils.isEmpty( taskName )){
             //TODO 抛异常
             return ResultCode.ERROR_20003.toString();
@@ -160,11 +176,11 @@ public class MsgSendServiceImpl implements MsgSendService {
         if( MsgConstant.SUCCESS.equals( resultAllMass.getResultCode() ) ) {
             //TODO 扣费
         }
-        return resultAllMass.toString();
+        return key;
     }
 
     @Override
-    public String sendSms(String tenantId,String appId,String accountId,String mobile, String tempId, String tempArgs) {
+    public String sendSms(String ip,String appId,String accountId,String mobile, String tempId, String tempArgs) {
         tempId = tempId.trim();
         tempArgs = tempArgs.trim();
         MsgTemplate temp = msgTemplateService.findByTempId(appId, accountId, tempId, true);
@@ -218,11 +234,11 @@ public class MsgSendServiceImpl implements MsgSendService {
             //TODO 插入数据库
         }
         logger.info("发送器："+resultOne.getHandlers()+"|发送类型：单发短信|手机号码："+mobile+"|模板id："+tempId+"|模板参数："+tempArgs+"|短信内容："+msg+"|发送结果："+resultOne.toString2());
-        return resultOne.toString();
+        return key;
     }
 
     @Override
-    public String sendMassSms(String tenantId,String appId,String subaccountId,String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) {
+    public String sendSmsMass(String ip, String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) {
         if(StringUtils.isEmpty( taskName )){
             //TODO 抛异常
             return ResultCode.ERROR_20003.toString();
@@ -308,12 +324,16 @@ public class MsgSendServiceImpl implements MsgSendService {
             }
         }
 
+        if(massMobile.getTelecom().size() > 0){//处理电信号码
+
+        }
+
         ResultAllMass resultAllMass = new ResultAllMass(list,massMobile.getNo());
         //处理发送结果
         if( MsgConstant.SUCCESS.equals( resultAllMass.getResultCode())){
             //TODO 扣费
         }
-        return resultAllMass.toString();
+        return key;
     }
 
     public String getMsg(String temp,String arg){

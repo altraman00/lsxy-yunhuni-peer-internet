@@ -4,8 +4,8 @@ import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.msg.supplier.SupplierSelector;
 import com.lsxy.msg.supplier.SupplierSendService;
-import com.lsxy.msg.supplier.model.MsgConstant;
-import com.lsxy.msg.supplier.model.ResultMass;
+import com.lsxy.msg.supplier.common.MsgConstant;
+import com.lsxy.msg.supplier.common.ResultMass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
 
     @Override
     public void handleMessage(DelaySendMassEvent message) throws JMSException {
-        logger.info("预计发送时间:"+ DateUtils.formatDate(DateUtils.parseDate(message.getSendTime(),"yyyyMMddhhmmss"),"yyyy-MM-dd hh:mm:ss")+" 当前时间："+ DateUtils.formatDate(new Date(),"yyyy-MM-dd hh:mm:ss")+" 延迟毫秒数："+message.getDelay());
+        logger.info("预计发送时间:"+ message.getSendTime() + " 当前时间："+ DateUtils.formatDate(new Date(),"yyyy-MM-dd hh:mm:ss")+" 延迟毫秒数："+message.getDelay());
         ResultMass resultMass = null;
         String[] split = message.getTempArgs().split(MsgConstant.ParamRegexStr);
         List<String> tempArgsList = Arrays.asList(split);

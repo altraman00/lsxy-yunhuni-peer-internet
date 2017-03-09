@@ -16,6 +16,10 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema = "db_lsxy_bi_yunhuni", name = "tb_bi_msg_user_request")
 public class MsgUserRequest extends IdEntity {
+    public static final int STATE_WAIT = 0;
+    public static final int STATE_SUCCESS = 1;
+    public static final int STATE_FAIL = -1;
+
     private String msgKey;
     private String tenantId;
     private String appId;
@@ -36,13 +40,27 @@ public class MsgUserRequest extends IdEntity {
     private String reason;
     private String remark;
     private String mobile;
-    @Column(name="mobile")
-    public String getMobile() {
-        return mobile;
+
+    public MsgUserRequest() {
     }
 
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
+
+    public MsgUserRequest(String msgKey, String tenantId, String appId, String subaccountId, String sendType, String msg, String tempId,
+                          String tempArgs, Date sendTime, Boolean isMass, Long sumNum, Integer state, Long pendingNum, String remark) {
+        this.msgKey = msgKey;
+        this.tenantId = tenantId;
+        this.appId = appId;
+        this.subaccountId = subaccountId;
+        this.sendType = sendType;
+        this.msg = msg;
+        this.tempId = tempId;
+        this.tempArgs = tempArgs;
+        this.sendTime = sendTime;
+        this.isMass = isMass;
+        this.sumNum = sumNum;
+        this.state = state;
+        this.pendingNum = pendingNum;
+        this.remark = remark;
     }
 
     @Column(name = "msg_key")
@@ -214,6 +232,15 @@ public class MsgUserRequest extends IdEntity {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    @Column(name="mobile")
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 
 }

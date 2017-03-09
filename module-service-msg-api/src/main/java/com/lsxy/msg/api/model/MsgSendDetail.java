@@ -16,6 +16,10 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema = "db_lsxy_bi_yunhuni", name = "tb_bi_msg_send_detail")
 public class MsgSendDetail extends IdEntity {
+    public static final int STATE_WAIT = 0;
+    public static final int STATE_SUCCESS = 1;
+    public static final int STATE_FAIL = -1;
+
     private String msgKey;
     private String tenantId;
     private String appId;

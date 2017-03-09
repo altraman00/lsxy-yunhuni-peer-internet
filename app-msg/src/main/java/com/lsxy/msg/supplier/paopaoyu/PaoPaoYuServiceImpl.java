@@ -2,9 +2,9 @@ package com.lsxy.msg.supplier.paopaoyu;
 
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.msg.supplier.AbstractSupplierSendServiceImpl;
-import com.lsxy.msg.supplier.model.PaoPaoYuMassNofity;
-import com.lsxy.msg.supplier.model.ResultMass;
-import com.lsxy.msg.supplier.model.ResultOne;
+import com.lsxy.msg.supplier.common.PaoPaoYuMassNofity;
+import com.lsxy.msg.supplier.common.ResultMass;
+import com.lsxy.msg.supplier.common.ResultOne;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

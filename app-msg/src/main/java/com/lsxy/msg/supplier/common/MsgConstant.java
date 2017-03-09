@@ -1,4 +1,6 @@
-package com.lsxy.msg.supplier.model;
+package com.lsxy.msg.supplier.common;
+
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
 
 /**
  * Created by liups on 2017/3/8.
@@ -13,8 +15,8 @@ public class MsgConstant {
 
     public static final String OTHER_ERROR_CODE = "-1";
     public static final String SUCCESS = "0";
-    public  static final String MSG_USSD = "msg_ussd";//模板闪印
-    public static final String MSG_SMS = "msg_sms";//普通模板短信
+    public  static final String MSG_USSD = ProductCode.msg_ussd.name();//模板闪印
+    public static final String MSG_SMS = ProductCode.msg_sms.name();//普通模板短信
     public static final String ChinaMobile  = "中国移动";//"中国移动";
     public static final String ChinaUnicom = "中国联通";//"中国联通";
     public static final String ChinaTelecom = "中国电信";//"中国电信";

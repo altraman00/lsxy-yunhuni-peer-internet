@@ -1,4 +1,4 @@
-package com.lsxy.msg.supplier.model;
+package com.lsxy.msg.supplier.common;
 
 import com.lsxy.framework.core.utils.JSONUtil;
 import org.apache.commons.lang.StringUtils;

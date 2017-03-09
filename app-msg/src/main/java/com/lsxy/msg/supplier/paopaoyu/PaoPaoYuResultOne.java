@@ -1,7 +1,7 @@
 package com.lsxy.msg.supplier.paopaoyu;
 
-import com.lsxy.msg.supplier.model.MsgConstant;
-import com.lsxy.msg.supplier.model.ResultOne;
+import com.lsxy.msg.supplier.common.MsgConstant;
+import com.lsxy.msg.supplier.common.ResultOne;
 import net.sf.json.JSONObject;
 
 /**
