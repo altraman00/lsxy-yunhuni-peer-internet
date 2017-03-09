@@ -432,7 +432,9 @@
                                                     <input type="text" class="form-control" placeholder="关联子账号" id="template_subId" /></div>
                                                 <div class="col-md-2">
                                                     <button class="btn btn-primary" type="button" onclick="templateList()">查询</button>
-                                                    <button href="#"  class="btn btn-primary defind modalShow" data-id="seven" >新增模板</button>
+                                                    <div hidden>
+                                                    <button href="#"  class="btn btn-primary defind modalShow" data-id="seven" >新增模板</button></div>
+                                                    <button href="#"  class="btn btn-primary " onclick="isnewTemplate()" >新增模板</button>
                                                 </div>
                                             </div>
                                             <table class="table table-striped cost-table-history tablelist" id="template-table">
@@ -1215,6 +1217,14 @@
 <link rel="stylesheet" href="${resPrefixUrl }/js/dist/css/bootstrap-select.css">
 <script src="${resPrefixUrl }/js/dist/js/bootstrap-select.js"></script>
         <script type="text/javascript">
+            function isnewTemplate(){
+                var state = '${app.status}';
+                if(state==1){
+                    $('button[data-id=seven]').click();
+                }else{
+                    showtoast("你还没进行公司认证，快去认证吧！");
+                }
+            }
             //多行文本输入框剩余字数计算
             function checkMaxInput(obj, maxLen) {
                 if (obj == null || obj == undefined || obj == "") {
@@ -2940,8 +2950,10 @@
                 editSubAccountFive.initObj(response.data);
                 $('#subAccount_home').hide();
                 $('#subAccount_datail').show();
-                $('#call-number2').attr("data-num-bind",response.data.id);
-                upnumber2();
+                if(appServiceType != 'msg'){
+                    $('#call-number2').attr("data-num-bind",response.data.id);
+                    upnumber2();
+                }
             }else{
                 showtoast(response.errorMsg?response.errorMsg:'数据异常');
             }
