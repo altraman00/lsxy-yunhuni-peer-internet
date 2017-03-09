@@ -117,11 +117,11 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
             try{
                 if(state.getBusinessData().get("direct_agent") != null){//直拨坐席
                     conversationService.create(state.getSubaccountId(),conversationId,CallCenterUtil.CONVERSATION_TYPE_CALL_AGENT,
-                            state.getResId(),state,state.getTenantId(),state.getAppId(),
+                            state.getBusinessData().get(BusinessState.REF_RES_ID),state,state.getTenantId(),state.getAppId(),
                             state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null,state.getUserdata());
                 }else if(state.getBusinessData().get("direct_out") != null){
                     conversationService.create(state.getSubaccountId(),conversationId,CallCenterUtil.CONVERSATION_TYPE_CALL_OUT,
-                            state.getResId(),state,state.getTenantId(),state.getAppId(),
+                            state.getBusinessData().get(BusinessState.REF_RES_ID),state,state.getTenantId(),state.getAppId(),
                             state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null,state.getUserdata());
                 }else if(state.getBusinessData().get("direct_hot") != null){
                     //收码

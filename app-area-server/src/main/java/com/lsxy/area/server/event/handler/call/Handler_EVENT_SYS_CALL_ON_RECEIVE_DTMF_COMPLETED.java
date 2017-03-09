@@ -229,7 +229,7 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
                             );
                         }
                         conversationService.create(state.getSubaccountId(),conversationId, CallCenterUtil.CONVERSATION_TYPE_CALL_AGENT,
-                                state.getResId(),state,state.getTenantId(),state.getAppId(),
+                                state.getBusinessData().get(BusinessState.REF_RES_ID),state,state.getTenantId(),state.getAppId(),
                                 state.getAreaId(),state.getCallBackUrl(), ConversationService.MAX_DURATION,null,state.getUserdata());
                         businessStateService.updateInnerField(
                                 call_id,
@@ -262,8 +262,8 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
                                         .put("isRedNum",isRedNum)
                         );
                     }
-                    conversationService.create(state.getSubaccountId(),conversationId, CallCenterUtil.CONVERSATION_TYPE_CALL_AGENT,
-                            state.getResId(),state,state.getTenantId(),state.getAppId(),
+                    conversationService.create(state.getSubaccountId(),conversationId, CallCenterUtil.CONVERSATION_TYPE_CALL_OUT,
+                            state.getBusinessData().get(BusinessState.REF_RES_ID),state,state.getTenantId(),state.getAppId(),
                             state.getAreaId(),state.getCallBackUrl(), ConversationService.MAX_DURATION,null,state.getUserdata());
                     businessStateService.updateInnerField(call_id,
                             //直拨被叫-外线
