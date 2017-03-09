@@ -69,7 +69,6 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * Created by liuws on 2016/8/29.
@@ -78,8 +77,6 @@ import java.util.regex.Pattern;
 public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
 
     private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_SYS_CALL_ON_INCOMING.class);
-
-    private static final Pattern EXTENSION_PATERN = Pattern.compile("^([2-9]\\d{6,10})|(100\\d{4,8})$");
 
     @Autowired
     private AppService appService;
@@ -101,9 +98,6 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
 
     @Value("${portal.test.call.number}")
     private String testNum;
-
-    @Value("${area.server.hot.number}")
-    private String hotNum;
 
     @Autowired
     private TenantServiceSwitchService tenantServiceSwitchService;
@@ -182,14 +176,14 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         String from_uri = (String)params.get("from_uri");//主叫sip地址
         String to_uri = (String)params.get("to_uri");//被叫号码sip地址
 
-        if(isExtensionNum(from_uri)){//是坐席分机呼入，可以呼给其他坐席，热线，外线，不能呼给平台号码
+        if(SipUrlUtil.isExtensionNum(from_uri)){//是坐席分机呼入，可以呼给其他坐席，热线，外线
             if(logger.isDebugEnabled()){
                 logger.info("分机直拨{}",params);
             }
             AgentLock from_agentLock = null;
             try{
                 //呼入号码为分机长号码
-                String from_extensionnum = extractTelnum(from_uri);
+                String from_extensionnum = SipUrlUtil.extractTelnum(from_uri);
                 //判断主叫分机是否存在，不合法直接拒绝
                 AppExtension from_appExtension = appExtensionService.getByUser(from_extensionnum);
                 if(from_appExtension == null){
@@ -282,42 +276,36 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 //转换长号码为短号码，显示在被叫的话机上
                 from_extensionnum = from_extensionnum.replace(extension_prefix,"");
 
-                if(isHotNum(to_uri)){//被叫是热线号码
-                    String to = extractTelnum(to_uri);
+                if(SipUrlUtil.isHotNum(to_uri)){//被叫是热线号码
+                    String to = SipUrlUtil.extractTelnum(to_uri);
                     if(logger.isDebugEnabled()){
                         logger.info("直拨热线，to={}",to);
                     }
-                }else if(isOut(to_uri)){//被叫是外线
-                    String to = extractTelnum(to_uri);
-                    if(logger.isDebugEnabled()){
-                        logger.info("直拨外线，to={}",to);
-                    }
-                    boolean isRedNum = apiGwRedBlankNumService.isRedNum(to);
-                    if(isRedNum){
-                        throw new NumberNotAllowToCallException(
-                                new ExceptionContext()
-                                        .put("to",to)
-                                        .put("isRedNum",isRedNum)
-                        );
-                    }
-                    //主叫调用应答
+                    //流程，应答成功后调用收码，收码完成事件中创建会议，会议创建成功后将call加入会议，加入会议成功事件 呼叫被叫，振铃事件将被叫加入会议
                     answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app));
                     businessStateService.updateInnerField(
-                            //直拨被叫-外线
-                            "direct_out",to
+                            call_id,
+                            //直拨外线-主叫分机短号
+                            "direct_hot",from_extensionnum,
+                            "direct_extension_prefix",extension_prefix
                     );
-                }else if(isShortNum(extension_prefix,to_uri)){//被叫是分机短号
+                }else if(SipUrlUtil.isShortNum(extension_prefix,to_uri)){//被叫是分机短号
                     //流程：应答成功创建会议，会议创建成功后将call加入会议，加入会议成功事件 呼叫被叫，振铃事件将被叫加入会议
                     AgentLock to_agentLock = null;
                     try{
                         //判断被叫分机是否存在
-                        String to_extensionnum = extension_prefix + extractTelnum(to_uri);//被叫号码要为长号码
+                        String to_extensionnum = extension_prefix + SipUrlUtil.extractTelnum(to_uri);//被叫号码要为长号码
                         if(logger.isDebugEnabled()){
                             logger.info("直拨分机，to={}",to_extensionnum);
                         }
+                        //不能自己呼给自己
+                        if(to_extensionnum.equals(extension_prefix+from_extensionnum)){
+                            logger.info("不能自己呼给自己,from={},to={}",(extension_prefix+from_extensionnum),to_extensionnum);
+                            return  res;
+                        }
                         //判断主叫分机是否存在，不合法直接拒绝
                         AppExtension to_appExtension = appExtensionService.getByUser(to_extensionnum);
-                        if(from_appExtension == null){
+                        if(to_appExtension == null){
                             logger.info("分机号不存在对应的分机记录extension_num={}",to_extensionnum);
                             return res;
                         }
@@ -331,13 +319,13 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                             logger.info("分机不可用,state={}",to_eState);
                             return res;
                         }
-                        String to_agentId = from_eState.getAgent();
-                        if(StringUtil.isBlank(from_agentId)){
-                            logger.info("坐席不存在，state={}",from_eState);
+                        String to_agentId = to_eState.getAgent();
+                        if(StringUtil.isBlank(to_agentId)){
+                            logger.info("坐席不存在，state={}",to_eState);
                             return res;
                         }
                         CallCenterAgent to_agent = callCenterAgentService.findById(to_agentId);
-                        if(from_agent == null){
+                        if(to_agent == null){
                             logger.info("坐席不存在，id={}",to_agentId);
                             return res;
                         }
@@ -361,10 +349,10 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                             logger.info("坐席正忙,state={}",agentState.getState(to_agentId));
                             return res;
                         }
-                        //主叫调用应答
                         answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app));
 
                         businessStateService.updateInnerField(
+                                call_id,
                                 //直拨被叫-坐席分机
                                 "direct_agent",to_agentId,
                                 //直拨主叫
@@ -382,7 +370,25 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                             }
                         }
                     }
-
+                }else if(SipUrlUtil.isOut(to_uri)){//被叫是外线
+                    String to = SipUrlUtil.extractTelnum(to_uri);
+                    if(logger.isDebugEnabled()){
+                        logger.info("直拨外线，to={}",to);
+                    }
+                    boolean isRedNum = apiGwRedBlankNumService.isRedNum(to);
+                    if(isRedNum){
+                        throw new NumberNotAllowToCallException(
+                                new ExceptionContext()
+                                        .put("to",to)
+                                        .put("isRedNum",isRedNum)
+                        );
+                    }
+                    answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app));
+                    businessStateService.updateInnerField(
+                            call_id,
+                            //直拨被叫-外线
+                            "direct_out",to
+                    );
                 }
             }catch (Throwable t){
                 logger.info("",t);
@@ -577,59 +583,6 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 .build();
         businessStateService.save(state);
         return call_id;
-    }
-
-    public static String extractTelnum(String sip){
-        if(StringUtil.isBlank(sip)){
-            return "";
-        }
-        int index = sip.indexOf("@");
-        if(index <=0){
-            index = sip.length();
-        }
-        if(logger.isDebugEnabled()){
-            logger.info("{}====》{}",sip,sip.substring(0,index).replace("sip:",""));
-        }
-        return sip.substring(0,index).replace("sip:","");
-    }
-
-    /***
-     * 判断是不是分机号
-     * @param uri
-     * @return
-     */
-    private boolean isExtensionNum(String uri){
-        String telnum = extractTelnum(uri);
-        return EXTENSION_PATERN.matcher(telnum).find();
-    }
-
-    /**
-     * 判断是否是分机短号
-     * @param uri
-     * @return
-     */
-    private boolean isShortNum(String prefix,String uri){
-        String telnum = prefix + extractTelnum(uri);
-        return isExtensionNum(telnum);
-    }
-
-    /**
-     * 判断是不是热线号码
-     * @param uri
-     * @return
-     */
-    private boolean isHotNum(String uri){
-        String telnum = extractTelnum(uri);
-        return hotNum.equals(telnum);
-    }
-
-    /**
-     * 判断是不是外线号码
-     * @param uri
-     * @return
-     */
-    private boolean isOut(String uri){
-        return false;
     }
 
     private String resolveFromTelNum(String from,LineGateway lineGateway){

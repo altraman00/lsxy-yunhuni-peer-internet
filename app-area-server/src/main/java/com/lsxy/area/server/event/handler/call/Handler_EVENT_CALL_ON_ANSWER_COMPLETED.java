@@ -117,14 +117,28 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
             try{
                 if(state.getBusinessData().get("direct_agent") != null){//直拨坐席
                     conversationService.create(state.getSubaccountId(),conversationId,CallCenterUtil.CONVERSATION_TYPE_CALL_AGENT,
-                            state.getResId(),state,state.getTenantId(),state.getAppId(),
+                            state.getBusinessData().get(BusinessState.REF_RES_ID),state,state.getTenantId(),state.getAppId(),
                             state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null,state.getUserdata());
                 }else if(state.getBusinessData().get("direct_out") != null){
                     conversationService.create(state.getSubaccountId(),conversationId,CallCenterUtil.CONVERSATION_TYPE_CALL_OUT,
-                            state.getResId(),state,state.getTenantId(),state.getAppId(),
+                            state.getBusinessData().get(BusinessState.REF_RES_ID),state,state.getTenantId(),state.getAppId(),
                             state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null,state.getUserdata());
                 }else if(state.getBusinessData().get("direct_hot") != null){
+                    //收码
+                    Map<String, Object> receive_params = new MapBuilder<String,Object>()
+                            .putIfNotEmpty("res_id",state.getResId())
+                            .putIfNotEmpty("valid_keys","0123456789")
+                            .putIfNotEmpty("finish_keys","")
+                            .putIfNotEmpty("first_key_timeout","10")
+                            .putIfNotEmpty("continues_keys_timeout","3")
+                            .putIfNotEmpty("user_data",call_id)
+                            .put("areaId",state.getAreaId())
+                            .build();
 
+                    RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_RECEIVE_DTMF_START, receive_params);
+                    if(!businessStateService.closed(call_id)) {
+                        rpcCaller.invoke(sessionContext, rpcrequest);
+                    }
                 }
             }catch (Throwable t){
                 logger.info("",t);

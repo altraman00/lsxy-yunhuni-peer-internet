@@ -274,7 +274,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
                         );
                     }
                     try{
-                        conversationService.inviteAgent(state.getSubaccountId(),state.getAppId(),state.getResId(),call_id,
+                        conversationService.inviteAgent(state.getSubaccountId(),state.getAppId(),conversationState.getBusinessData().get(BusinessState.REF_RES_ID),call_id,
                                         conversation_id,agent.getId(),
                                         agent.getName(),agent.getExtension(),null,from_extension,extension.getTelnum(),
                                         extension.getType(),extension.getUser(),ConversationService.MAX_DURATION,45,null,null);
@@ -296,7 +296,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
             String out = state.getBusinessData().get("direct_out");
             try {
                 businessStateService.deleteInnerField(state.getId(),"direct_out");
-                conversationService.inviteOut(state.getSubaccountId(),state.getAppId(),state.getResId(),conversation_id,null,out,
+                conversationService.inviteOut(state.getSubaccountId(),state.getAppId(),conversationState.getBusinessData().get(BusinessState.REF_RES_ID),conversation_id,null,out,
                         null,null,null,null,conversationState.getUserdata());
             } catch (YunhuniApiException e) {
                 logger.info("",e);
