@@ -286,6 +286,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 if(isHotNum(to_uri)){//被叫是热线号码
 
                 }else if(isShortNum(extension_prefix,to_uri)){//被叫是分机短号
+                    //流程：应答成功创建会议，会议创建成功后将call加入会议，加入会议成功事件 呼叫被叫，振铃事件将被叫加入会议
                     AgentLock to_agentLock = null;
                     try{
                         //判断被叫分机是否存在
@@ -345,17 +346,6 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                                 //直拨主叫
                                 "direct_from",from_extensionnum
                         );
-
-                        //应答成功创建会议 ok
-
-                        //会议创建成功后将call加入会议   ok
-
-                        //加入会议成功事件 呼叫被叫 未
-
-                        //振铃事件将被叫加入会议 ok
-
-
-
                     }catch (Throwable t){
                         logger.info("",t);
                     }finally {

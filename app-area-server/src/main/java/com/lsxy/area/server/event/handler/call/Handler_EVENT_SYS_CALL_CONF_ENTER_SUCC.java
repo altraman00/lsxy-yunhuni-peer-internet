@@ -293,6 +293,13 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
             }
         }else if(state.getBusinessData().get("direct_out") != null){//直拨外线
             String out = state.getBusinessData().get("direct_out");
+            try {
+                conversationService.inviteOut(state.getSubaccountId(),state.getAppId(),state.getResId(),conversation_id,null,out,
+                        null,null,null,null,conversationState.getUserdata());
+            } catch (YunhuniApiException e) {
+                logger.info("",e);
+                conversationService.exit(conversation_id,call_id);
+            }
         }
     }
 
