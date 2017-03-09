@@ -112,16 +112,19 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
         }
 
         if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
+            //分机直拨
             String conversationId = state.getBusinessData().get(CallCenterUtil.CONVERSATION_FIELD);
             try{
-                App app = appService.findById(state.getId());
-                //分机直拨
-                if(state.getBusinessData().get("direct_agent") != null ||
-                        state.getBusinessData().get("direct_out") != null
-                        ){//直拨坐席
-                    conversationService.create(state.getSubaccountId(),conversationId,
+                if(state.getBusinessData().get("direct_agent") != null){//直拨坐席
+                    conversationService.create(state.getSubaccountId(),conversationId,CallCenterUtil.CONVERSATION_TYPE_CALL_AGENT,
                             state.getResId(),state,state.getTenantId(),state.getAppId(),
                             state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null,state.getUserdata());
+                }else if(state.getBusinessData().get("direct_out") != null){
+                    conversationService.create(state.getSubaccountId(),conversationId,CallCenterUtil.CONVERSATION_TYPE_CALL_OUT,
+                            state.getResId(),state,state.getTenantId(),state.getAppId(),
+                            state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null,state.getUserdata());
+                }else if(state.getBusinessData().get("direct_hot") != null){
+
                 }
             }catch (Throwable t){
                 logger.info("",t);

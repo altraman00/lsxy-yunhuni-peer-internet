@@ -447,13 +447,8 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         }
                         if((conversationState.getClosed()== null || !conversationState.getClosed())){
                             //交谈开始事件
-                            if(queueId!=null){
-                                callCenterUtil.conversationBeginEvent(conversationState.getSubaccountId(),conversationState.getCallBackUrl(),conversation_id,
-                                        CallCenterUtil.CONVERSATION_TYPE_QUEUE,queueId,call_id,conversationState.getUserdata());
-                            }else{
-                                callCenterUtil.conversationBeginEvent(conversationState.getSubaccountId(),conversationState.getCallBackUrl(),conversation_id,
-                                        CallCenterUtil.CONVERSATION_TYPE_CALL_AGENT,queueId,call_id,conversationState.getUserdata());
-                            }
+                            callCenterUtil.conversationBeginEvent(conversationState.getSubaccountId(),conversationState.getCallBackUrl(),conversation_id,
+                                    conversationState.getBusinessData().get(CallCenterUtil.CONVERSATION_TYPE_FIELD),queueId,call_id,conversationState.getUserdata());
                         }
                     }
                 }
@@ -576,7 +571,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                     }
                     //交谈开始事件
                     callCenterUtil.conversationBeginEvent(conversationState.getSubaccountId(),conversationState.getCallBackUrl(),conversationId,
-                            CallCenterUtil.CONVERSATION_TYPE_CALL_OUT,null,call_id,conversationState.getUserdata());
+                            conversationState.getBusinessData().get(CallCenterUtil.CONVERSATION_TYPE_FIELD),null,call_id,conversationState.getUserdata());
                 }
             }
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
@@ -614,6 +609,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                     if(businessData.get("invite_to") != null){
                         try {
                             conversationService.create(state.getSubaccountId(),conversationId,
+                                    CallCenterUtil.CONVERSATION_TYPE_CALL_OUT,
                                     state.getBusinessData().get(BusinessState.REF_RES_ID),
                                     state,state.getTenantId(),state.getAppId(),
                                     state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null,state.getUserdata());
@@ -627,6 +623,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                     }else if(businessData.get("enqueue_xml") != null){
                         try {
                             conversationService.create(state.getSubaccountId(),conversationId,
+                                    CallCenterUtil.CONVERSATION_TYPE_CALL_AGENT,
                                     state.getBusinessData().get(BusinessState.REF_RES_ID),
                                     state,state.getTenantId(),state.getAppId(),
                                     state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null,state.getUserdata());

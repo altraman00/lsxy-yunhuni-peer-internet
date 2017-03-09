@@ -50,6 +50,8 @@ public class CallCenterUtil {
     public static final String CONVERSATION_FIELD = "CONVERSATION_ID";
     /**交谈中所使用的平台号码**/
     public static final String CONVERSATION_SYSNUM_FIELD = "CONVERSATION_SYSNUM";
+    /**交谈类型**/
+    public static final String CONVERSATION_TYPE_FIELD = "CONVERSATION_TYPE";
     /**ivr呼叫是否呼叫中心标记存放的字段**/
     public static final String ISCC_FIELD = "ISCC";
     public static final String ISCC_TRUE = "1";
