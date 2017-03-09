@@ -3,6 +3,7 @@ package com.lsxy.third.gateway;
 import com.lsxy.framework.FrameworkServiceConfig;
 import com.lsxy.framework.api.FrameworkApiConfig;
 import com.lsxy.framework.cache.FrameworkCacheConfig;
+import com.lsxy.framework.dubbo.EnableDubboConfiguration;
 import com.lsxy.framework.monitor.FrameworkMonitorConfig;
 import com.lsxy.framework.web.web.AbstractSpringBootWebStarter;
 import com.lsxy.msg.MsgServiceConfig;
@@ -20,6 +21,7 @@ import org.springframework.context.annotation.Import;
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
 @Import({FrameworkApiConfig.class,FrameworkServiceConfig.class, FrameworkCacheConfig.class, YunhuniApiConfig.class, YunhuniServiceConfig.class,
         FrameworkMonitorConfig.class,MsgApiConfig.class,MsgServiceConfig.class})
+@EnableDubboConfiguration
 public class MainClass  extends AbstractSpringBootWebStarter {
 
     public static final String systemId = "third.join.gateway";

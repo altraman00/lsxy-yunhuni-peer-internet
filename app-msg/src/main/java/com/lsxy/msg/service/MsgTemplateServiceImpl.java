@@ -3,6 +3,8 @@ package com.lsxy.msg.service;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.exceptions.api.RequestIllegalArgumentException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.Page;
@@ -41,13 +43,25 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
     public MsgTemplate createTemplate(MsgTemplate msgTemplate){
         msgTemplate.setTempId(getMsgTempNum());
         msgTemplate.setStatus(MsgTemplate.STATUS_WAIT);
-        this.save(msgTemplate);
+        msgTemplate = this.save(msgTemplate);
         return msgTemplate;
     }
 
     public String getMsgTempNum() {
         long num = 10000 + redisCacheService.incr(MSG_TEMP_NUM);
         return num + "";
+    }
+
+    @Override
+    public Page<MsgTemplate> getPageByCondition(Integer pageNo, Integer pageSize, String appId, String subaccountId, String name) {
+        String hql = " from MsgTemplate obj where obj.appId=?1 ";
+        if(StringUtil.isNotEmpty(subaccountId)){
+            hql += " and obj.subaccountId in ("+subaccountId+") ";
+        }
+        if(StringUtil.isNotEmpty(name)){
+            hql += " and obj.name like '%"+name+"%' ";
+        }
+        return pageList(hql,pageNo,pageSize,appId);
     }
 
     @Override

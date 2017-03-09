@@ -29,6 +29,19 @@ public class MsgTemplate extends IdEntity {
     private String remark;
     private String lastUserName;
 
+    public MsgTemplate() {
+    }
+
+    public MsgTemplate(String tenantId, String appId, String name, String type, String content, String remark) {
+        this.status = 0;
+        this.tenantId = tenantId;
+        this.appId = appId;
+        this.name = name;
+        this.type = type;
+        this.content = content;
+        this.remark = remark;
+    }
+
     @Column(name = "temp_id")
     public String getTempId() {
         return tempId;
