@@ -13,6 +13,7 @@ import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
+import com.lsxy.call.center.api.states.state.AgentState;
 import com.lsxy.framework.core.exceptions.api.AgentNotExistException;
 import com.lsxy.framework.core.exceptions.api.ExceptionContext;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -73,6 +74,12 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
     @Autowired
     private CallbackUrlUtil callbackUrlUtil;
 
+    @Autowired
+    private AgentState agentState;
+
+    @Autowired
+    private CallCenterUtil callCenterUtil;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CALL_ON_ANSWER_COMPLETED;
@@ -115,6 +122,10 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
             //分机直拨
             String conversationId = state.getBusinessData().get(CallCenterUtil.CONVERSATION_FIELD);
             try{
+                agentState.setState(state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD),CallCenterAgent.STATE_TALKING);
+                callCenterUtil.agentStateChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD)
+                        ,state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),
+                        CallCenterAgent.STATE_FETCHING,CallCenterAgent.STATE_TALKING,state.getUserdata());
                 if(state.getBusinessData().get("direct_agent") != null){//直拨坐席
                     conversationService.create(state.getSubaccountId(),conversationId,CallCenterUtil.CONVERSATION_TYPE_CALL_AGENT,
                             state.getBusinessData().get(BusinessState.REF_RES_ID),state,state.getTenantId(),state.getAppId(),
