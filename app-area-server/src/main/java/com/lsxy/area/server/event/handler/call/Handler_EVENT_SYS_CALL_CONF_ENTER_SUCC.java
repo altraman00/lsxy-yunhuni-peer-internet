@@ -10,11 +10,17 @@ import com.lsxy.area.server.service.callcenter.CallConversationService;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
+import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.call.center.api.model.CallCenter;
+import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.model.EnQueue;
-import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
-import com.lsxy.call.center.api.service.CallCenterConversationService;
-import com.lsxy.call.center.api.service.EnQueueService;
+import com.lsxy.call.center.api.service.*;
+import com.lsxy.call.center.api.states.lock.AgentLock;
+import com.lsxy.call.center.api.states.state.AgentState;
+import com.lsxy.call.center.api.states.state.ExtensionState;
 import com.lsxy.call.center.api.utils.EnQueueDecoder;
+import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -24,12 +30,14 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
+import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.session.model.Meeting;
 import com.lsxy.yunhuni.api.session.model.MeetingMember;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import com.lsxy.yunhuni.api.session.service.MeetingMemberService;
 import com.lsxy.yunhuni.api.session.service.MeetingService;
+import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -37,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
 
@@ -70,9 +79,6 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
     private ConfService confService;
 
     @Autowired
-    private ConversationService conversationService;
-
-    @Autowired
     private CallConversationService callConversationService;
 
     @Reference(lazy = true,check = false,timeout = 3000)
@@ -84,11 +90,32 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
     @Reference(lazy = true,check = false,timeout = 3000)
     private EnQueueService enQueueService;
 
+    @Reference(timeout=3000,check = false,lazy = true)
+    private AppExtensionService appExtensionService;
+
+    @Reference(timeout=3000,check = false,lazy = true)
+    private CallCenterAgentService callCenterAgentService;
+
+    @Autowired
+    private ConversationService conversationService;
+
     @Autowired
     private RPCCaller rpcCaller;
 
     @Autowired
     private SessionContext sessionContext;
+
+    @Autowired
+    private ExtensionState extensionState;
+
+    @Autowired
+    private AgentState agentState;
+
+    @Autowired
+    private RedisCacheService redisCacheService;
+
+    @Autowired
+    private CallCenterUtil callCenterUtil;
 
     @Override
     public String getEventName() {
@@ -167,6 +194,112 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
                         businessData.get(CallCenterUtil.AGENT_NAME_FIELD),call_id,enqueue,CallCenterUtil.QUEUE_TYPE_CALL_AGENT,conversation_id);
             }catch (Throwable t){
                 logger.info("排队找坐席出错",t);
+                conversationService.exit(conversation_id,call_id);
+            }
+        }else if(state.getBusinessData().get("direct_agent") != null){//直拨坐席
+            String agentId = state.getBusinessData().get("direct_agent");
+            String from_extension = state.getBusinessData().get("direct_from");
+            try{
+                businessStateService.deleteInnerField(state.getId(),"direct_agent","direct_from");
+                CallCenterAgent agent = callCenterAgentService.findById(agentId);
+                if(agent == null){
+                    throw new AgentNotExistException(new ExceptionContext().put("agentId",agentId));
+                }
+                //获取坐席状态
+                AgentState.Model aState = agentState.get(agentId);
+                if(aState == null || aState.getState() == null){
+                    throw new AgentNotExistException(
+                            new ExceptionContext()
+                                    .put("appId",appId)
+                                    .put("agentId",agentId)
+                                    .put("agentstate",aState)
+                    );
+                }
+                if(aState.getExtension() == null){
+                    throw new ExtensionNotExistException(
+                            new ExceptionContext()
+                                    .put("appId",appId)
+                                    .put("agentName",agent.getName())
+                                    .put("agentId",agentId)
+                                    .put("agentstate",aState)
+                    );
+                }
+                //座席没有报道
+                if (aState.getLastRegTime() + AgentState.REG_EXPIRE < System.currentTimeMillis()) {
+                    throw new AgentExpiredException(
+                            new ExceptionContext()
+                                    .put("appId",appId)
+                                    .put("agentName",agent.getName())
+                                    .put("agentId",agentId)
+                                    .put("agentstate",aState)
+                    );
+                }
+                ExtensionState.Model eState = extensionState.get(aState.getExtension());
+                //分机不可用
+                if(eState == null || !ExtensionState.Model.ENABLE_TRUE.equals(eState.getEnable())){
+                    throw new ExtensionUnEnableException(
+                            new ExceptionContext()
+                                    .put("appId",appId)
+                                    .put("agentName",agent.getName())
+                                    .put("agentId",agentId)
+                                    .put("extension_id",aState.getExtension())
+                                    .put("extensionState",eState)
+                    );
+                }
+                AppExtension extension = appExtensionService.findById(aState.getExtension());
+                if(extension == null){
+                    throw new ExtensionNotExistException(
+                            new ExceptionContext()
+                                    .put("appId",appId)
+                                    .put("agentName",agent.getName())
+                                    .put("agentId",agent.getId())
+                                    .put("extension_id",aState.getExtension())
+                    );
+                }
+                //坐席加锁，加锁失败直接拒绝
+                AgentLock agentLock = new AgentLock(redisCacheService,agentId);
+                if(!agentLock.lock()){
+                    logger.info("坐席加锁失败,id={}",agentId);
+                    throw new SystemBusyException();
+                }
+                try{
+                    //判断坐席状态是否是空闲，非空闲直接拒绝
+                    if(!CallCenterAgent.STATE_IDLE.equals(agentState.getState(agentId))){
+                        throw new SystemBusyException(
+                                new ExceptionContext()
+                                        .put("appId",appId)
+                                        .put("agentName",agent.getName())
+                                        .put("agentId",agentId)
+                                        .put("extension_id",aState.getExtension())
+                        );
+                    }
+                    try{
+                        conversationService.inviteAgent(state.getSubaccountId(),state.getAppId(),state.getResId(),call_id,
+                                        conversation_id,agent.getId(),
+                                        agent.getName(),agent.getExtension(),null,from_extension,extension.getTelnum(),
+                                        extension.getType(),extension.getUser(),ConversationService.MAX_DURATION,45,null,null);
+                        agentState.setState(agentId,CallCenterAgent.STATE_FETCHING);
+                        callCenterUtil.agentStateChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),agent.getId(),agent.getName(),
+                                CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,state.getUserdata());
+                    }catch (Throwable t){
+                        agentState.setState(agentId,CallCenterAgent.STATE_IDLE);
+                        throw t;
+                    }
+                }finally {
+                    agentLock.unlock();
+                }
+            }catch (Throwable t){
+                logger.info("",t);
+                conversationService.exit(conversation_id,call_id);
+            }
+        }else if(state.getBusinessData().get("direct_out") != null){//直拨外线
+            String out = state.getBusinessData().get("direct_out");
+            try {
+                businessStateService.deleteInnerField(state.getId(),"direct_out");
+                conversationService.inviteOut(state.getSubaccountId(),state.getAppId(),state.getResId(),conversation_id,null,out,
+                        null,null,null,null,conversationState.getUserdata());
+            } catch (YunhuniApiException e) {
+                logger.info("",e);
                 conversationService.exit(conversation_id,call_id);
             }
         }
