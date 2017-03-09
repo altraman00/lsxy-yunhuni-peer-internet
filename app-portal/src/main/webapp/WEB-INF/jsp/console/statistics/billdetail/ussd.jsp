@@ -50,12 +50,12 @@
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="aside-li-a active">
+                                            <div class="aside-li-a">
                                                 <a href="${ctx}/console/statistics/billdetail/ivr">自定义IVR</a>
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="aside-li-a">
+                                            <div class="aside-li-a active">
                                                 <a href="${ctx}/console/statistics/billdetail/ussd">闪印</a>
                                             </div>
                                         </li>
@@ -87,25 +87,31 @@
                                 class="fa fa-angle-left text"></i> <i class="fa fa-angle-right text-active"></i> </a>
                         </div>-->
                         <div class="wrapper header">
-                            <span class="border-left">&nbsp;自定义IVR</span>
+                            <span class="border-left">&nbsp;闪印</span>
                         </div>
                         <section class="scrollable wrapper w-f">
                             <!--大图标 添加样子 application-tab -->
                             <section class="panel panel-default pos-rlt clearfix ">
-                                <ul id="myTab" class="nav nav-tabs" name="appId">
+                                <ul id="myTab" class="nav nav-tabs" name="appId" style="margin-bottom: 10px;">
                                     <li <c:if test="${appId=='all'}"> class="active"</c:if> >
                                         <a href="" data-toggle="tab" onclick="appSubmit('all')">全部</a>
                                     </li>
                                     <c:forEach items="${appList}" var="app" varStatus="s">
                                         <li
-                                                <c:if test="${app.id==appId}"> class="active"</c:if>
+                                            <c:if test="${app.id==appId}"> class="active"</c:if>
                                         >
                                             <a href="" data-toggle="tab" onclick="appSubmit('${app.id}')">${app.name}</a>
                                         </li>
                                     </c:forEach>
                                 </ul>
-                                <div id="myTabContent" class="tab-content" style="">
-                                    <form:form action="${ctx}/console/statistics/billdetail/ivr" method="post" id="mainForm">
+                                <div id="myTabContent" class="tab-content" >
+                                    <form:form action="${ctx}/console/statistics/billdetail/ussd" method="post" id="mainForm">
+                                        <div class="row margin-bottom-20">
+                                            <div class="col-md-9">
+                                                <input type="radio" name="isMass" value="0" class="selectdata" <c:if test="${isMass == '0'}">checked </c:if>>消息单发
+                                                <input type="radio" name="isMass" value="1" <c:if test="${isMass == '1'}">checked </c:if> class="selectdata ml-15">消息群发
+                                            </div>
+                                        </div>
                                         <div class="row statistics_row" >
                                             <input type="hidden" id="appId" name="appId" value="${appId}">
                                             <div class="col-md-1">
@@ -126,54 +132,51 @@
                                             </div>
                                         </div>
                                     </form:form>
-                                    <div >
-
-                                        <table class="table table-striped cost-table-history ">
+                                    <div>
+                                        <table class="table table-striped cost-table-history">
                                             <thead>
-                                            <tr>
-                                                <c:set var="sum_cost" value="0.00"></c:set>
-                                                <c:if test="${sum!=null && sum.cost!=null}">
-                                                    <c:set value="${sum.cost}" var="sum_cost"></c:set>
-                                                </c:if>
-                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum_cost}" pattern="0.000"></fmt:formatNumber> 元</span></th>
-                                            </tr>
-                                            <tr>
-                                                <th>呼叫时间</th>
-                                                <th>呼叫类型</th>
-                                                <th>主叫</th>
-                                                <th>被叫</th>
-                                                <th>时长（秒）</th>
-                                                <th><span style="float:left;width: 80px" ><span style="float:right;" >消费金额</span></span></th>
-                                                <th>操作</th>
-                                            </tr>
+                                            <c:if test="${isMass==1}">
+                                                <tr>
+                                                    <th>序号</th>
+                                                    <th>任务名</th>
+                                                    <th>任务状态</th>
+                                                    <th>创建时间</th>
+                                                    <th>结束时间</th>
+                                                    <th>发送结果</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                            </c:if>
+                                            <c:if test="${isMass==0}">
+                                                <tr>
+                                                    <th>序号</th>
+                                                    <th>创建时间</th>
+                                                    <th>手机号码</th>
+                                                    <th>发送内容</th>
+                                                    <th>发送结果</th>
+                                                    <th>备注</th>
+                                                </tr>
+                                            </c:if>
                                             </thead>
                                             <tbody>
                                             <c:forEach items="${pageObj.result}" var="result" varStatus="s">
                                                 <tr>
                                                     <td><fmt:formatDate value="${result.callStartDt}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
-                                                    <td>
-                                                        <c:if test="${result.ivrType==1}">呼入</c:if>
-                                                        <c:if test="${result.ivrType==2}">呼出</c:if>
-                                                    </td>
                                                     <td>${result.fromNum}</td>
                                                     <td>${result.toNum}</td>
                                                     <td>${result.costTimeLong}</td>
-                                                    <td>
-                                                        <span style="float:left;width: 80px" ><span style="float:right;" >
-                                                            ￥<fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber>
-                                                        </span></span></td>
-                                                    <td>
-                                                        <c:if test="${result.costTimeLong != 0 && result.recording != 0}">
-                                                            <a id="downVoid${result.id}" onclick="downVoid('${result.id}')" data-statu="1">录音下载</a>
-                                                        </c:if>
-                                                    </td>
+                                                    <td><span style="float:left;width: 80px" ><span style="float:right;" >￥<fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber></span></span></td>
+                                                    <%--<td>--%>
+                                                        <%--<c:if test="${result.costTimeLong != 0 && result.recording != 0}">--%>
+                                                            <%--<a id="downVoid${result.id}" onclick="downVoid('${result.id}')" data-statu="1">录音下载</a>--%>
+                                                        <%--</c:if>--%>
+                                                    <%--</td>--%>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>
                                         </table>
                                     </div>
                                     <c:set var="extraParam" value="&start=${start}&end=${end}&appId=${appId}"></c:set>
-                                    <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/ivr"></c:set>
+                                    <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/callback"></c:set>
                                     <%@include file="/inc/pagefooter.jsp" %>
                                 </div>
                             </section>
@@ -196,9 +199,9 @@
         $('#mainForm').submit();
     }
     function download(){
-        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/ivr/download");
+        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/callback/download");
         $('#mainForm').submit();
-        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/ivr");
+        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/callback");
     }
     function downVoid(id) {
         var tag  = $('#downVoid'+id);
@@ -213,11 +216,7 @@
                     tag.html('录音下载').attr("data-statu","1");
                 }else{
                     showtoast(result.errorMsg);
-                    if(result.errorCode == "0401"){
-                        tag.remove();
-                    }else{
-                        tag.html('下载失败,请重试').attr("data-statu","1");
-                    }
+                    tag.html('下载失败,请重试').attr("data-statu","1");
                 }
             });
         }else if(ststus==2){

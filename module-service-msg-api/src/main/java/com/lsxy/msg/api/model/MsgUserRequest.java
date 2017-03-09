@@ -35,6 +35,15 @@ public class MsgUserRequest extends IdEntity {
     private Long pendingNum;
     private String reason;
     private String remark;
+    private String mobile;
+    @Column(name="mobile")
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
 
     @Column(name = "msg_key")
     public String getMsgKey() {
