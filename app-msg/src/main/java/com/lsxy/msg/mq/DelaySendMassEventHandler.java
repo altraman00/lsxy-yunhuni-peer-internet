@@ -33,24 +33,15 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
         List<String> tempArgsList = Arrays.asList(split);
         List<String> mobiles = Arrays.asList(message.getMobiles().split(MsgConstant.NumRegexStr));
         Date sendTime = DateUtils.parseDate(message.getSendTime(), MsgConstant.TimePartten);
-        switch(message.getSendType()){
-            case MsgConstant.MSG_SMS:{
-                SupplierSendService supplierSendService = supplierSelector.getSmsSendMassService(message.getOperator());
-                resultMass = supplierSendService.smsSendMass(message.getKey(),message.getTaskName(),message.getTempId(),tempArgsList,message.getMsg(),mobiles,sendTime);
-                break;
-            }
-            case MsgConstant.MSG_USSD:{
-                SupplierSendService supplierSendService = supplierSelector.getUssdSendMassService(message.getOperator());
-                resultMass = supplierSendService.ussdSendMass(message.getKey(),message.getTaskName(),message.getTempId(),tempArgsList,message.getMsg(),mobiles,sendTime);
-                break;
-            }
+        SupplierSendService supplierSendService = supplierSelector.getSendMassService(message.getOperator(),message.getSendType());
+        if(supplierSendService != null){
+            resultMass = supplierSendService.sendMass(message.getKey(),message.getTaskName(),message.getTempId(),tempArgsList,message.getMsg(),mobiles,sendTime,message.getSendType());
         }
 
         if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode())&& !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){//成功存发送记录
             //TODO 存放记录
         }else{//失败也存放发送记录
             // TODO 存放记录
-
         }
 
 //        接口调用成功则不理会，接口调用失败，则进行补扣费

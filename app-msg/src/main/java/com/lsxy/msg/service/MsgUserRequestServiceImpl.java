@@ -47,4 +47,5 @@ public class MsgUserRequestServiceImpl extends AbstractService<MsgUserRequest> i
         }
 
     }
+
 }

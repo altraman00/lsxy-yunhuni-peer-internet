@@ -18,45 +18,32 @@ public class SupplierSelector {
     @Qualifier(value = "qiXunTongService")
     SupplierSendService qiXunTongService;
 
-    public SupplierSendService getUssdSendOneService(String operator){
-        switch(operator){
-            case MsgConstant.ChinaMobile:{
-                return paoPaoYuService;
+    public SupplierSendService getSendOneService(String operator,String sendType){
+        return getSupplierSendService(operator, sendType);
+    }
+
+    private SupplierSendService getSupplierSendService(String operator, String sendType) {
+        if(MsgConstant.MSG_USSD.equals(sendType)){
+            switch(operator){
+                case MsgConstant.ChinaMobile:{
+                    return paoPaoYuService;
+                }
+            }
+        }else if(MsgConstant.MSG_SMS.equals(sendType)){
+            switch(operator){
+                case MsgConstant.ChinaMobile:{
+                    return paoPaoYuService;
+                }
+                case MsgConstant.ChinaUnicom:{
+                    return qiXunTongService;
+                }
             }
         }
         return null;
     }
 
-    public SupplierSendService getUssdSendMassService(String operator){
-        switch(operator){
-            case MsgConstant.ChinaMobile:{
-                return paoPaoYuService;
-            }
-        }
-        return null;
+    public SupplierSendService getSendMassService(String operator,String sendType){
+        return getSupplierSendService(operator, sendType);
     }
 
-    public SupplierSendService getSmsSendOneService(String operator){
-        switch(operator){
-            case MsgConstant.ChinaMobile:{
-                return paoPaoYuService;
-            }
-            case MsgConstant.ChinaUnicom:{
-                return qiXunTongService;
-            }
-        }
-        return null;
-    }
-
-    public SupplierSendService getSmsSendMassService(String operator){
-        switch(operator){
-            case MsgConstant.ChinaMobile:{
-                return paoPaoYuService;
-            }
-            case MsgConstant.ChinaUnicom:{
-                return qiXunTongService;
-            }
-        }
-        return null;
-    }
 }

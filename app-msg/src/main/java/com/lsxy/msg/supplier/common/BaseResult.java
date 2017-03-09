@@ -17,6 +17,8 @@ public class BaseResult implements Serializable {
     protected String resultDesc;
     protected String handlers;
     protected String taskId;
+    protected String supplierTempId;
+
     public BaseResult() {
     }
     public BaseResult(ResultCode result) {
@@ -53,6 +55,14 @@ public class BaseResult implements Serializable {
 
     public void setTaskId(String taskId) {
         this.taskId = taskId;
+    }
+
+    public String getSupplierTempId() {
+        return supplierTempId;
+    }
+
+    public void setSupplierTempId(String supplierTempId) {
+        this.supplierTempId = supplierTempId;
     }
 
     @Override

@@ -43,4 +43,14 @@ public class MsgSupplierTemplateServiceImpl extends AbstractService<MsgSupplierT
         }
     }
 
+    @Override
+    public String findSupplierTempIdByTempIdAndSupplierCode(String tempId, String supplierCode) {
+        MsgSupplierTemplate template = msgSupplierTemplateDao.findFirstByTempIdAndSupplierCode(tempId,supplierCode);
+        if(template != null){
+            return template.getSupplierTempId();
+        }else{
+            return null;
+        }
+    }
+
 }

@@ -27,7 +27,7 @@ public class MsgSendRecord extends IdEntity {
     private String taskId;
     private String taskName;
     private String sendType;
-    private String supplierId;
+    private String supplierCode;
     private String operator;
     private String msg;
     private String tempId;
@@ -43,6 +43,28 @@ public class MsgSendRecord extends IdEntity {
     private Long pendingNum;
     private String reason;
     private String remark;
+
+    public MsgSendRecord(String msgKey, String tenantId, String appId, String subaccountId, String taskId, String sendType, String supplierCode, String operator, String msg,
+                         String tempId, String supplierTempId, String tempArgs, Date sendTime, BigDecimal msgCost) {
+        this.msgKey = msgKey;
+        this.tenantId = tenantId;
+        this.appId = appId;
+        this.subaccountId = subaccountId;
+        this.taskId = taskId;
+        this.sendType = sendType;
+        this.supplierCode = supplierCode;
+        this.operator = operator;
+        this.msg = msg;
+        this.tempId = tempId;
+        this.supplierTempId = supplierTempId;
+        this.tempArgs = tempArgs;
+        this.sendTime = sendTime;
+        this.msgCost = msgCost;
+        this.isMass = false;
+        this.sumNum = 1L;
+        this.state = STATE_WAIT;
+        this.pendingNum = 1L;
+    }
 
     @Column(name = "msg_key")
     public String getMsgKey() {
@@ -107,13 +129,13 @@ public class MsgSendRecord extends IdEntity {
         this.sendType = sendType;
     }
 
-    @Column(name = "supplier_id")
-    public String getSupplierId() {
-        return supplierId;
+    @Column(name = "supplier_code")
+    public String getSupplierCode() {
+        return supplierCode;
     }
 
-    public void setSupplierId(String supplierId) {
-        this.supplierId = supplierId;
+    public void setSupplierCode(String supplierCode) {
+        this.supplierCode = supplierCode;
     }
 
     @Column(name = "operator")

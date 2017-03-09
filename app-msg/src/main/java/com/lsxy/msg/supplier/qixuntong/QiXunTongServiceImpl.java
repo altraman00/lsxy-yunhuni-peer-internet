@@ -41,32 +41,40 @@ public class QiXunTongServiceImpl extends AbstractSupplierSendServiceImpl {
     }
 
     @Override
-    public ResultOne smsSendOne(String tempId, List<String> tempArgs, String msg, String mobile) {
-        String result = getQiXinTongClient().sendTempleMSM("",tempId, msg ,  mobile);
-        logger.info("调用[企信通][单发][模板短信]结果:"+ result);
-        return new QiXunTongResultOne(result);
+    public ResultOne sendOne(String tempId, List<String> tempArgs, String msg, String mobile,String sendType) {
+        if(MsgConstant.MSG_SMS.equals(sendType)){
+            String result = getQiXinTongClient().sendTempleMSM("",tempId, msg ,  mobile);
+            logger.info("调用[企信通][单发][模板短信]结果:"+ result);
+            return new QiXunTongResultOne(result);
+        }else{
+            return null;
+        }
     }
 
     @Override
-    public ResultMass smsSendMass(String msgKey ,String taskName, String tempId, List<String> tempArgs,String msg,  List<String> mobiles, Date sendTime) {
-        if(mobiles == null || mobiles.size() == 0){
-            //TODO 抛异常
-        }
-        long delay = sendTime.getTime() - new Date().getTime();
-        if(delay < 0){
-            String mobilesStr = StringUtils.join(mobiles, QiXunTongConstant.QiXunTongNumRegexStr);
-            String result = getQiXinTongClient().sendTempleMSM(taskName,tempId, msg ,  mobilesStr);
-            logger.info("调用[企信通][群发][模板短信]结果:"+ result);
-            return new QiXunTongResultMass(result,mobilesStr);
+    public ResultMass sendMass(String msgKey ,String taskName, String tempId, List<String> tempArgs,String msg,  List<String> mobiles, Date sendTime,String sendType) {
+        if(MsgConstant.MSG_SMS.equals(sendType)){
+            if(mobiles == null || mobiles.size() == 0){
+                //TODO 抛异常
+            }
+            long delay = sendTime.getTime() - new Date().getTime();
+            if(delay < 0){
+                String mobilesStr = StringUtils.join(mobiles, QiXunTongConstant.QiXunTongNumRegexStr);
+                String result = getQiXinTongClient().sendTempleMSM(taskName,tempId, msg ,  mobilesStr);
+                logger.info("调用[企信通][群发][模板短信]结果:"+ result);
+                return new QiXunTongResultMass(result,mobilesStr);
+            }else{
+                String mobilesStr = StringUtils.join(mobiles, MsgConstant.NumRegexStr);
+                String  sendTimeStr = DateUtils.getDate(sendTime,MsgConstant.TimePartten);
+                String tempArgsStr = StringUtils.join(tempArgs, MsgConstant.ParamRegexStr);
+                //发布定时任务
+                mqService.publish( new DelaySendMassEvent( delay,  msgKey,taskName,tempId,  tempArgsStr, mobilesStr, sendTimeStr, msg,  MsgConstant.MSG_USSD, MsgConstant.ChinaUnicom));
+                //先按发送成功的计算
+                ResultMass resultMass = new QiXunTongResultMass("{\"resultcode\":0,\"resultmsg\":\"成功\",\"taskid\":\"" + MsgConstant.AwaitingTaskId + "\"}",mobilesStr);
+                return resultMass;
+            }
         }else{
-            String mobilesStr = StringUtils.join(mobiles, MsgConstant.NumRegexStr);
-            String  sendTimeStr = DateUtils.getDate(sendTime,MsgConstant.TimePartten);
-            String tempArgsStr = StringUtils.join(tempArgs, MsgConstant.ParamRegexStr);
-            //发布定时任务
-            mqService.publish( new DelaySendMassEvent( delay,  msgKey,taskName,tempId,  tempArgsStr, mobilesStr, sendTimeStr, msg,  MsgConstant.MSG_USSD, MsgConstant.ChinaUnicom));
-            //先按发送成功的计算
-            ResultMass resultMass = new QiXunTongResultMass("{\"resultcode\":0,\"resultmsg\":\"成功\",\"taskid\":\"" + MsgConstant.AwaitingTaskId + "\"}",mobilesStr);
-            return resultMass;
+            return null;
         }
 
     }

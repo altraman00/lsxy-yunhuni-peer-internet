@@ -10,4 +10,6 @@ import java.lang.reflect.InvocationTargetException;
  */
 public interface MsgSupplierTemplateService extends BaseService<MsgSupplierTemplate> {
     void deleteMsgTemplate(String appId, String subaccountId, String tempId, boolean isGW) throws InvocationTargetException, IllegalAccessException;
+
+    String findSupplierTempIdByTempIdAndSupplierCode(String tempId, String supplierCode);
 }

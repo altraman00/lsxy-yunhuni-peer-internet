@@ -12,7 +12,7 @@ import java.util.Arrays;
  * Created by zhangxb on 2017/1/10.
  */
 public class PaoPaoYuResultMass extends ResultMass {
-    public PaoPaoYuResultMass(String result,String mobiles) {
+    public PaoPaoYuResultMass(String result,String mobiles,String supplierTempId) {
         String resultCode ;
         String resultDesc = null;
         String taskId = null;
@@ -41,5 +41,6 @@ public class PaoPaoYuResultMass extends ResultMass {
         this.resultDesc = resultDesc;
         this.taskId = taskId;
         this.handlers = PaoPaoYuConstant.PaopaoyuCode;
+        this.supplierTempId = supplierTempId;
     }
 }

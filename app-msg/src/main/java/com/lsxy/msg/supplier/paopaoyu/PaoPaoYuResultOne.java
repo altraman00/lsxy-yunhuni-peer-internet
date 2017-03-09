@@ -10,7 +10,7 @@ import net.sf.json.JSONObject;
  */
 public class PaoPaoYuResultOne extends ResultOne {
 
-    public PaoPaoYuResultOne(String result) {
+    public PaoPaoYuResultOne(String result,String supplierTempId) {
         //result_code":"0","result_desc":"Successfully.","taskId":"355d3a807165415785e5487fcce929b6"
         String resultCode ;
         String resultDesc = null;
@@ -29,6 +29,7 @@ public class PaoPaoYuResultOne extends ResultOne {
         this.resultDesc = resultDesc;
         this.taskId = taskId;
         this.handlers = PaoPaoYuConstant.PaopaoyuCode;
+        this.supplierTempId = supplierTempId;
     }
 
 }

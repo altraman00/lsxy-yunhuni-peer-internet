@@ -11,4 +11,5 @@ import java.util.Date;
  */
 public interface MsgUserRequestService extends BaseService<MsgUserRequest> {
     Page<MsgUserRequest> getPageByCondition(Integer pageNo, Integer pageSize, String sendType,String appId,Date start, Date end, int isMass, String taskName, String mobile );
+
 }

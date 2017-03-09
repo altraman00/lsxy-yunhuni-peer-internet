@@ -21,7 +21,7 @@ public class MsgSupplierTemplate extends IdEntity {
     private String tenantId;
     private String appId;
     private String subaccountId;
-    private String supplierId;
+    private String supplierCode;
     private String supplierTempId;
     private Integer status;
     private String remark;
@@ -63,13 +63,13 @@ public class MsgSupplierTemplate extends IdEntity {
         this.subaccountId = subaccountId;
     }
 
-    @Column(name = "supplier_id")
-    public String getSupplierId() {
-        return supplierId;
+    @Column(name = "supplier_code")
+    public String getSupplierCode() {
+        return supplierCode;
     }
 
-    public void setSupplierId(String supplierId) {
-        this.supplierId = supplierId;
+    public void setSupplierCode(String supplierCode) {
+        this.supplierCode = supplierCode;
     }
 
     @Column(name = "supplier_temp_id")

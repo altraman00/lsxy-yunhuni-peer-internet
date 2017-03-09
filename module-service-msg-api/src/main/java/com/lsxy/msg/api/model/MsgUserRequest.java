@@ -46,7 +46,7 @@ public class MsgUserRequest extends IdEntity {
 
 
     public MsgUserRequest(String msgKey, String tenantId, String appId, String subaccountId, String sendType, String msg, String tempId,
-                          String tempArgs, Date sendTime, Boolean isMass, Long sumNum, Integer state, Long pendingNum, String remark) {
+                          String tempArgs, Date sendTime,BigDecimal msgCost) {
         this.msgKey = msgKey;
         this.tenantId = tenantId;
         this.appId = appId;
@@ -56,11 +56,11 @@ public class MsgUserRequest extends IdEntity {
         this.tempId = tempId;
         this.tempArgs = tempArgs;
         this.sendTime = sendTime;
-        this.isMass = isMass;
-        this.sumNum = sumNum;
-        this.state = state;
-        this.pendingNum = pendingNum;
-        this.remark = remark;
+        this.msgCost = msgCost;
+        this.isMass = false;
+        this.sumNum = 1L;
+        this.state = STATE_WAIT;
+        this.pendingNum = 1L;
     }
 
     @Column(name = "msg_key")

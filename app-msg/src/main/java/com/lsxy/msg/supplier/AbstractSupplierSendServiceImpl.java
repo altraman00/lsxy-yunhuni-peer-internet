@@ -1,8 +1,10 @@
 package com.lsxy.msg.supplier;
 
+import com.lsxy.msg.api.service.MsgSupplierTemplateService;
 import com.lsxy.msg.supplier.common.PaoPaoYuMassNofity;
 import com.lsxy.msg.supplier.common.ResultMass;
 import com.lsxy.msg.supplier.common.ResultOne;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 import java.util.List;
@@ -11,30 +13,32 @@ import java.util.List;
  * Created by liups on 2017/3/8.
  */
 public abstract class AbstractSupplierSendServiceImpl implements SupplierSendService {
+    @Autowired
+    MsgSupplierTemplateService msgSupplierTemplateService;
+
 
     @Override
-    public ResultOne ussdSendOne(String tempId, List<String> tempArgs, String msg, String mobile) {
+    public ResultOne sendOne(String tempId, List<String> tempArgs, String msg, String mobile, String sendType) {
         return null;
     }
 
     @Override
-    public ResultMass ussdSendMass(String msgKey ,String taskName, String tempId, List<String> tempArgs, String msg, List<String> mobiles, Date sendTime) {
-        return null;
-    }
-
-    @Override
-    public ResultOne smsSendOne(String tempId, List<String> tempArgs, String msg, String mobile) {
-        return null;
-    }
-
-    @Override
-    public ResultMass smsSendMass(String msgKey ,String taskName, String tempId, List<String> tempArgs, String msg, List<String> mobiles, Date sendTime) {
+    public ResultMass sendMass(String msgKey, String taskName, String tempId, List<String> tempArgs, String msg, List<String> mobiles, Date sendTime, String sendType) {
         return null;
     }
 
     @Override
     public PaoPaoYuMassNofity getTask(String taskId) {
         return null;
+    }
+
+    @Override
+    public int getMaxSendNum() {
+        return 0;
+    }
+
+    protected String getSupplierTempId(String tempId,String supplierCode){
+        return msgSupplierTemplateService.findSupplierTempIdByTempIdAndSupplierCode(tempId,supplierCode);
     }
 
 }
