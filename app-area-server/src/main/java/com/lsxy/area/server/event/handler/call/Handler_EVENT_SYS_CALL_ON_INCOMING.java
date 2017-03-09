@@ -361,6 +361,14 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
 
                 }else if(isOut(to_uri)){//被叫是外线
                     String to = extractTelnum(to_uri);
+                    boolean isRedNum = apiGwRedBlankNumService.isRedNum(to);
+                    if(isRedNum){
+                        throw new NumberNotAllowToCallException(
+                                new ExceptionContext()
+                                        .put("to",to)
+                                        .put("isRedNum",isRedNum)
+                        );
+                    }
                     //主叫调用应答
                     answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app));
                     businessStateService.updateInnerField(
