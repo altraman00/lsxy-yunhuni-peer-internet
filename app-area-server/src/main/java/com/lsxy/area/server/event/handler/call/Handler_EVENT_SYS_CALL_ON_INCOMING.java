@@ -6,7 +6,6 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.batch.CallCenterBatchInserter;
 import com.lsxy.area.server.batch.CallSessionBatchInserter;
-import com.lsxy.area.server.batch.VoiceIvrBatchInserter;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationService;
@@ -20,7 +19,6 @@ import com.lsxy.call.center.api.model.CallCenterConversationMember;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
 import com.lsxy.call.center.api.states.lock.AgentLock;
-import com.lsxy.call.center.api.states.lock.ExtensionLock;
 import com.lsxy.call.center.api.states.state.AgentState;
 import com.lsxy.call.center.api.states.state.ExtensionState;
 import com.lsxy.framework.api.tenant.model.Tenant;
@@ -51,7 +49,6 @@ import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
-import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
@@ -59,7 +56,6 @@ import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
 import com.lsxy.yunhuni.api.session.model.CallSession;
-import com.lsxy.yunhuni.api.session.model.VoiceIvr;
 import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
 import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import org.apache.commons.collections.MapUtils;
@@ -83,7 +79,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
 
     private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_SYS_CALL_ON_INCOMING.class);
 
-    private static final Pattern EXTENSION_PATERN = Pattern.compile("^([2-9]|100)\\d{6,10}$");
+    private static final Pattern EXTENSION_PATERN = Pattern.compile("^([2-9]\\d{6,10})|(100\\d{4,8})$");
 
     @Autowired
     private AppService appService;
@@ -288,6 +284,25 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                     if(logger.isDebugEnabled()){
                         logger.info("直拨热线，to={}",to);
                     }
+                }else if(isOut(to_uri)){//被叫是外线
+                    String to = extractTelnum(to_uri);
+                    if(logger.isDebugEnabled()){
+                        logger.info("直拨外线，to={}",to);
+                    }
+                    boolean isRedNum = apiGwRedBlankNumService.isRedNum(to);
+                    if(isRedNum){
+                        throw new NumberNotAllowToCallException(
+                                new ExceptionContext()
+                                        .put("to",to)
+                                        .put("isRedNum",isRedNum)
+                        );
+                    }
+                    //主叫调用应答
+                    answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app));
+                    businessStateService.updateInnerField(
+                            //直拨被叫-外线
+                            "direct_out",to
+                    );
                 }else if(isShortNum(extension_prefix,to_uri)){//被叫是分机短号
                     //流程：应答成功创建会议，会议创建成功后将call加入会议，加入会议成功事件 呼叫被叫，振铃事件将被叫加入会议
                     AgentLock to_agentLock = null;
@@ -365,25 +380,6 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                         }
                     }
 
-                }else if(isOut(to_uri)){//被叫是外线
-                    String to = extractTelnum(to_uri);
-                    if(logger.isDebugEnabled()){
-                        logger.info("直拨外线，to={}",to);
-                    }
-                    boolean isRedNum = apiGwRedBlankNumService.isRedNum(to);
-                    if(isRedNum){
-                        throw new NumberNotAllowToCallException(
-                                new ExceptionContext()
-                                        .put("to",to)
-                                        .put("isRedNum",isRedNum)
-                        );
-                    }
-                    //主叫调用应答
-                    answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app));
-                    businessStateService.updateInnerField(
-                            //直拨被叫-外线
-                            "direct_out",to
-                    );
                 }
             }catch (Throwable t){
                 logger.info("",t);
