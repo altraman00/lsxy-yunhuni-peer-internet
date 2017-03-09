@@ -40,11 +40,6 @@ public class PaoPaoYuServiceImpl extends AbstractSupplierSendServiceImpl {
     }
 
     @Override
-    public String getSupplierCode() {
-        return PaoPaoYuConstant.PaopaoyuCode;
-    }
-
-    @Override
     public int getMaxSendNum() {
         return PaoPaoYuConstant.PaoPaoYuMaxNum;
     }
@@ -58,12 +53,11 @@ public class PaoPaoYuServiceImpl extends AbstractSupplierSendServiceImpl {
     }
 
     @Override
-    public ResultMass ussdSendMass(String taskName, String tempId, List<String> tempArgs,String msg,  List<String> mobiles, Date sendTime) {
+    public ResultMass ussdSendMass(String msgKey ,String taskName, String tempId, List<String> tempArgs,String msg,  List<String> mobiles, Date sendTime) {
         if(mobiles == null || mobiles.size() == 0){
             //TODO 抛异常
         }
-        //TODO 组成字符串
-        String mobilesStr = StringUtils.join(mobiles, ",");
+        String mobilesStr = StringUtils.join(mobiles, PaoPaoYuConstant.PaoPaoYuNumRegexStr);
         String sendTimeStr = DateUtils.getDate(sendTime,PaoPaoYuConstant.PaoaoyuTimePartten);
         String tempArgsStr = StringUtils.join(tempArgs, PaoPaoYuConstant.PaoPaoYuParamRegexStr);
         String result =  getPaoPaoYuClient().addTask( taskName, tempId, tempArgsStr, mobilesStr, sendTimeStr, "0");
@@ -80,12 +74,11 @@ public class PaoPaoYuServiceImpl extends AbstractSupplierSendServiceImpl {
     }
 
     @Override
-    public ResultMass smsSendMass(String taskName, String tempId, List<String> tempArgs,String msg,  List<String> mobiles, Date sendTime) {
+    public ResultMass smsSendMass(String msgKey ,String taskName, String tempId, List<String> tempArgs,String msg,  List<String> mobiles, Date sendTime) {
         if(mobiles == null || mobiles.size() == 0){
             //TODO 抛异常
         }
-        //TODO 组成字符串
-        String mobilesStr = StringUtils.join(mobiles, ",");
+        String mobilesStr = StringUtils.join(mobiles, PaoPaoYuConstant.PaoPaoYuNumRegexStr);
         String sendTimeStr = DateUtils.getDate(sendTime,PaoPaoYuConstant.PaoaoyuTimePartten);
         String tempArgsStr = StringUtils.join(tempArgs, PaoPaoYuConstant.PaoPaoYuParamRegexStr);
         String result =  getPaoPaoYuClient().addTask( taskName, tempId, tempArgsStr, mobilesStr, sendTimeStr, "1");

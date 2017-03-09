@@ -2,17 +2,12 @@ package com.lsxy.msg.service;
 
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
-import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.msg.api.model.MsgTemplate;
 import com.lsxy.msg.api.service.MsgSendService;
 import com.lsxy.msg.api.service.MsgTemplateService;
-import com.lsxy.msg.mq.DelaySendEvent;
 import com.lsxy.msg.supplier.SupplierSelector;
 import com.lsxy.msg.supplier.SupplierSendService;
 import com.lsxy.msg.supplier.model.*;
-import com.lsxy.msg.supplier.paopaoyu.PaoPaoYuConstant;
-import com.lsxy.msg.supplier.qixuntong.QiXunTongConstant;
-import com.lsxy.msg.supplier.qixuntong.QiXunTongResultMass;
 import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -37,11 +32,10 @@ public class MsgSendServiceImpl implements MsgSendService {
     TelnumLocationService telnumLocationService;
     @Autowired
     SupplierSelector supplierSelector;
-    @Autowired
-    private MQService mqService;
+
 
     @Override
-    public String sendUssd(String appId,String accountId,String mobile, String tempId, String tempArgs) {
+    public String sendUssd(String tenantId,String appId,String accountId,String mobile, String tempId, String tempArgs) {
         tempId = tempId.trim();
         tempArgs = tempArgs.trim();
         MsgTemplate temp = msgTemplateService.findByTempId(appId, accountId, tempId, true);
@@ -92,7 +86,7 @@ public class MsgSendServiceImpl implements MsgSendService {
     }
 
     @Override
-    public String sendMassUssd(String appId,String accountId,String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) {
+    public String sendMassUssd(String tenantId,String appId,String subaccountId,String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) {
         if(StringUtils.isEmpty( taskName )){
             //TODO 抛异常
             return ResultCode.ERROR_20003.toString();
@@ -112,7 +106,7 @@ public class MsgSendServiceImpl implements MsgSendService {
         }
         tempId = tempId.trim();
         tempArgs = tempArgs.trim();
-        MsgTemplate temp = msgTemplateService.findByTempId(appId, accountId, tempId, true);
+        MsgTemplate temp = msgTemplateService.findByTempId(appId, subaccountId, tempId, true);
         if(temp == null){
             //TODO 抛异常
             throw new RuntimeException("模板不存在");
@@ -153,36 +147,10 @@ public class MsgSendServiceImpl implements MsgSendService {
                 List<String> ulList = mobileList.subList(ul * uMax, ((ul + 1) * uMax) > mobileList.size() ? mobileList.size() : ((ul + 1) * uMax));
                 String[] split = tempArgs.split(MsgConstant.ParamRegexStr);
                 List<String> tempArgsList = Arrays.asList(split);
-                ResultMass resultMass = massService.ussdSendMass(taskName, tempId, tempArgsList, msg, ulList, sendTime);
+                ResultMass resultMass = massService.ussdSendMass(key,taskName, tempId, tempArgsList, msg, ulList, sendTime);
                 list.add(resultMass);
                 if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode() )){
                     //TODO 存发送记录
-                }
-            }
-        }
-
-        if(massMobile.getUnicom().size() > 0){//处理联通号码
-            List<String> mobileList = massMobile.getMobile();
-            SupplierSendService massService = supplierSelector.getUssdSendMassService( MsgConstant.ChinaUnicom);
-            int uMax = massService.getMaxSendNum();
-            int ulength = mobileList.size() / uMax + ( mobileList.size() % uMax == 0 ? 0 :1 );
-            long delay = sendTime.getTime() - new Date().getTime();
-            for(int ul = 0;ul <ulength ;ul ++ ) {
-                if(delay <= 0 ){
-                    List<String> ulList = mobileList.subList(ul * uMax, ((ul + 1) * uMax) > mobileList.size() ? mobileList.size() : ((ul + 1) * uMax));
-                    String[] split = tempArgs.split(MsgConstant.ParamRegexStr);
-                    List<String> tempArgsList = Arrays.asList(split);
-                    ResultMass resultMass = massService.ussdSendMass(taskName, tempId, tempArgsList, msg, ulList, sendTime);
-                    list.add(resultMass);
-                    if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode() )){
-                        //TODO 存发送记录
-                    }
-                }else{
-                    //发布定时任务
-//                    mqService.publish( new DelaySendEvent( delay,  key,  "",  "",  mobiles,  taskName,  msg,  tempId,  tempArgs,  "",  "",  sendTime));
-                    //先按发送成功的计算
-                    ResultMass resultMass = new QiXunTongResultMass("{\"resultcode\":0,\"resultmsg\":\"成功\",\"taskid\":\"预计群发送成功\"}",mobiles);
-                    list.add(resultMass);
                 }
             }
         }
@@ -191,13 +159,12 @@ public class MsgSendServiceImpl implements MsgSendService {
         //处理发送结果
         if( MsgConstant.SUCCESS.equals( resultAllMass.getResultCode() ) ) {
             //TODO 扣费
-            //TODO 存入数据库
         }
         return resultAllMass.toString();
     }
 
     @Override
-    public String sendSms(String appId,String accountId,String mobile, String tempId, String tempArgs) {
+    public String sendSms(String tenantId,String appId,String accountId,String mobile, String tempId, String tempArgs) {
         tempId = tempId.trim();
         tempArgs = tempArgs.trim();
         MsgTemplate temp = msgTemplateService.findByTempId(appId, accountId, tempId, true);
@@ -255,8 +222,98 @@ public class MsgSendServiceImpl implements MsgSendService {
     }
 
     @Override
-    public String sendMassSms(String appId,String accountId,String taskName, String tempId, String tempIdArgs, String mobiles, String sendTimeStr) {
-        return null;
+    public String sendMassSms(String tenantId,String appId,String subaccountId,String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) {
+        if(StringUtils.isEmpty( taskName )){
+            //TODO 抛异常
+            return ResultCode.ERROR_20003.toString();
+        }
+        taskName = taskName.trim();
+        Date sendTime;
+        //校验群发时间
+        if(StringUtils.isNotEmpty(sendTimeStr)){
+            try{
+                sendTime = DateUtils.parseDate(sendTimeStr, MsgConstant.TimePartten);
+            }catch (Exception e){
+                //TODO 抛异常
+                return ResultCode.ERROR_200010.toString();
+            }
+        }else{
+            sendTime = new Date();
+        }
+        tempId = tempId.trim();
+        tempArgs = tempArgs.trim();
+        MsgTemplate temp = msgTemplateService.findByTempId(appId, subaccountId, tempId, true);
+        if(temp == null){
+            //TODO 抛异常
+            throw new RuntimeException("模板不存在");
+        }
+
+        String tempContent = temp.getContent();
+        String msg = getMsg(tempContent, tempArgs).trim();
+        //TODO 检查消息长度
+
+        //检查参数格式是否合法
+        if(!checkTempArgs(tempArgs)){
+            //TODO 抛异常
+            return ResultCode.ERROR_20004.toString();
+        }
+        //检查有效号码-并按运营商处理
+        MassMobile massMobile = vaildMobiles(mobiles,MsgConstant.MSG_USSD);
+        if(massMobile.getCountVaild() > MsgConstant.MaxNum){
+            //TODO 抛异常
+            return ResultCode.ERROR_20005.toString();
+        }
+        if(massMobile.getCountVaild() <= 0){
+            //TODO 抛异常
+            return ResultCode.ERROR_20001.toString();
+        }
+
+        //TODO 判断余额是否可以发送
+
+        //生成任务标识，发送
+        String key = UUIDGenerator.uuid();
+        //处理发送结果
+        List<ResultMass> list = new ArrayList<>();
+        if(massMobile.getMobile().size() > 0){//处理移动号码
+            List<String> mobileList = massMobile.getMobile();
+            SupplierSendService massService = supplierSelector.getUssdSendMassService( MsgConstant.ChinaMobile);
+            int uMax = massService.getMaxSendNum();
+            int ulength = mobileList.size() / uMax + ( mobileList.size() % uMax == 0 ? 0 :1 );
+            for(int ul = 0;ul <ulength ;ul ++ ) {
+                List<String> ulList = mobileList.subList(ul * uMax, ((ul + 1) * uMax) > mobileList.size() ? mobileList.size() : ((ul + 1) * uMax));
+                String[] split = tempArgs.split(MsgConstant.ParamRegexStr);
+                List<String> tempArgsList = Arrays.asList(split);
+                ResultMass resultMass = massService.smsSendMass(key,taskName, tempId, tempArgsList, msg, ulList, sendTime);
+                list.add(resultMass);
+                if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode() )&& !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){
+                    //TODO 存发送记录
+                }
+            }
+        }
+
+        if(massMobile.getUnicom().size() > 0){//处理联通号码
+            List<String> mobileList = massMobile.getMobile();
+            SupplierSendService massService = supplierSelector.getUssdSendMassService( MsgConstant.ChinaUnicom);
+            int uMax = massService.getMaxSendNum();
+            int ulength = mobileList.size() / uMax + ( mobileList.size() % uMax == 0 ? 0 :1 );
+            for(int ul = 0;ul <ulength ;ul ++ ) {
+                List<String> ulList = mobileList.subList(ul * uMax, ((ul + 1) * uMax) > mobileList.size() ? mobileList.size() : ((ul + 1) * uMax));
+                String[] split = tempArgs.split(MsgConstant.ParamRegexStr);
+                List<String> tempArgsList = Arrays.asList(split);
+                ResultMass resultMass = massService.smsSendMass(key,taskName, tempId, tempArgsList, msg, ulList, sendTime);
+                list.add(resultMass);
+                if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode() ) && !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){
+                    //TODO 存发送记录
+                }
+            }
+        }
+
+        ResultAllMass resultAllMass = new ResultAllMass(list,massMobile.getNo());
+        //处理发送结果
+        if( MsgConstant.SUCCESS.equals( resultAllMass.getResultCode())){
+            //TODO 扣费
+        }
+        return resultAllMass.toString();
     }
 
     public String getMsg(String temp,String arg){

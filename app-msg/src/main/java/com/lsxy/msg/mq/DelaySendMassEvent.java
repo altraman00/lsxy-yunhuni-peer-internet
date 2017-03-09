@@ -6,28 +6,25 @@ import com.lsxy.framework.mq.api.AbstractDelayMQEvent;
 /**
  * Created by zhangxb on 2017/2/10.
  */
-public class DelaySendEvent extends AbstractDelayMQEvent {
+public class DelaySendMassEvent extends AbstractDelayMQEvent {
     private String key;
-    private String userId;
-    private String userName;
-    private String mobiles;
     private String taskName;
-    private String msg;
     private String tempId;
     private String tempArgs;
+    private String mobiles;
+    private String sendTime;
+    private String msg;
     private String sendType;
     private String operator;
-    private String sendTime;
+
     @Override
     public String getTopicName() {
         return SystemConfig.getProperty("global.mq.topic.app.ussd.api","test_topic_app_ussd_api");
     }
 
-    public DelaySendEvent(Long delay, String key, String userId, String userName, String mobiles, String taskName, String msg, String tempId, String tempArgs, String sendType, String operator, String sendTime) {
+    public DelaySendMassEvent(Long delay, String key, String taskName, String tempId, String tempArgs, String mobiles, String sendTime, String msg, String sendType, String operator) {
         super(delay.intValue());
         this.key = key;
-        this.userId = userId;
-        this.userName = userName;
         this.mobiles = mobiles;
         this.taskName = taskName;
         this.msg = msg;
@@ -46,44 +43,12 @@ public class DelaySendEvent extends AbstractDelayMQEvent {
         this.key = key;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getMobiles() {
-        return mobiles;
-    }
-
-    public void setMobiles(String mobiles) {
-        this.mobiles = mobiles;
-    }
-
     public String getTaskName() {
         return taskName;
     }
 
     public void setTaskName(String taskName) {
         this.taskName = taskName;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
     }
 
     public String getTempId() {
@@ -102,6 +67,30 @@ public class DelaySendEvent extends AbstractDelayMQEvent {
         this.tempArgs = tempArgs;
     }
 
+    public String getMobiles() {
+        return mobiles;
+    }
+
+    public void setMobiles(String mobiles) {
+        this.mobiles = mobiles;
+    }
+
+    public String getSendTime() {
+        return sendTime;
+    }
+
+    public void setSendTime(String sendTime) {
+        this.sendTime = sendTime;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
     public String getSendType() {
         return sendType;
     }
@@ -116,13 +105,5 @@ public class DelaySendEvent extends AbstractDelayMQEvent {
 
     public void setOperator(String operator) {
         this.operator = operator;
-    }
-
-    public String getSendTime() {
-        return sendTime;
-    }
-
-    public void setSendTime(String sendTime) {
-        this.sendTime = sendTime;
     }
 }

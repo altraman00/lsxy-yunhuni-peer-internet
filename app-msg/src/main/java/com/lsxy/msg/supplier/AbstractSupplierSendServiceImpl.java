@@ -18,7 +18,7 @@ public abstract class AbstractSupplierSendServiceImpl implements SupplierSendSer
     }
 
     @Override
-    public ResultMass ussdSendMass(String taskName, String tempId, List<String> tempArgs, String msg, List<String> mobiles, Date sendTime) {
+    public ResultMass ussdSendMass(String msgKey ,String taskName, String tempId, List<String> tempArgs, String msg, List<String> mobiles, Date sendTime) {
         return null;
     }
 
@@ -28,7 +28,7 @@ public abstract class AbstractSupplierSendServiceImpl implements SupplierSendSer
     }
 
     @Override
-    public ResultMass smsSendMass(String taskName, String tempId, List<String> tempArgs, String msg, List<String> mobiles, Date sendTime) {
+    public ResultMass smsSendMass(String msgKey ,String taskName, String tempId, List<String> tempArgs, String msg, List<String> mobiles, Date sendTime) {
         return null;
     }
 

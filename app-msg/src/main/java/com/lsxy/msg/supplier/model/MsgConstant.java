@@ -21,5 +21,7 @@ public class MsgConstant {
 
     public static String TimePartten =  "yyyy-MM-dd HH:mm:ss";//2017-02-13 18:45:10
 
+    public static String AwaitingTaskId = "mqAwaiting"; //当taskId为这个时，表示在延迟队列里待发送
+
     public static final int SEND_FIAL_MAX_NUM = 3;
 }

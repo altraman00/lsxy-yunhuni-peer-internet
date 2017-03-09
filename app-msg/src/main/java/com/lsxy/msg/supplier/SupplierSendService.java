@@ -13,15 +13,13 @@ import java.util.List;
 public interface SupplierSendService {
     ResultOne ussdSendOne(String tempId, List<String> tempArgs, String msg, String mobile);
 
-    ResultMass ussdSendMass(String taskName,String tempId,List<String> tempArgs,String msg, List<String> mobiles,Date sendTime);
+    ResultMass ussdSendMass(String msgKey ,String taskName,String tempId,List<String> tempArgs,String msg, List<String> mobiles,Date sendTime);
 
     ResultOne smsSendOne(String tempId,List<String> tempArgs,String msg,String mobile);
 
-    ResultMass smsSendMass(String taskName,String tempId,List<String> tempArgs,String msg, List<String> mobiles,Date sendTime);
+    ResultMass smsSendMass(String msgKey ,String taskName,String tempId,List<String> tempArgs,String msg, List<String> mobiles,Date sendTime);
 
     PaoPaoYuMassNofity getTask(String taskId);
-
-    String getSupplierCode();
 
     int getMaxSendNum();
 }
