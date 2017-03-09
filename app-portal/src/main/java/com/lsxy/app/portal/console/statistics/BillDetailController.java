@@ -47,8 +47,9 @@ public class BillDetailController extends AbstractPortalController {
             isMass = "0";
         }
         mav.addObject("isMass",isMass);
-        String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/msg_user_request/plist?pageNo={1}&pageSize={2}&isMass={3}&start={4}&end={5}&appId={6}&taskName={7}&mobile={8}";
-        RestResponse<Page<MsgUserRequest>> result = RestRequest.buildSecurityRequest(token).getPage(uri, MsgUserRequest.class, pageNo, pageSize, isMass, map.get("start"),map.get("end"),map.get("appId"),taskName,mobile);
+        String sendType = "msg";
+        String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/msg_user_request/plist?pageNo={1}&pageSize={2}&isMass={3}&start={4}&end={5}&appId={6}&taskName={7}&mobile={8}&sendType={9}";
+        RestResponse<Page<MsgUserRequest>> result = RestRequest.buildSecurityRequest(token).getPage(uri, MsgUserRequest.class, pageNo, pageSize, isMass, map.get("start"),map.get("end"),map.get("appId"),taskName,mobile,sendType);
         Page pageObj = result.getData();
         mav.addObject("pageObj",pageObj);
         mav.setViewName("/console/statistics/billdetail/sms");
@@ -63,10 +64,11 @@ public class BillDetailController extends AbstractPortalController {
         if(StringUtils.isEmpty(isMass)){
             isMass = "0";
         }
+        String sendType = "ussd";
         mav.addObject("isMass",isMass);
         String token = getSecurityToken(request);
-        String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/msg_user_request/plist?pageNo={1}&pageSize={2}&isMass={3}&start={4}&end={5}&appId={6}&taskName={7}&mobile={8}";
-        RestResponse<Page<MsgUserRequest>> result = RestRequest.buildSecurityRequest(token).getPage(uri, MsgUserRequest.class, pageNo, pageSize, isMass, map.get("start"),map.get("end"),map.get("appId"),taskName,mobile);
+        String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/msg_user_request/plist?pageNo={1}&pageSize={2}&isMass={3}&start={4}&end={5}&appId={6}&taskName={7}&mobile={8}&sendType={9}";
+        RestResponse<Page<MsgUserRequest>> result = RestRequest.buildSecurityRequest(token).getPage(uri, MsgUserRequest.class, pageNo, pageSize, isMass, map.get("start"),map.get("end"),map.get("appId"),taskName,mobile,sendType);
         Page pageObj = result.getData();
         mav.addObject("pageObj",pageObj);
         mav.setViewName("/console/statistics/billdetail/ussd");
