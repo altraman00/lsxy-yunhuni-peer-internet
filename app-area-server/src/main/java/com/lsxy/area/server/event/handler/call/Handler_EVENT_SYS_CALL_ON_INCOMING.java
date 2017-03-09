@@ -284,13 +284,19 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 from_extensionnum = from_extensionnum.replace(extension_prefix,"");
 
                 if(isHotNum(to_uri)){//被叫是热线号码
-
+                    String to = extractTelnum(to_uri);
+                    if(logger.isDebugEnabled()){
+                        logger.info("直拨热线，to={}",to);
+                    }
                 }else if(isShortNum(extension_prefix,to_uri)){//被叫是分机短号
                     //流程：应答成功创建会议，会议创建成功后将call加入会议，加入会议成功事件 呼叫被叫，振铃事件将被叫加入会议
                     AgentLock to_agentLock = null;
                     try{
                         //判断被叫分机是否存在
                         String to_extensionnum = extension_prefix + extractTelnum(to_uri);//被叫号码要为长号码
+                        if(logger.isDebugEnabled()){
+                            logger.info("直拨分机，to={}",to_extensionnum);
+                        }
                         //判断主叫分机是否存在，不合法直接拒绝
                         AppExtension to_appExtension = appExtensionService.getByUser(to_extensionnum);
                         if(from_appExtension == null){
@@ -361,6 +367,9 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
 
                 }else if(isOut(to_uri)){//被叫是外线
                     String to = extractTelnum(to_uri);
+                    if(logger.isDebugEnabled()){
+                        logger.info("直拨外线，to={}",to);
+                    }
                     boolean isRedNum = apiGwRedBlankNumService.isRedNum(to);
                     if(isRedNum){
                         throw new NumberNotAllowToCallException(
