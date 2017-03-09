@@ -183,7 +183,9 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         String to_uri = (String)params.get("to_uri");//被叫号码sip地址
 
         if(isExtensionNum(from_uri)){//是坐席分机呼入，可以呼给其他坐席，热线，外线，不能呼给平台号码
-            String conversationId = UUIDGenerator.uuid();
+            if(logger.isDebugEnabled()){
+                logger.info("分机直拨{}",params);
+            }
             AgentLock from_agentLock = null;
             try{
                 //呼入号码为分机长号码
@@ -272,6 +274,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                     logger.info("分机前缀不一致{},{}",from_extensionnum,extension_prefix);
                     return res;
                 }
+                String conversationId = UUIDGenerator.uuid();
                 //设置坐席状态为fetching
                 String call_id = saveSessionCall(subaccountId,app,app.getTenant(),res_id,conversationId,from_agent.getId(),from_agent.getName(),from_agent.getExtension(),from_uri,to_uri);
                 agentState.setState(from_agentId,CallCenterAgent.STATE_FETCHING);
