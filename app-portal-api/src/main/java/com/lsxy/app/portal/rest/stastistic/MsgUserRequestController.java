@@ -4,9 +4,11 @@ import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.msg.api.model.MsgUserRequest;
 import com.lsxy.msg.api.service.MsgUserRequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +25,7 @@ public class MsgUserRequestController extends AbstractRestController {
     @Reference(timeout=3000,check = false,lazy = true)
     private MsgUserRequestService msgUserRequestService;
 
-    @RequestMapping("plist")
+    @RequestMapping("/plist")
     public RestResponse pList(@RequestParam(defaultValue = "1") Integer pageNo,@RequestParam(defaultValue = "20") Integer pageSize,String sendType,String appId, String  start, String  end, int isMass, String taskName, String mobile ){
         Date startTime = null;
         Date endTime = null;
@@ -33,5 +35,10 @@ public class MsgUserRequestController extends AbstractRestController {
         }catch (Exception e){}
         Page page = msgUserRequestService.getPageByCondition( pageNo,  pageSize,sendType, appId, startTime,  endTime,  isMass,  taskName,  mobile );
         return RestResponse.success(page);
+    }
+    @RequestMapping("/get/{id}")
+    public RestResponse pList(@PathVariable String id){
+        MsgUserRequest msgUserRequest = msgUserRequestService.findById(id);
+        return RestResponse.success(msgUserRequest);
     }
 }

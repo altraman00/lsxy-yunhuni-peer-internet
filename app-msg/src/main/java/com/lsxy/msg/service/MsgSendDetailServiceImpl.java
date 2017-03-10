@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by liups on 2017/3/1.
@@ -36,5 +37,10 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
             hql += " and obj.state = '"+state+"' ";
         }
         return pageList(hql,pageNo,pageSize,msgKey);
+    }
+
+    @Override
+    public List<MsgSendDetail> findByMsgKey(String msgKey) {
+        return msgSendDetailDao.findByMsgKey(msgKey);
     }
 }

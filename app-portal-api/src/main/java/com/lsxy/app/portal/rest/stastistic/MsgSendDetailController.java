@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * Created by zhangxb on 2017/3/9.
  */
@@ -20,9 +22,14 @@ public class MsgSendDetailController extends AbstractRestController {
     private static final Logger logger = LoggerFactory.getLogger(MsgUserRequestController.class);
     @Reference(timeout=3000,check = false,lazy = true)
     private MsgSendDetailService msgSendDetailService;
-    @RequestMapping("plist")
+    @RequestMapping("/plist")
     public RestResponse pList(@RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, @RequestParam String msgKey, String mobile, String state ){
         Page page = msgSendDetailService.getPageByContiton( pageNo,  pageSize,msgKey,  mobile,state );
         return RestResponse.success(page);
+    }
+    @RequestMapping("/list")
+    public RestResponse list(@RequestParam String msgKey ){
+        List list = msgSendDetailService.findByMsgKey( msgKey );
+        return RestResponse.success(list);
     }
 }

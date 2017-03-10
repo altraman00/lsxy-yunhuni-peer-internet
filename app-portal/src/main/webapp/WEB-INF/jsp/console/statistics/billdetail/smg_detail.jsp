@@ -1,8 +1,18 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
 <%@include file="/inc/import.jsp" %>
 <div id="myTabContent2" hidden class="tab-content" >
-        <small style="font-size:20px;">消息群发详情</small>
-
+        <div>
+            <small style="font-size:30px;">消息群发详情</small>
+        </div>
+        <div>
+            <small style="font-size:20px;">任务名称：${detail_1.taskName}&nbsp;&nbsp;&nbsp;&nbsp;
+                任务状态：
+                <c:if test="${detail_1.state==1}">任务完成</c:if>
+                <c:if test="${detail_1.state==0}">待处理</c:if>
+                <c:if test="${detail_1.state==-1}">任务失败</c:if>&nbsp;&nbsp;&nbsp;&nbsp;
+                成功数：${detail_1.succNum}&nbsp;失败数：${detail_1.failNum}&nbsp;待发数：${detail_1.pendingNum}
+            </small>
+        </div>
         <div class="row statistics_row" >
             <div class="col-md-2 mywidth">
                 手机号码

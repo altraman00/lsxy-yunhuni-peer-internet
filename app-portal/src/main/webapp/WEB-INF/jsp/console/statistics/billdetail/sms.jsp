@@ -184,6 +184,7 @@
                                             <tbody>
                                             <c:if test="${isMass==1}">
                                                 <c:forEach items="${pageObj.result}" var="result" varStatus="s">
+                                                    <c:if test="${result.msgKey==msgKey}"><c:set value="${result}" var="detail_1"></c:set></c:if>
                                                     <tr>
                                                         <td>${result.msgKey}</td>
                                                         <td>${result.taskName}</td>
@@ -199,7 +200,11 @@
                                                             </c:if>
                                                         </td>
                                                         <td>成功数：${result.succNum}&nbsp;失败数：${result.failNum}&nbsp;待发数：${result.pendingNum}</td>
-                                                        <td><a href="#" onclick="toDetail('${result.msgKey}')">详情</a>&nbsp;&nbsp;<a href="">下载</a> </td>
+                                                        <td>
+                                                            <a href="#" onclick="toDetail('${result.msgKey}')">详情</a>
+                                                            &nbsp;&nbsp;
+                                                            <a href="javascript:download('${result.id}')"  >下载</a>
+                                                        </td>
                                                     </tr>
                                                 </c:forEach>
                                             </c:if>
@@ -257,35 +262,16 @@
         })
     });
     function appSubmit(appId){
+        $('#msgKey').val("");
+        $('#mobile1').val("");
+        $('#state').val('');
         $('#appId').val(appId);
         $('#mainForm').submit();
     }
-    function download(){
-        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/callback/download");
+    function download(id){
+        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/download/msg/"+id);
         $('#mainForm').submit();
-        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/callback");
-    }
-    function downVoid(id) {
-        var tag  = $('#downVoid'+id);
-        var ststus = tag.attr('data-statu');
-        if(ststus==1){
-            //查询录音是否下载到oss,是下载到本地，否下载到oss显示 正在下载 ,下载oss失败，显示重试
-            var params = {'${_csrf.parameterName}':'${_csrf.token}'};
-            tag.html('正在下载<span class="download"></span>').attr("data-statu","2");
-            ajaxsubmit("${ctx}/console/app/file/record/cdr/download/"+id,params,function(result) {
-                if(result.success){
-                    window.open(result.data);
-                    tag.html('录音下载').attr("data-statu","1");
-                }else{
-                    showtoast(result.errorMsg);
-                    tag.html('下载失败,请重试').attr("data-statu","1");
-                }
-            });
-        }else if(ststus==2){
-            tag.html('下载失败,请重试').attr("data-statu","1");
-        }else{
-            tag.html('录音下载').attr("data-statu","1");
-        }
+        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/ussd");
     }
     $(function () {
         var msgKey = '${msgKey}';
