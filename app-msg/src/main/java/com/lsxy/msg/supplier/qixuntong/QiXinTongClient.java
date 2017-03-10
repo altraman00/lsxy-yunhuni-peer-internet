@@ -1,4 +1,4 @@
-package com.lsxy.msg.supplier.factory.client;
+package com.lsxy.msg.supplier.qixuntong;
 
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.msg.supplier.utils.HttpConnectionManager;
@@ -119,9 +119,6 @@ public class QiXinTongClient {
         return ERROR_STR;
     }
 
-    public static void main(String[] args) {
-        System.out.println( makeMD5("11111"));
-    }
     /**加密算法**/
     public static String makeMD5(String plainText) {
         try {

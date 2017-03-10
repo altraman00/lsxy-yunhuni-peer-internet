@@ -16,6 +16,10 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema = "db_lsxy_bi_yunhuni", name = "tb_bi_msg_user_request")
 public class MsgUserRequest extends IdEntity {
+    public static final int STATE_WAIT = 0;
+    public static final int STATE_SUCCESS = 1;
+    public static final int STATE_FAIL = -1;
+
     private String msgKey;
     private String tenantId;
     private String appId;
@@ -35,6 +39,29 @@ public class MsgUserRequest extends IdEntity {
     private Long pendingNum;
     private String reason;
     private String remark;
+    private String mobile;
+
+    public MsgUserRequest() {
+    }
+
+
+    public MsgUserRequest(String msgKey, String tenantId, String appId, String subaccountId, String sendType, String msg, String tempId,
+                          String tempArgs, Date sendTime,BigDecimal msgCost) {
+        this.msgKey = msgKey;
+        this.tenantId = tenantId;
+        this.appId = appId;
+        this.subaccountId = subaccountId;
+        this.sendType = sendType;
+        this.msg = msg;
+        this.tempId = tempId;
+        this.tempArgs = tempArgs;
+        this.sendTime = sendTime;
+        this.msgCost = msgCost;
+        this.isMass = false;
+        this.sumNum = 1L;
+        this.state = STATE_WAIT;
+        this.pendingNum = 1L;
+    }
 
     @Column(name = "msg_key")
     public String getMsgKey() {
@@ -134,13 +161,12 @@ public class MsgUserRequest extends IdEntity {
     public void setMsgCost(BigDecimal msgCost) {
         this.msgCost = msgCost;
     }
-
     @Column(name = "is_mass")
-    public Boolean getMass() {
+    public Boolean getIsMass() {
         return isMass;
     }
 
-    public void setMass(Boolean mass) {
+    public void setIsMass(Boolean mass) {
         isMass = mass;
     }
 
@@ -205,6 +231,15 @@ public class MsgUserRequest extends IdEntity {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    @Column(name="mobile")
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 
 }

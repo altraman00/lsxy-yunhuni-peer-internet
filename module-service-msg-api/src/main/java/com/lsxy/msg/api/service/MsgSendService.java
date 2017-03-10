@@ -1,17 +1,15 @@
 package com.lsxy.msg.api.service;
 
-import java.util.Date;
-
 /**
  * Created by liups on 2017/3/7.
  */
 public interface MsgSendService {
     //单发闪印
-    String sendUssd(String mobile,String tempId,String tempArgw);
+    String sendUssd(String ip,String appId,String accountId,String mobile,String tempId,String tempArgs);
     //群发闪印
-    String sendMassUssd(String taskName,String tempId,String tempIdArgs, String mobiles, Date sendTime);
+    String sendUssdMass(String ip, String appId, String accountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr);
     //单发短信
-    String sendSms(String mobile,String tempId,String tempArgw);
+    String sendSms(String ip,String appId,String accountId,String mobile,String tempId,String tempArgs);
     //群发短信
-    String sendMassSms(String taskName,String tempId,String tempIdArgs, String mobiles, Date sendTime);
+    String sendSmsMass(String ip, String appId, String accountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr);
 }
