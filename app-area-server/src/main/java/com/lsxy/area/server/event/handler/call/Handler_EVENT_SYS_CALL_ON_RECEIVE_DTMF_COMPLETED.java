@@ -130,6 +130,8 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
         }
 
         if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
+            //热线收码结束标记
+            businessStateService.deleteInnerField(CallCenterUtil.DIRECT_RECEIVE_ING_FIELD);
             //分机短号
             String from_extensionnum = state.getBusinessData().get(CallCenterUtil.DIRECT_HOT_FIELD);
             //分机前缀
@@ -290,7 +292,7 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
             }finally {
                 lock.unlock();
             }
-        }else{
+        }else if(canDoivr(state)){
             Long begin_time = null;
             Long end_time = null;
             if(params.get("begin_time") != null){
@@ -317,6 +319,16 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
                     .build());
         }
         return res;
+    }
+
+    private boolean canDoivr(BusinessState state){
+        if(BusinessState.TYPE_IVR_CALL.equals(state.getType())){//是ivr呼出
+            return true;
+        }
+        if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){//是ivr呼入
+            return true;
+        }
+        return false;
     }
 
     private void hangup(String res_id,String call_id,String area_id){

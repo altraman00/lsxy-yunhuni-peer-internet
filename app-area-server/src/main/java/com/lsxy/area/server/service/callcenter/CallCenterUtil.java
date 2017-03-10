@@ -91,10 +91,14 @@ public class CallCenterUtil {
     public static final String HOLD_VOICE_FIELD = "HOLD_VOICE";
 
     /**直拨热线标记**/
-    public static final String DIRECT_HOT_FIELD = "direct_hot";
+    public static final String DIRECT_HOT_FIELD = "DIRECT_HOT";
+
+    /**直拨热线-等待收码**/
+    public static final String DIRECT_RECEIVE_ING_FIELD = "DIRECT_RECEIVE_ING";
 
     /**分机前缀**/
-    public static final String DIRECT_EXTENSIONPREFIX_FIELD = "direct_extension_prefix";
+    public static final String DIRECT_EXTENSIONPREFIX_FIELD = "DIRECT_EXTENSION_PREFIX";
+
 
     /**直拨被叫-坐席**/
     public static final String DIRECT_AGENT_FIELD = "DIRECT_AGENT";

@@ -149,6 +149,8 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
                     RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_RECEIVE_DTMF_START, receive_params);
                     if(!businessStateService.closed(call_id)) {
                         rpcCaller.invoke(sessionContext, rpcrequest);
+                        //热线收码标记
+                        businessStateService.updateInnerField(call_id,CallCenterUtil.DIRECT_RECEIVE_ING_FIELD,"1");
                     }
                 }
             }catch (Throwable t){

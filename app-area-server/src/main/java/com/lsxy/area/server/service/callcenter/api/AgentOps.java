@@ -26,6 +26,8 @@ import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
+import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
+import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
@@ -416,7 +418,21 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     if(from_extensionnum == null){
                         throw new IllegalArgumentException();
                     }
-                    //TODO 停止收码
+                    if(state.getBusinessData().get(CallCenterUtil.DIRECT_RECEIVE_ING_FIELD)!=null){
+                        Map<String, Object> stop_params = new MapBuilder<String,Object>()
+                                .putIfNotEmpty("res_id",state.getResId())
+                                .putIfNotEmpty("user_data",state.getId())
+                                .put("areaId",state.getAreaId())
+                                .build();
+                        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_RECEIVE_DTMF_STOP, stop_params);
+                        if(!businessStateService.closed(callId)) {
+                            try {
+                                rpcCaller.invoke(sessionContext, rpcrequest,true);
+                            } catch (Throwable t) {
+                                throw new InvokeCallException(t);
+                            }
+                        }
+                    }
                     businessStateService.deleteInnerField(CallCenterUtil.DIRECT_HOT_FIELD,CallCenterUtil.DIRECT_EXTENSIONPREFIX_FIELD);
                 }finally {
                     lock.unlock();
