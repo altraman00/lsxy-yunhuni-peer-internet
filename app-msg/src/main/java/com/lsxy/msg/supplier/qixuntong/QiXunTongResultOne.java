@@ -1,6 +1,7 @@
 package com.lsxy.msg.supplier.qixuntong;
 
-import com.lsxy.msg.supplier.model.ResultOne;
+import com.lsxy.msg.supplier.common.MsgConstant;
+import com.lsxy.msg.supplier.common.ResultOne;
 import net.sf.json.JSONObject;
 
 /**
@@ -21,11 +22,11 @@ public class QiXunTongResultOne extends ResultOne {
             resultDesc = resp.getString("resultmsg");
             //翻译为中文
             resultDesc = QiXunTongResultCode.getQiXunTongResult( resultCode , resultDesc );
-            resultCode = OTHER_ERROR_CODE;
+            resultCode = MsgConstant.OTHER_ERROR_CODE;
         }
         this.resultCode = resultCode;
         this.resultDesc = resultDesc;
         this.taskId = taskId;
-        this.handlers = handler_qixuntong;
+        this.handlers = QiXunTongConstant.QixuntongCode;
     }
 }

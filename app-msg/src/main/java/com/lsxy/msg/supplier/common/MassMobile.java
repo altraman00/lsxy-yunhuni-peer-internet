@@ -1,4 +1,4 @@
-package com.lsxy.msg.supplier.model;
+package com.lsxy.msg.supplier.common;
 
 import java.util.List;
 

@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 @Table(schema = "db_lsxy_bi_yunhuni", name = "tb_bi_msg_supplier")
 public class MsgSupplier extends IdEntity {
     private String supplierName;
+    private String code;
     private BigDecimal unitPrice;
     private Boolean isUssd;
     private Boolean isTemplate;
@@ -32,6 +33,15 @@ public class MsgSupplier extends IdEntity {
 
     public void setSupplierName(String supplierName) {
         this.supplierName = supplierName;
+    }
+
+    @Column(name = "code")
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     @Column(name = "unit_price")

@@ -1,6 +1,7 @@
 package com.lsxy.msg.supplier.qixuntong;
 
-import com.lsxy.msg.supplier.model.ResultMass;
+import com.lsxy.msg.supplier.common.MsgConstant;
+import com.lsxy.msg.supplier.common.ResultMass;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class QiXunTongResultMass extends ResultMass {
         JSONObject resp = JSONObject.fromObject(result);
         //{"resultcode":0,"resultmsg":"成功","taskid":"C945316932025847"}
         resultCode = resp.getString("resultcode");
-        String[] de = mobiles.split(PaoPaoYuNumRegexStr);
+        String[] de = mobiles.split(QiXunTongConstant.QiXunTongNumRegexStr);
         this.sumNum = de.length;
         if("0".equals(resultCode)) {//调用接口成功
             taskId = resp.getString("taskid");
@@ -27,7 +28,7 @@ public class QiXunTongResultMass extends ResultMass {
             resultDesc = resp.getString("resultmsg");
             //翻译为中文
             resultDesc = QiXunTongResultCode.getQiXunTongResult( resultCode , resultDesc );
-            resultCode = OTHER_ERROR_CODE;
+            resultCode = MsgConstant.OTHER_ERROR_CODE;
             this.badPhones = new ArrayList<String>(Arrays.asList(de));
         }
         this.failNum = this.badPhones != null ? this.badPhones.size() : 0;
@@ -35,6 +36,6 @@ public class QiXunTongResultMass extends ResultMass {
         this.resultCode = resultCode;
         this.resultDesc = resultDesc;
         this.taskId = taskId;
-        this.handlers = handler_qixuntong;
+        this.handlers = QiXunTongConstant.QixuntongCode;
     }
 }

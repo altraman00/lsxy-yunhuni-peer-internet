@@ -1,4 +1,4 @@
-package com.lsxy.msg.supplier.factory;
+package com.lsxy.msg.supplier;
 
 import com.lsxy.framework.core.utils.JSONUtil;
 import net.sf.json.JSONObject;
