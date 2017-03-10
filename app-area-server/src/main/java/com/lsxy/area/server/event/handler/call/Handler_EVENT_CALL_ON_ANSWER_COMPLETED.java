@@ -117,8 +117,6 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
         }catch (Throwable t){
             logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
         }
-        //删除等待应答标记
-        businessStateService.deleteInnerField(call_id,IVRActionService.IVR_ANSWER_WAITTING_FIELD);
         if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
             //分机直拨
             String conversationId = state.getBusinessData().get(CallCenterUtil.CONVERSATION_FIELD);
@@ -156,8 +154,13 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
             }catch (Throwable t){
                 logger.info("",t);
                 hangup(state.getResId(),call_id,state.getAreaId());
+            }finally {
+                //删除等待应答标记，这行代码不能改变顺序
+                businessStateService.deleteInnerField(call_id,IVRActionService.IVR_ANSWER_WAITTING_FIELD);
             }
         }else{
+            //删除等待应答标记，这行代码不能改变顺序
+            businessStateService.deleteInnerField(call_id,IVRActionService.IVR_ANSWER_WAITTING_FIELD);
             ivrActionService.doAction(call_id,null);
         }
 

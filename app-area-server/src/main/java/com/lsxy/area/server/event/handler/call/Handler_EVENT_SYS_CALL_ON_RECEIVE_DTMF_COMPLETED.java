@@ -7,6 +7,7 @@ import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
+import com.lsxy.area.server.util.CallLock;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.SipUrlUtil;
 import com.lsxy.call.center.api.model.AppExtension;
@@ -135,9 +136,18 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
             String extension_prefix = state.getBusinessData().get("direct_extension_prefix");
             String to = keys;
             String conversationId = UUIDGenerator.uuid();
+            if(from_extensionnum == null){
+                throw new IllegalArgumentException();
+            }
+            CallLock lock = new CallLock(redisCacheService,call_id);
+            if(!lock.lock()){
+                logger.info("呼叫加锁失败callid={}",call_id);
+                return res;
+            }
             try{
-                if(from_extensionnum == null || StringUtil.isNotBlank(error) || StringUtils.isBlank(to)){
-                    throw new IllegalArgumentException();
+                businessStateService.deleteInnerField("direct_hot","direct_extension_prefix");
+                if(StringUtil.isNotBlank(error) || StringUtils.isBlank(to)){
+                    throw new IllegalArgumentException(String.format("收码失败callid=%s,error=%s,keys=%s",call_id,error,keys));
                 }
                 //判断是呼给外线 还是 其他分机
                 if(SipUrlUtil.isHotNum(to)){//不允许呼给热线
@@ -277,6 +287,8 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
                 }
             }catch (Throwable t){
                 hangup(state.getResId(),call_id,state.getAreaId());
+            }finally {
+                lock.unlock();
             }
         }else{
             Long begin_time = null;
