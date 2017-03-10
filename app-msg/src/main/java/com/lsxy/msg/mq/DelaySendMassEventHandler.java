@@ -22,8 +22,8 @@ import java.util.List;
 @Component
 public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMassEvent> {
     private static final Logger logger = LoggerFactory.getLogger(DelaySendMassEventHandler.class);
-    @Autowired
-    SupplierSelector supplierSelector;
+//    @Autowired
+//    SupplierSelector supplierSelector;
 
     @Override
     public void handleMessage(DelaySendMassEvent message) throws JMSException {
@@ -33,7 +33,7 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
         List<String> tempArgsList = Arrays.asList(split);
         List<String> mobiles = Arrays.asList(message.getMobiles().split(MsgConstant.NumRegexStr));
         Date sendTime = DateUtils.parseDate(message.getSendTime(), MsgConstant.TimePartten);
-        SupplierSendService supplierSendService = supplierSelector.getSendMassService(message.getOperator(),message.getSendType());
+        SupplierSendService supplierSendService = null;// supplierSelector.getSendMassService(message.getOperator(),message.getSendType());
         if(supplierSendService != null){
             resultMass = supplierSendService.sendMass(message.getKey(),message.getTaskName(),message.getTempId(),tempArgsList,message.getMsg(),mobiles,sendTime,message.getSendType());
         }

@@ -7,7 +7,6 @@ import com.lsxy.msg.api.model.MsgSendRecord;
 import com.lsxy.msg.api.model.MsgTemplate;
 import com.lsxy.msg.api.model.MsgUserRequest;
 import com.lsxy.msg.api.service.*;
-import com.lsxy.msg.supplier.SupplierSelector;
 import com.lsxy.msg.supplier.SupplierSendService;
 import com.lsxy.msg.supplier.common.*;
 import com.lsxy.yunhuni.api.app.model.App;
@@ -38,8 +37,8 @@ public class MsgSendServiceImpl implements MsgSendService {
     MsgTemplateService msgTemplateService;
     @Autowired
     TelnumLocationService telnumLocationService;
-    @Autowired
-    SupplierSelector supplierSelector;
+//    @Autowired
+//    SupplierSelector supplierSelector;
     @Autowired
     AppService appService;
     @Autowired
@@ -108,7 +107,7 @@ public class MsgSendServiceImpl implements MsgSendService {
         //生成任务标识，发送
         ResultOne resultOne = null;
         String key = UUIDGenerator.uuid();
-        SupplierSendService smsSendOneService = supplierSelector.getSendOneService(operator,sendType);
+        SupplierSendService smsSendOneService = null;//supplierSelector.getSendOneService(operator,sendType);
         if(smsSendOneService == null){
             //TODO 抛异常 找不到短信服务商
         }
@@ -202,7 +201,7 @@ public class MsgSendServiceImpl implements MsgSendService {
         List<ResultMass> list = new ArrayList<>();
         if(massMobile.getMobile().size() > 0){//处理移动号码
             List<String> mobileList = massMobile.getMobile();
-            SupplierSendService massService = supplierSelector.getSendMassService( MsgConstant.ChinaMobile,sendType);
+            SupplierSendService massService = null;//supplierSelector.getSendMassService( MsgConstant.ChinaMobile,sendType);
             if(massService != null){
                 int uMax = massService.getMaxSendNum();
                 int ulength = mobileList.size() / uMax + ( mobileList.size() % uMax == 0 ? 0 :1 );
@@ -221,7 +220,7 @@ public class MsgSendServiceImpl implements MsgSendService {
 
         if(massMobile.getUnicom().size() > 0){//处理联通号码
             List<String> mobileList = massMobile.getMobile();
-            SupplierSendService massService = supplierSelector.getSendMassService( MsgConstant.ChinaUnicom,sendType);
+            SupplierSendService massService = null;//supplierSelector.getSendMassService( MsgConstant.ChinaUnicom,sendType);
             if(massService != null){
                 int uMax = massService.getMaxSendNum();
                 int ulength = mobileList.size() / uMax + ( mobileList.size() % uMax == 0 ? 0 :1 );
