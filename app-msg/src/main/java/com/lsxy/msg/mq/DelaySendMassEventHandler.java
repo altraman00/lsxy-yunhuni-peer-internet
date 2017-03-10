@@ -47,10 +47,10 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
                     message.getTempId(),tempArgsList,message.getMsg(),mobiles,sendTime,message.getSendType(),message.getCost());
         }
 
-        if(resultMass != null && MsgConstant.success.equals( resultMass.getResultCode())){//成功存发送记录
+        if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode())){//成功存发送记录
             //存发送记录，
             MsgSendRecord msgSendRecord = new MsgSendRecord(message.getKey(),message.getTenantId(),message.getAppId(),message.getSubaccountId(),resultMass.getTaskId(),message.getTaskName(),message.getSendType(),resultMass.getHandlers(),message.getOperator(),message.getMsg(),
-                    message.getTempId(),resultMass.getSupplierTempId(),message.getTempArgs(),sendTime,new BigDecimal(message.getCost()),true,resultMass.getPendingNum(),resultMass.getPendingNum(),MsgSendRecord.STATE_WAIT);
+                    message.getTempId(),resultMass.getSupplierTempId(),message.getTempArgs(),sendTime,new BigDecimal(message.getCost()),true,resultMass.getSumNum(),resultMass.getPendingNum(),resultMass.getFailNum(),MsgSendRecord.STATE_WAIT);
             msgSendRecordService.save(msgSendRecord);
             msgSendDetailService.batchInsertDetail(msgSendRecord,resultMass.getPendingPhones(), MsgSendDetail.STATE_WAIT);
             msgSendDetailService.batchInsertDetail(msgSendRecord,resultMass.getBadPhones(),MsgSendDetail.STATE_FAIL);
@@ -58,7 +58,7 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
             //失败也存放发送记录
             //存发送记录
             MsgSendRecord msgSendRecord = new MsgSendRecord(message.getKey(),message.getTenantId(),message.getAppId(),message.getSubaccountId(),resultMass.getTaskId(),message.getTaskName(),message.getSendType(),resultMass.getHandlers(),message.getOperator(),message.getMsg(),
-                    message.getTempId(),resultMass.getSupplierTempId(),message.getTempArgs(),sendTime,new BigDecimal(message.getCost()),true,resultMass.getPendingNum(),resultMass.getPendingNum(),MsgSendRecord.STATE_FAIL);
+                    message.getTempId(),resultMass.getSupplierTempId(),message.getTempArgs(),sendTime,new BigDecimal(message.getCost()),true,resultMass.getSumNum(),resultMass.getPendingNum(),resultMass.getFailNum(),MsgSendRecord.STATE_FAIL);
             msgSendRecordService.save(msgSendRecord);
             msgSendDetailService.batchInsertDetail(msgSendRecord,resultMass.getPendingPhones(), MsgSendDetail.STATE_WAIT);
             msgSendDetailService.batchInsertDetail(msgSendRecord,resultMass.getBadPhones(),MsgSendDetail.STATE_FAIL);
@@ -66,7 +66,7 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
 
 //        接口调用成功则不理会，接口调用失败，则进行补扣费
 //        处理发送结果
-        if( MsgConstant.success.equals( resultMass.getResultCode() ) ) {
+        if( MsgConstant.SUCCESS.equals( resultMass.getResultCode() ) ) {
 
         }else{
             //TODO 每条费用

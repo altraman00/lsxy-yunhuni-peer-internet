@@ -28,7 +28,7 @@ public class ResultAllMass extends BaseResult {
         for (int i = 0; i < list.size(); i++) {
             ResultMass resultMass = list.get(i);
             // 一开始的所有号码为所有等待的号码
-            this.sumNum +=  resultMass.getSumNum();
+            this.sumNum +=  resultMass.getPendingNum();
             this.pendingNum += resultMass.getPendingNum();
             this.failNum += resultMass.getFailNum();
             if(resultMass.getBadPhones() != null){

@@ -259,7 +259,7 @@ public class MsgSendServiceImpl implements MsgSendService {
                 if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode() )&& !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){
                     //存发送记录 一开始发送总数是所有等待的号码
                     MsgSendRecord msgSendRecord = new MsgSendRecord(key,tenantId,appId,subaccountId,resultMass.getTaskId(),taskName,sendType,resultMass.getHandlers(),oprator,msg,
-                            tempId,resultMass.getSupplierTempId(),tempArgs,sendTime,cost,true,resultMass.getPendingNum(),resultMass.getPendingNum(),MsgSendRecord.STATE_WAIT);
+                            tempId,resultMass.getSupplierTempId(),tempArgs,sendTime,cost,true,resultMass.getPendingNum(),resultMass.getPendingNum(),0L,MsgSendRecord.STATE_WAIT);
                     msgSendRecordService.save(msgSendRecord);
                     msgSendDetailService.batchInsertDetail(msgSendRecord,resultMass.getPendingPhones(),MsgSendDetail.STATE_WAIT);
                 }
