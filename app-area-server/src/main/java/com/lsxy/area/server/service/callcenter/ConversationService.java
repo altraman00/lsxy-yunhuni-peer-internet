@@ -218,7 +218,7 @@ public class ConversationService {
      * @return
      * @throws YunhuniApiException
      */
-    public String create(String subaccountId,String id,String ref_res_id,
+    public String create(String subaccountId,String id,String type,String ref_res_id,
                          BusinessState initiator,String tenantId,String appId, String areaId,String callBackUrl, Integer maxDuration,String hold_voice,String user_data) throws YunhuniApiException {
         if(maxDuration == null || maxDuration > MAX_DURATION){
             maxDuration = MAX_DURATION;
@@ -250,6 +250,7 @@ public class ConversationService {
                         .putIfNotEmpty(BusinessState.REF_RES_ID,ref_res_id)
                         .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,initiator.getId())//交谈发起者的callid
                         .putIfNotEmpty(CallCenterUtil.CONVERSATION_SYSNUM_FIELD,initiator.getBusinessData().get("from"))
+                        .putIfNotEmpty(CallCenterUtil.CONVERSATION_TYPE_FIELD,type)
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(initiator))
                         .putIfNotEmpty(CallCenterUtil.HOLD_VOICE_FIELD,hold_voice)//TODO 如果hold_voice为null是否要默认的
                         .putIfNotEmpty("max_seconds",maxDuration.toString())//交谈最大持续时长
@@ -261,6 +262,7 @@ public class ConversationService {
             conversation.setId(id);
             conversation.setSubaccountId(subaccountId);
             conversation.setState(CallCenterConversation.STATE_UNREADY);
+            conversation.setType(type);
             conversation.setAppId(appId);
             conversation.setTenantId(tenantId);
             conversation.setRelevanceId(initiator.getId());
@@ -416,7 +418,7 @@ public class ConversationService {
         return callId;
     }
 
-    public String agentCall(String subaccountId,String appId,String conversationId,String agentId,String agentName,String extension,
+    public String agentCall(String subaccountId,String appId,String ref_res_id,String conversationId,String agentId,String agentName,String extension,
                               String systemNum,String agentPhone,String type,String user,
                               Integer maxDuration, Integer maxDialDuration,Integer voiceMode,String userData) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
@@ -463,7 +465,7 @@ public class ConversationService {
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
                 .put("areaId",areaId)
-                .putIfNotEmpty(BusinessState.REF_RES_ID,null)
+                .putIfNotEmpty(BusinessState.REF_RES_ID,ref_res_id)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
         try {
@@ -483,7 +485,7 @@ public class ConversationService {
                 .setLineGatewayId(lineId)
                 .setUserdata(userData)
                 .setBusinessData(new MapBuilder<String,String>()
-                        .putIfNotEmpty(BusinessState.REF_RES_ID,null)
+                        .putIfNotEmpty(BusinessState.REF_RES_ID,ref_res_id)
                         .putIfNotEmpty(CallCenterUtil.CONVERSATION_FIELD,conversationId)
                         .putIfNotEmpty(CallCenterUtil.AGENT_ID_FIELD,agentId)
                         .putIfNotEmpty(CallCenterUtil.AGENT_NAME_FIELD,agentName)
