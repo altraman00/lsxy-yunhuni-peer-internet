@@ -131,9 +131,9 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
 
         if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
             //分机短号
-            String from_extensionnum = state.getBusinessData().get("direct_hot");
+            String from_extensionnum = state.getBusinessData().get(CallCenterUtil.DIRECT_HOT_FIELD);
             //分机前缀
-            String extension_prefix = state.getBusinessData().get("direct_extension_prefix");
+            String extension_prefix = state.getBusinessData().get(CallCenterUtil.DIRECT_EXTENSIONPREFIX_FIELD);
             String to = keys;
             String conversationId = UUIDGenerator.uuid();
             if(from_extensionnum == null){
@@ -145,7 +145,7 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
                 return res;
             }
             try{
-                businessStateService.deleteInnerField("direct_hot","direct_extension_prefix");
+                businessStateService.deleteInnerField(CallCenterUtil.DIRECT_HOT_FIELD,CallCenterUtil.DIRECT_EXTENSIONPREFIX_FIELD);
                 if(StringUtil.isNotBlank(error) || StringUtils.isBlank(to)){
                     throw new IllegalArgumentException(String.format("收码失败callid=%s,error=%s,keys=%s",call_id,error,keys));
                 }
@@ -244,9 +244,9 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
                         businessStateService.updateInnerField(
                                 call_id,
                                 //直拨被叫-坐席分机
-                                "direct_agent",to_agentId,
+                                CallCenterUtil.DIRECT_AGENT_FIELD,to_agentId,
                                 //直拨主叫
-                                "direct_from",from_extensionnum
+                                CallCenterUtil.DIRECT_FROM_FIELD,from_extensionnum
                         );
                     }catch (Throwable t){
                         logger.info("",t);
@@ -277,7 +277,7 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
                             state.getAreaId(),state.getCallBackUrl(), ConversationService.MAX_DURATION,null,state.getUserdata());
                     businessStateService.updateInnerField(call_id,
                             //直拨被叫-外线
-                            "direct_out",to
+                            CallCenterUtil.DIRECT_OUT_FIELD,to
                     );
                 }else{
                     throw new NumberNotAllowToCallException(new ExceptionContext()

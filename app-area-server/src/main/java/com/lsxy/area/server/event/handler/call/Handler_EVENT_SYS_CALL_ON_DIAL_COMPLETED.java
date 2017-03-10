@@ -606,7 +606,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         conversationService.logicExit(conversationId,call_id);
                     }
                 }else{
-                    if(businessData.get("invite_to") != null){
+                    if(businessData.get(CallCenterUtil.INVITETO_FIELD) != null){
                         try {
                             conversationService.create(state.getSubaccountId(),conversationId,
                                     CallCenterUtil.CONVERSATION_TYPE_CALL_OUT,
@@ -614,13 +614,14 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                     state,state.getTenantId(),state.getAppId(),
                                     state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null,state.getUserdata());
                             //坐席加入交谈成功事件中要呼叫这个号码
-                            businessStateService.updateInnerField(conversationId,"invite_from",
-                                    businessData.get("invite_from")!=null?businessData.get("invite_from"):"","invite_to",businessData.get("invite_to"));
-                            businessStateService.deleteInnerField(call_id,"invite_to","invite_from");
+                            businessStateService.updateInnerField(conversationId,CallCenterUtil.INVITEFROM_FIELD,
+                                    businessData.get(CallCenterUtil.INVITEFROM_FIELD)!=null?businessData.get(CallCenterUtil.INVITEFROM_FIELD):"",
+                                    CallCenterUtil.INVITETO_FIELD,businessData.get(CallCenterUtil.INVITETO_FIELD));
+                            businessStateService.deleteInnerField(call_id,CallCenterUtil.INVITETO_FIELD,CallCenterUtil.INVITEFROM_FIELD);
                         } catch (YunhuniApiException e) {
                             conversationService.logicExit(conversationId,call_id);
                         }
-                    }else if(businessData.get("enqueue_xml") != null){
+                    }else if(businessData.get(CallCenterUtil.ENQUEUEXML_FIELD) != null){
                         try {
                             conversationService.create(state.getSubaccountId(),conversationId,
                                     CallCenterUtil.CONVERSATION_TYPE_CALL_AGENT,
@@ -628,9 +629,9 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                     state,state.getTenantId(),state.getAppId(),
                                     state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null,state.getUserdata());
                             //坐席加入交谈成功事件中要呼叫这个号码
-                            businessStateService.updateInnerField(conversationId,"enqueue_xml",
-                                    businessData.get("enqueue_xml"));
-                            businessStateService.deleteInnerField(call_id,"enqueue_xml");
+                            businessStateService.updateInnerField(conversationId,CallCenterUtil.ENQUEUEXML_FIELD,
+                                    businessData.get(CallCenterUtil.ENQUEUEXML_FIELD));
+                            businessStateService.deleteInnerField(call_id,CallCenterUtil.ENQUEUEXML_FIELD);
                         } catch (YunhuniApiException e) {
                             conversationService.logicExit(conversationId,call_id);
                         }

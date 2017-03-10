@@ -396,8 +396,8 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         }
         //有正在处理的交谈
         if(state != null && (state.getClosed() == null || !state.getClosed())){
-            if(state.getBusinessData().get("invite_to") != null){
-                throw new SystemBusyException("已经在邀请呼叫了to="+state.getBusinessData().get("invite_to"));
+            if(state.getBusinessData().get(CallCenterUtil.INVITETO_FIELD) != null){
+                throw new SystemBusyException("已经在邀请呼叫了to="+state.getBusinessData().get(CallCenterUtil.INVITETO_FIELD));
             }
             if(state.getBusinessData().get(IVRActionService.IVR_ANSWER_WAITTING_FIELD) != null){
                 throw new SystemBusyException("呼叫正在等待应答callid="+callId);
@@ -410,13 +410,14 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                 }
                 try{
                     //分机短号
-                    String from_extensionnum = state.getBusinessData().get("direct_hot");
+                    String from_extensionnum = state.getBusinessData().get(CallCenterUtil.DIRECT_HOT_FIELD);
                     //分机前缀
-                    String extension_prefix = state.getBusinessData().get("direct_extension_prefix");
+                    String extension_prefix = state.getBusinessData().get(CallCenterUtil.DIRECT_EXTENSIONPREFIX_FIELD);
                     if(from_extensionnum == null){
                         throw new IllegalArgumentException();
                     }
-                    businessStateService.deleteInnerField("direct_hot","direct_extension_prefix");
+                    //TODO 停止收码
+                    businessStateService.deleteInnerField(CallCenterUtil.DIRECT_HOT_FIELD,CallCenterUtil.DIRECT_EXTENSIONPREFIX_FIELD);
                 }finally {
                     lock.unlock();
                 }
@@ -429,7 +430,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     state.getBusinessData().get(BusinessState.REF_RES_ID),state,
                     state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),maxAnswerSeconds,null,userData);
             //坐席加入交谈成功事件中要呼叫这个号码
-            businessStateService.updateInnerField(callId,"invite_from",from!=null?from:"","invite_to",to);
+            businessStateService.updateInnerField(callId,CallCenterUtil.INVITEFROM_FIELD,from!=null?from:"",CallCenterUtil.INVITETO_FIELD,to);
         }else{
             AgentLock agentLock = new AgentLock(redisCacheService,agent);
             if(!agentLock.lock()){
@@ -458,7 +459,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                             extension.getId(),from,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null,userData);
                     agentState.setState(agent,CallCenterAgent.STATE_FETCHING);
                     //坐席加入交谈成功事件中要呼叫这个号码
-                    businessStateService.updateInnerField(callId,"invite_from",(from == null?"":from),"invite_to",to);
+                    businessStateService.updateInnerField(callId,CallCenterUtil.INVITEFROM_FIELD,(from == null?"":from),CallCenterUtil.INVITETO_FIELD,to);
                     CallCenter callCenter = new CallCenter();
                     callCenter.setId(callId);
                     callCenter.setTenantId(app.getTenant().getId());
@@ -640,7 +641,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         }
         //有正在处理的交谈
         if(state != null && (state.getClosed() == null || !state.getClosed())){
-            if(state.getBusinessData().get("enqueue_xml") != null){
+            if(state.getBusinessData().get(CallCenterUtil.ENQUEUEXML_FIELD) != null){
                 throw new SystemBusyException();
             }
             //TODO 将其他交谈全部设置为保持（cti需要提供批量） 这里应该是阻塞调用好点
@@ -651,7 +652,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                     state.getBusinessData().get(BusinessState.REF_RES_ID),state,
                     state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),maxAnswerSeconds,null,enQueue.getUser_data());
             //坐席加入交谈成功事件中要排队找坐席
-            businessStateService.updateInnerField(callId,"enqueue_xml",enqueueXml);
+            businessStateService.updateInnerField(callId,CallCenterUtil.ENQUEUEXML_FIELD,enqueueXml);
         }else{
             AgentLock agentLock = new AgentLock(redisCacheService,agent);
             if(!agentLock.lock()){
@@ -682,7 +683,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                             extension.getId(),null,extension.getTelnum(),extension.getType(),extension.getUser(),maxAnswerSeconds,maxDialSeconds,null,enQueue.getUser_data());
                     agentState.setState(agent,CallCenterAgent.STATE_FETCHING);
                     //坐席加入交谈成功事件中要排队找坐席
-                    businessStateService.updateInnerField(callId,"enqueue_xml",enqueueXml);
+                    businessStateService.updateInnerField(callId,CallCenterUtil.ENQUEUEXML_FIELD,enqueueXml);
                     CallCenter callCenter = new CallCenter();
                     callCenter.setId(callId);
                     callCenter.setTenantId(app.getTenant().getId());
