@@ -1,9 +1,9 @@
 package com.lsxy.msg.supplier;
 
-import com.alibaba.dubbo.config.annotation.Service;
 import com.lsxy.msg.supplier.common.MsgConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 /**
  * Created by liups on 2017/3/8.
