@@ -7,6 +7,9 @@ import com.lsxy.framework.mq.api.AbstractDelayMQEvent;
  * Created by zhangxb on 2017/2/10.
  */
 public class DelaySendMassEvent extends AbstractDelayMQEvent {
+    private String tenantId;
+    private String appId;
+    private String subaccountId;
     private String key;
     private String taskName;
     private String tempId;
@@ -16,14 +19,18 @@ public class DelaySendMassEvent extends AbstractDelayMQEvent {
     private String msg;
     private String sendType;
     private String operator;
+    private String cost;
 
     @Override
     public String getTopicName() {
         return SystemConfig.getProperty("global.mq.topic.app.ussd.api","test_topic_app_ussd_api");
     }
 
-    public DelaySendMassEvent(Long delay, String key, String taskName, String tempId, String tempArgs, String mobiles, String sendTime, String msg, String sendType, String operator) {
+    public DelaySendMassEvent(Long delay,String tenantId,String appId ,String subaccountId , String key, String taskName, String tempId, String tempArgs, String mobiles, String sendTime, String msg, String sendType, String operator,String cost) {
         super(delay.intValue());
+        this.tenantId = tenantId;
+        this.appId = appId;
+        this.subaccountId = subaccountId;
         this.key = key;
         this.mobiles = mobiles;
         this.taskName = taskName;
@@ -33,6 +40,31 @@ public class DelaySendMassEvent extends AbstractDelayMQEvent {
         this.sendType = sendType;
         this.operator = operator;
         this.sendTime = sendTime;
+        this.cost = cost;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    public String getSubaccountId() {
+        return subaccountId;
+    }
+
+    public void setSubaccountId(String subaccountId) {
+        this.subaccountId = subaccountId;
     }
 
     public String getKey() {
@@ -105,5 +137,13 @@ public class DelaySendMassEvent extends AbstractDelayMQEvent {
 
     public void setOperator(String operator) {
         this.operator = operator;
+    }
+
+    public String getCost() {
+        return cost;
+    }
+
+    public void setCost(String cost) {
+        this.cost = cost;
     }
 }

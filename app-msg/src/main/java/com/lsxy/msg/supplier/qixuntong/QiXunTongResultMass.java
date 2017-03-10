@@ -20,7 +20,6 @@ public class QiXunTongResultMass extends ResultMass {
         //{"resultcode":0,"resultmsg":"成功","taskid":"C945316932025847"}
         resultCode = resp.getString("resultcode");
         String[] de = mobiles.split(QiXunTongConstant.QiXunTongNumRegexStr);
-        this.sumNum = de.length;
         if("0".equals(resultCode)) {//调用接口成功
             taskId = resp.getString("taskid");
             this.pendingPhones = new ArrayList<>(Arrays.asList( de ));
@@ -33,6 +32,7 @@ public class QiXunTongResultMass extends ResultMass {
         }
         this.failNum = this.badPhones != null ? this.badPhones.size() : 0;
         this.pendingNum = this.pendingPhones != null ? this.pendingPhones.size() : 0;
+        this.sumNum = this.pendingNum;
         this.resultCode = resultCode;
         this.resultDesc = resultDesc;
         this.taskId = taskId;

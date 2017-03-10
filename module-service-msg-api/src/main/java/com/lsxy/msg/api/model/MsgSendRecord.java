@@ -46,11 +46,18 @@ public class MsgSendRecord extends IdEntity {
 
     public MsgSendRecord(String msgKey, String tenantId, String appId, String subaccountId, String taskId, String sendType, String supplierCode, String operator, String msg,
                          String tempId, String supplierTempId, String tempArgs, Date sendTime, BigDecimal msgCost) {
+        this(msgKey,tenantId,appId,subaccountId,taskId,null,sendType,supplierCode,operator,msg,tempId,supplierTempId,tempArgs,sendTime,msgCost,false,1L,1L,STATE_WAIT);
+
+    }
+
+    public MsgSendRecord(String msgKey, String tenantId, String appId, String subaccountId, String taskId, String taskName, String sendType, String supplierCode, String operator,
+                         String msg, String tempId, String supplierTempId, String tempArgs, Date sendTime, BigDecimal msgCost, Boolean isMass, Long sumNum, Long pendingNum,Integer state) {
         this.msgKey = msgKey;
         this.tenantId = tenantId;
         this.appId = appId;
         this.subaccountId = subaccountId;
         this.taskId = taskId;
+        this.taskName = taskName;
         this.sendType = sendType;
         this.supplierCode = supplierCode;
         this.operator = operator;
@@ -60,10 +67,10 @@ public class MsgSendRecord extends IdEntity {
         this.tempArgs = tempArgs;
         this.sendTime = sendTime;
         this.msgCost = msgCost;
-        this.isMass = false;
-        this.sumNum = 1L;
-        this.state = STATE_WAIT;
-        this.pendingNum = 1L;
+        this.isMass = isMass;
+        this.sumNum = sumNum;
+        this.pendingNum = pendingNum;
+        this.state = state;
     }
 
     @Column(name = "msg_key")

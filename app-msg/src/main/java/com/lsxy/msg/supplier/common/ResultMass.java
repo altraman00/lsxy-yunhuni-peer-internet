@@ -7,9 +7,9 @@ import java.util.List;
  * Created by zhangxb on 2017/1/10.
  */
 public class ResultMass  extends BaseResult {
-    protected int sumNum;//操作号码总数
-    protected int failNum;//失败次数
-    protected int pendingNum;//待发送数
+    protected long sumNum;//发送号码总数（不包括不能发送的号码）
+    protected long failNum;//失败次数
+    protected long pendingNum;//待发送数
     protected List<String> pendingPhones = new ArrayList<>();
     protected List<String> badPhones = new ArrayList<>();
     public ResultMass() {
@@ -27,27 +27,27 @@ public class ResultMass  extends BaseResult {
         this.badPhones = badPhones;
     }
 
-    public int getSumNum() {
+    public long getSumNum() {
         return sumNum;
     }
 
-    public void setSumNum(int sumNum) {
+    public void setSumNum(long sumNum) {
         this.sumNum = sumNum;
     }
 
-    public int getFailNum() {
+    public long getFailNum() {
         return failNum;
     }
 
-    public void setFailNum(int failNum) {
+    public void setFailNum(long failNum) {
         this.failNum = failNum;
     }
 
-    public int getPendingNum() {
+    public long getPendingNum() {
         return pendingNum;
     }
 
-    public void setPendingNum(int pendingNum) {
+    public void setPendingNum(long pendingNum) {
         this.pendingNum = pendingNum;
     }
 

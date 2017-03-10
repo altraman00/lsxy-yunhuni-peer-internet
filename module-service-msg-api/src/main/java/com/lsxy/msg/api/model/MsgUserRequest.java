@@ -26,6 +26,8 @@ public class MsgUserRequest extends IdEntity {
     private String subaccountId;
     private String taskName;
     private String sendType;
+    private String mobile;
+    private String mobiles;
     private String msg;
     private String tempId;
     private String tempArgs;
@@ -37,30 +39,40 @@ public class MsgUserRequest extends IdEntity {
     private Long succNum;
     private Long failNum;
     private Long pendingNum;
+    private Long invalidNum;
     private String reason;
     private String remark;
-    private String mobile;
 
     public MsgUserRequest() {
     }
 
 
-    public MsgUserRequest(String msgKey, String tenantId, String appId, String subaccountId, String sendType, String msg, String tempId,
+    public MsgUserRequest(String msgKey, String tenantId, String appId, String subaccountId, String sendType,String mobile, String msg, String tempId,
                           String tempArgs, Date sendTime,BigDecimal msgCost) {
+        this(msgKey, tenantId, appId, subaccountId,null, sendType, mobile,null, msg, tempId, tempArgs, sendTime, msgCost,false,1L,STATE_WAIT,1L,null,null);
+    }
+
+    public MsgUserRequest(String msgKey, String tenantId, String appId, String subaccountId, String taskName, String sendType, String mobile, String mobiles, String msg, String tempId,
+                          String tempArgs, Date sendTime, BigDecimal msgCost, Boolean isMass, Long sumNum, Integer state, Long pendingNum, Long invalidNum, String reason) {
         this.msgKey = msgKey;
         this.tenantId = tenantId;
         this.appId = appId;
         this.subaccountId = subaccountId;
+        this.taskName = taskName;
         this.sendType = sendType;
+        this.mobile = mobile;
+        this.mobiles = mobiles;
         this.msg = msg;
         this.tempId = tempId;
         this.tempArgs = tempArgs;
         this.sendTime = sendTime;
         this.msgCost = msgCost;
-        this.isMass = false;
-        this.sumNum = 1L;
-        this.state = STATE_WAIT;
-        this.pendingNum = 1L;
+        this.isMass = isMass;
+        this.sumNum = sumNum;
+        this.state = state;
+        this.pendingNum = pendingNum;
+        this.invalidNum = invalidNum;
+        this.reason = reason;
     }
 
     @Column(name = "msg_key")
@@ -115,6 +127,24 @@ public class MsgUserRequest extends IdEntity {
 
     public void setSendType(String sendType) {
         this.sendType = sendType;
+    }
+
+    @Column(name="mobile")
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    @Column(name="mobiles")
+    public String getMobiles() {
+        return mobiles;
+    }
+
+    public void setMobiles(String mobiles) {
+        this.mobiles = mobiles;
     }
 
     @Column(name = "msg")
@@ -216,6 +246,15 @@ public class MsgUserRequest extends IdEntity {
         this.pendingNum = pendingNum;
     }
 
+    @Column(name = "invalid_num")
+    public Long getInvalidNum() {
+        return invalidNum;
+    }
+
+    public void setInvalidNum(Long invalidNum) {
+        this.invalidNum = invalidNum;
+    }
+
     @Column(name = "reason")
     public String getReason() {
         return reason;
@@ -234,13 +273,5 @@ public class MsgUserRequest extends IdEntity {
         this.remark = remark;
     }
 
-    @Column(name="mobile")
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
-    }
 
 }

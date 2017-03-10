@@ -19,7 +19,7 @@ public class PaoPaoYuResultMass extends ResultMass {
         JSONObject resp = JSONObject.fromObject(result);
         resultCode = resp.getString("result_code");
         String[] de = mobiles.split(PaoPaoYuConstant.PaoPaoYuNumRegexStr);
-        this.sumNum = de.length;
+
         if("0".equals(resultCode)) {//调用接口成功
             taskId = resp.getString("taskId");
             this.pendingPhones = new ArrayList<>(Arrays.asList( de ));
@@ -37,6 +37,7 @@ public class PaoPaoYuResultMass extends ResultMass {
         }
         this.failNum = this.badPhones != null ? this.badPhones.size() : 0;
         this.pendingNum = this.pendingPhones != null ? this.pendingPhones.size() : 0;
+        this.sumNum = this.pendingNum;
         this.resultCode = resultCode;
         this.resultDesc = resultDesc;
         this.taskId = taskId;

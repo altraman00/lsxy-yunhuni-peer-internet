@@ -22,6 +22,10 @@ public class SupplierSelector {
         return getSupplierSendService(operator, sendType);
     }
 
+    public SupplierSendService getSendMassService(String operator,String sendType){
+        return getSupplierSendService(operator, sendType);
+    }
+
     private SupplierSendService getSupplierSendService(String operator, String sendType) {
         if(MsgConstant.MSG_USSD.equals(sendType)){
             switch(operator){
@@ -40,10 +44,6 @@ public class SupplierSelector {
             }
         }
         return null;
-    }
-
-    public SupplierSendService getSendMassService(String operator,String sendType){
-        return getSupplierSendService(operator, sendType);
     }
 
 }

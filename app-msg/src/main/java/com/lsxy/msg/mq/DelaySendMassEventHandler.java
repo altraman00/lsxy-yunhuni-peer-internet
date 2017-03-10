@@ -2,6 +2,10 @@ package com.lsxy.msg.mq;
 
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.mq.api.MQMessageHandler;
+import com.lsxy.msg.api.model.MsgSendDetail;
+import com.lsxy.msg.api.model.MsgSendRecord;
+import com.lsxy.msg.api.service.MsgSendDetailService;
+import com.lsxy.msg.api.service.MsgSendRecordService;
 import com.lsxy.msg.supplier.SupplierSelector;
 import com.lsxy.msg.supplier.SupplierSendService;
 import com.lsxy.msg.supplier.common.MsgConstant;
@@ -12,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -24,10 +29,13 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
     private static final Logger logger = LoggerFactory.getLogger(DelaySendMassEventHandler.class);
     @Autowired
     SupplierSelector supplierSelector;
+    @Autowired
+    MsgSendRecordService msgSendRecordService;
+    @Autowired
+    MsgSendDetailService msgSendDetailService;
 
     @Override
     public void handleMessage(DelaySendMassEvent message) throws JMSException {
-        logger.info("预计发送时间:"+ message.getSendTime() + " 当前时间："+ DateUtils.formatDate(new Date(),"yyyy-MM-dd hh:mm:ss")+" 延迟毫秒数："+message.getDelay());
         ResultMass resultMass = null;
         String[] split = message.getTempArgs().split(MsgConstant.ParamRegexStr);
         List<String> tempArgsList = Arrays.asList(split);
@@ -35,18 +43,30 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
         Date sendTime = DateUtils.parseDate(message.getSendTime(), MsgConstant.TimePartten);
         SupplierSendService supplierSendService = supplierSelector.getSendMassService(message.getOperator(),message.getSendType());
         if(supplierSendService != null){
-            resultMass = supplierSendService.sendMass(message.getKey(),message.getTaskName(),message.getTempId(),tempArgsList,message.getMsg(),mobiles,sendTime,message.getSendType());
+            resultMass = supplierSendService.sendMass(message.getTenantId(),message.getAppId(),message.getSubaccountId(),message.getKey(),message.getTaskName(),
+                    message.getTempId(),tempArgsList,message.getMsg(),mobiles,sendTime,message.getSendType(),message.getCost());
         }
 
-        if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode())&& !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){//成功存发送记录
-            //TODO 存放记录
-        }else{//失败也存放发送记录
-            // TODO 存放记录
+        if(resultMass != null && MsgConstant.success.equals( resultMass.getResultCode())){//成功存发送记录
+            //存发送记录，
+            MsgSendRecord msgSendRecord = new MsgSendRecord(message.getKey(),message.getTenantId(),message.getAppId(),message.getSubaccountId(),resultMass.getTaskId(),message.getTaskName(),message.getSendType(),resultMass.getHandlers(),message.getOperator(),message.getMsg(),
+                    message.getTempId(),resultMass.getSupplierTempId(),message.getTempArgs(),sendTime,new BigDecimal(message.getCost()),true,resultMass.getPendingNum(),resultMass.getPendingNum(),MsgSendRecord.STATE_WAIT);
+            msgSendRecordService.save(msgSendRecord);
+            msgSendDetailService.batchInsertDetail(msgSendRecord,resultMass.getPendingPhones(), MsgSendDetail.STATE_WAIT);
+            msgSendDetailService.batchInsertDetail(msgSendRecord,resultMass.getBadPhones(),MsgSendDetail.STATE_FAIL);
+        }else if(resultMass != null && !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){
+            //失败也存放发送记录
+            //存发送记录
+            MsgSendRecord msgSendRecord = new MsgSendRecord(message.getKey(),message.getTenantId(),message.getAppId(),message.getSubaccountId(),resultMass.getTaskId(),message.getTaskName(),message.getSendType(),resultMass.getHandlers(),message.getOperator(),message.getMsg(),
+                    message.getTempId(),resultMass.getSupplierTempId(),message.getTempArgs(),sendTime,new BigDecimal(message.getCost()),true,resultMass.getPendingNum(),resultMass.getPendingNum(),MsgSendRecord.STATE_FAIL);
+            msgSendRecordService.save(msgSendRecord);
+            msgSendDetailService.batchInsertDetail(msgSendRecord,resultMass.getPendingPhones(), MsgSendDetail.STATE_WAIT);
+            msgSendDetailService.batchInsertDetail(msgSendRecord,resultMass.getBadPhones(),MsgSendDetail.STATE_FAIL);
         }
 
 //        接口调用成功则不理会，接口调用失败，则进行补扣费
 //        处理发送结果
-        if( MsgConstant.SUCCESS.equals( resultMass.getResultCode() ) ) {
+        if( MsgConstant.success.equals( resultMass.getResultCode() ) ) {
 
         }else{
             //TODO 每条费用

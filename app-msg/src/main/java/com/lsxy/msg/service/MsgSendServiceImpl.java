@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -71,6 +72,7 @@ public class MsgSendServiceImpl implements MsgSendService {
         return sendMass(appId, subaccountId, taskName, tempId, tempArgs, mobiles, sendTimeStr,MsgConstant.MSG_SMS);
     }
 
+    @Transactional
     private String sendOne(String appId, String subaccountId, String mobile, String tempId, String tempArgs,String sendType) {
         App app = appService.findById(appId);
         //TODO 判断红黑名单
@@ -90,6 +92,11 @@ public class MsgSendServiceImpl implements MsgSendService {
             //TODO 抛异常
             return ResultCode.ERROR_20004.toString();
         }
+        String msg = getMsg(tempContent, tempArgs);
+        if(!checkMsgLength(msg,sendType)){
+            //TODO 抛异常
+        }
+
         //检验号码的合法性
         mobile = mobile.trim();
         if(!checkMobile(mobile)){
@@ -114,7 +121,6 @@ public class MsgSendServiceImpl implements MsgSendService {
         }
         String[] split = tempArgs.split(MsgConstant.ParamRegexStr);
         List<String> tempArgsList = Arrays.asList(split);
-        String msg = getMsg(tempContent, tempArgs);
         resultOne = smsSendOneService.sendOne(tempId, tempArgsList, msg, mobile,sendType);
 
         if(resultOne == null){
@@ -128,7 +134,7 @@ public class MsgSendServiceImpl implements MsgSendService {
             //TODO 计算费用
             BigDecimal cost = BigDecimal.ZERO;
             //插入记录
-            MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,MsgConstant.MSG_USSD,msg,tempId,tempArgs,new Date(),cost);
+            MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,MsgConstant.MSG_USSD,mobile,msg,tempId,tempArgs,new Date(),cost);
             msgUserRequestService.save(msgRequest);
             MsgSendRecord msgSendRecord = new MsgSendRecord(key,app.getTenant().getId(),appId,subaccountId,resultOne.getTaskId(),MsgConstant.MSG_USSD,resultOne.getHandlers(),
                     operator,msg,tempId,resultOne.getSupplierTempId(),tempArgs,new Date(),cost);
@@ -149,6 +155,7 @@ public class MsgSendServiceImpl implements MsgSendService {
     }
 
     private String sendMass(String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr,String sendType) {
+        App app = appService.findById(appId);
         if(StringUtils.isEmpty( taskName )){
             //TODO 抛异常
             return ResultCode.ERROR_20003.toString();
@@ -175,14 +182,18 @@ public class MsgSendServiceImpl implements MsgSendService {
         }
 
         String tempContent = temp.getContent();
-        String msg = getMsg(tempContent, tempArgs).trim();
-        //TODO 检查消息长度
-
         //检查参数格式是否合法
         if(!checkTempArgs(tempArgs)){
             //TODO 抛异常
             return ResultCode.ERROR_20004.toString();
         }
+        String msg = getMsg(tempContent, tempArgs).trim();
+
+        //检查消息长度
+        if(!checkMsgLength(msg,sendType)){
+            //TODO 抛异常
+        }
+
         //检查有效号码-并按运营商处理
         MassMobile massMobile = vaildMobiles(mobiles,MsgConstant.MSG_USSD);
         if(massMobile.getCountVaild() > MsgConstant.MaxNum){
@@ -200,54 +211,61 @@ public class MsgSendServiceImpl implements MsgSendService {
         String key = UUIDGenerator.uuid();
         //处理发送结果
         List<ResultMass> list = new ArrayList<>();
+        //TODO 单条费用
+        BigDecimal cost = BigDecimal.ZERO;
+
         if(massMobile.getMobile().size() > 0){//处理移动号码
             List<String> mobileList = massMobile.getMobile();
-            SupplierSendService massService = supplierSelector.getSendMassService( MsgConstant.ChinaMobile,sendType);
-            if(massService != null){
-                int uMax = massService.getMaxSendNum();
-                int ulength = mobileList.size() / uMax + ( mobileList.size() % uMax == 0 ? 0 :1 );
-                for(int ul = 0;ul <ulength ;ul ++ ) {
-                    List<String> ulList = mobileList.subList(ul * uMax, ((ul + 1) * uMax) > mobileList.size() ? mobileList.size() : ((ul + 1) * uMax));
-                    String[] split = tempArgs.split(MsgConstant.ParamRegexStr);
-                    List<String> tempArgsList = Arrays.asList(split);
-                    ResultMass resultMass = massService.sendMass(key,taskName, tempId, tempArgsList, msg, ulList, sendTime,sendType);
-                    list.add(resultMass);
-                    if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode() )&& !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){
-                        //TODO 存发送记录
-                    }
-                }
-            }
+            sendMassByOperator(app.getTenant().getId(),appId,subaccountId,taskName, tempId, tempArgs, sendType, sendTime, msg, key, list, mobileList, MsgConstant.ChinaMobile,cost);
         }
 
         if(massMobile.getUnicom().size() > 0){//处理联通号码
             List<String> mobileList = massMobile.getMobile();
-            SupplierSendService massService = supplierSelector.getSendMassService( MsgConstant.ChinaUnicom,sendType);
-            if(massService != null){
-                int uMax = massService.getMaxSendNum();
-                int ulength = mobileList.size() / uMax + ( mobileList.size() % uMax == 0 ? 0 :1 );
-                for(int ul = 0;ul <ulength ;ul ++ ) {
-                    List<String> ulList = mobileList.subList(ul * uMax, ((ul + 1) * uMax) > mobileList.size() ? mobileList.size() : ((ul + 1) * uMax));
-                    String[] split = tempArgs.split(MsgConstant.ParamRegexStr);
-                    List<String> tempArgsList = Arrays.asList(split);
-                    ResultMass resultMass = massService.sendMass(key,taskName, tempId, tempArgsList, msg, ulList, sendTime,sendType);
-                    list.add(resultMass);
-                    if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode() ) && !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){
-                        //TODO 存发送记录
-                    }
-                }
-            }
+            sendMassByOperator(app.getTenant().getId(),appId,subaccountId,taskName, tempId, tempArgs, sendType, sendTime, msg, key, list, mobileList, MsgConstant.ChinaUnicom,cost);
         }
 
         if(massMobile.getTelecom().size() > 0){//处理电信号码
-
+            List<String> mobileList = massMobile.getMobile();
+            sendMassByOperator(app.getTenant().getId(),appId,subaccountId,taskName, tempId, tempArgs, sendType, sendTime, msg, key, list, mobileList, MsgConstant.ChinaTelecom,cost);
         }
 
         ResultAllMass resultAllMass = new ResultAllMass(list,massMobile.getNo());
         //处理发送结果
+        int state = MsgUserRequest.STATE_FAIL;
+        if(MsgConstant.SUCCESS.equals(resultAllMass.getResultCode())){
+            state = MsgUserRequest.STATE_WAIT;
+        }
+        MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,taskName,sendType,null,mobiles,msg,tempId,tempArgs,sendTime,cost,true,
+                resultAllMass.getSumNum(),state,resultAllMass.getPendingNum(),resultAllMass.getInvalidNum(),resultAllMass.getResultDesc());
+        msgUserRequestService.save(msgRequest);
         if( MsgConstant.SUCCESS.equals( resultAllMass.getResultCode())){
             //TODO 扣费
+        }else{
+
         }
         return key;
+    }
+
+    private void sendMassByOperator(String tenantId,String appId,String subaccountId,String taskName, String tempId, String tempArgs, String sendType, Date sendTime, String msg, String key, List<ResultMass> list, List<String> mobileList, String oprator,BigDecimal cost) {
+        SupplierSendService massService = supplierSelector.getSendMassService( oprator,sendType);
+        if(massService != null){
+            int uMax = massService.getMaxSendNum();
+            int ulength = mobileList.size() / uMax + ( mobileList.size() % uMax == 0 ? 0 :1 );
+            for(int ul = 0;ul <ulength ;ul ++ ) {
+                List<String> ulMobileList = mobileList.subList(ul * uMax, ((ul + 1) * uMax) > mobileList.size() ? mobileList.size() : ((ul + 1) * uMax));
+                String[] split = tempArgs.split(MsgConstant.ParamRegexStr);
+                List<String> tempArgsList = Arrays.asList(split);
+                ResultMass resultMass = massService.sendMass(tenantId,appId,subaccountId,key,taskName, tempId, tempArgsList, msg, ulMobileList, sendTime,sendType,cost.toString());
+                if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode() )&& !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){
+                    //存发送记录 一开始发送总数是所有等待的号码
+                    MsgSendRecord msgSendRecord = new MsgSendRecord(key,tenantId,appId,subaccountId,resultMass.getTaskId(),taskName,sendType,resultMass.getHandlers(),oprator,msg,
+                            tempId,resultMass.getSupplierTempId(),tempArgs,sendTime,cost,true,resultMass.getPendingNum(),resultMass.getPendingNum(),MsgSendRecord.STATE_WAIT);
+                    msgSendRecordService.save(msgSendRecord);
+                    msgSendDetailService.batchInsertDetail(msgSendRecord,resultMass.getPendingPhones(),MsgSendDetail.STATE_WAIT);
+                }
+                list.add(resultMass);
+            }
+        }
     }
 
     public String getMsg(String temp,String arg){
@@ -345,7 +363,8 @@ public class MsgSendServiceImpl implements MsgSendService {
     public MassMobile vaildMobiles(String mobiles, String sendType) {
         String[] de = mobiles.split(MsgConstant.NumRegexStr);
         if( de.length > MsgConstant.MaxNum ){
-            return new MassMobile(100000);
+            //TODO 抛异常
+            throw new RuntimeException("号码超过最大限制");
         }
         Set<String> allNum = new HashSet<>();
         //联通号码
@@ -380,6 +399,40 @@ public class MsgSendServiceImpl implements MsgSendService {
             no.add(de[i]);
         }
         return new MassMobile(new ArrayList<>(allNum),new ArrayList<>(unicom),new ArrayList<>(mobile),new ArrayList<>(telecom),new ArrayList<>(no));
+    }
+
+    /*
+        短信字数＝短信模板内容字数 + 签名字数
+        短信字数<=70个字数，按照70个字数一条短信计算
+        短信字数>70个字数，即为长短信，按照67个字数记为一条短信计算
+    */
+    public int getCost(String msg,String sendType){
+        int cost = 1;
+        if(MsgConstant.MSG_SMS.equals(sendType)){
+            if( msg.length() > MsgConstant.MaxMsMLength ){
+                cost = msg.length() / MsgConstant.MaxOneMsMLength + msg.length() % MsgConstant.MaxOneMsMLength == 0 ? 0 :1;
+            }
+        }
+        return cost;
+    }
+
+    //检查发送内容长度
+    public boolean checkMsgLength(String msg,String sendType){
+        if(MsgConstant.MSG_SMS.equals(sendType)){
+            if( msg.length() <= 0 ){
+                return false;
+            }else{
+                return true;
+            }
+        }else if(MsgConstant.MSG_SMS.equals(sendType)){
+            //检验USSD长度
+            if(msg.length() > MsgConstant.MaxUssdLength){
+                return false;
+            }else {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

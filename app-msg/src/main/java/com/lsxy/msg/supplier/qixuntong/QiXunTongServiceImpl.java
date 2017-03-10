@@ -52,7 +52,7 @@ public class QiXunTongServiceImpl extends AbstractSupplierSendServiceImpl {
     }
 
     @Override
-    public ResultMass sendMass(String msgKey ,String taskName, String tempId, List<String> tempArgs,String msg,  List<String> mobiles, Date sendTime,String sendType) {
+    public ResultMass sendMass(String tenantId,String appId,String subaccountId,String msgKey ,String taskName, String tempId, List<String> tempArgs,String msg,  List<String> mobiles, Date sendTime,String sendType,String cost) {
         if(MsgConstant.MSG_SMS.equals(sendType)){
             if(mobiles == null || mobiles.size() == 0){
                 //TODO 抛异常
@@ -68,7 +68,7 @@ public class QiXunTongServiceImpl extends AbstractSupplierSendServiceImpl {
                 String  sendTimeStr = DateUtils.getDate(sendTime,MsgConstant.TimePartten);
                 String tempArgsStr = StringUtils.join(tempArgs, MsgConstant.ParamRegexStr);
                 //发布定时任务
-                mqService.publish( new DelaySendMassEvent( delay,  msgKey,taskName,tempId,  tempArgsStr, mobilesStr, sendTimeStr, msg,  MsgConstant.MSG_USSD, MsgConstant.ChinaUnicom));
+                mqService.publish( new DelaySendMassEvent( delay, tenantId,appId,subaccountId, msgKey,taskName,tempId,  tempArgsStr, mobilesStr, sendTimeStr, msg,  MsgConstant.MSG_USSD, MsgConstant.ChinaUnicom,cost));
                 //先按发送成功的计算
                 ResultMass resultMass = new QiXunTongResultMass("{\"resultcode\":0,\"resultmsg\":\"成功\",\"taskid\":\"" + MsgConstant.AwaitingTaskId + "\"}",mobilesStr);
                 return resultMass;
