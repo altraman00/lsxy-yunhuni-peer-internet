@@ -178,29 +178,29 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
             return;
         }
         conversationService.join(conversation_id,call_id);
-        if(conversationState.getBusinessData().get("invite_to") != null){//邀请外线
+        if(conversationState.getBusinessData().get(CallCenterUtil.INVITETO_FIELD) != null){//邀请外线
             try{
                 conversationService.inviteOut(conversationState.getSubaccountId(),appId,conversationState.getBusinessData().get(BusinessState.REF_RES_ID),
-                        conversation_id,conversationState.getBusinessData().get("invite_from"),
-                        conversationState.getBusinessData().get("invite_to"),null,null,null,null,conversationState.getUserdata());
-                businessStateService.deleteInnerField(conversation_id,"invite_to","invite_from");
+                        conversation_id,conversationState.getBusinessData().get(CallCenterUtil.INVITEFROM_FIELD),
+                        conversationState.getBusinessData().get(CallCenterUtil.INVITETO_FIELD),null,null,null,null,conversationState.getUserdata());
+                businessStateService.deleteInnerField(conversation_id,CallCenterUtil.INVITETO_FIELD,CallCenterUtil.INVITEFROM_FIELD);
             }catch (Throwable t){
                 conversationService.exit(conversation_id,call_id);
             }
-        }else if(conversationState.getBusinessData().get("enqueue_xml") != null){//排队
+        }else if(conversationState.getBusinessData().get(CallCenterUtil.ENQUEUEXML_FIELD) != null){//排队
             try{
-                EnQueue enqueue = EnQueueDecoder.decode(conversationState.getBusinessData().get("enqueue_xml"));
+                EnQueue enqueue = EnQueueDecoder.decode(conversationState.getBusinessData().get(CallCenterUtil.ENQUEUEXML_FIELD));
                 enQueueService.lookupAgent(state.getTenantId(),state.getAppId(),state.getSubaccountId(),
                         businessData.get(CallCenterUtil.AGENT_NAME_FIELD),call_id,enqueue,CallCenterUtil.QUEUE_TYPE_CALL_AGENT,conversation_id);
             }catch (Throwable t){
                 logger.info("排队找坐席出错",t);
                 conversationService.exit(conversation_id,call_id);
             }
-        }else if(state.getBusinessData().get("direct_agent") != null){//直拨坐席
-            String agentId = state.getBusinessData().get("direct_agent");
-            String from_extension = state.getBusinessData().get("direct_from");
+        }else if(state.getBusinessData().get(CallCenterUtil.DIRECT_AGENT_FIELD) != null){//直拨坐席
+            String agentId = state.getBusinessData().get(CallCenterUtil.DIRECT_AGENT_FIELD);
+            String from_extension = state.getBusinessData().get(CallCenterUtil.DIRECT_FROM_FIELD);
             try{
-                businessStateService.deleteInnerField(state.getId(),"direct_agent","direct_from");
+                businessStateService.deleteInnerField(state.getId(),CallCenterUtil.DIRECT_AGENT_FIELD,CallCenterUtil.DIRECT_FROM_FIELD);
                 CallCenterAgent agent = callCenterAgentService.findById(agentId);
                 if(agent == null){
                     throw new AgentNotExistException(new ExceptionContext().put("agentId",agentId));
@@ -292,10 +292,10 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
                 logger.info("",t);
                 conversationService.exit(conversation_id,call_id);
             }
-        }else if(state.getBusinessData().get("direct_out") != null){//直拨外线
-            String out = state.getBusinessData().get("direct_out");
+        }else if(state.getBusinessData().get(CallCenterUtil.DIRECT_OUT_FIELD) != null){//直拨外线
+            String out = state.getBusinessData().get(CallCenterUtil.DIRECT_OUT_FIELD);
             try {
-                businessStateService.deleteInnerField(state.getId(),"direct_out");
+                businessStateService.deleteInnerField(state.getId(),CallCenterUtil.DIRECT_OUT_FIELD);
                 conversationService.inviteOut(state.getSubaccountId(),state.getAppId(),conversationState.getBusinessData().get(BusinessState.REF_RES_ID),conversation_id,null,out,
                         null,null,null,null,conversationState.getUserdata());
             } catch (YunhuniApiException e) {

@@ -125,15 +125,15 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
                 callCenterUtil.agentStateChangedEvent(state.getSubaccountId(),state.getCallBackUrl(),state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD)
                         ,state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),
                         CallCenterAgent.STATE_FETCHING,CallCenterAgent.STATE_TALKING,state.getUserdata());
-                if(state.getBusinessData().get("direct_agent") != null){//直拨坐席
+                if(state.getBusinessData().get(CallCenterUtil.DIRECT_AGENT_FIELD) != null){//直拨坐席
                     conversationService.create(state.getSubaccountId(),conversationId,CallCenterUtil.CONVERSATION_TYPE_CALL_AGENT,
                             state.getBusinessData().get(BusinessState.REF_RES_ID),state,state.getTenantId(),state.getAppId(),
                             state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null,state.getUserdata());
-                }else if(state.getBusinessData().get("direct_out") != null){
+                }else if(state.getBusinessData().get(CallCenterUtil.DIRECT_OUT_FIELD) != null){
                     conversationService.create(state.getSubaccountId(),conversationId,CallCenterUtil.CONVERSATION_TYPE_CALL_OUT,
                             state.getBusinessData().get(BusinessState.REF_RES_ID),state,state.getTenantId(),state.getAppId(),
                             state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null,state.getUserdata());
-                }else if(state.getBusinessData().get("direct_hot") != null){
+                }else if(state.getBusinessData().get(CallCenterUtil.DIRECT_HOT_FIELD) != null){
                     //收码
                     Map<String, Object> receive_params = new MapBuilder<String,Object>()
                             .putIfNotEmpty("res_id",state.getResId())
@@ -149,6 +149,8 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
                     RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_RECEIVE_DTMF_START, receive_params);
                     if(!businessStateService.closed(call_id)) {
                         rpcCaller.invoke(sessionContext, rpcrequest);
+                        //热线收码标记
+                        businessStateService.updateInnerField(call_id,CallCenterUtil.DIRECT_RECEIVE_ING_FIELD,"1");
                     }
                 }
             }catch (Throwable t){

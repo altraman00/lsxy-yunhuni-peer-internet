@@ -286,8 +286,8 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                     businessStateService.updateInnerField(
                             call_id,
                             //直拨外线-主叫分机短号
-                            "direct_hot",from_extensionnum,
-                            "direct_extension_prefix",extension_prefix
+                            CallCenterUtil.DIRECT_HOT_FIELD,from_extensionnum,
+                            CallCenterUtil.DIRECT_EXTENSIONPREFIX_FIELD,extension_prefix
                     );
                 }else if(SipUrlUtil.isShortNum(extension_prefix,to_uri)){//被叫是分机短号
                     //流程：应答成功创建会议，会议创建成功后将call加入会议，加入会议成功事件 呼叫被叫，振铃事件将被叫加入会议
@@ -354,9 +354,9 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                         businessStateService.updateInnerField(
                                 call_id,
                                 //直拨被叫-坐席分机
-                                "direct_agent",to_agentId,
+                                CallCenterUtil.DIRECT_AGENT_FIELD,to_agentId,
                                 //直拨主叫
-                                "direct_from",from_extensionnum
+                                CallCenterUtil.DIRECT_FROM_FIELD,from_extensionnum
                         );
                     }catch (Throwable t){
                         logger.info("",t);
@@ -387,7 +387,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                     businessStateService.updateInnerField(
                             call_id,
                             //直拨被叫-外线
-                            "direct_out",to
+                            CallCenterUtil.DIRECT_OUT_FIELD,to
                     );
                 }
             }catch (Throwable t){

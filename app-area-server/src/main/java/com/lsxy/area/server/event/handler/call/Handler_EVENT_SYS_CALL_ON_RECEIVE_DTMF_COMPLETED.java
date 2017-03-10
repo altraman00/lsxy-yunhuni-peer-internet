@@ -130,10 +130,12 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
         }
 
         if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
+            //热线收码结束标记
+            businessStateService.deleteInnerField(CallCenterUtil.DIRECT_RECEIVE_ING_FIELD);
             //分机短号
-            String from_extensionnum = state.getBusinessData().get("direct_hot");
+            String from_extensionnum = state.getBusinessData().get(CallCenterUtil.DIRECT_HOT_FIELD);
             //分机前缀
-            String extension_prefix = state.getBusinessData().get("direct_extension_prefix");
+            String extension_prefix = state.getBusinessData().get(CallCenterUtil.DIRECT_EXTENSIONPREFIX_FIELD);
             String to = keys;
             String conversationId = UUIDGenerator.uuid();
             if(from_extensionnum == null){
@@ -145,7 +147,7 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
                 return res;
             }
             try{
-                businessStateService.deleteInnerField("direct_hot","direct_extension_prefix");
+                businessStateService.deleteInnerField(CallCenterUtil.DIRECT_HOT_FIELD,CallCenterUtil.DIRECT_EXTENSIONPREFIX_FIELD);
                 if(StringUtil.isNotBlank(error) || StringUtils.isBlank(to)){
                     throw new IllegalArgumentException(String.format("收码失败callid=%s,error=%s,keys=%s",call_id,error,keys));
                 }
@@ -244,9 +246,9 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
                         businessStateService.updateInnerField(
                                 call_id,
                                 //直拨被叫-坐席分机
-                                "direct_agent",to_agentId,
+                                CallCenterUtil.DIRECT_AGENT_FIELD,to_agentId,
                                 //直拨主叫
-                                "direct_from",from_extensionnum
+                                CallCenterUtil.DIRECT_FROM_FIELD,from_extensionnum
                         );
                     }catch (Throwable t){
                         logger.info("",t);
@@ -277,7 +279,7 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
                             state.getAreaId(),state.getCallBackUrl(), ConversationService.MAX_DURATION,null,state.getUserdata());
                     businessStateService.updateInnerField(call_id,
                             //直拨被叫-外线
-                            "direct_out",to
+                            CallCenterUtil.DIRECT_OUT_FIELD,to
                     );
                 }else{
                     throw new NumberNotAllowToCallException(new ExceptionContext()
@@ -290,7 +292,7 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
             }finally {
                 lock.unlock();
             }
-        }else{
+        }else if(canDoivr(state)){
             Long begin_time = null;
             Long end_time = null;
             if(params.get("begin_time") != null){
@@ -317,6 +319,16 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
                     .build());
         }
         return res;
+    }
+
+    private boolean canDoivr(BusinessState state){
+        if(BusinessState.TYPE_IVR_CALL.equals(state.getType())){//是ivr呼出
+            return true;
+        }
+        if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){//是ivr呼入
+            return true;
+        }
+        return false;
     }
 
     private void hangup(String res_id,String call_id,String area_id){
