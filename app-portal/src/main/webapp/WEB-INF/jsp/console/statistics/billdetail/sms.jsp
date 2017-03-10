@@ -108,11 +108,14 @@
                                     <form:form action="${ctx}/console/statistics/billdetail/sms" method="post" id="mainForm">
                                         <div class="row margin-bottom-20">
                                             <div class="col-md-9">
-                                                <input type="radio" name="isMass" value="0" class="selectdata" <c:if test="${isMass == '0'}">checked </c:if>>单发消息
-                                                <input type="radio" name="isMass" value="1" <c:if test="${isMass == '1'}">checked </c:if> class="selectdata ml-15">群发消息
+                                                <input type="radio" name="isMass" value="0" class="selectdata isMassChange" <c:if test="${isMass == '0'}">checked </c:if>>单发消息
+                                                <input type="radio" name="isMass" value="1" class="isMassChange" <c:if test="${isMass == '1'}">checked </c:if> class="selectdata ml-15">群发消息
                                             </div>
                                         </div>
                                         <div class="row statistics_row" >
+                                            <input type="hidden" id="msgKey" name="msgKey" value="${msgKey}">
+                                            <input type="hidden" id="state" name="state" value="${state}">
+                                            <input type="hidden" id="mobile1" name="mobile1" value="${mobile1}">
                                             <input type="hidden" id="appId" name="appId" value="${appId}">
                                             <div class="col-md-1">
                                                 日期
@@ -126,6 +129,26 @@
                                             <div class="col-md-2">
                                                 <input type="text" name="end" class="form-control currentDay "  value="${end}"  />
                                             </div>
+
+                                                <div id="isMass0" <c:if test="${isMass == '1'}">hidden</c:if>>
+                                                <div class="col-md-2 mywidth">
+                                                    手机号码
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <input type="text" name="mobile" class="form-control"  value="${mobile}"  />
+                                                </div>
+                                                </div>
+
+
+                                            <div id="isMass1" <c:if test="${isMass == '0'}">hidden </c:if>>
+                                                <div class="col-md-2 mywidth">
+                                                    任务名称
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <input type="text" name="taskName" class="form-control"  value="${taskName}"  />
+                                                </div>
+                                            </div>
+
                                             <div class="col-md-2">
                                                 <button class="btn btn-primary" type="submit"> 查询</button>
                                                 <%--<button class="btn btn-primary" type="button" onclick="download()"> 导出</button>--%>
@@ -138,7 +161,7 @@
                                             <c:if test="${isMass==1}">
                                                 <tr>
                                                     <th>序号</th>
-                                                    <th>任务名</th>
+                                                    <th>任务名称</th>
                                                     <th>任务状态</th>
                                                     <th>创建时间</th>
                                                     <th>结束时间</th>
@@ -165,9 +188,9 @@
                                                         <td>${result.msgKey}</td>
                                                         <td>${result.taskName}</td>
                                                         <td>
-                                                            <c:if test=" ${result.state==1}">任务完成</c:if>
-                                                            <c:if test=" ${result.state==0}">待处理</c:if>
-                                                            <c:if test=" ${result.state==-1}">任务失败</c:if>
+                                                            <c:if test="${result.state==1}">任务完成</c:if>
+                                                            <c:if test="${result.state==0}">待处理</c:if>
+                                                            <c:if test="${result.state==-1}">任务失败</c:if>
                                                         </td>
                                                         <td><fmt:formatDate value="${result.sendTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
                                                         <td>
@@ -176,7 +199,7 @@
                                                             </c:if>
                                                         </td>
                                                         <td>成功数：${result.succNum}&nbsp;失败数：${result.failNum}&nbsp;待发数：${result.pendingNum}</td>
-                                                        <td><a href="">详情</a>&nbsp;&nbsp;<a href="">下载</a> </td>
+                                                        <td><a href="#" onclick="toDetail('${result.msgKey}')">详情</a>&nbsp;&nbsp;<a href="">下载</a> </td>
                                                     </tr>
                                                 </c:forEach>
                                             </c:if>
@@ -188,9 +211,9 @@
                                                         <td>${result.mobile}</td>
                                                         <td>${result.msg}</td>
                                                         <td>
-                                                            <c:if test=" ${result.state==1}">发送成功</c:if>
-                                                            <c:if test=" ${result.state==0}">待处理</c:if>
-                                                            <c:if test=" ${result.state==-1}">发送失败</c:if>
+                                                            <c:if test="${result.state=='1'}">发送成功</c:if>
+                                                            <c:if test="${result.state=='0'}">待处理</c:if>
+                                                            <c:if test="${result.state=='-1'}">发送失败</c:if>
                                                         </td>
                                                         <td>${result.reason}</td>
                                                     </tr>
@@ -199,10 +222,11 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <c:set var="extraParam" value="&start=${start}&end=${end}&appId=${appId}"></c:set>
-                                    <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/callback"></c:set>
+                                    <c:set var="extraParam" value="&start=${start}&end=${end}&appId=${appId}&isMass=${isMass}&taskName=${taskName}&mobile=${mobile}"></c:set>
+                                    <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/sms"></c:set>
                                     <%@include file="/inc/pagefooter.jsp" %>
                                 </div>
+                                <%@include file="smg_detail.jsp"%>
                             </section>
                         </section>
                     </section>
@@ -218,6 +242,20 @@
 <!--must-->
 <script type="text/javascript" src='${resPrefixUrl }/js/statistics/find.js'> </script>
 <script type="text/javascript" >
+    $(function(){
+        $('.mywidth').css("width","90px");
+        $('.isMassChange').click(function(){
+            $('#mainForm').submit();
+//            var type = $(this).val();
+//            if(type == 1){
+//                $('#isMass1').show();
+//                $('#isMass0').hide();
+//            }else{
+//                $('#isMass0').show();
+//                $('#isMass1').hide();
+//            }
+        })
+    });
     function appSubmit(appId){
         $('#appId').val(appId);
         $('#mainForm').submit();
@@ -249,6 +287,13 @@
             tag.html('录音下载').attr("data-statu","1");
         }
     }
+    $(function () {
+        var msgKey = '${msgKey}';
+        if(msgKey!=null && msgKey.length >0) {
+            $('#myTabContent2').show();
+            $('#myTabContent').hide();
+        }
+    })
 </script>
 </body>
 </html>
