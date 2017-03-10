@@ -16,6 +16,10 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema = "db_lsxy_bi_yunhuni", name = "tb_bi_msg_send_detail")
 public class MsgSendDetail extends IdEntity {
+    public static final int STATE_WAIT = 0;
+    public static final int STATE_SUCCESS = 1;
+    public static final int STATE_FAIL = -1;
+
     private String msgKey;
     private String tenantId;
     private String appId;
@@ -29,11 +33,34 @@ public class MsgSendDetail extends IdEntity {
     private Date sendTime;
     private BigDecimal msgCost;
     private String sendType;
-    private String supplierId;
+    private String supplierCode;
     private String operator;
     private Integer state;
     private String reason;
     private String remark;
+
+    public MsgSendDetail() {
+    }
+
+    public MsgSendDetail(String msgKey, String tenantId, String appId, String subaccountId, String taskId, String mobile, String msg, String tempId,
+                         String supplierTempId, String tempArgs, Date sendTime, BigDecimal msgCost, String sendType, String supplierCode, String operator) {
+        this.msgKey = msgKey;
+        this.tenantId = tenantId;
+        this.appId = appId;
+        this.subaccountId = subaccountId;
+        this.taskId = taskId;
+        this.mobile = mobile;
+        this.msg = msg;
+        this.tempId = tempId;
+        this.supplierTempId = supplierTempId;
+        this.tempArgs = tempArgs;
+        this.sendTime = sendTime;
+        this.msgCost = msgCost;
+        this.sendType = sendType;
+        this.supplierCode = supplierCode;
+        this.operator = operator;
+        this.state = STATE_WAIT;
+    }
 
     @Column(name = "msg_key")
     public String getMsgKey() {
@@ -152,13 +179,13 @@ public class MsgSendDetail extends IdEntity {
         this.sendType = sendType;
     }
 
-    @Column(name = "supplier_id")
-    public String getSupplierId() {
-        return supplierId;
+    @Column(name = "supplier_code")
+    public String getSupplierCode() {
+        return supplierCode;
     }
 
-    public void setSupplierId(String supplierId) {
-        this.supplierId = supplierId;
+    public void setSupplierCode(String supplierCode) {
+        this.supplierCode = supplierCode;
     }
 
     @Column(name = "operator")

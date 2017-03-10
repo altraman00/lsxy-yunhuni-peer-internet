@@ -1218,8 +1218,9 @@
 <script src="${resPrefixUrl }/js/dist/js/bootstrap-select.js"></script>
         <script type="text/javascript">
             function isnewTemplate(){
-                var state = '${app.status}';
-                if(state==1){
+                var state = '${authState}';
+                console.info(state);
+                if(state==2){
                     $('button[data-id=seven]').click();
                 }else{
                     showtoast("你还没进行公司认证，快去认证吧！");
@@ -2950,7 +2951,8 @@
                 editSubAccountFive.initObj(response.data);
                 $('#subAccount_home').hide();
                 $('#subAccount_datail').show();
-                if(appServiceType != 'msg'){
+                if(appServiceType == 'msg'|| '${app.status}'!=1){
+                }else{
                     $('#call-number2').attr("data-num-bind",response.data.id);
                     upnumber2();
                 }

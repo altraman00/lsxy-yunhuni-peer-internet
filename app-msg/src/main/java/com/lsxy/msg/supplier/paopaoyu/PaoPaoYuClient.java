@@ -1,4 +1,4 @@
-package com.lsxy.msg.supplier.factory.client;
+package com.lsxy.msg.supplier.paopaoyu;
 
 import com.lsxy.framework.config.SystemConfig;
 import net.sf.json.JSONObject;

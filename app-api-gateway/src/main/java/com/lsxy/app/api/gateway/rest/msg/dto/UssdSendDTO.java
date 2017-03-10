@@ -1,19 +1,21 @@
-package com.lsxy.app.api.gateway.dto;
+package com.lsxy.app.api.gateway.rest.msg.dto;
+
+import com.lsxy.app.api.gateway.dto.CommonDTO;
 
 /**
- * Created by liups on 2017/3/7.
+ * Created by liups on 2017/3/9.
  */
-public class SmsSendDTO extends CommonDTO {
-    private String destPhone;
+public class UssdSendDTO extends CommonDTO {
+    private String mobile;
     private String tempId;
     private String tempArgs;
 
-    public String getDestPhone() {
-        return destPhone;
+    public String getMobile() {
+        return mobile;
     }
 
-    public void setDestPhone(String destPhone) {
-        this.destPhone = destPhone;
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 
     public String getTempId() {

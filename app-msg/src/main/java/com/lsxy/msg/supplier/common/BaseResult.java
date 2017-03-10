@@ -1,4 +1,4 @@
-package com.lsxy.msg.supplier.model;
+package com.lsxy.msg.supplier.common;
 
 import com.lsxy.framework.core.utils.JSONUtil;
 import org.apache.commons.lang.StringUtils;
@@ -12,32 +12,13 @@ import java.util.Map;
  */
 public class BaseResult implements Serializable {
     private static final long serialVersionUID = 1L;
-    public static final int MaxMsMLength = 70;//普通短信长度扣费
-    public static final int MaxOneMsMLength = 67;//普通短信长度扣费
-    public static final int MaxNum = 10000;//目前最大支持10000个群发
-    public static final String NumRegexStr = ",";//多手机号码用逗号分割
-    public static final String ParamRegexStr = ";";//多参数用分号分割
-    public static final int PaoPaoYuMaxNum = 10000;//泡泡鱼最大群发数10000
-    public static final String PaoPaoYuNumRegexStr = ",";//泡泡鱼多号码已，分割
-    public static final int QiXunTongMaxNum = 10000;//企讯通最大群发数10000
-    public static final String QiXunTongNumRegexStr = ",";//企讯通多号码已，分割
-    public static final String OTHER_ERROR_CODE = "-1";
-    public static final String SUCCESS = "0";
-    public  static final int SENDTYPE_TEMP_USSD = 0;//闪印
-    public static final int SENDTYPE_TEMP_MSM = 1;//普通短信
-    public static final int SENDTYPE_MSM = 2;//普通短信
-    public static final int ChinaMobile  = 1;//"中国移动";
-    public static final int ChinaUnicom = 2;//"中国联通";
-    public static final int ChinaTelecom = 3;//"中国电信";
-    public static final String handler_paopaoyu = "PaoPaoYu";
-    public static final String handler_qixuntong = "QiXunTong";
-    public static final String replace_symbol_paopaoyu = "#*#";
-    public static final String replace_symbol_qixuntong = "#P#";
-    public static final int SEND_FIAL_MAX_NUM = 3;
+
     protected String resultCode;
     protected String resultDesc;
     protected String handlers;
     protected String taskId;
+    protected String supplierTempId;
+
     public BaseResult() {
     }
     public BaseResult(ResultCode result) {
@@ -74,6 +55,14 @@ public class BaseResult implements Serializable {
 
     public void setTaskId(String taskId) {
         this.taskId = taskId;
+    }
+
+    public String getSupplierTempId() {
+        return supplierTempId;
+    }
+
+    public void setSupplierTempId(String supplierTempId) {
+        this.supplierTempId = supplierTempId;
     }
 
     @Override

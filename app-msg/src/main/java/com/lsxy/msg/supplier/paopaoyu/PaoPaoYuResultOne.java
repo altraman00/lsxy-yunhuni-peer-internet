@@ -1,9 +1,8 @@
 package com.lsxy.msg.supplier.paopaoyu;
 
-import com.lsxy.msg.supplier.model.ResultOne;
+import com.lsxy.msg.supplier.common.MsgConstant;
+import com.lsxy.msg.supplier.common.ResultOne;
 import net.sf.json.JSONObject;
-
-import static com.lsxy.msg.supplier.model.BaseResult.OTHER_ERROR_CODE;
 
 /**
  * 泡泡鱼单发结果处理
@@ -11,7 +10,7 @@ import static com.lsxy.msg.supplier.model.BaseResult.OTHER_ERROR_CODE;
  */
 public class PaoPaoYuResultOne extends ResultOne {
 
-    public PaoPaoYuResultOne(String result) {
+    public PaoPaoYuResultOne(String result,String supplierTempId) {
         //result_code":"0","result_desc":"Successfully.","taskId":"355d3a807165415785e5487fcce929b6"
         String resultCode ;
         String resultDesc = null;
@@ -24,12 +23,13 @@ public class PaoPaoYuResultOne extends ResultOne {
             resultDesc = resp.getString("result_desc");
             //翻译为中文
             resultDesc = PaoPaoYuResultCode.getPaoPaoYuResult( resultCode , resultDesc );
-            resultCode = OTHER_ERROR_CODE;
+            resultCode = MsgConstant.OTHER_ERROR_CODE;
         }
         this.resultCode = resultCode;
         this.resultDesc = resultDesc;
         this.taskId = taskId;
-        this.handlers = handler_paopaoyu;
+        this.handlers = PaoPaoYuConstant.PaopaoyuCode;
+        this.supplierTempId = supplierTempId;
     }
 
 }

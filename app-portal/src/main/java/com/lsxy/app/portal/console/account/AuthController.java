@@ -87,15 +87,6 @@ public class AuthController extends AbstractPortalController {
         return result;
     }
     /**
-     * 获取实名认证信息的rest请求方法
-     * @return
-     */
-    private RestResponse findAuthInfo(HttpServletRequest request){
-        String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL  + "/rest/account/auth/find_auth_info";
-        return  RestRequest.buildSecurityRequest(token).get(uri,HashMap.class);
-    }
-    /**
      * 获取后台状态的rest请求方法
      * @return
      */
