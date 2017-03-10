@@ -113,6 +113,9 @@
                                             </div>
                                         </div>
                                         <div class="row statistics_row" >
+                                            <input type="hidden" id="msgKey" name="msgKey" value="${msgKey}">
+                                            <input type="hidden" id="state" name="state" value="${state}">
+                                            <input type="hidden" id="mobile1" name="mobile1" value="${mobile1}">
                                             <input type="hidden" id="appId" name="appId" value="${appId}">
                                             <div class="col-md-1">
                                                 日期
@@ -191,7 +194,7 @@
                                                             </c:if>
                                                         </td>
                                                         <td>成功数：${result.succNum}&nbsp;失败数：${result.failNum}&nbsp;待发数：${result.pendingNum}</td>
-                                                        <td><a href="">详情</a>&nbsp;&nbsp;<a href="">下载</a> </td>
+                                                        <td><a href="#" onclick="toDetail('${result.msgKey}')">详情</a>&nbsp;&nbsp;<a href="">下载</a> </td>
                                                     </tr>
                                                 </c:forEach>
                                             </c:if>
@@ -218,6 +221,7 @@
                                     <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/ussd"></c:set>
                                     <%@include file="/inc/pagefooter.jsp" %>
                                 </div>
+                                <%@include file="smg_detail.jsp"%>
                             </section>
                         </section>
                     </section>
@@ -278,6 +282,13 @@
             tag.html('录音下载').attr("data-statu","1");
         }
     }
+    $(function () {
+        var msgKey = '${msgKey}';
+        if(msgKey!=null && msgKey.length >0) {
+            $('#myTabContent2').show();
+            $('#myTabContent').hide();
+        }
+    })
 </script>
 </body>
 </html>

@@ -39,6 +39,9 @@ public class MsgSendDetail extends IdEntity {
     private String reason;
     private String remark;
 
+    public MsgSendDetail() {
+    }
+
     public MsgSendDetail(String msgKey, String tenantId, String appId, String subaccountId, String taskId, String mobile, String msg, String tempId,
                          String supplierTempId, String tempArgs, Date sendTime, BigDecimal msgCost, String sendType, String supplierCode, String operator) {
         this.msgKey = msgKey;

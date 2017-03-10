@@ -26,7 +26,7 @@
             </c:if>
             <c:if test="${startPageNo1 > 1}">
                 <li>
-                    <a href="${pageUrl1}?pageNo=${startPageNo1-1}&pageSize=${pageObj1.pageSize}${extraParam1}" aria-label="Previous">
+                    <a href="${pageUrl1}?pageNo1=${startPageNo1-1}&pageSize1=${pageObj1.pageSize}${extraParam1}" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
@@ -38,14 +38,14 @@
                                 class="active"
                             </c:if>
                     >
-                        <a href="${pageUrl1}?pageNo=${s.index}&pageSize=${pageObj1.pageSize}${extraParam1}">${s.index}</a>
+                        <a href="${pageUrl1}?pageNo1=${s.index}&pageSize1=${pageObj1.pageSize}${extraParam1}">${s.index}</a>
                     </li>
                 </c:if>
             </c:forEach>
 
             <c:if test="${pageObj1.totalPageCount>endPageNo1}">
                 <li>
-                    <a href="${pageUrl1}?pageNo=${endPageNo1+1}&pageSize=${pageObj1.pageSize}${extraParam1}" aria-label="Next">
+                    <a href="${pageUrl1}?pageNo1=${endPageNo1+1}&pageSize1=${pageObj1.pageSize}${extraParam1}" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>
