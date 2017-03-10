@@ -146,7 +146,7 @@
                                             <div class="col-md-3 text-right"><span class="text-label" ><strong>选择服务:</strong></span></div>
                                             <div class="col-md-9" >
                                                 <div class="btn app-tag active" data-app="voice"><i class="iconfont icon-call-voice"></i><span>语音</span></div>
-                                                <div class="btn app-tag" data-app="msg"><i class="iconfont icon-call-msg"></i><span>消息</span></div>
+                                                <div class="btn app-tag" data-app="msg"><i class="iconfont icon-xiaoxi"></i><span>消息</span></div>
                                                 <div class="btn app-tag" data-app="call_center"><i class="iconfont icon-call-center" ></i><span>呼叫中心</span></div>
                                             </div>
                                         </div>
