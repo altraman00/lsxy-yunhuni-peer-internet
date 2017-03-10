@@ -1,5 +1,6 @@
 package com.lsxy.area.server.voicecodec;
 
+import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.StringUtil;
 
 /**
@@ -47,5 +48,9 @@ public class VoiceCodec {
         }
         String[] codec_arr = codes.split(",");
         return selectExtensionCodec(codec_arr);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(selectLineCodec("[G729_20MS,%20G711_ULAW_20MS,%20G711_ALAW_20MS]".replaceAll("\\[","").replaceAll("\\]","")));
     }
 }
