@@ -8,6 +8,7 @@ import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.batch.CallCenterBatchInserter;
 import com.lsxy.area.server.service.callcenter.*;
 import com.lsxy.area.server.service.ivr.IVRActionService;
+import com.lsxy.area.server.util.CallLock;
 import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.call.center.api.model.*;
@@ -29,6 +30,7 @@ import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountServi
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.app.service.ServiceType;
+import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
@@ -136,6 +138,9 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
 
     @Autowired
     private CallbackUrlUtil callbackUrlUtil;
+
+    @Autowired
+    private ApiGwRedBlankNumService apiGwRedBlankNumService;
 
     @Override
     public void reject(String subaccountId, String ip, String appId, String name, String queueId, String userData) throws YunhuniApiException {
@@ -261,6 +266,14 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                             .put("to",to)
             );
         }
+        boolean isRedNum = apiGwRedBlankNumService.isRedNum(to);
+        if(isRedNum){
+            throw new NumberNotAllowToCallException(
+                    new ExceptionContext()
+                            .put("to",to)
+                            .put("isRedNum",isRedNum)
+            );
+        }
         if(maxAnswerSeconds == null || maxAnswerSeconds > ConversationService.MAX_DURATION){
             maxAnswerSeconds = ConversationService.MAX_DURATION;
         }
@@ -384,7 +397,29 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         //有正在处理的交谈
         if(state != null && (state.getClosed() == null || !state.getClosed())){
             if(state.getBusinessData().get("invite_to") != null){
-                throw new SystemBusyException();
+                throw new SystemBusyException("已经在邀请呼叫了to="+state.getBusinessData().get("invite_to"));
+            }
+            if(state.getBusinessData().get(IVRActionService.IVR_ANSWER_WAITTING_FIELD) != null){
+                throw new SystemBusyException("呼叫正在等待应答callid="+callId);
+            }
+
+            if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
+                CallLock lock = new CallLock(redisCacheService,callId);
+                if(!lock.lock()){
+                    throw new SystemBusyException("加锁失败callid="+callId);
+                }
+                try{
+                    //分机短号
+                    String from_extensionnum = state.getBusinessData().get("direct_hot");
+                    //分机前缀
+                    String extension_prefix = state.getBusinessData().get("direct_extension_prefix");
+                    if(from_extensionnum == null){
+                        throw new IllegalArgumentException();
+                    }
+                    businessStateService.deleteInnerField("direct_hot","direct_extension_prefix");
+                }finally {
+                    lock.unlock();
+                }
             }
             //TODO 将其他交谈全部设置为保持（cti需要提供批量） 这里应该是阻塞调用好点
 
