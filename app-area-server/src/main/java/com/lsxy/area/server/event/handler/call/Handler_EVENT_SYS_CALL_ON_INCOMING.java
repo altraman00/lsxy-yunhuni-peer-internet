@@ -184,7 +184,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             String right_codec = VoiceCodec.selectExtensionCodec(codecs);
             if(StringUtil.isBlank(right_codec)){
                 logger.info("不支持的语音编码params={},codecs={}",params,VoiceCodec.getExtensionCodecs());
-                return res;
+                //return res;
             }
             AgentLock from_agentLock = null;
             try{
@@ -436,7 +436,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
 
         if(StringUtil.isBlank(right_codec)){
             logger.info("不支持的语音编码params={},codecs={}",params,calledLine.getCodecs());
-            return;
+            //return;
         }
 
         String from = resolveFromTelNum(from_uri,calledLine);//主叫号码
