@@ -49,7 +49,7 @@ public class VoiceCodec {
             return null;
         }
         String[] line_codec_arr = lineCodecs.split(",");
-        String[] codec_arr = codecs.split(",");
+        String[] codec_arr = codecs.replaceAll("\\[","").replaceAll("\\]","").split(",");
         return selectLineCodec(line_codec_arr,codec_arr);
     }
 
@@ -61,7 +61,7 @@ public class VoiceCodec {
         if(StringUtil.isBlank(codes)){
             return null;
         }
-        String[] codec_arr = codes.split(",");
+        String[] codec_arr = codes.replaceAll("\\[","").replaceAll("\\]","").split(",");
         return selectExtensionCodec(codec_arr);
     }
 }
