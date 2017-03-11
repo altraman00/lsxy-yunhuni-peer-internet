@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
  * Created by zhangxb on 2017/3/10.
  */
 @Controller
-@RequestMapping("/console/statistics/consume/")
+@RequestMapping("/console/statistics/msg/")
 public class MsgStatisticsController extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(MsgStatisticsController.class);
 
