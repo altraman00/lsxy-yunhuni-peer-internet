@@ -2438,12 +2438,12 @@
         // $('#playtable').find(".playtr").remove();["✔", "✘"],
         for(var i =0 ; i<data.length; i++){
             html +='<tr id="rent-'+ data[i].rentId +'">' +
-                    '<td class="text-center">'+data[i].num+'</td>' +
+                    '<td class="text-center">'+nulltostr(data[i].num)+'</td>' +
                     '<td class="text-center">' + (data[i].status == 0 ? '过期': '正常') + '</td>' +
                     '<td class="text-center">'+ (data[i].isCalled == 0 ? '✘': '✔') +'</td>' +
                     '<td class="text-center">'+ (data[i].isDialing == 0 ? '✘': '✔') +'</td>' +
                     '<td class="text-center"><span class="text-center-l-fixed">'+data[i].areaCode+'</span></td>' +
-                    '<td class="text-center"> ' + data[i].expireTime + ' </td>' +
+                    '<td class="text-center"> ' + nulltostr(data[i].expireTime) + ' </td>' +
                     '<td class="text-center"><a onclick="unband(\''+data[i].rentId+'\')">解除绑定</a></td>' +
                     '</tr>'
         }
@@ -2496,12 +2496,12 @@
         // $('#playtable').find(".playtr").remove();["✔", "✘"],
         for(var i =0 ; i<data.length; i++){
             html +='<tr id="rent-'+ data[i].rentId +'">' +
-                '<td class="text-center">'+data[i].num+'</td>' +
+                '<td class="text-center">'+nulltostr(data[i].num)+'</td>' +
                 '<td class="text-center">' + (data[i].status == 0 ? '过期': '正常') + '</td>' +
                 '<td class="text-center">'+ (data[i].isCalled == 0 ? '✘': '✔') +'</td>' +
                 '<td class="text-center">'+ (data[i].isDialing == 0 ? '✘': '✔') +'</td>' +
                 '<td class="text-center"><span class="text-center-l-fixed">'+data[i].areaCode+'</span></td>' +
-                '<td class="text-center"> ' + data[i].expireTime + ' </td>' +
+                '<td class="text-center"> ' + nulltostr(data[i].expireTime) + ' </td>' +
                 '<td class="text-center"><a onclick="unband2(\''+data[i].rentId+'\')">解除绑定</a></td>' +
                 '</tr>'
         }
@@ -2776,10 +2776,10 @@
         // $('#playtable').find(".playtr").remove();["✔", "✘"],
         for(var i =0 ; i<data.length; i++){
             html +='<tr id="extension-'+ data[i].id +'">' +
-                    '<td class="">'+ data[i].id +'</td>' +
-                    '<td class="">' + data[i].user + '</td>' +
-                    '<td class="">'+ data[i].password +'</td>' +
-                    '<td class="">'+ (data[i].certId == undefined ||data[i].certId== null ?'': data[i].certId) +'</td>' +
+                    '<td class="">'+ nulltostr(data[i].id) +'</td>' +
+                    '<td class="">' + nulltostr(data[i].user) + '</td>' +
+                    '<td class="">'+ nulltostr(data[i].password) +'</td>' +
+                    '<td class="">'+ nulltostr(data[i].certId ) +'</td>' +
                     '<td class="">'+ (data[i].enable?'可用':'不可用') +'</td>' +
                     '<td class="">'+ (data[i].type==1?'SIP 终端':(data[i].type==2?'SIP 网关':(data[i].type==3?'普通电话':'未知类型'))) +'</td>' +
                     '<td class=""><a href="javascript:delExtension(\''+data[i].id+'\')" >删除</a></td>' +
@@ -2877,16 +2877,16 @@
         },"get");
         for(var i =0 ; i<data.length; i++){
             html +='<tr class="playtr" id="play-'+data[i].id+'">' +
-                '<td class="text-center">'+ data[i].certId +'</td>' +
-                '<td class="text-center">'+ data[i].secretKey +'</td>';
+                '<td class="text-center">'+ nulltostr(data[i].certId) +'</td>' +
+                '<td class="text-center">'+ nulltostr(data[i].secretKey) +'</td>';
             if(appServiceType=='msg'){
-                html += '<td class="text-center">' + data[i].ussdNum + '</td>' ;
-                html += '<td class="text-center">' + data[i].smsNum + '</td>' ;
+                html += '<td class="text-center">' + nulltostr(data[i].ussdNum) + '</td>' ;
+                html += '<td class="text-center">' + nulltostr(data[i].smsNum) + '</td>' ;
             }else if(appServiceType=='call_center'){
-                html += '<td class="text-center">' + data[i].voiceNum + '</td>' ;
+                html += '<td class="text-center">' + nulltostr(data[i].voiceNum) + '</td>' ;
 //                html += '<td class="text-center">' + data[i].seatNum + '</td>' ;
             }else if(appServiceType=='voice'){
-                html += '<td class="text-center">' + data[i].voiceNum + '</td>' ;
+                html += '<td class="text-center">' + nulltostrdata[i].voiceNum) + '</td>' ;
             }
             var state = data[i].enabled == 1?"启用":"禁用";
             var color = data[i].enabled == 1?"text-success":"text-danger";
@@ -3011,11 +3011,11 @@
             }
 
             html +='<tr id="agent-'+ data[i].name +'">' +
-                    '<td class="text-center">'+ data[i].name +'</td>' +
-                    '<td class="text-center">'+ skillStr +'</td>' +
-                    '<td class="text-center">'+ (data[i].extension!=null?data[i].extension:'') +'</td>' +
-                     '<td class="text-center">'+ data[i].certId +'</td>' +
-                    '<td class="text-center">' + data[i].state + '</td>' +
+                    '<td class="text-center">'+ nulltostr(data[i].name) +'</td>' +
+                    '<td class="text-center">'+ nulltostr(skillStr) +'</td>' +
+                    '<td class="text-center">'+ nulltostr(data[i].extension) +'</td>' +
+                     '<td class="text-center">'+ nulltostr(data[i].certId) +'</td>' +
+                    '<td class="text-center">' + nulltostr(data[i].state) + '</td>' +
                     '<td class="text-center"><a href="javascript:delAgent(\''+data[i].id+'\')" >删除</a></td>' +
                     '</tr>'
         }
@@ -3043,13 +3043,13 @@
         // $('#playtable').find(".playtr").remove();["✔", "✘"],
         for(var i =0 ; i<data.length; i++){
             html +='<tr id="queue-'+ data[i].id +'">' +
-                '<td class="text-center"><span style="float:left;" >'+ data[i].whereExpression +'</span></td>' +
-                '<td class="text-center"><span style="float:left;" >'+ data[i].sortExpression +'</span></td>' +
-                '<td class="text-center">' + data[i].priority + '</td>' +
-                '<td class="text-center">' + data[i].queueTimeout + '</td>' +
-                '<td class="text-center">' + data[i].fetchTimeout + '</td>' +
-                '<td class="text-center">'+ data[i].certId +'</td>' +
-                '<td class="text-center">' + data[i].remark + '</td>' +
+                '<td class="text-center"><span style="float:left;" >'+ nulltostr(data[i].whereExpression) +'</span></td>' +
+                '<td class="text-center"><span style="float:left;" >'+ nulltostr(data[i].sortExpression) +'</span></td>' +
+                '<td class="text-center">' + nulltostr(data[i].priority) + '</td>' +
+                '<td class="text-center">' + nulltostr(data[i].queueTimeout) + '</td>' +
+                '<td class="text-center">' + nulltostr(data[i].fetchTimeout) + '</td>' +
+                '<td class="text-center">'+ nulltostr(data[i].certId) +'</td>' +
+                '<td class="text-center">' + nulltostr(data[i].remark) + '</td>' +
                 '</tr>'
         }
         $('#queue-list').html(html);
@@ -3094,6 +3094,9 @@
                 }
             });
         }
+    }
+    function nulltostr(val){
+        return val==null||val==undefined ? '':val;
     }
 </script>
 
