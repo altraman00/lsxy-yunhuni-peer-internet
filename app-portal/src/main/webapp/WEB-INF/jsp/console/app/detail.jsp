@@ -2886,7 +2886,7 @@
                 html += '<td class="text-center">' + nulltostr(data[i].voiceNum) + '</td>' ;
 //                html += '<td class="text-center">' + data[i].seatNum + '</td>' ;
             }else if(appServiceType=='voice'){
-                html += '<td class="text-center">' + nulltostrdata[i].voiceNum) + '</td>' ;
+                html += '<td class="text-center">' + nulltostr(data[i].voiceNum) + '</td>' ;
             }
             var state = data[i].enabled == 1?"启用":"禁用";
             var color = data[i].enabled == 1?"text-success":"text-danger";
