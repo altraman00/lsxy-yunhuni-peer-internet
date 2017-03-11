@@ -79,7 +79,7 @@ public class IVRTest {
         String res_id = UUIDGenerator.uuid();
         String from = "13692206627";
         String to = "8675522730043";
-        ivrActionService.doActionIfAccept(null,app,tenant,res_id,from,to,null,false);
+        ivrActionService.doActionIfAccept(null,app,tenant,res_id,from,to,null,false,null);
 
         List<VoiceIvr> lists = (List<VoiceIvr>)voiceIvrService.list("from VoiceIvr order by createTime desc");
         System.out.println(lists.get(0).getId());

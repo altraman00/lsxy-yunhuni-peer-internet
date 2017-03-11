@@ -11,6 +11,7 @@ import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.area.server.util.SipUrlUtil;
+import com.lsxy.area.server.voicecodec.VoiceCodec;
 import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
 import com.lsxy.call.center.api.service.CallCenterConversationService;
@@ -32,6 +33,7 @@ import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
@@ -123,6 +125,9 @@ public class ConversationService {
 
     @Autowired
     private ApiCertificateSubAccountService apiCertificateSubAccountService;
+
+    @Autowired
+    private LineGatewayService lineGatewayService;
 
     public BaseEnQueue getEnqueue(String queueId){
         BaseEnQueue enqueue = null;
@@ -349,7 +354,7 @@ public class ConversationService {
         String to = null;
         String areaId = null;
         String lineId = null;
-
+        String codecs = null;
         if(AppExtension.TYPE_TELPHONE.equals(type)){
             AreaAndTelNumSelector.Selector selector =
                     areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app,systemNum,agentPhone);
@@ -357,11 +362,13 @@ public class ConversationService {
             lineId = selector.getLineId();
             from = selector.getOneTelnumber();
             to = selector.getToUri();
+            codecs = VoiceCodec.filteLineCodecs(lineGatewayService.findById(lineId).getCodecs());
         }else{
             areaId = areaAndTelNumSelector.getAreaId(app);
             from = (StringUtil.isEmpty(diaplyNum)
                     ? systemNum : diaplyNum) + "@"+areaId+".area.oneyun.com";
             to = user + "@" + sip_address;
+            codecs = VoiceCodec.getExtensionCodecs();
         }
         CallSession callSession = new CallSession();
         callSession.setId(UUIDGenerator.uuid());
@@ -377,6 +384,7 @@ public class ConversationService {
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("to_uri",to)
                 .putIfNotEmpty("from_uri",from)
+                .putIfNotEmpty("codecs",codecs)
                 .put("max_answer_seconds",maxDuration, IVRActionService.MAX_DURATION_SEC)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
@@ -427,7 +435,7 @@ public class ConversationService {
         String to = null;
         String areaId = null;
         String lineId = null;
-
+        String codecs = null;
         if(AppExtension.TYPE_TELPHONE.equals(type)){
             AreaAndTelNumSelector.Selector selector =
                     areaAndTelNumSelector.getTelnumberAndAreaId(subaccountId,app,systemNum,agentPhone);
@@ -435,6 +443,7 @@ public class ConversationService {
             lineId = selector.getLineId();
             from = selector.getOneTelnumber();
             to = selector.getToUri();
+            codecs = VoiceCodec.filteLineCodecs(lineGatewayService.findById(lineId).getCodecs());
         }else{
             areaId = areaAndTelNumSelector.getAreaId(app);
             if(StringUtil.isEmpty(systemNum)){
@@ -446,6 +455,7 @@ public class ConversationService {
             }
             from = (systemNum) + "@"+areaId+".area.oneyun.com";
             to = user + "@" + sip_address;
+            codecs = VoiceCodec.getExtensionCodecs();
         }
         CallSession callSession = new CallSession();
         callSession.setId(UUIDGenerator.uuid());
@@ -461,6 +471,7 @@ public class ConversationService {
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("to_uri",to)
                 .putIfNotEmpty("from_uri",from)
+                .putIfNotEmpty("codecs",codecs)
                 .put("max_answer_seconds",maxDuration, IVRActionService.MAX_DURATION_SEC)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
@@ -525,7 +536,7 @@ public class ConversationService {
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber();
         String lineId = selector.getLineId();
-
+        String codecs = VoiceCodec.filteLineCodecs(lineGatewayService.findById(lineId).getCodecs());
         String callId = UUIDGenerator.uuid();
         CallSession callSession = new CallSession();
         callSession.setStatus(CallSession.STATUS_PREPARING);
@@ -541,10 +552,11 @@ public class ConversationService {
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("to_uri",selector.getToUri())
                 .putIfNotEmpty("from_uri",oneTelnumber)
+                .putIfNotEmpty("codecs",codecs)
                 .put("max_answer_seconds",maxDuration, IVRActionService.MAX_DURATION_SEC)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
-                .put("areaId",areaId)
+                .putIfNotEmpty("areaId",areaId)
                 .putIfNotEmpty(BusinessState.REF_RES_ID,ref_res_id)
                 .build();
 

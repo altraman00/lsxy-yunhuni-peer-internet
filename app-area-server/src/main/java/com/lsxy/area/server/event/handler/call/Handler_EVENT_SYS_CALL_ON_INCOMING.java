@@ -12,6 +12,7 @@ import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.SipUrlUtil;
+import com.lsxy.area.server.voicecodec.VoiceCodec;
 import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.model.CallCenterAgent;
@@ -175,10 +176,15 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         String res_id = (String)params.get("res_id");
         String from_uri = (String)params.get("from_uri");//主叫sip地址
         String to_uri = (String)params.get("to_uri");//被叫号码sip地址
-
+        String codecs = (String)params.get("codecs");
         if(SipUrlUtil.isExtensionNum(from_uri)){//是坐席分机呼入，可以呼给其他坐席，热线，外线
             if(logger.isDebugEnabled()){
                 logger.info("分机直拨{}",params);
+            }
+            String right_codec = VoiceCodec.selectExtensionCodec(codecs);
+            if(StringUtil.isBlank(right_codec)){
+                logger.info("不支持的语音编码params={},codecs={}",params,VoiceCodec.getExtensionCodecs());
+                return res;
             }
             AgentLock from_agentLock = null;
             try{
@@ -270,7 +276,9 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 }
                 String conversationId = UUIDGenerator.uuid();
                 //设置坐席状态为fetching
-                String call_id = saveSessionCall(subaccountId,app,app.getTenant(),res_id,conversationId,from_agent.getId(),from_agent.getName(),from_agent.getExtension(),from_uri,to_uri);
+                String call_id = saveSessionCall(subaccountId,app,app.getTenant(),res_id,
+                        conversationId,from_agent.getId(),from_agent.getName(),from_agent.getExtension(),
+                        from_uri,to_uri,right_codec);
                 agentState.setState(from_agentId,CallCenterAgent.STATE_FETCHING);
 
                 //转换长号码为短号码，显示在被叫的话机上
@@ -282,7 +290,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                         logger.info("直拨热线，to={}",to);
                     }
                     //流程，应答成功后调用收码，收码完成事件中创建会议，会议创建成功后将call加入会议，加入会议成功事件 呼叫被叫，振铃事件将被叫加入会议
-                    answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app));
+                    answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app),right_codec);
                     businessStateService.updateInnerField(
                             call_id,
                             //直拨外线-主叫分机短号
@@ -349,7 +357,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                             logger.info("坐席正忙,state={}",agentState.getState(to_agentId));
                             return res;
                         }
-                        answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app));
+                        answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app),right_codec);
 
                         businessStateService.updateInnerField(
                                 call_id,
@@ -383,7 +391,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                                         .put("isRedNum",isRedNum)
                         );
                     }
-                    answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app));
+                    answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app),right_codec);
                     businessStateService.updateInnerField(
                             call_id,
                             //直拨被叫-外线
@@ -403,14 +411,17 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 }
             }
         }else{
+            if(logger.isDebugEnabled()){
+                logger.info("ivr呼入{}",params);
+            }
             //是外线呼入,进入ivr流程
-            doIvrAction(res_id,from_uri,to_uri,params);
+            doIvrAction(res_id,from_uri,to_uri,params,codecs);
         }
         return res;
     }
 
 
-    private void doIvrAction(String res_id,String from_uri,String to_uri,Map<String,Object> params){
+    private void doIvrAction(String res_id,String from_uri,String to_uri,Map<String,Object> params,String codecs){
         ResourceTelenum to = resourceTelenumService.findNumByCallUri(to_uri);//被叫号码
         if(to ==null){
             logger.info("被叫号码不存在{}",params);
@@ -421,6 +432,13 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             logger.info("线路不存在{}",params);
             return;
         }
+        String right_codec = VoiceCodec.selectLineCodec(calledLine.getCodecs(),codecs);
+
+        if(StringUtil.isBlank(right_codec)){
+            logger.info("不支持的语音编码params={},codecs={}",params,calledLine.getCodecs());
+            return;
+        }
+
         String from = resolveFromTelNum(from_uri,calledLine);//主叫号码
 
         Tenant tenant = null;
@@ -503,16 +521,17 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("[{}][{}]开始处理ivr",tenant.getId(),app.getId());
         }
-        ivrActionService.doActionIfAccept(subaccountId,app,tenant,res_id,from,to.getTelNumber(),calledLine.getId(),isCallCenter);
+        ivrActionService.doActionIfAccept(subaccountId,app,tenant,res_id,from,to.getTelNumber(),
+                calledLine.getId(),isCallCenter,right_codec);
     }
 
-
-    public void answer(String res_id,String call_id,String areaId){
+    public void answer(String res_id,String call_id,String areaId,String codec){
         Map<String, Object> params = new MapBuilder<String,Object>()
-                .put("res_id",res_id)
-                .put("max_answer_seconds",IVRActionService.MAX_DURATION_SEC)
-                .put("user_data",call_id)
-                .put("areaId",areaId)
+                .putIfNotEmpty("res_id",res_id)
+                .putIfNotEmpty("codec",codec)
+                .putIfNotEmpty("max_answer_seconds",IVRActionService.MAX_DURATION_SEC)
+                .putIfNotEmpty("user_data",call_id)
+                .putIfNotEmpty("areaId",areaId)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_ANSWER,params);
         try {
@@ -522,7 +541,9 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         }
     }
 
-    private String saveSessionCall(String subaccountId,App app, Tenant tenant, String res_id, String conversationId,String agentId,String agentName,String extension,String from, String to){
+    private String saveSessionCall(String subaccountId,App app, Tenant tenant, String res_id,
+                                   String conversationId,String agentId,String agentName,
+                                   String extension,String from, String to,String codec){
         String call_id = UUIDGenerator.uuid();
         CallSession callSession = new CallSession();
         callSession.setId(UUIDGenerator.uuid());
@@ -568,7 +589,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 .setAreaId(areaId)
                 .setBusinessData(new MapBuilder<String,String>()
                         //incoming是第一个会话所以是自己引用自己
-                        .put(BusinessState.REF_RES_ID,res_id)
+                        .putIfNotEmpty(BusinessState.REF_RES_ID,res_id)
                         .putIfNotEmpty(CallCenterUtil.CONVERSATION_FIELD,conversationId)
                         .putIfNotEmpty(CallCenterUtil.AGENT_ID_FIELD,agentId)
                         .putIfNotEmpty(CallCenterUtil.AGENT_NAME_FIELD,agentName)
@@ -578,7 +599,8 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                         .putIfNotEmpty("from", SipUrlUtil.extractTelnum(from))
                         .putIfNotEmpty("to", SipUrlUtil.extractTelnum(to))
                         .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,call_id)
-                        .put(IVRActionService.IVR_ANSWER_WAITTING_FIELD,"1")
+                        .putIfNotEmpty(IVRActionService.IVR_ANSWER_WAITTING_FIELD,"1")
+                        .putIfNotEmpty(IVRActionService.IVR_ANSWER_CODEC_FIELD,codec)
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
                 .build();
