@@ -11,6 +11,7 @@ import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.SipUrlUtil;
+import com.lsxy.area.server.voicecodec.VoiceCodec;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.api.tenant.service.TenantService;
@@ -173,7 +174,7 @@ public class DialActionHandler extends ActionHandler{
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber();
         String lineId = selector.getLineId();
-
+        String codecs = VoiceCodec.filteLineCodecs(lineGatewayService.findById(lineId).getCodecs());
         String callId = null;
 
         CallSession callSession = null;
@@ -217,6 +218,7 @@ public class DialActionHandler extends ActionHandler{
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("to_uri",selector.getToUri())
                 .putIfNotEmpty("from_uri",oneTelnumber)
+                .putIfNotEmpty("codecs",codecs)
                 .putIfNotEmpty("parent_call_res_id",parent_call_res_id)
                 .putIfNotEmpty("ring_play_file",ring_play_file)
                 .put("max_answer_seconds",maxCallDuration, IVRActionService.MAX_DURATION_SEC)

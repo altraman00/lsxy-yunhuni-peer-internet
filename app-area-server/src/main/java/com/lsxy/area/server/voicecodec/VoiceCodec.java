@@ -1,7 +1,10 @@
 package com.lsxy.area.server.voicecodec;
 
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.StringUtil;
+
+import java.util.List;
 
 /**
  * Created by liuws on 2017/3/10.
@@ -9,33 +12,42 @@ import com.lsxy.framework.core.utils.StringUtil;
  */
 public class VoiceCodec {
 
-    //我们支持的线路供应商编码 选择顺序列表
-    private static final String LINE_CODECS="G729_20MS,G723_5_3_30MS,G723_6_3_30MS,G711_ALAW_20MS,G711_ULAW_20MS";
-    private static final String[] LINE_CODEC_LIST = LINE_CODECS.split(",");
-
     //我们支持的内部分机编码 选择列表
-    private static final String EXTENSION_CODECS = "iLBC_30MS,G729_20MS,G711_ALAW_20MS,G711_ULAW_20MS";
+    private static final String EXTENSION_CODECS = SystemConfig.getProperty("area.server.extension.codec");
     private static final String[] EXTENSION_CODEC_LIST = EXTENSION_CODECS.split(",");
 
     private static final VoiceCodecStrategy strategy = new DefaultVoiceCodecStrategy();
 
-    public static String getLineCodecs(){
-        return LINE_CODECS;
+    public static String filteLineCodecs(String lineCodes){
+        if(StringUtil.isBlank(lineCodes)){
+            return null;
+        }
+        StringBuilder result = new StringBuilder();
+        String[] codecs = lineCodes.split(",");
+        for (String codec: codecs) {
+            if(StringUtil.isNotBlank(codec)){
+                result.append(codec.trim());
+                result.append(",");
+            }
+        }
+        return result.substring(0,result.length());
     }
+
     public static String getExtensionCodecs(){
         return EXTENSION_CODECS;
     }
 
-    public static String selectLineCodec(String[] codes){
-        return strategy.select(LINE_CODEC_LIST,codes);
+    public static String selectLineCodec(String[] lineCodecs,String[] codecs){
+        return strategy.select(lineCodecs,codecs);
     }
 
-    public static String selectLineCodec(String codes){
-        if(StringUtil.isBlank(codes)){
+    public static String selectLineCodec(String lineCodecs,String codecs){
+        if(StringUtil.isBlank(codecs)){
             return null;
         }
-        String[] codec_arr = codes.split(",");
-        return selectLineCodec(codec_arr);
+        String[] line_codec_arr = lineCodecs.split(",");
+        String[] codec_arr = codecs.split(",");
+        return selectLineCodec(line_codec_arr,codec_arr);
     }
 
     public static String selectExtensionCodec(String[] codes){
@@ -48,9 +60,5 @@ public class VoiceCodec {
         }
         String[] codec_arr = codes.split(",");
         return selectExtensionCodec(codec_arr);
-    }
-
-    public static void main(String[] args) {
-        System.out.println(selectLineCodec("[G729_20MS,%20G711_ULAW_20MS,%20G711_ALAW_20MS]".replaceAll("\\[","").replaceAll("\\]","")));
     }
 }

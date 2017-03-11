@@ -96,6 +96,9 @@ public class IVRActionService {
     /**IVR呼入执行ivr动作前，会自动应答，所以保存ivr动作xml一次，应答后自动执行动作**/
     public static final String IVR_ANSWER_AFTER_XML_FIELD = "IVR_ANSWER_AFTER_XML";
 
+    /**应答语音编码**/
+    public static final String IVR_ANSWER_CODEC_FIELD = "IVR_ANSWER_CODEC";
+
     /**IVR当前执行的action**/
     public static final String IVR_ACTION_FIELD ="IVR_ACTION";
 
@@ -365,14 +368,15 @@ public class IVRActionService {
      * @return
      */
     public boolean doActionIfAccept(String subaccountId,App app, Tenant tenant,String res_id,
-                                    String from, String to,String lineId,boolean iscc){
+                                    String from, String to,String lineId,boolean iscc,String codec){
         String call_id = UUIDGenerator.uuid();
-        saveIvrSessionCall(subaccountId,call_id,app,tenant,res_id,from,to,lineId,iscc);
+        saveIvrSessionCall(subaccountId,call_id,app,tenant,res_id,from,to,lineId,iscc,codec);
         doAction(call_id,null);
         return true;
     }
 
-    private void saveIvrSessionCall(String subaccountId,String call_id, App app, Tenant tenant, String res_id, String from, String to, String lineId, boolean iscc){
+    private void saveIvrSessionCall(String subaccountId,String call_id, App app, Tenant tenant, String res_id,
+                                    String from, String to, String lineId, boolean iscc,String codec){
         CallSession callSession = new CallSession();
         callSession.setId(UUIDGenerator.uuid());
         try{
@@ -430,9 +434,10 @@ public class IVRActionService {
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
                         //incoming是第一个会话所以是自己引用自己
-                        .put(BusinessState.REF_RES_ID,res_id)
+                        .putIfNotEmpty(BusinessState.REF_RES_ID,res_id)
                         //TYPE_IVR_INCOMING 才需要等待应答标记
-                        .put(IVR_ANSWER_WAITTING_FIELD,"1")
+                        .putIfNotEmpty(IVR_ANSWER_WAITTING_FIELD,"1")
+                        .putIfNotEmpty(IVRActionService.IVR_ANSWER_CODEC_FIELD,codec)
                         //incoming事件from 和 to是相反的
                         .putIfNotEmpty("from",SipUrlUtil.extractTelnum(to))
                         .putIfNotEmpty("to", SipUrlUtil.extractTelnum(from))
@@ -444,12 +449,13 @@ public class IVRActionService {
         businessStateService.save(state);
     }
 
-    public void answer(String res_id,String call_id,String areaId){
+    public void answer(String res_id,String call_id,String areaId,String codec){
         Map<String, Object> params = new MapBuilder<String,Object>()
-                .put("res_id",res_id)
-                .put("max_answer_seconds",MAX_DURATION_SEC)
-                .put("user_data",call_id)
-                .put("areaId",areaId)
+                .putIfNotEmpty("res_id",res_id)
+                .putIfNotEmpty("codec",codec)
+                .putIfNotEmpty("max_answer_seconds",MAX_DURATION_SEC)
+                .putIfNotEmpty("user_data",call_id)
+                .putIfNotEmpty("areaId",areaId)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_ANSWER,params);
         try {
@@ -532,7 +538,7 @@ public class IVRActionService {
                 if(logger.isDebugEnabled()){
                     logger.info("调用应答isCallcenter={}，callid={}",conversationService.isCC(state),call_id);
                 }
-                answer(state.getResId(),call_id,state.getAreaId());
+                answer(state.getResId(),call_id,state.getAreaId(),state.getBusinessData().get(IVR_ANSWER_CODEC_FIELD));
                 return true;
             }
             businessStateService.updateInnerField(call_id,IVR_ACTION_FIELD,h.getAction());
