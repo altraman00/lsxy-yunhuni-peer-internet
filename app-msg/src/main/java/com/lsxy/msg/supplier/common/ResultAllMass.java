@@ -1,5 +1,7 @@
 package com.lsxy.msg.supplier.common;
 
+import com.lsxy.msg.api.model.MsgConstant;
+
 import java.util.ArrayList;
 import java.util.List;
 

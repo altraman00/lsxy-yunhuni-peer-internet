@@ -11,4 +11,8 @@ import java.util.List;
  */
 public interface MsgSendDetailService extends BaseService<MsgSendDetail> {
     void batchInsertDetail(MsgSendRecord msgSendRecord, List<String> pendingPhones,int state);
+
+    void updateStateByMsgKey(String msgKey, int state);
+
+    MsgSendDetail findByTaskIdAndMobile(String taskId, String mobile);
 }

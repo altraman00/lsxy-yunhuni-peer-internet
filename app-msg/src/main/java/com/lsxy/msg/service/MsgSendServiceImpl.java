@@ -2,10 +2,7 @@ package com.lsxy.msg.service;
 
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
-import com.lsxy.msg.api.model.MsgSendDetail;
-import com.lsxy.msg.api.model.MsgSendRecord;
-import com.lsxy.msg.api.model.MsgTemplate;
-import com.lsxy.msg.api.model.MsgUserRequest;
+import com.lsxy.msg.api.model.*;
 import com.lsxy.msg.api.service.*;
 import com.lsxy.msg.supplier.SupplierSelector;
 import com.lsxy.msg.supplier.SupplierSendService;
@@ -54,7 +51,7 @@ public class MsgSendServiceImpl implements MsgSendService {
 
     @Override
     public String sendUssd(String ip,String appId,String subaccountId,String mobile, String tempId, String tempArgs) {
-        return sendOne(appId, subaccountId, mobile, tempId, tempArgs,MsgConstant.MSG_USSD);
+        return sendOne(appId, subaccountId, mobile, tempId, tempArgs, MsgConstant.MSG_USSD);
     }
 
     @Override

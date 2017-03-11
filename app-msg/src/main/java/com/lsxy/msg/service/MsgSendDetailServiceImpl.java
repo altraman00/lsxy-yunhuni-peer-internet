@@ -33,7 +33,7 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
 
     @Override
     public void batchInsertDetail(MsgSendRecord record, List<String> phones,int state) {
-        String values = " id,msg_key,tenant_id,app_id,subaccount_id,task_id,mobile,msg,temp_id,supplier_temp_id,temp_args,send_time,msg_cost,send_type,supplier_code,operator,state," +
+        String values = " id,msg_key,tenant_id,app_id,subaccount_id,task_id,mobile,msg,is_mass,temp_id,supplier_temp_id,temp_args,send_time,msg_cost,send_type,supplier_code,operator,state," +
                 "create_time,last_time,deleted,sortno,version";
         String valuesMark = "";
         int length = values.split(",").length;
@@ -49,7 +49,7 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
 
         if(phones != null && phones.size() > 0){
             for(String phone:phones){
-                Object[] obj =  new Object[]{UUIDGenerator.uuid(),record.getMsgKey(),record.getTenantId(),record.getAppId(),record.getSubaccountId(),record.getTaskId(),phone,record.getMsgCost(),
+                Object[] obj =  new Object[]{UUIDGenerator.uuid(),record.getMsgKey(),record.getTenantId(),record.getAppId(),record.getSubaccountId(),record.getTaskId(),phone,record.getMsg(),true,
                 record.getTempId(),record.getSupplierTempId(),record.getTempArgs(),record.getSendTime(),record.getMsgCost(),record.getSendType(),record.getSupplierCode(),record.getOperator(),
                         state,record.getCreateTime(),record.getLastTime(),0,0,0};
                 resultList.add(obj);
@@ -59,5 +59,15 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
         if(resultList != null && resultList.size() > 0){
             jdbcTemplate.batchUpdate(insertSql,resultList);
         }
+    }
+
+    @Override
+    public void updateStateByMsgKey(String msgKey, int state) {
+        msgSendDetailDao.updateStateByMsgKey(msgKey,state);
+    }
+
+    @Override
+    public MsgSendDetail findByTaskIdAndMobile(String taskId, String mobile) {
+        return msgSendDetailDao.findFirstByTaskIdAndMobile(taskId,mobile);
     }
 }

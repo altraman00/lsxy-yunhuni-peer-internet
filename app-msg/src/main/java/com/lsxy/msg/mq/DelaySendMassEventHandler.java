@@ -8,7 +8,7 @@ import com.lsxy.msg.api.service.MsgSendDetailService;
 import com.lsxy.msg.api.service.MsgSendRecordService;
 import com.lsxy.msg.supplier.SupplierSelector;
 import com.lsxy.msg.supplier.SupplierSendService;
-import com.lsxy.msg.supplier.common.MsgConstant;
+import com.lsxy.msg.api.model.MsgConstant;
 import com.lsxy.msg.supplier.common.ResultMass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

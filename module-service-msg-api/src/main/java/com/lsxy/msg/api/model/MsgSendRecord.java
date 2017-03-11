@@ -41,8 +41,13 @@ public class MsgSendRecord extends IdEntity {
     private Long succNum;
     private Long failNum;
     private Long pendingNum;
+    private Integer sendFailTime;
     private String reason;
     private String remark;
+
+    public MsgSendRecord(String msgKey) {
+        this.msgKey = msgKey;
+    }
 
     public MsgSendRecord(String msgKey, String tenantId, String appId, String subaccountId, String taskId, String sendType, String supplierCode, String operator, String msg,
                          String tempId, String supplierTempId, String tempArgs, Date sendTime, BigDecimal msgCost) {
@@ -210,11 +215,11 @@ public class MsgSendRecord extends IdEntity {
     }
 
     @Column(name = "is_mass")
-    public Boolean getMass() {
+    public Boolean getIsMass() {
         return isMass;
     }
 
-    public void setMass(Boolean mass) {
+    public void setIsMass(Boolean mass) {
         isMass = mass;
     }
 
@@ -252,6 +257,15 @@ public class MsgSendRecord extends IdEntity {
 
     public void setFailNum(Long failNum) {
         this.failNum = failNum;
+    }
+
+    @Column(name = "send_fail_time")
+    public Integer getSendFailTime() {
+        return sendFailTime;
+    }
+
+    public void setSendFailTime(Integer sendFailTime) {
+        this.sendFailTime = sendFailTime;
     }
 
     @Column(name = "pending_num")

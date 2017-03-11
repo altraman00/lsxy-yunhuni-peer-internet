@@ -48,4 +48,9 @@ public class MsgUserRequestServiceImpl extends AbstractService<MsgUserRequest> i
 
     }
 
+    @Override
+    public void updateStateByMsgKey(String msgKey, int state) {
+        msgUserRequestDao.updateStateByMsgKey(msgKey,state);
+    }
+
 }

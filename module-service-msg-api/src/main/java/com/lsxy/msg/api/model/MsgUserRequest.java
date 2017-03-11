@@ -193,11 +193,11 @@ public class MsgUserRequest extends IdEntity {
     }
 
     @Column(name = "is_mass")
-    public Boolean getMass() {
+    public Boolean getIsMass() {
         return isMass;
     }
 
-    public void setMass(Boolean mass) {
+    public void setIsMass(Boolean mass) {
         isMass = mass;
     }
 

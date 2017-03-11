@@ -2,10 +2,11 @@ package com.lsxy.msg.supplier.paopaoyu;
 
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.msg.supplier.AbstractSupplierSendServiceImpl;
-import com.lsxy.msg.supplier.common.MsgConstant;
-import com.lsxy.msg.supplier.common.PaoPaoYuMassNofity;
+import com.lsxy.msg.api.model.MsgConstant;
 import com.lsxy.msg.supplier.common.ResultMass;
 import com.lsxy.msg.supplier.common.ResultOne;
+import com.msg.paopaoyu.PaoPaoYuClient;
+import com.msg.paopaoyu.PaoPaoYuConstant;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,6 @@ public class PaoPaoYuServiceImpl extends AbstractSupplierSendServiceImpl {
         return paoPaoYuClient;
     }
 
-    @Override
     public PaoPaoYuMassNofity getTask(String taskId) {
         String result = getPaoPaoYuClient().getTask(taskId);
         logger.info("调用[泡泡鱼][查询群发]结果:"+ result);

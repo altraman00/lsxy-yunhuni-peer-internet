@@ -1,4 +1,4 @@
-package com.lsxy.msg.supplier.common;
+package com.lsxy.msg.api.model;
 
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 

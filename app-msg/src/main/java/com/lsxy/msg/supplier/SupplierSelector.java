@@ -1,6 +1,6 @@
 package com.lsxy.msg.supplier;
 
-import com.lsxy.msg.supplier.common.MsgConstant;
+import com.lsxy.msg.api.model.MsgConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

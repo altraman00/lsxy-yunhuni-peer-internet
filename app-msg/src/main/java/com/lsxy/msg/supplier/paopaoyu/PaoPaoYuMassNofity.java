@@ -1,4 +1,4 @@
-package com.lsxy.msg.supplier.common;
+package com.lsxy.msg.supplier.paopaoyu;
 
 import com.lsxy.framework.core.utils.JSONUtil;
 import net.sf.json.JSONArray;

@@ -23,4 +23,14 @@ public class MsgSendRecordServiceImpl extends AbstractService<MsgSendRecord> imp
     public BaseDaoInterface<MsgSendRecord, Serializable> getDao() {
         return this.msgSendRecordDao;
     }
+
+    @Override
+    public MsgSendRecord findByTaskId(String taskId) {
+        return msgSendRecordDao.findFirstByTaskId(taskId);
+    }
+
+    @Override
+    public void updateStateByMsgKey(String msgKey, int state) {
+        msgSendRecordDao.updateStateByMsgKey(msgKey,state);
+    }
 }
