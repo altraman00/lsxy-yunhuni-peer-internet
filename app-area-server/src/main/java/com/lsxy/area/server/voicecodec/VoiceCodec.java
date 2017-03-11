@@ -45,6 +45,9 @@ public class VoiceCodec {
         if(StringUtil.isBlank(codecs)){
             return null;
         }
+        if(StringUtil.isBlank(lineCodecs)){
+            return null;
+        }
         String[] line_codec_arr = lineCodecs.split(",");
         String[] codec_arr = codecs.split(",");
         return selectLineCodec(line_codec_arr,codec_arr);
