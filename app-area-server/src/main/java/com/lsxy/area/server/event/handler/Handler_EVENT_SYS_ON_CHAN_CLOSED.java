@@ -207,7 +207,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             voiceCdr.setIvrType(1);
         }else if(BusinessState.TYPE_CC_INVITE_AGENT_CALL.equals(businessState.getType()) &&
                 !SipUrlUtil.isOut(toNum) && !SipUrlUtil.isHotNum(toNum) && SipUrlUtil.isExtensionNum(toNum) &&
-                !SipUrlUtil.isOut(fromNum) && !SipUrlUtil.isHotNum(fromNum) && SipUrlUtil.isExtensionNum(fromNum)
+                !SipUrlUtil.isOut(fromNum) && !SipUrlUtil.isHotNum(fromNum) && !SipUrlUtil.isExtensionNum(fromNum)
                 ){
             ResourceTelenum resourceTelenum = null;
             try {
