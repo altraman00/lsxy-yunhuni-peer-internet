@@ -1058,7 +1058,7 @@
                         <textarea class="form-control" v-model="content"  placeholder="" style="height:86px;position:absolute;margin:0;padding:2px "
                         id="template_content" onkeydown="checkMaxInput(this,62)" onkeyup="checkMaxInput(this,62)" onfocus="checkMaxInput(this,62)" onblur="checkMaxInput(this,62);"
                         >{{content}}</textarea>
-                            <div id="template_contentmsg" class="note" style="position:absolute;line-height:147px;padding:3px 250px;height: 0px"><font color="#777">62/62</font></div>
+                            <div id="template_contentmsg" class="note" style="position:absolute;line-height:147px;padding:3px 250px;height: 0px"><font color="#777">0/62</font></div>
                         </div>
                         <span style="position:absolute;line-height:184px;padding:3px 3px;height: 0px">
                             例：【壹耘】您的验证码是#*#,请在#*#分钟内完成输</span>
@@ -1075,7 +1075,7 @@
                                   id="template_remark" onkeydown="checkMaxInput(this,100)" onkeyup="checkMaxInput(this,100)" onfocus="checkMaxInput(this,100)" onblur="checkMaxInput(this,100);"
                         >{{remark}}</textarea>
                         </div>
-                        <div id="template_remarkmsg" class="note" style="position:absolute;line-height:235px;padding:3px 235px;height: 0px"><font color="#777">100/100</font></div>
+                        <div id="template_remarkmsg" class="note" style="position:absolute;line-height:235px;padding:3px 235px;height: 0px"><font color="#777">0/100</font></div>
                     </div>
                     <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
                 </div>
@@ -1219,7 +1219,6 @@
         <script type="text/javascript">
             function isnewTemplate(){
                 var state = '${authState}';
-                console.info(state);
                 if(state==2){
                     $('button[data-id=seven]').click();
                 }else{
@@ -1241,10 +1240,10 @@
 
                 if (obj.value.length > maxLen) { //如果输入的字数超过了限制
                     obj.value = obj.value.substring(0, maxLen); //就去掉多余的字
-                    $('#'+newid).html((maxLen - obj.value.length)+"/"+maxLen );
+                    $('#'+newid).html(( obj.value.length)+"/"+maxLen );//maxLen
 //                    strResult = '<span id="' + newid + '" class=\'Max_msg\' ><br/>剩(' + (maxLen - obj.value.length) + ')字</span>'; //计算并显示剩余字数
                 } else {
-                    $('#'+newid).html((maxLen - obj.value.length)+"/"+maxLen );
+                    $('#'+newid).html(( obj.value.length)+"/"+maxLen );
 //                    strResult = '<span id="' + newid + '" class=\'Max_msg\' ><br/>剩(' + (maxLen - obj.value.length) + ')字</span>'; //计算并显示剩余字数
                 }
 
@@ -1602,8 +1601,8 @@
             init:function(){
                 this.id=this.tempId=this.type=this.name=this.content=this.remark=this.reason='';
                 this.state=-1;
-                this.remarklength=60;
-                this.contentlength=100;
+                this.remarklength=0;
+                this.contentlength=0;
             },initObj:function(obj){
                 this.id=obj.id;
                 this.tempId=obj.tempId;
@@ -1613,8 +1612,8 @@
                 this.remark=obj.remark;
                 this.state = obj.status;
                 this.reason = obj.reason;
-                this.remarklength=obj.remark!=null?(100- new Number(obj.remark.length)):100;
-                this.contentlength=obj.content!=null?(60- new Number(obj.content.length)):60;
+                this.remarklength=obj.remark!=null?( new Number(obj.remark.length)):100;
+                this.contentlength=obj.content!=null?( new Number(obj.content.length)):60;
             }
         }
     });
@@ -2719,8 +2718,8 @@
             var state = data[i].state=='1'?'审核已通过':(data[i].state=='0'?'待审核':(data[i].state=='-1'?'审核不通过！':'未知')) ;
             var color = data[i].enabled == 1?"text-success":"text-danger";
             var reason = data[i].reason==null?'':data[i].reason;
-            html+= '<td class="text-center '+color+'" id="enable_'+data[i].id+'" title="审核不通过原因:'+reason+'">' + state+ '</td>' +
-                '<td class="text-center"><a href="javascript:totemplateDetail(\''+data[i].id+'\')" >详情</a>&nbsp;<a href="javascript:delTemplate(\''+data[i].id+'\')" >删除</a></td>' +
+            html+= '<td class="'+color+'" id="enable_'+data[i].id+'" title="审核不通过原因:'+reason+'">' + state+ '</td>' +
+                '<td class=""><a href="javascript:totemplateDetail(\''+data[i].id+'\')" >详情</a>&nbsp;<a href="javascript:delTemplate(\''+data[i].id+'\')" >删除</a></td>' +
                 '</tr>'
         }
         $('#template-list').html(html);
