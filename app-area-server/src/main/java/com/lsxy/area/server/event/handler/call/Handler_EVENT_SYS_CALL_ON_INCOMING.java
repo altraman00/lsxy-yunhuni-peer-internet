@@ -270,7 +270,9 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 }
                 String conversationId = UUIDGenerator.uuid();
                 //设置坐席状态为fetching
-                String call_id = saveSessionCall(subaccountId,app,app.getTenant(),res_id,conversationId,from_agent.getId(),from_agent.getName(),from_agent.getExtension(),from_uri,to_uri);
+                String call_id = saveSessionCall(subaccountId,app,app.getTenant(),
+                        res_id,conversationId,from_agent.getId(),from_agent.getName(),
+                        from_agent.getExtension(),from_uri,to_uri,extension_prefix);
                 agentState.setState(from_agentId,CallCenterAgent.STATE_FETCHING);
 
                 //转换长号码为短号码，显示在被叫的话机上
@@ -522,10 +524,17 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         }
     }
 
-    private String saveSessionCall(String subaccountId,App app, Tenant tenant, String res_id, String conversationId,String agentId,String agentName,String extension,String from, String to){
+    private String saveSessionCall(String subaccountId,App app, Tenant tenant, String res_id,
+                                   String conversationId,String agentId,String agentName,
+                                   String extension,String from, String to,String extension_prefix){
         String call_id = UUIDGenerator.uuid();
         CallSession callSession = new CallSession();
         callSession.setId(UUIDGenerator.uuid());
+
+        if(!SipUrlUtil.isHotNum(to) && !SipUrlUtil.isOut(to) && SipUrlUtil.isShortNum(extension_prefix,to)){
+            //通话记录需要补全分机号码前缀
+            to = extension_prefix + to;
+        }
         try{
             callSession.setStatus(CallSession.STATUS_CALLING);
             callSession.setFromNum(SipUrlUtil.extractTelnum(from));
