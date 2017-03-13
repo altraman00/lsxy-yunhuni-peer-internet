@@ -69,16 +69,16 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12 text-center">
-                                            <p class="font18">消费额统计</p>
+                                            <p class="font18">消息发送统计</p>
                                         </div>
                                     </div>
                                     <!--日统计-->
                                     <div class="row monthform" >
                                         <div class="col-md-12">
                                             <input type="text" class="datepicker currentMonth form-control date_block monthstart" value="${consumeStatisticsVo.startTime}" />
-                                            <span class="monthcontrast"><span>对比</span><input type="text" class="datepicker currentMonth form-control date_block monthend" /></span>
+                                            <%--<span class="monthcontrast"><span>对比</span><input type="text" class="datepicker currentMonth form-control date_block monthend" /></span>--%>
                                             <button class="btn btn-primary finddatebtn" data-id="month" >查询</button>
-                                            <button class="btn btn-default compassbtn monthcbtn" data-id="month">对比</button>
+                                            <%--<button class="btn btn-default compassbtn monthcbtn" data-id="month">对比</button>--%>
                                             <span class="tips-error monthtips"></span>
                                         </div>
                                     </div>
@@ -87,9 +87,9 @@
                                     <div class="row yearform" >
                                         <div class="col-md-12">
                                             <input type="text" class="datepicker  form-control currentYear date_block yearstart" value="${consumeStatisticsVo.startTime2}"  />
-                                            <span class="yearcontrast"><span>对比</span><input type="text" class="datepicker currentYear form-control date_block yearend" /></span>
+                                            <%--<span class="yearcontrast"><span>对比</span><input type="text" class="datepicker currentYear form-control date_block yearend" /></span>--%>
                                             <button class="btn btn-primary finddatebtn " data-id="year" >查询</button>
-                                            <button class="btn btn-default compassbtn yearcbtn" data-id="year">对比</button>
+                                            <%--<button class="btn btn-default compassbtn yearcbtn" data-id="year">对比</button>--%>
                                             <span class="tips-error yeartips"></span>
                                         </div>
                                     </div>
@@ -115,7 +115,6 @@
                                             <th>短信发送总量</th>
                                             <th>短信成功发送量</th>
                                             <th>短信失败发送量</th>
-                                            <th>短信发送总量</th>
                                         </tr>
                                         </thead>
                                         <tbody id="tableModal">
@@ -146,6 +145,7 @@
     <script src="${resPrefixUrl }/js/echarts.min.js" ></script>
     <!--统计插件主题-->
     <script src="${resPrefixUrl }/js/echartstheme/wonderland.js" ></script>
+        <script src="${resPrefixUrl }/js/statistics/statistics_msg.js"></script>
     <!--syncpage-->
     <script type="text/javascript" src='${resPrefixUrl }/js/page.js'></script>
 
@@ -270,20 +270,17 @@
             var starttime = initialStartTime(type);
             var endtime = initialEndTime(type);
             var params = {'type':type1,'appId':app,'startTime':starttime,'endTime':endtime, csrfParameterName:csrfToken};
-            ajaxsubmit(ctx+"/console/statistics/consume/list",params,function(result){
+            ajaxsubmit(ctx+"/console/statistics/msg/list",params,function(result){
                 var resultData = result.data;
-                tdata = new Array();
-                var count = 0;
-                for(var i=0;i<resultData.length;i++){
-                    tdata[i]=resultData[i].name;
-                    count+=resultData[i].data.length;
-                }
-                seriesjson=JSON.stringify(resultData);
-                seriesjson = eval('('+seriesjson+')');
+                tdata = {
+                    "fail":resultData.fail,
+                    "succ":resultData.succ
+                };
+                var count = resultData.count;
                 //堆叠效果
-                seriesjson[0].areaStyle= {normal: {}};
+//                seriesjson[0].areaStyle= {normal: {}};
                 typeAll=type;
-                charts(tdata,seriesjson,typeAll);
+                charts(tdata,typeAll);
                 updatetable(count);
             });
         }
@@ -297,22 +294,25 @@
          * @param tdata 标题项
          * @param tdata 标题项
          */
-        function charts(tdata,series,type){
+        function charts(tdata,type){
             var Xdata = monthData;
             if(type=='year'){
                 Xdata = timeData;
             }
-            var myChart = echarts.init(document.getElementById('ecpanel'),'wonderland');
+            var myChart = echarts.init(document.getElementById('ecpanel'),'statistics_msg');
             option = {
                 title: {
                     text: '',
-                    subtext:'金额（元）'
+                    subtext:'发送量（条）'
                 },
                 tooltip: {
-                    trigger: 'axis'
+                    trigger: 'axis',
+                    axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                        type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                    }
                 },
                 legend: {
-                    data:tdata
+                    data:''//tdata
                 },
                 grid: {
                     left: '3%',
@@ -333,14 +333,27 @@
                         color:'#999',
                     }
                 },
-                yAxis: {
-                    type: 'value',
-                    nameGap:32,
-                    nameTextStyle:{
-                        color:'#999',
+                yAxis: [
+                    {
+                        type : 'value'
                     }
-                },
-                series: series
+                ],
+                series: [
+                    {
+                        name:'成功(条)',
+                        type:'bar',
+                        stack: '闪印',
+                        barWidth : 30,
+                        data:tdata["succ"]
+                    },
+                    {
+                        name:'失败(条)',
+                        type:'bar',
+                        stack: '闪印',
+                        barWidth : 30,
+                        data:tdata["fail"]
+                    }
+                ]
             };
 
             myChart.setOption(option);
@@ -381,36 +394,14 @@
             var starttime = initialStartTime(type);
             var endtime = initialEndTime(type);
             var param = {'type':type1,'appId':app,'startTime':starttime,'endTime':endtime,'pageNo':nowPage,'pageSize':listRows,csrfParameterName:csrfToken};
-            ajaxsync(ctx+"/console/statistics/consume/page_list",param,function(result){
-                var resultData = result.data;
-                var data =[];
+            ajaxsync(ctx+"/console/statistics/msg/plist",param,function(result){
+                var resultData = result.data.result;
+                var html ='';
                 for(var i=0;i<resultData.length;i++){
-                    var tempData = new Date(resultData[i].dt);
+                    var tempData = new Date(resultData[i].date);
                     var tempDataStr = tempData.getFullYear()+"-"+(tempData.getMonth()+1)+"-"+tempData.getDate();
                     if(type=='year'){tempDataStr =  tempData.getFullYear()+"-"+(tempData.getMonth()+1);}
-                    var cost = new String(resultData[i].amongAmount).split(".");
-                    var cost2 = "";
-                    if(cost.length==1){
-                        cost2="000";
-                    }else{
-                        cost2 = cost[1];
-                        if(cost[1].length>3){
-                            cost2 = cost[1].substring(0,3);
-                        }else if(cost[1].length<3){
-                            var tleng =3 - cost[1].length;
-                            for(var j=0;j<tleng;j++){
-                                cost2+="0";
-                            }
-                        }
-                    }
-                    var temp = [tempDataStr,'￥'+cost[0]+"."+cost2];
-                    data[i]=temp;
-                }
-                i++;
-                var html ='';
-                //数据列表
-                for(var i = 0 ; i<data.length; i++){
-                    html +='<tr><td>'+data[i][0]+'</td><td><span style="float:left;width: 80px" ><span style="float:right;" >'+data[i][1]+'</span></span></td></tr>';
+                    html +='<tr><td>'+tempDataStr+'</td><td>'+resultData[i].ussd+'</td><td>'+resultData[i].ussdSucc+'</td><td>'+resultData[i].ussdFail+'</td><td>'+resultData[i].sms+'</td><td>'+resultData[i].smsSucc+'</td><td>'+resultData[i].smsFail+'</td></tr>';
                 }
                 $('#tableModal').find("tr").remove();
                 $('#tableModal').append(html);
@@ -419,7 +410,7 @@
 
         //当浏览器大小变化时
         $(window).resize(function () {
-            charts(tdata,seriesjson,typeAll);
+            charts(tdata,typeAll);
         });
 
 
