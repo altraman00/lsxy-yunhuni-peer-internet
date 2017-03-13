@@ -3,12 +3,15 @@ package com.lsxy.area.server.event.handler;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.mq.CdrEvent;
 import com.lsxy.area.server.service.callcenter.ConversationService;
+import com.lsxy.area.server.util.SipUrlUtil;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.api.billing.service.CalBillingService;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.StringUtil;
@@ -18,6 +21,9 @@ import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
@@ -62,6 +68,15 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
     CalCostService calCostService;
     @Autowired
     private MQService mqService;
+
+    @Autowired
+    private AppService appService;
+
+    @Autowired
+    private ApiCertificateSubAccountService apiCertificateSubAccountService;
+
+    @Autowired
+    private AreaAndTelNumSelector areaAndTelNumSelector;
 
     @Override
     public String getEventName() {
@@ -164,40 +179,89 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
 
         voiceCdr.setType(productCode.name());
         voiceCdr.setRelevanceId(businessState.getId());
-        String host;
-        if(cdrSplit[11].trim().equals("0")){//等于0时表示呼入，参考CTI CDR事件说明文档
-            //相对平台是呼入 处理to
-            voiceCdr.setFromNum(cdrSplit[7].trim());
-            String toNum = cdrSplit[8].trim().split("@")[0];
-            ResourceTelenum num = resourceTelenumService.findByTelNumberOrCallUri(toNum);
-            if(num != null){
-                voiceCdr.setToNum(num.getTelNumber());
+        LineGateway lineGateway = null;
+        String host = null;
+
+        String fromNum = cdrSplit[7].trim();
+        String toNum = cdrSplit[8].trim();
+        if(BusinessState.TYPE_CC_AGENT_CALL.equals(businessState.getType()) &&
+                !SipUrlUtil.isOut(fromNum) && !SipUrlUtil.isHotNum(fromNum) && SipUrlUtil.isExtensionNum(fromNum)){
+            ResourceTelenum resourceTelenum = null;
+            try {
+                resourceTelenum =
+                        areaAndTelNumSelector.getTelnumber
+                                (businessState.getSubaccountId(),appService.findById(businessState.getAppId()));
+            } catch (YunhuniApiException e) {
+                logger.warn("获取平台号码出错",e);
+            }
+            if(resourceTelenum != null){
+                voiceCdr.setToNum(resourceTelenum.getTelNumber());
             }else{
                 voiceCdr.setToNum(toNum);
             }
-            //TODO host根据from来获取
-            String[] fromSplit = cdrSplit[7].trim().split("@");
-            if(fromSplit.length > 1){
-                host = fromSplit[1];
-            }else{
-                host = cdrSplit[10].trim().split("@")[1];
+
+            //分机直拨,线路为坐席线路
+            lineGateway = new LineGateway();
+            lineGateway.setId(LineGateway.ID_OPENSIPS);
+            voiceCdr.setFromNum(fromNum);
+            voiceCdr.setIvrType(1);
+        }else if(BusinessState.TYPE_CC_INVITE_AGENT_CALL.equals(businessState.getType()) &&
+                !SipUrlUtil.isOut(toNum) && !SipUrlUtil.isHotNum(toNum) && SipUrlUtil.isExtensionNum(toNum) &&
+                !SipUrlUtil.isOut(fromNum) && !SipUrlUtil.isHotNum(fromNum) && SipUrlUtil.isExtensionNum(fromNum)
+                ){
+            ResourceTelenum resourceTelenum = null;
+            try {
+                resourceTelenum =
+                        areaAndTelNumSelector.getTelnumber
+                                (businessState.getSubaccountId(),appService.findById(businessState.getAppId()));
+            } catch (YunhuniApiException e) {
+                logger.warn("获取平台号码出错",e);
             }
-        }else{
-            //相对平台是呼出 处理from
-            String fromNum = cdrSplit[7].trim().split("@")[0];
-            ResourceTelenum num = resourceTelenumService.findByTelNumberOrCallUri(fromNum);
-            if(num != null){
-                voiceCdr.setFromNum(num.getTelNumber());
+            if(resourceTelenum != null){
+                voiceCdr.setFromNum(resourceTelenum.getTelNumber());
             }else{
                 voiceCdr.setFromNum(fromNum);
             }
-            voiceCdr.setToNum(cdrSplit[8].trim());
-            //host根据to来获取
-            String[] toSplit = cdrSplit[8].trim().split("@");
-            if(toSplit.length > 1){
-                host = toSplit[1];
+            //分机直拨,线路为坐席线路
+            lineGateway = new LineGateway();
+            lineGateway.setId(LineGateway.ID_OPENSIPS);
+            voiceCdr.setToNum(toNum);
+            voiceCdr.setIvrType(2);
+        }else{
+            if(cdrSplit[11].trim().equals("0")){//等于0时表示呼入，参考CTI CDR事件说明文档
+                //相对平台是呼入 处理to
+                voiceCdr.setFromNum(fromNum);
+                toNum = toNum.split("@")[0];
+                ResourceTelenum num = resourceTelenumService.findByTelNumberOrCallUri(toNum);
+                if(num != null){
+                    voiceCdr.setToNum(num.getTelNumber());
+                }else{
+                    voiceCdr.setToNum(toNum);
+                }
+                //TODO host根据from来获取
+                String[] fromSplit = fromNum.split("@");
+                if(fromSplit.length > 1){
+                    host = fromSplit[1];
+                }else{
+                    host = cdrSplit[10].trim().split("@")[1];
+                }
             }else{
-                host = cdrSplit[10].trim().split("@")[1];
+                //相对平台是呼出 处理from
+                fromNum = fromNum.split("@")[0];
+                ResourceTelenum num = resourceTelenumService.findByTelNumberOrCallUri(fromNum);
+                if(num != null){
+                    voiceCdr.setFromNum(num.getTelNumber());
+                }else{
+                    voiceCdr.setFromNum(fromNum);
+                }
+                voiceCdr.setToNum(toNum);
+                //host根据to来获取
+                String[] toSplit = toNum.split("@");
+                if(toSplit.length > 1){
+                    host = toSplit[1];
+                }else{
+                    host = cdrSplit[10].trim().split("@")[1];
+                }
             }
         }
         Date callStartDate = getCallDate(cdrSplit[18].trim());
@@ -207,7 +271,10 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         voiceCdr.setCallEndDt(callEndDate == null?new Date():callEndDate);
         voiceCdr.setCallTimeLong(Long.parseLong(cdrSplit[21].trim()));
 
-        LineGateway lineGateway = lineGatewayService.findByHost(host);
+        if(lineGateway == null){
+            lineGateway = lineGatewayService.findByHost(host);
+        }
+
         if(lineGateway == null){
             voiceCdr.setLineId(null);
             voiceCdr.setLineCost(BigDecimal.ZERO);
