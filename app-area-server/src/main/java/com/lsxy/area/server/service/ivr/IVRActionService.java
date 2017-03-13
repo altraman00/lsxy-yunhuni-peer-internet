@@ -377,8 +377,8 @@ public class IVRActionService {
         callSession.setId(UUIDGenerator.uuid());
         try{
             callSession.setStatus(CallSession.STATUS_CALLING);
-            callSession.setFromNum(to);
-            callSession.setToNum(from);
+            callSession.setFromNum(SipUrlUtil.extractTelnum(to));
+            callSession.setToNum(SipUrlUtil.extractTelnum(from));
             callSession.setAppId(app.getId());
             callSession.setTenantId(app.getTenant().getId());
             callSession.setRelevanceId(call_id);
@@ -390,8 +390,8 @@ public class IVRActionService {
                 callCenter.setId(call_id);
                 callCenter.setTenantId(tenant.getId());
                 callCenter.setAppId(app.getId());
-                callCenter.setFromNum(from);
-                callCenter.setToNum(to);
+                callCenter.setFromNum(SipUrlUtil.extractTelnum(from));
+                callCenter.setToNum(SipUrlUtil.extractTelnum(to));
                 callCenter.setStartTime(new Date());
                 callCenter.setType(""+CallCenter.CALL_IN);
                 callCenter.setCost(BigDecimal.ZERO);
@@ -407,8 +407,8 @@ public class IVRActionService {
                 voiceIvr.setId(call_id);
                 voiceIvr.setAppId(app.getId());
                 voiceIvr.setTenantId(app.getTenant().getId());
-                voiceIvr.setFromNum(from);
-                voiceIvr.setToNum(to);
+                voiceIvr.setFromNum(SipUrlUtil.extractTelnum(from));
+                voiceIvr.setToNum(SipUrlUtil.extractTelnum(to));
                 voiceIvr.setStartTime(new Date());
                 voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_INCOMING);
                 voiceIvrBatchInserter.put(voiceIvr);

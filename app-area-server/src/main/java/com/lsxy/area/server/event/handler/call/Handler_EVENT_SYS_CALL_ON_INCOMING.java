@@ -528,8 +528,8 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         callSession.setId(UUIDGenerator.uuid());
         try{
             callSession.setStatus(CallSession.STATUS_CALLING);
-            callSession.setFromNum(from);
-            callSession.setToNum(to);
+            callSession.setFromNum(SipUrlUtil.extractTelnum(from));
+            callSession.setToNum(SipUrlUtil.extractTelnum(to));
             callSession.setAppId(app.getId());
             callSession.setTenantId(app.getTenant().getId());
             callSession.setRelevanceId(call_id);
@@ -540,10 +540,10 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             callCenter.setId(call_id);
             callCenter.setTenantId(tenant.getId());
             callCenter.setAppId(app.getId());
-            callCenter.setFromNum(from);
-            callCenter.setToNum(to);
+            callCenter.setFromNum(SipUrlUtil.extractTelnum(from));
+            callCenter.setToNum(SipUrlUtil.extractTelnum(to));
             callCenter.setStartTime(new Date());
-            callCenter.setType(""+CallCenter.CALL_IN);
+            callCenter.setType(""+CallCenter.CALL_UP);
             callCenter.setCost(BigDecimal.ZERO);
             callCenterBatchInserter.put(callCenter);
             try{
