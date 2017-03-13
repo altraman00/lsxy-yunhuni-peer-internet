@@ -65,6 +65,9 @@
 								<a data-toggle="tooltip" data-placement='right' title='会话统计' href="${ctx}/console/statistics/session/index"  class="nav-router" data-router="statistics/session"> <i class="iconfont icon-menu-session"></i> <span> <span>会话统计</span> </a>
 							</li>
 							<li>
+								<a data-toggle="tooltip" data-placement='right' title='消息统计' href="${ctx}/console/statistics/msg/index"  class="nav-router" data-router="statistics/msg"> <i class="iconfont icon-menu-msg"></i> <span> <span>消息统计</span> </a>
+							</li>
+							<li>
 								<a data-toggle="tooltip" data-placement='right' title='呼叫中心统计' href="${ctx}/console/statistics/callcenter/index" class="nav-router" data-router="statistics/callcenter"><i class="iconfont icon-menu-call"></i> <span>呼叫中心统计</span> </a>
 							</li>
 							<li>
