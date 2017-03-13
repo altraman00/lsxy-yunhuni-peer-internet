@@ -25,6 +25,7 @@ public class MsgSendDetail extends IdEntity {
     private String appId;
     private String subaccountId;
     private String taskId;
+    private String recordId;
     private String mobile;
     private String msg;
     private Boolean isMass;
@@ -43,13 +44,14 @@ public class MsgSendDetail extends IdEntity {
     public MsgSendDetail() {
     }
 
-    public MsgSendDetail(String msgKey, String tenantId, String appId, String subaccountId, String taskId, String mobile, String msg, String tempId,
+    public MsgSendDetail(String msgKey, String tenantId, String appId, String subaccountId, String taskId,String recordId, String mobile, String msg, String tempId,
                          String supplierTempId, String tempArgs, Date sendTime, BigDecimal msgCost, String sendType, String supplierCode, String operator) {
         this.msgKey = msgKey;
         this.tenantId = tenantId;
         this.appId = appId;
         this.subaccountId = subaccountId;
         this.taskId = taskId;
+        this.recordId = recordId;
         this.mobile = mobile;
         this.msg = msg;
         this.isMass = false;
@@ -116,6 +118,15 @@ public class MsgSendDetail extends IdEntity {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
+    }
+
+    @Column(name = "record_id")
+    public String getRecordId() {
+        return recordId;
+    }
+
+    public void setRecordId(String recordId) {
+        this.recordId = recordId;
     }
 
     @Column(name = "msg")

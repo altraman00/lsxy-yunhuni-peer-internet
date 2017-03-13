@@ -22,7 +22,7 @@ public abstract class AbstractSupplierSendServiceImpl implements SupplierSendSer
     }
 
     @Override
-    public ResultMass sendMass(String tenantId, String appId, String subaccountId, String msgKey, String taskName, String tempId, List<String> tempArgs, String msg, List<String> mobiles, Date sendTime, String sendType, String cost) {
+    public ResultMass sendMass(String recordId,String tenantId, String appId, String subaccountId, String msgKey, String taskName, String tempId, List<String> tempArgs, String msg, List<String> mobiles, Date sendTime, String sendType, String cost) {
         return null;
     }
 

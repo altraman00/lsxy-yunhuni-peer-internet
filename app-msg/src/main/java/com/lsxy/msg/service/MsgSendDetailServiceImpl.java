@@ -33,7 +33,7 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
 
     @Override
     public void batchInsertDetail(MsgSendRecord record, List<String> phones,int state) {
-        String values = " id,msg_key,tenant_id,app_id,subaccount_id,task_id,mobile,msg,is_mass,temp_id,supplier_temp_id,temp_args,send_time,msg_cost,send_type,supplier_code,operator,state," +
+        String values = " id,msg_key,tenant_id,app_id,subaccount_id,task_id,record_id,mobile,msg,is_mass,temp_id,supplier_temp_id,temp_args,send_time,msg_cost,send_type,supplier_code,operator,state," +
                 "create_time,last_time,deleted,sortno,version";
         String valuesMark = "";
         int length = values.split(",").length;
@@ -49,7 +49,7 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
 
         if(phones != null && phones.size() > 0){
             for(String phone:phones){
-                Object[] obj =  new Object[]{UUIDGenerator.uuid(),record.getMsgKey(),record.getTenantId(),record.getAppId(),record.getSubaccountId(),record.getTaskId(),phone,record.getMsg(),true,
+                Object[] obj =  new Object[]{UUIDGenerator.uuid(),record.getMsgKey(),record.getTenantId(),record.getAppId(),record.getSubaccountId(),record.getTaskId(),record.getId(),phone,record.getMsg(),true,
                 record.getTempId(),record.getSupplierTempId(),record.getTempArgs(),record.getSendTime(),record.getMsgCost(),record.getSendType(),record.getSupplierCode(),record.getOperator(),
                         state,record.getCreateTime(),record.getLastTime(),0,0,0};
                 resultList.add(obj);
@@ -69,5 +69,10 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
     @Override
     public MsgSendDetail findByTaskIdAndMobile(String taskId, String mobile) {
         return msgSendDetailDao.findFirstByTaskIdAndMobile(taskId,mobile);
+    }
+
+    @Override
+    public void updateDetailStateAndTaskIdByRecordIdAndPhones(String recordId, List<String> pendingPhones, int stateWait,String taskId) {
+        msgSendDetailDao.updateDetailStateAndTaskIdByRecordId(recordId, pendingPhones, stateWait,taskId);
     }
 }

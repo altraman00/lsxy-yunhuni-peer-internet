@@ -10,6 +10,7 @@ public class DelaySendMassEvent extends AbstractDelayMQEvent {
     private String tenantId;
     private String appId;
     private String subaccountId;
+    private String recordId;
     private String key;
     private String taskName;
     private String tempId;
@@ -26,11 +27,12 @@ public class DelaySendMassEvent extends AbstractDelayMQEvent {
         return SystemConfig.getProperty("global.mq.topic.app.ussd.api","test_topic_app_ussd_api");
     }
 
-    public DelaySendMassEvent(Long delay,String tenantId,String appId ,String subaccountId , String key, String taskName, String tempId, String tempArgs, String mobiles, String sendTime, String msg, String sendType, String operator,String cost) {
+    public DelaySendMassEvent(Long delay,String tenantId,String appId ,String subaccountId ,String recordId, String key, String taskName, String tempId, String tempArgs, String mobiles, String sendTime, String msg, String sendType, String operator,String cost) {
         super(delay.intValue());
         this.tenantId = tenantId;
         this.appId = appId;
         this.subaccountId = subaccountId;
+        this.recordId = recordId;
         this.key = key;
         this.mobiles = mobiles;
         this.taskName = taskName;
@@ -65,6 +67,14 @@ public class DelaySendMassEvent extends AbstractDelayMQEvent {
 
     public void setSubaccountId(String subaccountId) {
         this.subaccountId = subaccountId;
+    }
+
+    public String getRecordId() {
+        return recordId;
+    }
+
+    public void setRecordId(String recordId) {
+        this.recordId = recordId;
     }
 
     public String getKey() {

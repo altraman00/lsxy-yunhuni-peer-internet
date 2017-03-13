@@ -51,12 +51,13 @@ public class MsgSendRecord extends IdEntity {
 
     public MsgSendRecord(String msgKey, String tenantId, String appId, String subaccountId, String taskId, String sendType, String supplierCode, String operator, String msg,
                          String tempId, String supplierTempId, String tempArgs, Date sendTime, BigDecimal msgCost) {
-        this(msgKey,tenantId,appId,subaccountId,taskId,null,sendType,supplierCode,operator,msg,tempId,supplierTempId,tempArgs,sendTime,msgCost,false,1L,1L,0L,STATE_WAIT);
+        this(null,msgKey,tenantId,appId,subaccountId,taskId,null,sendType,supplierCode,operator,msg,tempId,supplierTempId,tempArgs,sendTime,msgCost,false,1L,1L,0L,STATE_WAIT);
 
     }
 
-    public MsgSendRecord(String msgKey, String tenantId, String appId, String subaccountId, String taskId, String taskName, String sendType, String supplierCode, String operator,
+    public MsgSendRecord(String id,String msgKey, String tenantId, String appId, String subaccountId, String taskId, String taskName, String sendType, String supplierCode, String operator,
                          String msg, String tempId, String supplierTempId, String tempArgs, Date sendTime, BigDecimal msgCost, Boolean isMass, Long sumNum, Long pendingNum,Long failNum,Integer state) {
+        this.id = id;
         this.msgKey = msgKey;
         this.tenantId = tenantId;
         this.appId = appId;

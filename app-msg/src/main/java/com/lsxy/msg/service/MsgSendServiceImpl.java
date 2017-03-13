@@ -136,7 +136,7 @@ public class MsgSendServiceImpl implements MsgSendService {
             MsgSendRecord msgSendRecord = new MsgSendRecord(key,app.getTenant().getId(),appId,subaccountId,resultOne.getTaskId(),MsgConstant.MSG_USSD,resultOne.getHandlers(),
                     operator,msg,tempId,resultOne.getSupplierTempId(),tempArgs,new Date(),cost);
             msgSendRecordService.save(msgSendRecord);
-            MsgSendDetail msgSendDetail = new MsgSendDetail(key,app.getTenant().getId(),appId,subaccountId,resultOne.getTaskId(),mobile,msg,
+            MsgSendDetail msgSendDetail = new MsgSendDetail(key,app.getTenant().getId(),appId,subaccountId,resultOne.getTaskId(),msgSendRecord.getId(),mobile,msg,
                     tempId,resultOne.getSupplierTempId(),tempArgs,new Date(),cost,MsgConstant.MSG_USSD,resultOne.getHandlers(),operator);
             msgSendDetailService.save(msgSendDetail);
             //T插入消费记录
@@ -252,10 +252,11 @@ public class MsgSendServiceImpl implements MsgSendService {
                 List<String> ulMobileList = mobileList.subList(ul * uMax, ((ul + 1) * uMax) > mobileList.size() ? mobileList.size() : ((ul + 1) * uMax));
                 String[] split = tempArgs.split(MsgConstant.ParamRegexStr);
                 List<String> tempArgsList = Arrays.asList(split);
-                ResultMass resultMass = massService.sendMass(tenantId,appId,subaccountId,key,taskName, tempId, tempArgsList, msg, ulMobileList, sendTime,sendType,cost.toString());
+                String recordId = UUIDGenerator.uuid();//记录的Id提前生成
+                ResultMass resultMass = massService.sendMass(recordId,tenantId,appId,subaccountId,key,taskName, tempId, tempArgsList, msg, ulMobileList, sendTime,sendType,cost.toString());
                 if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode() )&& !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){
                     //存发送记录 一开始发送总数是所有等待的号码
-                    MsgSendRecord msgSendRecord = new MsgSendRecord(key,tenantId,appId,subaccountId,resultMass.getTaskId(),taskName,sendType,resultMass.getHandlers(),oprator,msg,
+                    MsgSendRecord msgSendRecord = new MsgSendRecord(recordId,key,tenantId,appId,subaccountId,resultMass.getTaskId(),taskName,sendType,resultMass.getHandlers(),oprator,msg,
                             tempId,resultMass.getSupplierTempId(),tempArgs,sendTime,cost,true,resultMass.getPendingNum(),resultMass.getPendingNum(),0L,MsgSendRecord.STATE_WAIT);
                     msgSendRecordService.save(msgSendRecord);
                     msgSendDetailService.batchInsertDetail(msgSendRecord,resultMass.getPendingPhones(),MsgSendDetail.STATE_WAIT);

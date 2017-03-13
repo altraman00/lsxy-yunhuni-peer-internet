@@ -39,4 +39,9 @@ public class MsgSendRecordServiceImpl extends AbstractService<MsgSendRecord> imp
     public List<MsgSendRecord> findSendOneWait() {
         return null;
     }
+
+    @Override
+    public void updateStateAndTaskIdById(String id, int state, String taskId) {
+        msgSendRecordDao.updateStateAndTaskIdById(id,state,taskId);
+    }
 }

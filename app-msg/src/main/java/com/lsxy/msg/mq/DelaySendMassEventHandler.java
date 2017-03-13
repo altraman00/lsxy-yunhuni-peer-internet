@@ -43,25 +43,21 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
         Date sendTime = DateUtils.parseDate(message.getSendTime(), MsgConstant.TimePartten);
         SupplierSendService supplierSendService = supplierSelector.getSendMassService(message.getOperator(),message.getSendType());
         if(supplierSendService != null){
-            resultMass = supplierSendService.sendMass(message.getTenantId(),message.getAppId(),message.getSubaccountId(),message.getKey(),message.getTaskName(),
+            resultMass = supplierSendService.sendMass(message.getTenantId(),message.getAppId(),message.getSubaccountId(),message.getRecordId(),message.getKey(),message.getTaskName(),
                     message.getTempId(),tempArgsList,message.getMsg(),mobiles,sendTime,message.getSendType(),message.getCost());
         }
 
-        if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode())){//成功存发送记录
-            //存发送记录，
-            MsgSendRecord msgSendRecord = new MsgSendRecord(message.getKey(),message.getTenantId(),message.getAppId(),message.getSubaccountId(),resultMass.getTaskId(),message.getTaskName(),message.getSendType(),resultMass.getHandlers(),message.getOperator(),message.getMsg(),
-                    message.getTempId(),resultMass.getSupplierTempId(),message.getTempArgs(),sendTime,new BigDecimal(message.getCost()),true,resultMass.getSumNum(),resultMass.getPendingNum(),resultMass.getFailNum(),MsgSendRecord.STATE_WAIT);
-            msgSendRecordService.save(msgSendRecord);
-            msgSendDetailService.batchInsertDetail(msgSendRecord,resultMass.getPendingPhones(), MsgSendDetail.STATE_WAIT);
-            msgSendDetailService.batchInsertDetail(msgSendRecord,resultMass.getBadPhones(),MsgSendDetail.STATE_FAIL);
-        }else if(resultMass != null && !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){
-            //失败也存放发送记录
-            //存发送记录
-            MsgSendRecord msgSendRecord = new MsgSendRecord(message.getKey(),message.getTenantId(),message.getAppId(),message.getSubaccountId(),resultMass.getTaskId(),message.getTaskName(),message.getSendType(),resultMass.getHandlers(),message.getOperator(),message.getMsg(),
-                    message.getTempId(),resultMass.getSupplierTempId(),message.getTempArgs(),sendTime,new BigDecimal(message.getCost()),true,resultMass.getSumNum(),resultMass.getPendingNum(),resultMass.getFailNum(),MsgSendRecord.STATE_FAIL);
-            msgSendRecordService.save(msgSendRecord);
-            msgSendDetailService.batchInsertDetail(msgSendRecord,resultMass.getPendingPhones(), MsgSendDetail.STATE_WAIT);
-            msgSendDetailService.batchInsertDetail(msgSendRecord,resultMass.getBadPhones(),MsgSendDetail.STATE_FAIL);
+        if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode())){
+            //成功发送
+            //更新发送记录，
+            msgSendRecordService.updateStateAndTaskIdById(message.getRecordId(),MsgSendRecord.STATE_WAIT,resultMass.getTaskId());
+            msgSendDetailService.updateDetailStateAndTaskIdByRecordIdAndPhones(message.getRecordId(),resultMass.getPendingPhones(), MsgSendDetail.STATE_WAIT,resultMass.getTaskId());
+            msgSendDetailService.updateDetailStateAndTaskIdByRecordIdAndPhones(message.getRecordId(),resultMass.getBadPhones(), MsgSendDetail.STATE_FAIL,resultMass.getTaskId());
+        }else if(resultMass == null || !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){
+            //发送失败
+            //更新发送记录，
+            msgSendRecordService.updateStateAndTaskIdById(message.getRecordId(),MsgSendRecord.STATE_FAIL,resultMass.getTaskId());
+            msgSendDetailService.updateDetailStateAndTaskIdByRecordIdAndPhones(message.getRecordId(),resultMass.getBadPhones(), MsgSendDetail.STATE_FAIL,resultMass.getTaskId());
         }
 
 //        接口调用成功则不理会，接口调用失败，则进行补扣费

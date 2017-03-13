@@ -17,4 +17,8 @@ public interface MsgSendRecordDao extends BaseDaoInterface<MsgSendRecord, Serial
     @Modifying
     @Query("update MsgSendRecord r set r.state = :state where r.msgKey = :msgKey")
     void updateStateByMsgKey(@Param("msgKey") String msgKey, @Param("state") int state);
+
+    @Modifying
+    @Query("update MsgSendRecord r set r.state = :state,r.taskId = :taskId where r.id = :id")
+    void updateStateAndTaskIdById(@Param("id")String id,@Param("state") int state,@Param("taskId") String taskId);
 }
