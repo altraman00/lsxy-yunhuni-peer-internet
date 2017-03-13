@@ -13,6 +13,7 @@ import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
+import com.lsxy.yunhuni.api.product.service.CalCostService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,8 @@ public class MsgSendServiceImpl implements MsgSendService {
     MsgSendDetailService msgSendDetailService;
     @Autowired
     ConsumeService consumeService;
+    @Autowired
+    CalCostService calCostService;
 
     @Override
     public String sendUssd(String ip,String appId,String subaccountId,String mobile, String tempId, String tempArgs) {
@@ -128,8 +131,8 @@ public class MsgSendServiceImpl implements MsgSendService {
         //开始发送
         //处理发送结果
         if(MsgConstant.SUCCESS.equals( resultOne.getResultCode() )) {
-            //TODO 计算费用
-            BigDecimal cost = BigDecimal.ZERO;
+            // 计算每条费用
+            BigDecimal cost = calCostService.calCost(sendType,app.getTenant().getId());
             //插入记录
             MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,MsgConstant.MSG_USSD,mobile,msg,tempId,tempArgs,new Date(),cost);
             msgUserRequestService.save(msgRequest);
@@ -139,7 +142,7 @@ public class MsgSendServiceImpl implements MsgSendService {
             MsgSendDetail msgSendDetail = new MsgSendDetail(key,app.getTenant().getId(),appId,subaccountId,resultOne.getTaskId(),msgSendRecord.getId(),mobile,msg,
                     tempId,resultOne.getSupplierTempId(),tempArgs,new Date(),cost,MsgConstant.MSG_USSD,resultOne.getHandlers(),operator);
             msgSendDetailService.save(msgSendDetail);
-            //T插入消费记录
+            //插入消费记录
             if(msgRequest.getMsgCost().compareTo(BigDecimal.ZERO) == 1){
                 //插入消费
                 ProductCode productCode = ProductCode.valueOf(msgRequest.getSendType());
@@ -208,8 +211,8 @@ public class MsgSendServiceImpl implements MsgSendService {
         String key = UUIDGenerator.uuid();
         //处理发送结果
         List<ResultMass> list = new ArrayList<>();
-        //TODO 单条费用
-        BigDecimal cost = BigDecimal.ZERO;
+        // 单条费用
+        BigDecimal cost = calCostService.calCost(sendType,app.getTenant().getId());
 
         if(massMobile.getMobile().size() > 0){//处理移动号码
             List<String> mobileList = massMobile.getMobile();
@@ -235,17 +238,14 @@ public class MsgSendServiceImpl implements MsgSendService {
         MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,taskName,sendType,null,mobiles,msg,tempId,tempArgs,sendTime,cost,true,
                 resultAllMass.getSumNum(),state,resultAllMass.getPendingNum(),resultAllMass.getInvalidNum(),resultAllMass.getResultDesc());
         msgUserRequestService.save(msgRequest);
-        if( MsgConstant.SUCCESS.equals( resultAllMass.getResultCode())){
-            //TODO 扣费
-        }else{
 
-        }
         return key;
     }
 
     private void sendMassByOperator(String tenantId,String appId,String subaccountId,String taskName, String tempId, String tempArgs, String sendType, Date sendTime, String msg, String key, List<ResultMass> list, List<String> mobileList, String oprator,BigDecimal cost) {
         SupplierSendService massService = supplierSelector.getSendMassService( oprator,sendType);
         if(massService != null){
+            List<String> detailIds = new ArrayList<>();
             int uMax = massService.getMaxSendNum();
             int ulength = mobileList.size() / uMax + ( mobileList.size() % uMax == 0 ? 0 :1 );
             for(int ul = 0;ul <ulength ;ul ++ ) {
@@ -259,10 +259,15 @@ public class MsgSendServiceImpl implements MsgSendService {
                     MsgSendRecord msgSendRecord = new MsgSendRecord(recordId,key,tenantId,appId,subaccountId,resultMass.getTaskId(),taskName,sendType,resultMass.getHandlers(),oprator,msg,
                             tempId,resultMass.getSupplierTempId(),tempArgs,sendTime,cost,true,resultMass.getPendingNum(),resultMass.getPendingNum(),0L,MsgSendRecord.STATE_WAIT);
                     msgSendRecordService.save(msgSendRecord);
-                    msgSendDetailService.batchInsertDetail(msgSendRecord,resultMass.getPendingPhones(),MsgSendDetail.STATE_WAIT);
+                    List<String> subDetailIds = msgSendDetailService.batchInsertDetail(msgSendRecord, resultMass.getPendingPhones(), MsgSendDetail.STATE_WAIT);
+                    //所有明细的Id
+                    detailIds.addAll(subDetailIds);
                 }
                 list.add(resultMass);
             }
+            //批量扣费
+            ProductCode product = ProductCode.valueOf(sendType);
+            consumeService.batchConsume(new Date(),sendType,cost,product.getRemark(),appId,tenantId,subaccountId,detailIds);
         }
     }
 

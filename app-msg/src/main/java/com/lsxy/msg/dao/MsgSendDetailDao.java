@@ -20,6 +20,9 @@ public interface MsgSendDetailDao extends BaseDaoInterface<MsgSendDetail, Serial
     MsgSendDetail findFirstByTaskIdAndMobile(String taskId, String mobile);
 
     @Modifying
-    @Query("update MsgSendDetail d set d.state = :state,d.taskId = :taskId where d.recordId = :recordId AND d.mobile IN (:pendingPhones)")
-    void updateDetailStateAndTaskIdByRecordId(String recordId, List<String> pendingPhones, int stateWait,String taskId);
+    @Query("update MsgSendDetail d set d.state = :state,d.taskId = :taskId where d.recordId = :recordId AND d.mobile IN (:phones)")
+    void updateDetailStateAndTaskIdByRecordId(@Param("recordId") String recordId,@Param("phones") List<String> phones, @Param("state") int state,@Param("taskId") String taskId);
+
+
+    List<String> findIdByRecordIdAndMobileIn(String recordId, List<String> phones);
 }

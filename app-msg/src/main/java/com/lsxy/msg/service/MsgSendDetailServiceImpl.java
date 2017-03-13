@@ -26,13 +26,15 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+
+
     @Override
     public BaseDaoInterface<MsgSendDetail, Serializable> getDao() {
         return this.msgSendDetailDao;
     }
 
     @Override
-    public void batchInsertDetail(MsgSendRecord record, List<String> phones,int state) {
+    public List<String> batchInsertDetail(MsgSendRecord record, List<String> phones,int state) {
         String values = " id,msg_key,tenant_id,app_id,subaccount_id,task_id,record_id,mobile,msg,is_mass,temp_id,supplier_temp_id,temp_args,send_time,msg_cost,send_type,supplier_code,operator,state," +
                 "create_time,last_time,deleted,sortno,version";
         String valuesMark = "";
@@ -46,10 +48,12 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
         }
         String insertSql = " insert into db_lsxy_bi_yunhuni.tb_bi_voice_cdr_month("+ values + ") values ("+valuesMark+")";
         List resultList = new ArrayList();
-
+        List<String> ids = new ArrayList<>();
         if(phones != null && phones.size() > 0){
             for(String phone:phones){
-                Object[] obj =  new Object[]{UUIDGenerator.uuid(),record.getMsgKey(),record.getTenantId(),record.getAppId(),record.getSubaccountId(),record.getTaskId(),record.getId(),phone,record.getMsg(),true,
+                String uuid = UUIDGenerator.uuid();
+                ids.add(uuid);
+                Object[] obj =  new Object[]{uuid,record.getMsgKey(),record.getTenantId(),record.getAppId(),record.getSubaccountId(),record.getTaskId(),record.getId(),phone,record.getMsg(),true,
                 record.getTempId(),record.getSupplierTempId(),record.getTempArgs(),record.getSendTime(),record.getMsgCost(),record.getSendType(),record.getSupplierCode(),record.getOperator(),
                         state,record.getCreateTime(),record.getLastTime(),0,0,0};
                 resultList.add(obj);
@@ -59,6 +63,8 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
         if(resultList != null && resultList.size() > 0){
             jdbcTemplate.batchUpdate(insertSql,resultList);
         }
+        return ids;
+
     }
 
     @Override
@@ -72,7 +78,12 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
     }
 
     @Override
-    public void updateDetailStateAndTaskIdByRecordIdAndPhones(String recordId, List<String> pendingPhones, int stateWait,String taskId) {
-        msgSendDetailDao.updateDetailStateAndTaskIdByRecordId(recordId, pendingPhones, stateWait,taskId);
+    public List<String> updateDetailStateAndTaskIdByRecordIdAndPhones(String recordId, List<String> phones, int state,String taskId) {
+        msgSendDetailDao.updateDetailStateAndTaskIdByRecordId(recordId, phones, state,taskId);
+        if(MsgSendDetail.STATE_FAIL == state){
+             return msgSendDetailDao.findIdByRecordIdAndMobileIn(recordId,phones);
+        }else{
+            return null;
+        }
     }
 }

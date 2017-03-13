@@ -10,6 +10,8 @@ import com.lsxy.msg.supplier.SupplierSelector;
 import com.lsxy.msg.supplier.SupplierSendService;
 import com.lsxy.msg.api.model.MsgConstant;
 import com.lsxy.msg.supplier.common.ResultMass;
+import com.lsxy.yunhuni.api.consume.service.ConsumeService;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,8 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
     MsgSendRecordService msgSendRecordService;
     @Autowired
     MsgSendDetailService msgSendDetailService;
+    @Autowired
+    ConsumeService consumeService;
 
     @Override
     public void handleMessage(DelaySendMassEvent message) throws JMSException {
@@ -46,30 +50,26 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
             resultMass = supplierSendService.sendMass(message.getTenantId(),message.getAppId(),message.getSubaccountId(),message.getRecordId(),message.getKey(),message.getTaskName(),
                     message.getTempId(),tempArgsList,message.getMsg(),mobiles,sendTime,message.getSendType(),message.getCost());
         }
-
+        List<String> ids = null;
         if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode())){
             //成功发送
             //更新发送记录，
             msgSendRecordService.updateStateAndTaskIdById(message.getRecordId(),MsgSendRecord.STATE_WAIT,resultMass.getTaskId());
             msgSendDetailService.updateDetailStateAndTaskIdByRecordIdAndPhones(message.getRecordId(),resultMass.getPendingPhones(), MsgSendDetail.STATE_WAIT,resultMass.getTaskId());
-            msgSendDetailService.updateDetailStateAndTaskIdByRecordIdAndPhones(message.getRecordId(),resultMass.getBadPhones(), MsgSendDetail.STATE_FAIL,resultMass.getTaskId());
+            ids = msgSendDetailService.updateDetailStateAndTaskIdByRecordIdAndPhones(message.getRecordId(),resultMass.getBadPhones(), MsgSendDetail.STATE_FAIL,resultMass.getTaskId());
         }else if(resultMass == null || !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){
             //发送失败
             //更新发送记录，
             msgSendRecordService.updateStateAndTaskIdById(message.getRecordId(),MsgSendRecord.STATE_FAIL,resultMass.getTaskId());
-            msgSendDetailService.updateDetailStateAndTaskIdByRecordIdAndPhones(message.getRecordId(),resultMass.getBadPhones(), MsgSendDetail.STATE_FAIL,resultMass.getTaskId());
+            ids = msgSendDetailService.updateDetailStateAndTaskIdByRecordIdAndPhones(message.getRecordId(),resultMass.getBadPhones(), MsgSendDetail.STATE_FAIL,resultMass.getTaskId());
         }
 
-//        接口调用成功则不理会，接口调用失败，则进行补扣费
-//        处理发送结果
-        if( MsgConstant.SUCCESS.equals( resultMass.getResultCode() ) ) {
-
-        }else{
-            //TODO 每条费用
-//            int msgCost = sendMassMessageService.getRealCost( message.getMsg() ,message.getTempId(),message.getTempArgs(), message.getSendType() );
-//            进行扣费
-//            int realCost = resultMass.getBadPhones()!=null?resultMass.getBadPhones().size():0 * msgCost;
-            //TODO 费用返还
+        //接口调用成功则不理会，接口调用失败，进行补扣费
+        //处理发送结果
+        if(ids != null && ids.size() > 0){
+            BigDecimal cost = BigDecimal.ZERO.subtract(new BigDecimal(message.getCost()));
+            ProductCode product = ProductCode.valueOf(message.getSendType());
+            consumeService.batchConsume(new Date(),message.getSendType(),cost,product.getRemark(),message.getAppId(),message.getTenantId(),message.getSubaccountId(),ids);
         }
     }
 }

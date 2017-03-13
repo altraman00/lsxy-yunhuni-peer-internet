@@ -10,11 +10,11 @@ import java.util.List;
  * Created by liups on 2017/3/1.
  */
 public interface MsgSendDetailService extends BaseService<MsgSendDetail> {
-    void batchInsertDetail(MsgSendRecord msgSendRecord, List<String> pendingPhones,int state);
+    List<String> batchInsertDetail(MsgSendRecord msgSendRecord, List<String> pendingPhones,int state);
 
     void updateStateByMsgKey(String msgKey, int state);
 
     MsgSendDetail findByTaskIdAndMobile(String taskId, String mobile);
 
-    void updateDetailStateAndTaskIdByRecordIdAndPhones(String recordId, List<String> pendingPhones, int stateWait,String taskId);
+    List<String> updateDetailStateAndTaskIdByRecordIdAndPhones(String recordId, List<String> phones, int state,String taskId);
 }

@@ -15,8 +15,8 @@ public class DelaySendMassEvent extends AbstractDelayMQEvent {
     private String taskName;
     private String tempId;
     private String tempArgs;
-    private String mobiles;
     private String sendTime;
+    private String mobiles;
     private String msg;
     private String sendType;
     private String operator;
