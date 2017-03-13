@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Created by liups on 2017/3/1.
@@ -35,10 +34,7 @@ public class MsgSendRecordServiceImpl extends AbstractService<MsgSendRecord> imp
         msgSendRecordDao.updateStateByMsgKey(msgKey,state);
     }
 
-    @Override
-    public List<MsgSendRecord> findSendOneWait() {
-        return null;
-    }
+
 
     @Override
     public void updateStateAndTaskIdById(String id, int state, String taskId) {

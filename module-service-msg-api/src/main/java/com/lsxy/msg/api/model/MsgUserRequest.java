@@ -40,6 +40,7 @@ public class MsgUserRequest extends IdEntity {
     private Long failNum;
     private Long pendingNum;
     private Long invalidNum;
+    private Integer sendFailTime;
     private String reason;
     private String remark;
 
@@ -48,8 +49,9 @@ public class MsgUserRequest extends IdEntity {
 
 
     public MsgUserRequest(String msgKey, String tenantId, String appId, String subaccountId, String sendType,String mobile, String msg, String tempId,
-                          String tempArgs, Date sendTime,BigDecimal msgCost) {
-        this(msgKey, tenantId, appId, subaccountId,null, sendType, mobile,null, msg, tempId, tempArgs, sendTime, msgCost,false,1L,STATE_WAIT,1L,null,null);
+                          String tempArgs, Date sendTime,BigDecimal msgCost,Integer state) {
+
+        this(msgKey, tenantId, appId, subaccountId,null, sendType, mobile,null, msg, tempId, tempArgs, sendTime, msgCost,false,1L,state,1L,null,null);
     }
 
     public MsgUserRequest(String msgKey, String tenantId, String appId, String subaccountId, String taskName, String sendType, String mobile, String mobiles, String msg, String tempId,
@@ -253,6 +255,15 @@ public class MsgUserRequest extends IdEntity {
 
     public void setInvalidNum(Long invalidNum) {
         this.invalidNum = invalidNum;
+    }
+
+    @Column(name = "send_fail_time")
+    public Integer getSendFailTime() {
+        return sendFailTime;
+    }
+
+    public void setSendFailTime(Integer sendFailTime) {
+        this.sendFailTime = sendFailTime;
     }
 
     @Column(name = "reason")

@@ -130,11 +130,11 @@ public class MsgSendServiceImpl implements MsgSendService {
 
         //开始发送
         //处理发送结果
+        BigDecimal cost = calCostService.calCost(sendType,app.getTenant().getId());
         if(MsgConstant.SUCCESS.equals( resultOne.getResultCode() )) {
             // 计算每条费用
-            BigDecimal cost = calCostService.calCost(sendType,app.getTenant().getId());
             //插入记录
-            MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,MsgConstant.MSG_USSD,mobile,msg,tempId,tempArgs,new Date(),cost);
+            MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,MsgConstant.MSG_USSD,mobile,msg,tempId,tempArgs,new Date(),cost,MsgUserRequest.STATE_WAIT);
             msgUserRequestService.save(msgRequest);
             MsgSendRecord msgSendRecord = new MsgSendRecord(key,app.getTenant().getId(),appId,subaccountId,resultOne.getTaskId(),MsgConstant.MSG_USSD,resultOne.getHandlers(),
                     operator,msg,tempId,resultOne.getSupplierTempId(),tempArgs,new Date(),cost);
@@ -146,9 +146,13 @@ public class MsgSendServiceImpl implements MsgSendService {
             if(msgRequest.getMsgCost().compareTo(BigDecimal.ZERO) == 1){
                 //插入消费
                 ProductCode productCode = ProductCode.valueOf(msgRequest.getSendType());
-                Consume consume = new Consume(msgRequest.getCreateTime(),productCode.name(),msgRequest.getMsgCost(),productCode.getRemark(),msgRequest.getAppId(),msgRequest.getTenantId(),msgRequest.getId(),msgRequest.getSubaccountId());
+                Consume consume = new Consume(msgRequest.getCreateTime(),productCode.name(),msgRequest.getMsgCost(),productCode.getRemark(),msgRequest.getAppId(),msgRequest.getTenantId(),msgSendDetail.getId(),msgRequest.getSubaccountId());
                 consumeService.consume(consume);
             }
+        }else{
+            MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,MsgConstant.MSG_USSD,mobile,msg,tempId,tempArgs,new Date(),cost,MsgUserRequest.STATE_FAIL);
+            msgRequest.setSendFailTime(1);
+            msgUserRequestService.save(msgRequest);
         }
         logger.info("发送器："+resultOne.getHandlers()+"|发送类型：单发闪印|手机号码："+mobile+"|模板id："+tempId+"|模板参数："+tempArgs+"|短信内容："+msg+"|发送结果："+resultOne.toString2());
         return key;

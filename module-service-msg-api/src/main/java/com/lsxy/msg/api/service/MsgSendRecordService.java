@@ -13,7 +13,5 @@ public interface MsgSendRecordService extends BaseService<MsgSendRecord> {
 
     void updateStateByMsgKey(String msgKey, int state);
 
-    List<MsgSendRecord> findSendOneWait();
-
     void updateStateAndTaskIdById(String id, int state, String taskId);
 }
