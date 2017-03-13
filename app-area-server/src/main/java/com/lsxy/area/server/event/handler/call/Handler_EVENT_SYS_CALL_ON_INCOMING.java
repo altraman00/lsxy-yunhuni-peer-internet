@@ -278,7 +278,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 //设置坐席状态为fetching
                 String call_id = saveSessionCall(subaccountId,app,app.getTenant(),res_id,
                         conversationId,from_agent.getId(),from_agent.getName(),from_agent.getExtension(),
-                        from_uri,to_uri,right_codec);
+                        from_uri,to_uri,right_codec,extension_prefix);
                 agentState.setState(from_agentId,CallCenterAgent.STATE_FETCHING);
 
                 //转换长号码为短号码，显示在被叫的话机上
@@ -543,14 +543,19 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
 
     private String saveSessionCall(String subaccountId,App app, Tenant tenant, String res_id,
                                    String conversationId,String agentId,String agentName,
-                                   String extension,String from, String to,String codec){
+                                   String extension,String from, String to,String codec,String extension_prefix){
         String call_id = UUIDGenerator.uuid();
         CallSession callSession = new CallSession();
         callSession.setId(UUIDGenerator.uuid());
+
+        if(!SipUrlUtil.isHotNum(to) && !SipUrlUtil.isOut(to) && SipUrlUtil.isShortNum(extension_prefix,to)){
+            //通话记录需要补全分机号码前缀
+            to = extension_prefix + to;
+        }
         try{
             callSession.setStatus(CallSession.STATUS_CALLING);
-            callSession.setFromNum(from);
-            callSession.setToNum(to);
+            callSession.setFromNum(SipUrlUtil.extractTelnum(from));
+            callSession.setToNum(SipUrlUtil.extractTelnum(to));
             callSession.setAppId(app.getId());
             callSession.setTenantId(app.getTenant().getId());
             callSession.setRelevanceId(call_id);
@@ -561,10 +566,10 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             callCenter.setId(call_id);
             callCenter.setTenantId(tenant.getId());
             callCenter.setAppId(app.getId());
-            callCenter.setFromNum(from);
-            callCenter.setToNum(to);
+            callCenter.setFromNum(SipUrlUtil.extractTelnum(from));
+            callCenter.setToNum(SipUrlUtil.extractTelnum(to));
             callCenter.setStartTime(new Date());
-            callCenter.setType(""+CallCenter.CALL_IN);
+            callCenter.setType(""+CallCenter.CALL_UP);
             callCenter.setCost(BigDecimal.ZERO);
             callCenterBatchInserter.put(callCenter);
             try{
