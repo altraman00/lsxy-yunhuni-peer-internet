@@ -204,7 +204,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             lineGateway = new LineGateway();
             lineGateway.setId(LineGateway.ID_OPENSIPS);
             voiceCdr.setFromNum(fromNum);
-            voiceCdr.setIvrType(1);
+            //voiceCdr.setIvrType(1);
         }else if(BusinessState.TYPE_CC_INVITE_AGENT_CALL.equals(businessState.getType()) &&
                 !SipUrlUtil.isOut(fromNum) && !SipUrlUtil.isHotNum(fromNum) && SipUrlUtil.isExtensionNum("20001"+fromNum)
                 ){
@@ -225,7 +225,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             lineGateway = new LineGateway();
             lineGateway.setId(LineGateway.ID_OPENSIPS);
             voiceCdr.setToNum(toNum);
-            voiceCdr.setIvrType(2);
+            //voiceCdr.setIvrType(2);
         }else{
             if(cdrSplit[11].trim().equals("0")){//等于0时表示呼入，参考CTI CDR事件说明文档
                 //相对平台是呼入 处理to
