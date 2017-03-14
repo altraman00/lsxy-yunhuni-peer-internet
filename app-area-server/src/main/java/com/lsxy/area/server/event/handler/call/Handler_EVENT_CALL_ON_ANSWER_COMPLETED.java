@@ -158,11 +158,11 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
                 hangup(state.getResId(),call_id,state.getAreaId());
             }finally {
                 //删除等待应答标记，这行代码不能改变顺序
-                businessStateService.deleteInnerField(call_id,IVRActionService.IVR_ANSWER_WAITTING_FIELD);
+                businessStateService.deleteInnerField(call_id,IVRActionService.IVR_ANSWER_WAITTING_FIELD,IVRActionService.IVR_ANSWER_CODEC_FIELD);
             }
         }else{
             //删除等待应答标记，这行代码不能改变顺序
-            businessStateService.deleteInnerField(call_id,IVRActionService.IVR_ANSWER_WAITTING_FIELD);
+            businessStateService.deleteInnerField(call_id,IVRActionService.IVR_ANSWER_WAITTING_FIELD,IVRActionService.IVR_ANSWER_CODEC_FIELD);
             ivrActionService.doAction(call_id,null);
         }
 

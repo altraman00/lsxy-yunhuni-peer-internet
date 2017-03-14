@@ -5,6 +5,7 @@ import com.lsxy.app.area.cti.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.area.agent.cti.CTINode;
 import com.lsxy.area.agent.utils.RefResIdUtil;
+import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -14,6 +15,7 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.handler.RpcRequestHandler;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,9 +50,12 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
         try {
             Map<String, Object> params = request.getParamMap();
             String call_id = (String)params.get("user_data");
+            String codecs = (String)params.get("codecs");
 
             CTINode cticlient = cticlientContext.getAvalibleNode(RefResIdUtil.get(params));
-
+            if(StringUtils.isNotEmpty(codecs)){
+                params.put("codecs", codecs.split(","));
+            }
             cticlient.createResource( "sys.call", params, new RpcResultListener(){
                 @Override
                 protected void onResult(Object o) {
