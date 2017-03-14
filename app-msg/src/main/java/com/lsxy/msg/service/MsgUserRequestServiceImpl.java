@@ -56,6 +56,9 @@ public class MsgUserRequestServiceImpl extends AbstractService<MsgUserRequest> i
         msgUserRequestDao.updateStateByMsgKey(msgKey,state);
     }
 
-
+    @Override
+    public List<MsgUserRequest> findAwaitedRequets() {
+        return null;
+    }
 
 }

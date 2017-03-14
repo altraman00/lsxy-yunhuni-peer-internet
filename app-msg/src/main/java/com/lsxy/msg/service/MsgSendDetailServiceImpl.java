@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by liups on 2017/3/1.
@@ -100,6 +101,12 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
     @Override
     public void updateStateFromWaitedToSuccessByRecordId(String recordId) {
         msgSendDetailDao.updateStateFromWaitedToStateByRecordId(recordId, MsgSendDetail.STATE_WAIT ,MsgSendDetail.STATE_SUCCESS);
+    }
+
+    @Override
+    public Map getStateCountByRecordId(String recordId) {
+        String sql = "SELECT d.state,COUNT(1) FROM db_lsxy_bi_yunhuni.tb_bi_msg_send_detail d WHERE d.record_id = ? GROUP BY d.state";
+        return jdbcTemplate.queryForMap(sql,recordId);
     }
 
 }

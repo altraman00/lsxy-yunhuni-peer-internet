@@ -19,4 +19,6 @@ public interface MsgSendRecordService extends BaseService<MsgSendRecord> {
     List<MsgSendRecord> findUssdSendOneFailAndSendNotOver();
 
     List<MsgSendRecord> findWaitedSendMassBySupplier(String supplierCode);
+
+    List<MsgSendRecord> findByMsgKey(String msgKey);
 }

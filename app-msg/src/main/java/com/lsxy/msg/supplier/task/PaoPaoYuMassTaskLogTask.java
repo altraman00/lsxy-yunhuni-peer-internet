@@ -32,8 +32,6 @@ public class PaoPaoYuMassTaskLogTask {
     @Autowired
     MsgSendRecordService msgSendRecordService;
     @Autowired
-    MsgUserRequestService msgUserRequestService;
-    @Autowired
     MsgSendDetailService msgSendDetailService;
     @Autowired
     SupplierSelector supplierSelector;

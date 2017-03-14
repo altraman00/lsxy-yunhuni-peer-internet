@@ -5,6 +5,7 @@ import com.lsxy.msg.api.model.MsgSendDetail;
 import com.lsxy.msg.api.model.MsgSendRecord;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by liups on 2017/3/1.
@@ -21,4 +22,6 @@ public interface MsgSendDetailService extends BaseService<MsgSendDetail> {
     List<String> updateStateByRecordIdAndPhones(String recordId, List<String> phones, int state);
 
     void updateStateFromWaitedToSuccessByRecordId(String recordId);
+
+    Map getStateCountByRecordId(String recordId);
 }

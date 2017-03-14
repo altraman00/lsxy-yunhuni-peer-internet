@@ -56,4 +56,9 @@ public class MsgSendRecordServiceImpl extends AbstractService<MsgSendRecord> imp
     public List<MsgSendRecord> findWaitedSendMassBySupplier(String supplierCode){
         return msgSendRecordDao.findBySupplierCodeAndStateAndIsMass(supplierCode,MsgSendRecord.STATE_WAIT,true);
     }
+
+    @Override
+    public List<MsgSendRecord> findByMsgKey(String msgKey) {
+        return msgSendRecordDao.findByMsgKey(msgKey);
+    }
 }
