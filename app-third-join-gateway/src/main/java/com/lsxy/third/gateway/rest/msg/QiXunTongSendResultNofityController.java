@@ -7,12 +7,16 @@ import com.lsxy.msg.api.service.MsgSendDetailService;
 import com.lsxy.msg.api.service.MsgSendRecordService;
 import com.lsxy.msg.api.service.MsgUserRequestService;
 import com.lsxy.third.gateway.base.AbstractAPIController;
+import com.lsxy.yunhuni.api.consume.model.Consume;
+import com.lsxy.yunhuni.api.consume.service.ConsumeService;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.msg.qixuntong.QiXunTongConstant;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,6 +45,8 @@ public class QiXunTongSendResultNofityController extends AbstractAPIController {
     MsgUserRequestService msgUserRequestService;
     @Reference(timeout=3000,check = false,lazy = true)
     MsgSendDetailService msgSendDetailService;
+    @Autowired
+    ConsumeService consumeService;
 
     @RequestMapping(value = "",method = RequestMethod.POST,produces = "application/json;charset=UTF-8")
     public String handle(HttpServletRequest request){
@@ -80,7 +88,11 @@ public class QiXunTongSendResultNofityController extends AbstractAPIController {
                 msgSendDetail.setState(state);
                 msgSendDetailService.save(msgSendDetail);
                 if(MsgSendDetail.STATE_FAIL == state){
-                    //TODO 扣费返还
+                    // 扣费返还
+                    ProductCode productCode = ProductCode.valueOf(msgSendDetail.getSendType());
+                    BigDecimal cost = BigDecimal.ZERO.subtract(msgSendDetail.getMsgCost());
+                    Consume consume = new Consume(new Date(),productCode.name(),cost,productCode.getRemark(),msgSendDetail.getAppId(),msgSendDetail.getTenantId(),msgSendDetail.getId(),msgSendDetail.getSubaccountId());
+                    consumeService.consume(consume);
                 }
                 if(!msgSendDetail.getIsMass()) {
                     try{

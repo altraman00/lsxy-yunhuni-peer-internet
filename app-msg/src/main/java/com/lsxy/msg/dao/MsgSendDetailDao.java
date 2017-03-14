@@ -23,6 +23,13 @@ public interface MsgSendDetailDao extends BaseDaoInterface<MsgSendDetail, Serial
     @Query("update MsgSendDetail d set d.state = :state,d.taskId = :taskId where d.recordId = :recordId AND d.mobile IN (:phones)")
     void updateDetailStateAndTaskIdByRecordId(@Param("recordId") String recordId,@Param("phones") List<String> phones, @Param("state") int state,@Param("taskId") String taskId);
 
+    @Modifying
+    @Query("update MsgSendDetail d set d.state = :state where d.recordId = :recordId AND d.mobile IN (:phones)")
+    void updateStateByRecordId(@Param("recordId") String recordId, @Param("phones") List<String> phones, @Param("state") int state);
 
     List<String> findIdByRecordIdAndMobileIn(String recordId, List<String> phones);
+
+    @Modifying
+    @Query("update MsgSendDetail d set d.state = :state where d.recordId = :recordId AND d.state = :stateWait")
+    void updateStateFromWaitedToStateByRecordId(@Param("recordId") String recordId, @Param("stateWait") int stateWait, @Param("state") int state);
 }

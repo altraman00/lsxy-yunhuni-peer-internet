@@ -56,10 +56,6 @@ public class MsgUserRequestServiceImpl extends AbstractService<MsgUserRequest> i
         msgUserRequestDao.updateStateByMsgKey(msgKey,state);
     }
 
-    @Override
-    public List<MsgUserRequest> findSendOneFailAndSendNotOver() {
-        Date date = new Date(System.currentTimeMillis() - 1000 * 120);
-        return msgUserRequestDao.findByStateAndSendTypeAndSendFailTimeLessThanEqualAndLastTimeLessThanEqual(MsgSendRecord.STATE_FAIL, MsgConstant.MSG_USSD,3,date);
-    }
+
 
 }

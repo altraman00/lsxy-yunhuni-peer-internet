@@ -40,7 +40,7 @@ public class MsgUserRequest extends IdEntity {
     private Long failNum;
     private Long pendingNum;
     private Long invalidNum;
-    private Integer sendFailTime;
+
     private String reason;
     private String remark;
 
@@ -257,14 +257,6 @@ public class MsgUserRequest extends IdEntity {
         this.invalidNum = invalidNum;
     }
 
-    @Column(name = "send_fail_time")
-    public Integer getSendFailTime() {
-        return sendFailTime;
-    }
-
-    public void setSendFailTime(Integer sendFailTime) {
-        this.sendFailTime = sendFailTime;
-    }
 
     @Column(name = "reason")
     public String getReason() {

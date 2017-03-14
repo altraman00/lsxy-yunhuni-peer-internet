@@ -9,12 +9,16 @@ import com.lsxy.msg.api.service.MsgSendDetailService;
 import com.lsxy.msg.api.service.MsgSendRecordService;
 import com.lsxy.msg.api.service.MsgUserRequestService;
 import com.lsxy.third.gateway.base.AbstractAPIController;
+import com.lsxy.yunhuni.api.consume.model.Consume;
+import com.lsxy.yunhuni.api.consume.service.ConsumeService;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.msg.paopaoyu.PaoPaoYuClient;
 import com.msg.paopaoyu.PaoPaoYuConstant;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +26,10 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,6 +48,8 @@ public class PaoPaoYuSendResultNofityController extends AbstractAPIController {
     MsgUserRequestService msgUserRequestService;
     @Reference(timeout=3000,check = false,lazy = true)
     MsgSendDetailService msgSendDetailService;
+    @Autowired
+    ConsumeService consumeService;
 
     @RequestMapping(value = "",method = RequestMethod.POST,produces = "application/json;charset=UTF-8")
     public String handle(HttpServletRequest request){
@@ -80,13 +90,13 @@ public class PaoPaoYuSendResultNofityController extends AbstractAPIController {
         boolean flag = isSign( serialId, taskId, sign);
         if(flag) {
             if (PaoPaoYuConstant.PapPaoyuStateSuccess.equals(status) || PaoPaoYuConstant.PapPaoyuStateFail.equals(status)) {
-                boolean isUpdateMain ;
+                boolean isUpdateMain = true;
                 if(PaoPaoYuConstant.PapPaoyuStateFail.equals(status)){//发送失败检查是否需要重发
                     //检查是否需要重发，更新泡泡鱼记录
                     if(MsgConstant.MSG_USSD.equals(msgSendRecord.getSendType()) && !msgSendRecord.getIsMass() && MsgConstant.SEND_FIAL_MAX_NUM > msgSendRecord.getSendFailTime() ){//需要重发
-                        msgSendRecord.setSendFailTime(msgSendRecord.getSendFailTime() + 1 );//失败次数+1
+                        int failTime = msgSendRecord.getSendFailTime() == null ? 0 : msgSendRecord.getSendFailTime();
+                        msgSendRecord.setSendFailTime( failTime + 1 );//失败次数+1
                         msgSendRecordService.save(msgSendRecord);//更新泡泡鱼记录
-
                         logger.info("[泡泡鱼][消息发送情况回调接口][等待重发]任务："+msgSendRecord.getTaskId());
                         isUpdateMain = false;
                     }else{//不需要重发
@@ -104,11 +114,21 @@ public class PaoPaoYuSendResultNofityController extends AbstractAPIController {
                     }
                     //更新泡泡鱼记录
                     msgSendRecord.setState(state);
+                    msgSendRecordService.save(msgSendRecord);
                     msgUserRequestService.updateStateByMsgKey(msgSendRecord.getMsgKey(),state);
-                    msgSendDetailService.updateStateByMsgKey(msgSendRecord.getMsgKey(),state);
+                    String mobiles = msgSendRecord.getMobiles();
+                    List<String> mobileList = Arrays.asList(mobiles.split(MsgConstant.NumRegexStr));
+                    List<String> detailIds = msgSendDetailService.updateStateAndTaskIdByRecordIdAndPhones(msgSendRecord.getId(), mobileList, state, msgSendRecord.getTaskId());
                     //查找主记录
-                    if (state == 1) {//发送失败
-                        //TODO 返还扣费
+                    if (state == MsgSendRecord.STATE_FAIL) {//发送失败
+                        // 返还扣费
+                        //插入消费
+                        for(String detailId : detailIds){
+                            ProductCode productCode = ProductCode.valueOf(msgSendRecord.getSendType());
+                            BigDecimal cost = BigDecimal.ZERO.subtract(msgSendRecord.getMsgCost());
+                            Consume consume = new Consume(new Date(),productCode.name(),cost,productCode.getRemark(),msgSendRecord.getAppId(),msgSendRecord.getTenantId(),detailId,msgSendRecord.getSubaccountId());
+                            consumeService.consume(consume);
+                        }
                     }
                 }
                 logger.info("[泡泡鱼][消息发送情况回调接口][请求]["+ip+"][处理成功]");

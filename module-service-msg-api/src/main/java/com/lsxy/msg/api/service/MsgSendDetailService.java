@@ -16,5 +16,9 @@ public interface MsgSendDetailService extends BaseService<MsgSendDetail> {
 
     MsgSendDetail findByTaskIdAndMobile(String taskId, String mobile);
 
-    List<String> updateDetailStateAndTaskIdByRecordIdAndPhones(String recordId, List<String> phones, int state,String taskId);
+    List<String> updateStateAndTaskIdByRecordIdAndPhones(String recordId, List<String> phones, int state, String taskId);
+
+    List<String> updateStateByRecordIdAndPhones(String recordId, List<String> phones, int state);
+
+    void updateStateFromWaitedToSuccessByRecordId(String recordId);
 }

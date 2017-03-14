@@ -1,23 +1,23 @@
 package com.lsxy.msg.supplier.task;
 
-import com.lsxy.app.uusd.message.model.PaoPaoYuMassNofity;
-import com.lsxy.app.uusd.message.model.base.BaseResult;
-import com.lsxy.app.uusd.message.service.BatchUpdateService;
-import com.lsxy.app.uusd.message.service.PaoPaoYuService;
-import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.core.utils.Page;
-import com.lsxy.yunhuni.api.ussd.model.MassLog;
-import com.lsxy.yunhuni.api.ussd.model.PaoPaoYuMassLog;
-import com.lsxy.yunhuni.api.ussd.model.UssdUser;
-import com.lsxy.yunhuni.api.ussd.service.PaoPaoYuMassLogService;
-import com.lsxy.yunhuni.api.ussd.service.UssdUserService;
+import com.lsxy.msg.api.model.MsgSendDetail;
+import com.lsxy.msg.api.model.MsgSendRecord;
+import com.lsxy.msg.api.service.MsgSendDetailService;
+import com.lsxy.msg.api.service.MsgSendRecordService;
+import com.lsxy.msg.api.service.MsgUserRequestService;
+import com.lsxy.msg.supplier.SupplierSelector;
+import com.lsxy.msg.supplier.SupplierSendService;
+import com.lsxy.msg.supplier.paopaoyu.PaoPaoYuMassNofity;
+import com.lsxy.yunhuni.api.consume.service.ConsumeService;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
+import com.msg.paopaoyu.PaoPaoYuConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Calendar;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -28,68 +28,60 @@ import java.util.List;
 @Component
 public class PaoPaoYuMassTaskLogTask {
     private static final Logger logger = LoggerFactory.getLogger(PaoPaoYuMassTaskLogTask.class);
+
     @Autowired
-    private UssdUserService ussdUserService;
+    MsgSendRecordService msgSendRecordService;
     @Autowired
-    private PaoPaoYuMassLogService paoPaoYuMassLogService;
+    MsgUserRequestService msgUserRequestService;
     @Autowired
-    private PaoPaoYuService paoPaoYuService;
+    MsgSendDetailService msgSendDetailService;
     @Autowired
-    private BatchUpdateService batchUpdateService;
+    SupplierSelector supplierSelector;
+    @Autowired
+    ConsumeService consumeService;
+
     /**
      * 每小时的10分钟，检测截止到当前的一个星期内的检测结果
      */
     @Scheduled(cron="0 0/10 * * * ?")
     public void hour(){
-        Calendar cal = Calendar.getInstance();
-        Date end = cal.getTime();
-        cal.add(Calendar.DATE,-7);
-        Date start = cal.getTime();
-        logger.info("[泡泡鱼][群发任务][检测开启]开始时间[{}]结束时间[{}]", DateUtils.formatDate(start), DateUtils.formatDate(end));
-        List<UssdUser> list = ussdUserService.getList();
-        for (int i = 0; i < list.size(); i++) {
-            UssdUser ussdUser = list.get(i);
-            int pageNo = 1;
-            int pageSize = 20;
-            //查看闪印群发结果
-            selectPageTsak( pageNo, pageSize , start , end , ussdUser.getId() , BaseResult.SENDTYPE_TEMP_USSD , MassLog.wait );
-            //查看模板短信群发结果
-            selectPageTsak( pageNo, pageSize , start , end , ussdUser.getId() , BaseResult.SENDTYPE_TEMP_USSD , MassLog.wait );
+        List<MsgSendRecord> records = msgSendRecordService.findWaitedSendMassBySupplier(PaoPaoYuConstant.PaopaoyuCode);
+        for(MsgSendRecord record : records){
+            selectTask(record);
         }
         logger.info("[泡泡鱼][群发任务][检测结束]");
     }
-    //查询一批任务的执行情况
-    private void selectPageTsak(Integer pageNo,Integer pageSize,Date start,Date end,String userId,int sendType,int state) {
-        //短信
-        Page<PaoPaoYuMassLog> page = paoPaoYuMassLogService.getPage(pageNo,pageSize,start,end,userId,sendType, state);
-        selectListTask(page.getResult());
-        while (page.getCurrentPageNo() < page.getTotalPageCount()) {
-            int tempPageNo = Integer.valueOf(page.getCurrentPageNo() + "") + 1;
-            page = paoPaoYuMassLogService.getPage(pageNo,pageSize,start,end,userId ,sendType, state);
-            selectListTask(page.getResult());
-        }
-    }
-    //查询一批任务的执行情况
-    private void selectListTask(List<PaoPaoYuMassLog> list){
-        for(int i=0;i<list.size();i++){
-            selectTask(list.get(i));
-        }
-    }
+
     //更新单任务的执行情况
-    private void  selectTask(PaoPaoYuMassLog paoPaoYuMassLog){
+    private void  selectTask(MsgSendRecord record){
         try {
-            PaoPaoYuMassNofity nofity = paoPaoYuService.getTask(paoPaoYuMassLog.getTaskId());
+            SupplierSendService sendMassService = supplierSelector.getSendMassService(record.getOperator(), record.getSupplierCode());
+            PaoPaoYuMassNofity nofity = (PaoPaoYuMassNofity) sendMassService.getTask(record.getTaskId());
             //调用查询结果成功，并且任务状态是完成。
             if( PaoPaoYuMassNofity.sueccess.equals( nofity.getResultCode() ) ){
                 PaoPaoYuMassNofity.Task task = nofity.getTask();
                 if( PaoPaoYuMassNofity.state_sueccess == task.getState()) {//群发任务结束
                     if(task.getPendingNum() == 0){//当前没有未发送的
                         //校验数据合理性
-                        if( paoPaoYuMassLog.getPendingNum() == ( task.getSendSuccNum() + task.getSendFailNum() )){
+                        if( record.getPendingNum() == ( task.getSendSuccNum() + task.getSendFailNum() )){
                             //更新结果
-                            batchUpdateService.updatePaoPaoYuTask( paoPaoYuMassLog , task );
+                            record.setState(MsgSendRecord.STATE_SUCCESS);
+                            record.setFailNum(record.getFailNum() + task.getSendFailNum());
+                            record.setFailNum(record.getSuccNum() + task.getSendSuccNum());
+                            record.setFailNum(task.getPendingNum() + 0L);
+                            msgSendRecordService.save(record);
+                            List<String> ids = msgSendDetailService.updateStateByRecordIdAndPhones(record.getId(), task.getFailPhoneList(), MsgSendDetail.STATE_FAIL);
+                            msgSendDetailService.updateStateFromWaitedToSuccessByRecordId(record.getId());
+
+                            //接口调用成功则不理会，接口调用失败，进行补扣费
+                            //处理发送结果
+                            if(ids != null && ids.size() > 0){
+                                BigDecimal cost = BigDecimal.ZERO.subtract(record.getMsgCost());
+                                ProductCode product = ProductCode.valueOf(record.getSendType());
+                                consumeService.batchConsume(new Date(),record.getSendType(),cost,product.getRemark(),record.getAppId(),record.getTenantId(),record.getSubaccountId(),ids);
+                            }
                         }else{
-                            logger.error("[校验][泡泡鱼][群发事件结果是否合理][不合理][期待结果值："+ paoPaoYuMassLog.getPendingNum() +"][实际结果值：(succ)"+task.getSendSuccNum() +
+                            logger.error("[校验][泡泡鱼][群发事件结果是否合理][不合理][期待结果值："+ record.getPendingNum() +"][实际结果值：(succ)"+task.getSendSuccNum() +
                                     "(fail)"+task.getSendFailNum()+"(pending)"+task.getPendingNum()+"]");
                         }
                     }else{
@@ -101,7 +93,7 @@ public class PaoPaoYuMassTaskLogTask {
                 }
             }
         } catch (Exception e) {
-            logger.error("[泡泡鱼][群发任务]["+paoPaoYuMassLog.getTaskId()+"]校验失败,原因:",e);
+            logger.error("[泡泡鱼][群发任务]["+record.getTaskId()+"]校验失败,原因:",e);
         }
     }
 }

@@ -34,7 +34,8 @@ public class PaoPaoYuServiceImpl extends AbstractSupplierSendServiceImpl {
         return paoPaoYuClient;
     }
 
-    public PaoPaoYuMassNofity getTask(String taskId) {
+    @Override
+    public Object getTask(String taskId) {
         String result = getPaoPaoYuClient().getTask(taskId);
         logger.info("调用[泡泡鱼][查询群发]结果:"+ result);
         return new PaoPaoYuMassNofity(result);

@@ -14,5 +14,7 @@ public interface SupplierSendService {
 
     ResultMass sendMass(String recordId,String tenantId,String appId,String subaccountId,String msgKey ,String taskName,String tempId,List<String> tempArgs,String msg, List<String> mobiles,Date sendTime,String sendType,String cost);
 
+    Object getTask(String taskId);
+
     int getMaxSendNum();
 }

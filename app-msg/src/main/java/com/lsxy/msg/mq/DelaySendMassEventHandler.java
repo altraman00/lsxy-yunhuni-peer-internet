@@ -55,13 +55,13 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
             //成功发送
             //更新发送记录，
             msgSendRecordService.updateStateAndTaskIdById(message.getRecordId(),MsgSendRecord.STATE_WAIT,resultMass.getTaskId());
-            msgSendDetailService.updateDetailStateAndTaskIdByRecordIdAndPhones(message.getRecordId(),resultMass.getPendingPhones(), MsgSendDetail.STATE_WAIT,resultMass.getTaskId());
-            ids = msgSendDetailService.updateDetailStateAndTaskIdByRecordIdAndPhones(message.getRecordId(),resultMass.getBadPhones(), MsgSendDetail.STATE_FAIL,resultMass.getTaskId());
+            msgSendDetailService.updateStateAndTaskIdByRecordIdAndPhones(message.getRecordId(),resultMass.getPendingPhones(), MsgSendDetail.STATE_WAIT,resultMass.getTaskId());
+            ids = msgSendDetailService.updateStateAndTaskIdByRecordIdAndPhones(message.getRecordId(),resultMass.getBadPhones(), MsgSendDetail.STATE_FAIL,resultMass.getTaskId());
         }else if(resultMass == null || !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){
             //发送失败
             //更新发送记录，
             msgSendRecordService.updateStateAndTaskIdById(message.getRecordId(),MsgSendRecord.STATE_FAIL,resultMass.getTaskId());
-            ids = msgSendDetailService.updateDetailStateAndTaskIdByRecordIdAndPhones(message.getRecordId(),resultMass.getBadPhones(), MsgSendDetail.STATE_FAIL,resultMass.getTaskId());
+            ids = msgSendDetailService.updateStateAndTaskIdByRecordIdAndPhones(message.getRecordId(),resultMass.getBadPhones(), MsgSendDetail.STATE_FAIL,resultMass.getTaskId());
         }
 
         //接口调用成功则不理会，接口调用失败，进行补扣费

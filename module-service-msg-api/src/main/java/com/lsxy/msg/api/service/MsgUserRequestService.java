@@ -15,5 +15,4 @@ public interface MsgUserRequestService extends BaseService<MsgUserRequest> {
 
     void updateStateByMsgKey(String msgKey, int state);
 
-    List<MsgUserRequest> findSendOneFailAndSendNotOver();
 }

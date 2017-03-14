@@ -136,7 +136,7 @@ public class MsgSendServiceImpl implements MsgSendService {
             //插入记录
             MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,MsgConstant.MSG_USSD,mobile,msg,tempId,tempArgs,new Date(),cost,MsgUserRequest.STATE_WAIT);
             msgUserRequestService.save(msgRequest);
-            MsgSendRecord msgSendRecord = new MsgSendRecord(key,app.getTenant().getId(),appId,subaccountId,resultOne.getTaskId(),MsgConstant.MSG_USSD,resultOne.getHandlers(),
+            MsgSendRecord msgSendRecord = new MsgSendRecord(key,app.getTenant().getId(),appId,subaccountId,resultOne.getTaskId(),mobile,MsgConstant.MSG_USSD,resultOne.getHandlers(),
                     operator,msg,tempId,resultOne.getSupplierTempId(),tempArgs,new Date(),cost);
             msgSendRecordService.save(msgSendRecord);
             MsgSendDetail msgSendDetail = new MsgSendDetail(key,app.getTenant().getId(),appId,subaccountId,resultOne.getTaskId(),msgSendRecord.getId(),mobile,msg,
@@ -151,7 +151,6 @@ public class MsgSendServiceImpl implements MsgSendService {
             }
         }else{
             MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,MsgConstant.MSG_USSD,mobile,msg,tempId,tempArgs,new Date(),cost,MsgUserRequest.STATE_FAIL);
-            msgRequest.setSendFailTime(1);
             msgUserRequestService.save(msgRequest);
         }
         logger.info("发送器："+resultOne.getHandlers()+"|发送类型：单发闪印|手机号码："+mobile+"|模板id："+tempId+"|模板参数："+tempArgs+"|短信内容："+msg+"|发送结果："+resultOne.toString2());
@@ -258,9 +257,10 @@ public class MsgSendServiceImpl implements MsgSendService {
                 List<String> tempArgsList = Arrays.asList(split);
                 String recordId = UUIDGenerator.uuid();//记录的Id提前生成
                 ResultMass resultMass = massService.sendMass(recordId,tenantId,appId,subaccountId,key,taskName, tempId, tempArgsList, msg, ulMobileList, sendTime,sendType,cost.toString());
+                String mobiles = StringUtils.join(ulMobileList,MsgConstant.NumRegexStr);
                 if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode() )&& !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){
                     //存发送记录 一开始发送总数是所有等待的号码
-                    MsgSendRecord msgSendRecord = new MsgSendRecord(recordId,key,tenantId,appId,subaccountId,resultMass.getTaskId(),taskName,sendType,resultMass.getHandlers(),oprator,msg,
+                    MsgSendRecord msgSendRecord = new MsgSendRecord(recordId,key,tenantId,appId,subaccountId,resultMass.getTaskId(),taskName,mobiles,sendType,resultMass.getHandlers(),oprator,msg,
                             tempId,resultMass.getSupplierTempId(),tempArgs,sendTime,cost,true,resultMass.getPendingNum(),resultMass.getPendingNum(),0L,MsgSendRecord.STATE_WAIT);
                     msgSendRecordService.save(msgSendRecord);
                     List<String> subDetailIds = msgSendDetailService.batchInsertDetail(msgSendRecord, resultMass.getPendingPhones(), MsgSendDetail.STATE_WAIT);

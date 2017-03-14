@@ -78,7 +78,7 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
     }
 
     @Override
-    public List<String> updateDetailStateAndTaskIdByRecordIdAndPhones(String recordId, List<String> phones, int state,String taskId) {
+    public List<String> updateStateAndTaskIdByRecordIdAndPhones(String recordId, List<String> phones, int state, String taskId) {
         msgSendDetailDao.updateDetailStateAndTaskIdByRecordId(recordId, phones, state,taskId);
         if(MsgSendDetail.STATE_FAIL == state){
              return msgSendDetailDao.findIdByRecordIdAndMobileIn(recordId,phones);
@@ -86,4 +86,20 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
             return null;
         }
     }
+
+    @Override
+    public List<String> updateStateByRecordIdAndPhones(String recordId, List<String> phones, int state) {
+        msgSendDetailDao.updateStateByRecordId(recordId, phones, state);
+        if(MsgSendDetail.STATE_FAIL == state){
+            return msgSendDetailDao.findIdByRecordIdAndMobileIn(recordId,phones);
+        }else{
+            return null;
+        }
+    }
+
+    @Override
+    public void updateStateFromWaitedToSuccessByRecordId(String recordId) {
+        msgSendDetailDao.updateStateFromWaitedToStateByRecordId(recordId, MsgSendDetail.STATE_WAIT ,MsgSendDetail.STATE_SUCCESS);
+    }
+
 }

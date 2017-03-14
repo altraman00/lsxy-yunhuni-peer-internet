@@ -27,6 +27,11 @@ public abstract class AbstractSupplierSendServiceImpl implements SupplierSendSer
     }
 
     @Override
+    public Object getTask(String taskId){
+        return null;
+    }
+
+    @Override
     public int getMaxSendNum() {
         return 0;
     }

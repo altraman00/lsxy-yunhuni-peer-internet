@@ -2,6 +2,7 @@ package com.lsxy.msg.api.service;
 
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.msg.api.model.MsgSendRecord;
+import com.lsxy.msg.api.model.MsgUserRequest;
 
 import java.util.List;
 
@@ -14,4 +15,8 @@ public interface MsgSendRecordService extends BaseService<MsgSendRecord> {
     void updateStateByMsgKey(String msgKey, int state);
 
     void updateStateAndTaskIdById(String id, int state, String taskId);
+
+    List<MsgSendRecord> findUssdSendOneFailAndSendNotOver();
+
+    List<MsgSendRecord> findWaitedSendMassBySupplier(String supplierCode);
 }
