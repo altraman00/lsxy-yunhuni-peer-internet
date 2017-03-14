@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -91,7 +92,7 @@ public class MsgTemptaleController extends AbstractRestController {
         return RestResponse.success(page);
     }
     @ApiOperation(value = "根据模板ID修改模板状态为审核通过")
-    @RequestMapping(value = "/pass/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/pass/{id}",method = RequestMethod.PUT)
     public RestResponse pass(
             @ApiParam(name = "id",value = "模板ID")
             @PathVariable String id
@@ -106,14 +107,17 @@ public class MsgTemptaleController extends AbstractRestController {
         }
     }
     @ApiOperation(value = "根据模板ID修改模板状态为审核不通过")
-    @RequestMapping(value = "/nopass/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/nopass/{id}",method = RequestMethod.PUT)
     public RestResponse pageList(
             @ApiParam(name = "id",value = "模板ID")
-            @PathVariable String id
-    ){
+            @PathVariable String id,
+            @ApiParam(name="reason",value = "原因")
+            @RequestBody Map map
+            ){
         MsgTemplate msgTemplate = msgTemplateService.findById(id);
         if(msgTemplate!=null){
             msgTemplate.setStatus(MsgTemplate.STATUS_FAIL);
+            msgTemplate.setReason((String)map.get("reason"));
             msgTemplateService.save(msgTemplate);
             return RestResponse.success();
         }else{
