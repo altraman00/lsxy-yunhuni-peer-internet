@@ -21,6 +21,7 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.Page;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -167,8 +168,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             //匹配的条件集合
             List<Condition> suitedConditions = new ArrayList<>();
             Map<String,Long> conditionScore = new HashMap<>();
-                Map<String,Integer> skillScore = new HashMap<>();
-                if(agent.getSkills()!=null && agent.getSkills().size()>0){
+            Map<String,Integer> skillScore = new HashMap<>();
+            if(agent.getSkills()!=null && agent.getSkills().size()>0){
                 for(AgentSkill obj:agent.getSkills()){
                     //TODO 处理技能，不让技能名称重复
                     if(StringUtils.isBlank(obj.getName())){
@@ -190,8 +191,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 }
 
                 //查询指定通道下所有条件集合，查出匹配的条件
-                setSuitedConditionsAndConditionScore(agent, suitedConditions, conditionScore, skillScore);
             }
+            setSuitedConditionsAndConditionScore(agent, suitedConditions, conditionScore, skillScore);
             //写入登录日志
             agentActionLogService.agentLogin(agent);
             //转成lua?
@@ -228,7 +229,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                     keyCount ++;
                     Condition condition = suitedConditions.get(i);
                     //设置座席条件
-                    bf.append(condition.getPriority() + "," + condition.getId() + ",");
+                    bf.append((condition.getPriority()== null ? 0:condition.getPriority()) + "," + condition.getId() + ",");
                     //设置条件座席（注意以下两行代码顺序不能变）
                     evalStr.add(5 + i,conditionScore.get(condition.getId()) + "," + agentId);
                     evalStr.add(2,CAs.getKey(condition.getId()));
@@ -239,6 +240,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 evalStr.add(2,aCsKey);
             }
             redisCacheService.eval(Lua.AGENTLOGIN,keyCount ,evalStr.toArray(new String[0]));
+            logger.info("execute lua params = {},{}",keyCount , JSONUtil2.objectToJson(evalStr));
 
             try{
                 //TODO 异步
