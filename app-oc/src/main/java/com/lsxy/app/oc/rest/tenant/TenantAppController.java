@@ -4,10 +4,14 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.oc.rest.tenant.vo.*;
 import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.call.center.api.model.CallCenterAgent;
+import com.lsxy.call.center.api.model.CallCenterQueue;
 import com.lsxy.call.center.api.model.Condition;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
+import com.lsxy.call.center.api.service.CallCenterQueueService;
 import com.lsxy.call.center.api.service.ConditionService;
+import com.lsxy.call.center.api.states.statics.ACs;
+import com.lsxy.call.center.api.states.statics.CAs;
 import com.lsxy.framework.api.billing.model.Billing;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.config.SystemConfig;
@@ -80,12 +84,22 @@ public class TenantAppController {
     ResourceTelenumService resourceTelenumService;
     @Reference(timeout=3000,check = false,lazy = true)
     private CallCenterAgentService callCenterAgentService;
+    @Reference(timeout=3000,check = false,lazy = true)
+    CallCenterQueueService callCenterQueueService;
     @Autowired
     private ApiCertificateSubAccountService apiCertificateSubAccountService;
     @Reference(timeout=3000,check = false,lazy = true)
     private ConditionService conditionService;
     @Reference(timeout=3000,check = false,lazy = true)
     private MsgTemplateService msgTemplateService;
+
+    @Autowired
+    private ACs aCs;
+
+    @Autowired
+    private CAs cAs;
+
+
     @ApiOperation(value = "租户的app列表，以及app上个月指标")
     @RequestMapping(value="/tenants/{id}/apps",method = RequestMethod.GET)
     public RestResponse apps(@PathVariable String id) throws MailConfigNotEnabledException, MailContentNullException {
@@ -534,5 +548,52 @@ public class TenantAppController {
         }
         return RestResponse.success(page);
     }
-
+    @ApiOperation(value = "获取租户的app的某个排队的全部坐席")
+    @RequestMapping(value = "/tenants/{tenant}/apps/{appId}/queue/{id}/agents",method = RequestMethod.GET)
+    public RestResponse queueToAgents(
+            @PathVariable String tenant,@PathVariable String appId,@PathVariable String id,
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize
+    ){
+        if(pageSize>20){
+            return RestResponse.failed("","每页记录数不能超过20");
+        }
+        Page page = cAs.getPage(id,pageNo,pageSize);
+        if(page!=null){
+            List<String> results = page.getResult();
+            List<CallCenterAgent> agents = new ArrayList<>();
+            if(results != null){
+                for (int i = 0; i < results.size(); i++) {
+                    CallCenterAgent agent = callCenterAgentService.findById(results.get(i));
+                    agents.add(agent);
+                }
+                page.setResult(agents);
+            }
+        }
+        return RestResponse.success(page);
+    }
+    @ApiOperation(value = "获取租户的app的某个坐席的全部排队")
+    @RequestMapping(value = "/tenants/{tenant}/apps/{appId}/agent/{id}/queues",method = RequestMethod.GET)
+    public RestResponse agentToQueues(
+            @PathVariable String tenant,@PathVariable String appId,@PathVariable String id,
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize
+    ){
+        if(pageSize>20){
+            return RestResponse.failed("","每页记录数不能超过20");
+        }
+        Page page = aCs.getPage(id,pageNo,pageSize);
+        if(page!=null){
+            List<String> results = page.getResult();
+            List<CallCenterQueue> queues = new ArrayList<>();
+            if(results != null){
+                for (int i = 0; i < results.size(); i++) {
+                    CallCenterQueue queue = callCenterQueueService.findById(results.get(i));
+                    queues.add(queue);
+                }
+                page.setResult(queues);
+            }
+        }
+        return RestResponse.success(page);
+    }
 }
