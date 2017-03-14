@@ -25,8 +25,10 @@ public class MsgSendDetail extends IdEntity {
     private String appId;
     private String subaccountId;
     private String taskId;
+    private String recordId;
     private String mobile;
     private String msg;
+    private Boolean isMass;
     private String tempId;
     private String supplierTempId;
     private String tempArgs;
@@ -42,15 +44,17 @@ public class MsgSendDetail extends IdEntity {
     public MsgSendDetail() {
     }
 
-    public MsgSendDetail(String msgKey, String tenantId, String appId, String subaccountId, String taskId, String mobile, String msg, String tempId,
+    public MsgSendDetail(String msgKey, String tenantId, String appId, String subaccountId, String taskId,String recordId, String mobile, String msg, String tempId,
                          String supplierTempId, String tempArgs, Date sendTime, BigDecimal msgCost, String sendType, String supplierCode, String operator) {
         this.msgKey = msgKey;
         this.tenantId = tenantId;
         this.appId = appId;
         this.subaccountId = subaccountId;
         this.taskId = taskId;
+        this.recordId = recordId;
         this.mobile = mobile;
         this.msg = msg;
+        this.isMass = false;
         this.tempId = tempId;
         this.supplierTempId = supplierTempId;
         this.tempArgs = tempArgs;
@@ -116,6 +120,15 @@ public class MsgSendDetail extends IdEntity {
         this.mobile = mobile;
     }
 
+    @Column(name = "record_id")
+    public String getRecordId() {
+        return recordId;
+    }
+
+    public void setRecordId(String recordId) {
+        this.recordId = recordId;
+    }
+
     @Column(name = "msg")
     public String getMsg() {
         return msg;
@@ -123,6 +136,15 @@ public class MsgSendDetail extends IdEntity {
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    @Column(name = "is_mass")
+    public Boolean getIsMass() {
+        return isMass;
+    }
+
+    public void getIsMass(Boolean mass) {
+        isMass = mass;
     }
 
     @Column(name = "temp_id")

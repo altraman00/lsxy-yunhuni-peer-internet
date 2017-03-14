@@ -16,6 +16,10 @@
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-config</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-core</artifactId>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/commons-httpclient/commons-httpclient -->
         <dependency>
             <groupId>commons-httpclient</groupId>

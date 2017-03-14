@@ -1,7 +1,9 @@
 package com.lsxy.msg.supplier.qixuntong;
 
-import com.lsxy.msg.supplier.common.MsgConstant;
+import com.lsxy.msg.api.model.MsgConstant;
 import com.lsxy.msg.supplier.common.ResultMass;
+import com.msg.qixuntong.QiXunTongConstant;
+import com.msg.qixuntong.QiXunTongResultCode;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;

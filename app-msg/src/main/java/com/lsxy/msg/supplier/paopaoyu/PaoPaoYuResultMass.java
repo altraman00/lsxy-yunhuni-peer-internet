@@ -1,7 +1,9 @@
 package com.lsxy.msg.supplier.paopaoyu;
 
-import com.lsxy.msg.supplier.common.MsgConstant;
+import com.lsxy.msg.api.model.MsgConstant;
 import com.lsxy.msg.supplier.common.ResultMass;
+import com.msg.paopaoyu.PaoPaoYuConstant;
+import com.msg.paopaoyu.PaoPaoYuResultCode;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -37,6 +39,7 @@ public class PaoPaoYuResultMass extends ResultMass {
         }
         this.failNum = this.badPhones != null ? this.badPhones.size() : 0;
         this.pendingNum = this.pendingPhones != null ? this.pendingPhones.size() : 0;
+
         this.resultCode = resultCode;
         this.resultDesc = resultDesc;
         this.taskId = taskId;

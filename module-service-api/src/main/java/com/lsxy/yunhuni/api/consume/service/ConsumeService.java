@@ -70,4 +70,17 @@ public interface ConsumeService extends BaseService<Consume> {
      * @return
      */
     BigDecimal getConsumeByAppIdAndDate(String appId,Date startDate, Date endDate);
+
+    /**
+     * 批量消费
+     * @param dt
+     * @param type
+     * @param cost
+     * @param remark
+     * @param appId
+     * @param tenantId
+     * @param subaccountId
+     * @param detailIds
+     */
+    void batchConsume(Date dt, String type, BigDecimal cost, String remark, String appId, String tenantId, String subaccountId, List<String> detailIds);
 }
