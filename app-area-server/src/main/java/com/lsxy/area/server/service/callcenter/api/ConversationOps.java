@@ -21,6 +21,7 @@ import com.lsxy.call.center.api.utils.EnQueueDecoder;
 import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -31,6 +32,7 @@ import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountServi
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.app.service.ServiceType;
+import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
@@ -105,6 +107,9 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
 
     @Autowired
     private ApiCertificateSubAccountService apiCertificateSubAccountService;
+
+    @Autowired
+    private ApiGwRedBlankNumService apiGwRedBlankNumService;
 
     @Override
     public boolean dismiss(String subaccountId, String ip, String appId, String conversationId) throws YunhuniApiException{
@@ -381,6 +386,23 @@ public class ConversationOps implements com.lsxy.call.center.api.service.Convers
             throw new RequestIllegalArgumentException(
                     new ExceptionContext().put("subaccountId",subaccountId)
                     .put("appId",appId).put("conversationId",conversationId)
+            );
+        }
+
+        if(StringUtil.isBlank(to)){
+            throw new RequestIllegalArgumentException(
+                    new ExceptionContext().put("subaccountId",subaccountId)
+                            .put("appId",appId)
+                            .put("conversationId",conversationId)
+                            .put("to",to)
+            );
+        }
+        boolean isRedNum = apiGwRedBlankNumService.isRedNum(to);
+        if(isRedNum){
+            throw new NumberNotAllowToCallException(
+                    new ExceptionContext()
+                            .put("to",to)
+                            .put("isRedNum",isRedNum)
             );
         }
 

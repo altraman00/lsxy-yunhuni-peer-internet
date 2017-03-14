@@ -15,6 +15,7 @@ import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,9 @@ public class Handler_EVENT_SYS_CALL_RECEIVE_DTMF_ON_FAIL extends EventHandler{
     @Autowired
     private ConversationService conversationService;
 
+    @Autowired
+    private Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED handler_event_sys_call_on_receive_dtmf_completed;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CALL_RECEIVE_DTMF_ON_FAIL;
@@ -56,44 +60,12 @@ public class Handler_EVENT_SYS_CALL_RECEIVE_DTMF_ON_FAIL extends EventHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        RPCResponse res = null;
         Map<String,Object> params = request.getParamMap();
         if(MapUtils.isEmpty(params)){
-            throw new InvalidParamException("request params is null");
+            params = new HashedMap();
         }
-        String call_id = (String)params.get("user_data");
-
-        if(StringUtils.isBlank(call_id)){
-            throw new InvalidParamException("call_id is null");
-        }
-
-        BusinessState state = businessStateService.get(call_id);
-        if(state == null){
-            throw new InvalidParamException("businessstate is null,call_id={}",call_id);
-        }
-        if(canDoivr(state)){
-            ivr(state,params,call_id);
-        }
-        return res;
-    }
-
-    private boolean canDoivr(BusinessState state){
-        if(BusinessState.TYPE_IVR_CALL.equals(state.getType())){//是ivr呼出
-            return true;
-        }
-        if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){//是ivr呼入
-            return true;
-        }
-        return false;
-    }
-    private void ivr(BusinessState state,Map<String,Object> params,String call_id){
-        if(logger.isDebugEnabled()){
-            logger.debug("call_id={},state={}",call_id,state);
-        }
-        if(StringUtils.isNotBlank(state.getCallBackUrl())){
-            ivrActionService.doAction(call_id,new MapBuilder<String,Object>()
-                    .putIfNotEmpty("error","receive error")
-                    .build());
-        }
+        params.put("error","receive error");
+        RPCRequest.newRequest(request.getName(),params);
+        return handler_event_sys_call_on_receive_dtmf_completed.handle(request, session);
     }
 }

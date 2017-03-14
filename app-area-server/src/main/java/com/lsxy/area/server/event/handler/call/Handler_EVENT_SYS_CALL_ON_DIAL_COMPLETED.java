@@ -356,42 +356,45 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                             conversationService.startRecord(conversationState);
                         }
 
-                        //停止交谈播放排队等待音
-                        if(conversationService.isPlayWait(conversationState)){
-                            conversationService.stopPlay(conversationState.getAreaId(),
-                                    conversationState.getId(),conversationState.getResId());
+                        if(queueId!=null){
+                            //停止交谈播放排队等待音
+                            if(conversationService.isPlayWait(conversationState)){
+                                conversationService.stopPlay(conversationState.getAreaId(),
+                                        conversationState.getId(),conversationState.getResId());
+                            }
+                            //排队产生的才需要播放坐席工号
+                            String agent_num = businessData.get(CallCenterUtil.AGENT_NUM_FIELD);
+                            String prevoice = businessData.get(CallCenterUtil.AGENT_PRENUMVOICE_FIELD);
+                            String postvoice = businessData.get(CallCenterUtil.AGENT_POSTNUMVOICE_FIELD);
+                            List<Object[]> plays = new ArrayList<>();
+                            try {
+                                if(StringUtil.isNotEmpty(prevoice)){
+                                    plays.add(new Object[]{playFileUtil.convert(state.getTenantId(),state.getAppId(),prevoice),0,""});
+                                }
+                                if(StringUtil.isNotEmpty(agent_num)){
+                                    plays.add(new Object[]{agent_num,1,""});
+                                }
+                                if(StringUtil.isNotEmpty(postvoice)){
+                                    plays.add(new Object[]{playFileUtil.convert(state.getTenantId(),state.getAppId(),postvoice),0,""});
+                                }
+                                if(plays!=null && plays.size()>0){
+                                    Map<String, Object> _params = new MapBuilder<String,Object>()
+                                            .putIfNotEmpty("res_id",conversationState.getResId())
+                                            .putIfNotEmpty("content", JSONUtil2.objectToJson(plays))
+                                            .putIfNotEmpty("user_data",conversation_id)
+                                            .put("areaId",state.getAreaId())
+                                            .build();
+                                    RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, _params);
+                                    rpcCaller.invoke(sessionContext, rpcrequest);
+                                }
+                            }catch(PlayFileNotExistsException e){
+                                logger.info("[{}][{}]放音文件不存在{},{},{},{}",state.getTenantId(),state.getAppId(),
+                                        agent_num,prevoice,postvoice,e);
+                            }catch(Throwable e) {
+                                logger.warn("调用失败 ",e);
+                            }
                         }
 
-                        String agent_num = businessData.get(CallCenterUtil.AGENT_NUM_FIELD);
-                        String prevoice = businessData.get(CallCenterUtil.AGENT_PRENUMVOICE_FIELD);
-                        String postvoice = businessData.get(CallCenterUtil.AGENT_POSTNUMVOICE_FIELD);
-                        List<Object[]> plays = new ArrayList<>();
-                        try {
-                            if(StringUtil.isNotEmpty(prevoice)){
-                                plays.add(new Object[]{playFileUtil.convert(state.getTenantId(),state.getAppId(),prevoice),0,""});
-                            }
-                            if(StringUtil.isNotEmpty(agent_num)){
-                                plays.add(new Object[]{agent_num,1,""});
-                            }
-                            if(StringUtil.isNotEmpty(postvoice)){
-                                plays.add(new Object[]{playFileUtil.convert(state.getTenantId(),state.getAppId(),postvoice),0,""});
-                            }
-                            if(plays!=null && plays.size()>0){
-                                Map<String, Object> _params = new MapBuilder<String,Object>()
-                                        .putIfNotEmpty("res_id",conversationState.getResId())
-                                        .putIfNotEmpty("content", JSONUtil2.objectToJson(plays))
-                                        .putIfNotEmpty("user_data",conversation_id)
-                                        .put("areaId",state.getAreaId())
-                                        .build();
-                                RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, _params);
-                                rpcCaller.invoke(sessionContext, rpcrequest);
-                            }
-                        }catch(PlayFileNotExistsException e){
-                            logger.info("[{}][{}]放音文件不存在{},{},{},{}",state.getTenantId(),state.getAppId(),
-                                    agent_num,prevoice,postvoice,e);
-                        }catch(Throwable e) {
-                            logger.warn("调用失败 ",e);
-                        }
                         try{
                             CallCenterConversation updateCallCenterConversation = new CallCenterConversation();
                             updateCallCenterConversation.setState(CallCenterConversation.STATE_READY);
@@ -433,13 +436,15 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         }catch (Throwable t){
                             logger.warn("更新CallCenter失败",t);
                         }
-                        try{
-                            callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
-                                    .Builder(state.getTenantId(),state.getAppId(),new Date())
-                                    .setToManualSuccess(1L)
-                                    .build());
-                        }catch (Throwable t){
-                            logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
+                        if(queueId!=null){//排队产生的才需要更新转人工成功次数
+                            try{
+                                callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
+                                        .Builder(state.getTenantId(),state.getAppId(),new Date())
+                                        .setToManualSuccess(1L)
+                                        .build());
+                            }catch (Throwable t){
+                                logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
+                            }
                         }
                         if((conversationState.getClosed()== null || !conversationState.getClosed())){
                             //交谈开始事件
@@ -602,7 +607,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         conversationService.logicExit(conversationId,call_id);
                     }
                 }else{
-                    if(businessData.get("invite_to") != null){
+                    if(businessData.get(CallCenterUtil.INVITETO_FIELD) != null){
                         try {
                             conversationService.create(state.getSubaccountId(),conversationId,
                                     CallCenterUtil.CONVERSATION_TYPE_CALL_OUT,
@@ -610,13 +615,14 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                     state,state.getTenantId(),state.getAppId(),
                                     state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null,state.getUserdata());
                             //坐席加入交谈成功事件中要呼叫这个号码
-                            businessStateService.updateInnerField(conversationId,"invite_from",
-                                    businessData.get("invite_from")!=null?businessData.get("invite_from"):"","invite_to",businessData.get("invite_to"));
-                            businessStateService.deleteInnerField(call_id,"invite_to","invite_from");
+                            businessStateService.updateInnerField(conversationId,CallCenterUtil.INVITEFROM_FIELD,
+                                    businessData.get(CallCenterUtil.INVITEFROM_FIELD)!=null?businessData.get(CallCenterUtil.INVITEFROM_FIELD):"",
+                                    CallCenterUtil.INVITETO_FIELD,businessData.get(CallCenterUtil.INVITETO_FIELD));
+                            businessStateService.deleteInnerField(call_id,CallCenterUtil.INVITETO_FIELD,CallCenterUtil.INVITEFROM_FIELD);
                         } catch (YunhuniApiException e) {
                             conversationService.logicExit(conversationId,call_id);
                         }
-                    }else if(businessData.get("enqueue_xml") != null){
+                    }else if(businessData.get(CallCenterUtil.ENQUEUEXML_FIELD) != null){
                         try {
                             conversationService.create(state.getSubaccountId(),conversationId,
                                     CallCenterUtil.CONVERSATION_TYPE_CALL_AGENT,
@@ -624,9 +630,9 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                                     state,state.getTenantId(),state.getAppId(),
                                     state.getAreaId(),state.getCallBackUrl(),ConversationService.MAX_DURATION,null,state.getUserdata());
                             //坐席加入交谈成功事件中要呼叫这个号码
-                            businessStateService.updateInnerField(conversationId,"enqueue_xml",
-                                    businessData.get("enqueue_xml"));
-                            businessStateService.deleteInnerField(call_id,"enqueue_xml");
+                            businessStateService.updateInnerField(conversationId,CallCenterUtil.ENQUEUEXML_FIELD,
+                                    businessData.get(CallCenterUtil.ENQUEUEXML_FIELD));
+                            businessStateService.deleteInnerField(call_id,CallCenterUtil.ENQUEUEXML_FIELD);
                         } catch (YunhuniApiException e) {
                             conversationService.logicExit(conversationId,call_id);
                         }
