@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by liups on 2017/3/1.
@@ -20,7 +21,7 @@ public interface MsgSendDetailDao extends BaseDaoInterface<MsgSendDetail, Serial
 
     @Modifying
     @Query("update MsgSendDetail d set d.state = :state,d.taskId = :taskId where d.recordId = :recordId AND d.mobile IN (:phones)")
-    void updateDetailStateAndTaskIdByRecordId(@Param("recordId") String recordId,@Param("phones") List<String> phones, @Param("state") int state,@Param("taskId") String taskId);
+    void updateDetailStateAndTaskIdByRecordId(@Param("recordId") String recordId, @Param("phones") List<String> phones, @Param("state") int state, @Param("taskId") String taskId);
 
     @Modifying
     @Query("update MsgSendDetail d set d.state = :state where d.recordId = :recordId AND d.mobile IN (:phones)")
