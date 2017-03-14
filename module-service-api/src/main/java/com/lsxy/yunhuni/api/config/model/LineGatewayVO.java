@@ -37,7 +37,8 @@ import java.math.BigDecimal;
                                 @FieldResult(name="quality", column="quality"),
                                 @FieldResult(name="capacity", column="capacity"),
                                 @FieldResult(name="sipAuthIp", column="sip_auth_ip"),
-                                @FieldResult(name="priority", column="priority")
+                                @FieldResult(name="priority", column="priority"),
+                                @FieldResult(name="codecs", column="codecs")
                         })
         }
 )
@@ -61,6 +62,7 @@ public class LineGatewayVO implements Serializable {
     private Integer capacity;//容量 数字
     private String sipAuthIp;//sip接入点的外网IP地址
     private Integer priority;//优先级，临时数据，数据库不保存
+    private String codecs;
 
     @Id
     public String getId() {
@@ -213,5 +215,13 @@ public class LineGatewayVO implements Serializable {
 
     public void setPriority(Integer priority) {
         this.priority = priority;
+    }
+
+    public String getCodecs() {
+        return codecs;
+    }
+
+    public void setCodecs(String codecs) {
+        this.codecs = codecs;
     }
 }
