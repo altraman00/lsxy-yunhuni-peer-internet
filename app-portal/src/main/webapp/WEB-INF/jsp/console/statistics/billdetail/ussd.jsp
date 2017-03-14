@@ -108,11 +108,14 @@
                                     <form:form action="${ctx}/console/statistics/billdetail/ussd" method="post" id="mainForm">
                                         <div class="row margin-bottom-20">
                                             <div class="col-md-9">
-                                                <input type="radio" name="isMass" value="0" class="selectdata" <c:if test="${isMass == '0'}">checked </c:if>>消息单发
-                                                <input type="radio" name="isMass" value="1" <c:if test="${isMass == '1'}">checked </c:if> class="selectdata ml-15">消息群发
+                                                <input type="radio" name="isMass" value="0" class="selectdata isMassChange" <c:if test="${isMass == '0'}">checked </c:if>>消息单发
+                                                <input type="radio" name="isMass" value="1" class="isMassChange" <c:if test="${isMass == '1'}">checked </c:if> class="selectdata ml-15">消息群发
                                             </div>
                                         </div>
                                         <div class="row statistics_row" >
+                                            <input type="hidden" id="msgKey" name="msgKey" value="${msgKey}">
+                                            <input type="hidden" id="state" name="state" value="${state}">
+                                            <input type="hidden" id="mobile1" name="mobile1" value="${mobile1}">
                                             <input type="hidden" id="appId" name="appId" value="${appId}">
                                             <div class="col-md-1">
                                                 日期
@@ -126,6 +129,22 @@
                                             <div class="col-md-2">
                                                 <input type="text" name="end" class="form-control currentDay "  value="${end}"  />
                                             </div>
+                                                <div id="isMass0" <c:if test="${isMass == '1'}">hidden</c:if>>
+                                                    <div class="col-md-2 mywidth">
+                                                        手机号码
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <input type="text" name="mobile" class="form-control"  value="${mobile}"  />
+                                                    </div>
+                                                </div>
+                                                <div id="isMass1" <c:if test="${isMass == '0'}">hidden</c:if>>
+                                                    <div class="col-md-2 mywidth">
+                                                        任务名称
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <input type="text" name="taskName" class="form-control"  value="${taskName}"  />
+                                                    </div>
+                                                </div>
                                             <div class="col-md-2">
                                                 <button class="btn btn-primary" type="submit"> 查询</button>
                                                 <%--<button class="btn btn-primary" type="button" onclick="download()"> 导出</button>--%>
@@ -138,7 +157,7 @@
                                             <c:if test="${isMass==1}">
                                                 <tr>
                                                     <th>序号</th>
-                                                    <th>任务名</th>
+                                                    <th>任务名称</th>
                                                     <th>任务状态</th>
                                                     <th>创建时间</th>
                                                     <th>结束时间</th>
@@ -158,27 +177,56 @@
                                             </c:if>
                                             </thead>
                                             <tbody>
-                                            <c:forEach items="${pageObj.result}" var="result" varStatus="s">
-                                                <tr>
-                                                    <td><fmt:formatDate value="${result.callStartDt}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
-                                                    <td>${result.fromNum}</td>
-                                                    <td>${result.toNum}</td>
-                                                    <td>${result.costTimeLong}</td>
-                                                    <td><span style="float:left;width: 80px" ><span style="float:right;" >￥<fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber></span></span></td>
-                                                    <%--<td>--%>
-                                                        <%--<c:if test="${result.costTimeLong != 0 && result.recording != 0}">--%>
-                                                            <%--<a id="downVoid${result.id}" onclick="downVoid('${result.id}')" data-statu="1">录音下载</a>--%>
-                                                        <%--</c:if>--%>
-                                                    <%--</td>--%>
-                                                </tr>
-                                            </c:forEach>
+                                            <c:if test="${isMass==1}">
+                                                <c:forEach items="${pageObj.result}" var="result" varStatus="s">
+                                                    <c:if test="${result.msgKey==msgKey}"><c:set value="${result}" var="detail_1"></c:set></c:if>
+                                                    <tr>
+                                                        <td>${result.msgKey}</td>
+                                                        <td>${result.taskName}</td>
+                                                        <td>
+                                                            <c:if test="${result.state==1}">任务完成</c:if>
+                                                            <c:if test="${result.state==0}">待处理</c:if>
+                                                            <c:if test="${result.state==-1}">任务失败</c:if>
+                                                        </td>
+                                                        <td><fmt:formatDate value="${result.sendTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
+                                                        <td>
+                                                            <c:if test="${result.state==1}">
+                                                                <fmt:formatDate value="${result.lastTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate>
+                                                            </c:if>
+                                                        </td>
+                                                        <td>成功数：${result.succNum}&nbsp;失败数：${result.failNum}&nbsp;待发数：${result.pendingNum}</td>
+                                                        <td>
+                                                            <a href="#" onclick="toDetail('${result.msgKey}')">详情</a>
+                                                            &nbsp;&nbsp;
+                                                            <a href="javascript:download('${result.id}')"  >下载</a>
+                                                        </td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </c:if>
+                                            <c:if test="${isMass==0}">
+                                                <c:forEach items="${pageObj.result}" var="result" varStatus="s">
+                                                    <tr>
+                                                        <td>${result.msgKey}</td>
+                                                        <td><fmt:formatDate value="${result.sendTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
+                                                        <td>${result.mobile}</td>
+                                                        <td>${result.msg}</td>
+                                                        <td>
+                                                            <c:if test="${result.state=='1'}">发送成功</c:if>
+                                                            <c:if test="${result.state=='0'}">待处理</c:if>
+                                                            <c:if test="${result.state=='-1'}">发送失败</c:if>
+                                                        </td>
+                                                        <td>${result.reason}</td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </c:if>
                                             </tbody>
                                         </table>
                                     </div>
-                                    <c:set var="extraParam" value="&start=${start}&end=${end}&appId=${appId}"></c:set>
-                                    <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/callback"></c:set>
+                                    <c:set var="extraParam" value="&start=${start}&end=${end}&appId=${appId}&isMass=${isMass}&taskName=${taskName}&mobile=${mobile}"></c:set>
+                                    <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/ussd"></c:set>
                                     <%@include file="/inc/pagefooter.jsp" %>
                                 </div>
+                                <%@include file="smg_detail.jsp"%>
                             </section>
                         </section>
                     </section>
@@ -194,37 +242,40 @@
 <!--must-->
 <script type="text/javascript" src='${resPrefixUrl }/js/statistics/find.js'> </script>
 <script type="text/javascript" >
+    $(function(){
+        $('.mywidth').css("width","90px");
+        $('.isMassChange').click(function(){
+            $('#mainForm').submit();
+//            var type = $(this).val();
+//            if(type == 1){
+//                $('#isMass1').show();
+//                $('#isMass0').hide();
+//            }else{
+//                $('#isMass0').show();
+//                $('#isMass1').hide();
+//            }
+        })
+    });
     function appSubmit(appId){
+        $('#msgKey').val("");
+        $('#mobile1').val("");
+        $('#state').val('');
         $('#appId').val(appId);
         $('#mainForm').submit();
     }
-    function download(){
-        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/callback/download");
+    function download(id){
+        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/download/msg/"+id);
         $('#mainForm').submit();
-        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/callback");
+        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/ussd");
     }
-    function downVoid(id) {
-        var tag  = $('#downVoid'+id);
-        var ststus = tag.attr('data-statu');
-        if(ststus==1){
-            //查询录音是否下载到oss,是下载到本地，否下载到oss显示 正在下载 ,下载oss失败，显示重试
-            var params = {'${_csrf.parameterName}':'${_csrf.token}'};
-            tag.html('正在下载<span class="download"></span>').attr("data-statu","2");
-            ajaxsubmit("${ctx}/console/app/file/record/cdr/download/"+id,params,function(result) {
-                if(result.success){
-                    window.open(result.data);
-                    tag.html('录音下载').attr("data-statu","1");
-                }else{
-                    showtoast(result.errorMsg);
-                    tag.html('下载失败,请重试').attr("data-statu","1");
-                }
-            });
-        }else if(ststus==2){
-            tag.html('下载失败,请重试').attr("data-statu","1");
-        }else{
-            tag.html('录音下载').attr("data-statu","1");
+
+    $(function () {
+        var msgKey = '${msgKey}';
+        if(msgKey!=null && msgKey.length >0) {
+            $('#myTabContent2').show();
+            $('#myTabContent').hide();
         }
-    }
+    })
 </script>
 </body>
 </html>

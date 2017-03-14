@@ -193,7 +193,6 @@ public class MsgUserRequest extends IdEntity {
     public void setMsgCost(BigDecimal msgCost) {
         this.msgCost = msgCost;
     }
-
     @Column(name = "is_mass")
     public Boolean getIsMass() {
         return isMass;

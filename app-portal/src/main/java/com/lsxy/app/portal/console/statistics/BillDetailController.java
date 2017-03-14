@@ -7,6 +7,7 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.msg.api.model.MsgSendDetail;
 import com.lsxy.msg.api.model.MsgUserRequest;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
@@ -38,41 +39,92 @@ import java.util.concurrent.Callable;
 public class BillDetailController extends AbstractPortalController {
     /**短信*/
     @RequestMapping("/sms")
-    public ModelAndView sms(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String start,String end, String appId,String isMass,String taskName,String mobile){
-        ModelAndView mav = new ModelAndView();
-        String token = getSecurityToken(request);
-        Map<String,String> map = init(request,start,end,appId,App.PRODUCT_MSG);
-        mav.addAllObjects(map);
-        if(StringUtils.isEmpty(isMass)){
-            isMass = "0";
-        }
-        mav.addObject("isMass",isMass);
-        String sendType = "msg";
-        String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/msg_user_request/plist?pageNo={1}&pageSize={2}&isMass={3}&start={4}&end={5}&appId={6}&taskName={7}&mobile={8}&sendType={9}";
-        RestResponse<Page<MsgUserRequest>> result = RestRequest.buildSecurityRequest(token).getPage(uri, MsgUserRequest.class, pageNo, pageSize, isMass, map.get("start"),map.get("end"),map.get("appId"),taskName,mobile,sendType);
-        Page pageObj = result.getData();
-        mav.addObject("pageObj",pageObj);
-        mav.setViewName("/console/statistics/billdetail/sms");
-        return mav;
+    public ModelAndView sms(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize,
+                            @RequestParam(defaultValue = "1") Integer pageNo1, @RequestParam(defaultValue = "20") Integer pageSize1,
+                            String start,String end, String appId,String isMass,String taskName,String mobile,String msgKey,String state,String mobile1){
+        String sendType = "sms";
+        return toMsg(request,pageNo,pageSize,pageNo1,pageSize1,start,end,appId,isMass,taskName,mobile,msgKey,state,mobile1,sendType);
     }
     /**闪印*/
     @RequestMapping("/ussd")
-    public ModelAndView ussd(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String start,String end, String appId,String isMass,String taskName,String mobile){
+    public ModelAndView ussd(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize,
+                             @RequestParam(defaultValue = "1") Integer pageNo1, @RequestParam(defaultValue = "20") Integer pageSize1,
+                             String start,String end, String appId,String isMass,String taskName,String mobile,String msgKey,String state,String mobile1){
+        String sendType = "ussd";
+        return toMsg(request,pageNo,pageSize,pageNo1,pageSize1,start,end,appId,isMass,taskName,mobile,msgKey,state,mobile1,sendType);
+    }
+    private ModelAndView toMsg(HttpServletRequest request, Integer pageNo, Integer pageSize,
+                               Integer pageNo1, Integer pageSize1,
+                               String start,String end, String appId,String isMass,String taskName,String mobile,String msgKey,String state,String mobile1,String sendType){
         ModelAndView mav = new ModelAndView();
+        String token = getSecurityToken(request);
         Map<String,String> map = init(request,start,end,appId,App.PRODUCT_MSG);
         mav.addAllObjects(map);
         if(StringUtils.isEmpty(isMass)){
             isMass = "0";
         }
-        String sendType = "ussd";
         mav.addObject("isMass",isMass);
-        String token = getSecurityToken(request);
+        if("0".equals(isMass)){
+            taskName="";
+        }else if("1".equals(isMass)){
+            mobile="";
+        }
+        mav.addObject("taskName",taskName);
+        mav.addObject("mobile",mobile);
+        String appId2 = appId;
+        if("all".equals(appId)){
+            appId2="";
+        }
         String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/msg_user_request/plist?pageNo={1}&pageSize={2}&isMass={3}&start={4}&end={5}&appId={6}&taskName={7}&mobile={8}&sendType={9}";
-        RestResponse<Page<MsgUserRequest>> result = RestRequest.buildSecurityRequest(token).getPage(uri, MsgUserRequest.class, pageNo, pageSize, isMass, map.get("start"),map.get("end"),map.get("appId"),taskName,mobile,sendType);
+        RestResponse<Page<MsgUserRequest>> result = RestRequest.buildSecurityRequest(token).getPage(uri, MsgUserRequest.class, pageNo, pageSize, isMass, map.get("start"),map.get("end"),appId2,taskName,mobile,sendType);
         Page pageObj = result.getData();
         mav.addObject("pageObj",pageObj);
-        mav.setViewName("/console/statistics/billdetail/ussd");
+        mav.addObject("sendType",sendType);
+        if(StringUtils.isNotEmpty(msgKey)){
+            mav.addObject("mobile1",mobile1);
+            mav.addObject("state",state);
+            mav.addObject("msgKey",msgKey);
+            mav.addObject("pageNo0",pageNo);
+            mav.addObject("pageSize0",pageSize);
+            String state1 = state;
+            if("-100".equals(state)){
+                state1 ="";
+            }
+            String uri1 =  PortalConstants.REST_PREFIX_URL  + "/rest/msg_user_detail/plist?pageNo={1}&pageSize={2}&msgKey={3}&mobile={4}&state={5}";
+            RestResponse<Page<MsgSendDetail>> result1 = RestRequest.buildSecurityRequest(token).getPage(uri1, MsgSendDetail.class, pageNo1, pageSize1, msgKey, mobile1,state1);
+            Page pageObj1 = result1.getData();
+            mav.addObject("pageObj1",pageObj1);
+        }else{
+            mav.addObject("mobile1","");
+            mav.addObject("state","-100");
+            mav.addObject("msgKey","");
+        }
+        mav.setViewName("/console/statistics/billdetail/"+sendType);
         return mav;
+    }
+    @RequestMapping("/download/msg/{id}")
+    @ResponseBody
+    public WebAsyncTask downloadMsg(HttpServletRequest request, HttpServletResponse response, @PathVariable String id){
+        Callable<String> callable = new Callable<String>() {
+            public String call() throws Exception {
+                String token = getSecurityToken(request);
+                String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/msg_user_request/get/{1}";
+                RestResponse<MsgUserRequest> result = RestRequest.buildSecurityRequest(token).get(uri, MsgUserRequest.class,  id );
+                MsgUserRequest msgUserRequest = result.getData();
+                if(msgUserRequest != null){
+                    String title = "msg".equals(msgUserRequest.getSendType())?"短信":"闪印" ;
+                    String one = "任务名字："+msgUserRequest.getTaskName()+"  任务状态："+( msgUserRequest.getState()==MsgUserRequest.STATE_FAIL ? "任务失败":(msgUserRequest.getState()==MsgUserRequest.STATE_SUCCESS?"任务结束":"待处理"))+"  成功数："+msgUserRequest.getSuccNum()+" 失败数："+msgUserRequest.getFailNum()+" 待发数："+msgUserRequest.getPendingNum();
+                    String[] headers =  new String[]{"手机号码","发送结果","原因"};
+                    String[] values = new String[]{"mobile","state:-1=发送失败;0=未发送;1=发送失败"};
+                    String uri1 =  PortalConstants.REST_PREFIX_URL  + "/rest/msg_user_detail/list?msgKey={1}";
+                    RestResponse<List<MsgSendDetail>> result1 = RestRequest.buildSecurityRequest(token).getList(uri1, MsgSendDetail.class,  msgUserRequest.getMsgKey() );
+                    List list = result1.getData();
+                    downloadExcel(title,one,headers,values,list,null,"cost",response);
+                }
+                return "";
+            }
+        };
+        return new WebAsyncTask(600000,callable);
     }
     /**
      * 语音通知

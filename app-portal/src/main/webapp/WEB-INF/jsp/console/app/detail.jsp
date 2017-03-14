@@ -1058,7 +1058,7 @@
                         <textarea class="form-control" v-model="content"  placeholder="" style="height:86px;position:absolute;margin:0;padding:2px "
                         id="template_content" onkeydown="checkMaxInput(this,62)" onkeyup="checkMaxInput(this,62)" onfocus="checkMaxInput(this,62)" onblur="checkMaxInput(this,62);"
                         >{{content}}</textarea>
-                            <div id="template_contentmsg" class="note" style="position:absolute;line-height:147px;padding:3px 250px;height: 0px"><font color="#777">62/62</font></div>
+                            <div id="template_contentmsg" class="note" style="position:absolute;line-height:147px;padding:3px 250px;height: 0px"><font color="#777">0/62</font></div>
                         </div>
                         <span style="position:absolute;line-height:184px;padding:3px 3px;height: 0px">
                             例：【壹耘】您的验证码是#*#,请在#*#分钟内完成输</span>
@@ -1075,7 +1075,7 @@
                                   id="template_remark" onkeydown="checkMaxInput(this,100)" onkeyup="checkMaxInput(this,100)" onfocus="checkMaxInput(this,100)" onblur="checkMaxInput(this,100);"
                         >{{remark}}</textarea>
                         </div>
-                        <div id="template_remarkmsg" class="note" style="position:absolute;line-height:235px;padding:3px 235px;height: 0px"><font color="#777">100/100</font></div>
+                        <div id="template_remarkmsg" class="note" style="position:absolute;line-height:235px;padding:3px 235px;height: 0px"><font color="#777">0/100</font></div>
                     </div>
                     <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
                 </div>
@@ -1218,8 +1218,8 @@
 <script src="${resPrefixUrl }/js/dist/js/bootstrap-select.js"></script>
         <script type="text/javascript">
             function isnewTemplate(){
-                var state = '${app.status}';
-                if(state==1){
+                var state = '${authState}';
+                if(state==2){
                     $('button[data-id=seven]').click();
                 }else{
                     showtoast("你还没进行公司认证，快去认证吧！");
@@ -1240,10 +1240,10 @@
 
                 if (obj.value.length > maxLen) { //如果输入的字数超过了限制
                     obj.value = obj.value.substring(0, maxLen); //就去掉多余的字
-                    $('#'+newid).html((maxLen - obj.value.length)+"/"+maxLen );
+                    $('#'+newid).html(( obj.value.length)+"/"+maxLen );//maxLen
 //                    strResult = '<span id="' + newid + '" class=\'Max_msg\' ><br/>剩(' + (maxLen - obj.value.length) + ')字</span>'; //计算并显示剩余字数
                 } else {
-                    $('#'+newid).html((maxLen - obj.value.length)+"/"+maxLen );
+                    $('#'+newid).html(( obj.value.length)+"/"+maxLen );
 //                    strResult = '<span id="' + newid + '" class=\'Max_msg\' ><br/>剩(' + (maxLen - obj.value.length) + ')字</span>'; //计算并显示剩余字数
                 }
 
@@ -1601,8 +1601,8 @@
             init:function(){
                 this.id=this.tempId=this.type=this.name=this.content=this.remark=this.reason='';
                 this.state=-1;
-                this.remarklength=60;
-                this.contentlength=100;
+                this.remarklength=0;
+                this.contentlength=0;
             },initObj:function(obj){
                 this.id=obj.id;
                 this.tempId=obj.tempId;
@@ -1612,8 +1612,8 @@
                 this.remark=obj.remark;
                 this.state = obj.status;
                 this.reason = obj.reason;
-                this.remarklength=obj.remark!=null?(100- new Number(obj.remark.length)):100;
-                this.contentlength=obj.content!=null?(60- new Number(obj.content.length)):60;
+                this.remarklength=obj.remark!=null?( new Number(obj.remark.length)):100;
+                this.contentlength=obj.content!=null?( new Number(obj.content.length)):60;
             }
         }
     });
@@ -2437,12 +2437,12 @@
         // $('#playtable').find(".playtr").remove();["✔", "✘"],
         for(var i =0 ; i<data.length; i++){
             html +='<tr id="rent-'+ data[i].rentId +'">' +
-                    '<td class="text-center">'+data[i].num+'</td>' +
+                    '<td class="text-center">'+nulltostr(data[i].num)+'</td>' +
                     '<td class="text-center">' + (data[i].status == 0 ? '过期': '正常') + '</td>' +
                     '<td class="text-center">'+ (data[i].isCalled == 0 ? '✘': '✔') +'</td>' +
                     '<td class="text-center">'+ (data[i].isDialing == 0 ? '✘': '✔') +'</td>' +
                     '<td class="text-center"><span class="text-center-l-fixed">'+data[i].areaCode+'</span></td>' +
-                    '<td class="text-center"> ' + data[i].expireTime + ' </td>' +
+                    '<td class="text-center"> ' + nulltostr(data[i].expireTime) + ' </td>' +
                     '<td class="text-center"><a onclick="unband(\''+data[i].rentId+'\')">解除绑定</a></td>' +
                     '</tr>'
         }
@@ -2495,12 +2495,12 @@
         // $('#playtable').find(".playtr").remove();["✔", "✘"],
         for(var i =0 ; i<data.length; i++){
             html +='<tr id="rent-'+ data[i].rentId +'">' +
-                '<td class="text-center">'+data[i].num+'</td>' +
+                '<td class="text-center">'+nulltostr(data[i].num)+'</td>' +
                 '<td class="text-center">' + (data[i].status == 0 ? '过期': '正常') + '</td>' +
                 '<td class="text-center">'+ (data[i].isCalled == 0 ? '✘': '✔') +'</td>' +
                 '<td class="text-center">'+ (data[i].isDialing == 0 ? '✘': '✔') +'</td>' +
                 '<td class="text-center"><span class="text-center-l-fixed">'+data[i].areaCode+'</span></td>' +
-                '<td class="text-center"> ' + data[i].expireTime + ' </td>' +
+                '<td class="text-center"> ' + nulltostr(data[i].expireTime) + ' </td>' +
                 '<td class="text-center"><a onclick="unband2(\''+data[i].rentId+'\')">解除绑定</a></td>' +
                 '</tr>'
         }
@@ -2718,8 +2718,8 @@
             var state = data[i].state=='1'?'审核已通过':(data[i].state=='0'?'待审核':(data[i].state=='-1'?'审核不通过！':'未知')) ;
             var color = data[i].enabled == 1?"text-success":"text-danger";
             var reason = data[i].reason==null?'':data[i].reason;
-            html+= '<td class="text-center '+color+'" id="enable_'+data[i].id+'" title="审核不通过原因:'+reason+'">' + state+ '</td>' +
-                '<td class="text-center"><a href="javascript:totemplateDetail(\''+data[i].id+'\')" >详情</a>&nbsp;<a href="javascript:delTemplate(\''+data[i].id+'\')" >删除</a></td>' +
+            html+= '<td class="'+color+'" id="enable_'+data[i].id+'" title="审核不通过原因:'+reason+'">' + state+ '</td>' +
+                '<td class=""><a href="javascript:totemplateDetail(\''+data[i].id+'\')" >详情</a>&nbsp;<a href="javascript:delTemplate(\''+data[i].id+'\')" >删除</a></td>' +
                 '</tr>'
         }
         $('#template-list').html(html);
@@ -2775,10 +2775,10 @@
         // $('#playtable').find(".playtr").remove();["✔", "✘"],
         for(var i =0 ; i<data.length; i++){
             html +='<tr id="extension-'+ data[i].id +'">' +
-                    '<td class="">'+ data[i].id +'</td>' +
-                    '<td class="">' + data[i].user + '</td>' +
-                    '<td class="">'+ data[i].password +'</td>' +
-                    '<td class="">'+ (data[i].certId == undefined ||data[i].certId== null ?'': data[i].certId) +'</td>' +
+                    '<td class="">'+ nulltostr(data[i].id) +'</td>' +
+                    '<td class="">' + nulltostr(data[i].user) + '</td>' +
+                    '<td class="">'+ nulltostr(data[i].password) +'</td>' +
+                    '<td class="">'+ nulltostr(data[i].certId ) +'</td>' +
                     '<td class="">'+ (data[i].enable?'可用':'不可用') +'</td>' +
                     '<td class="">'+ (data[i].type==1?'SIP 终端':(data[i].type==2?'SIP 网关':(data[i].type==3?'普通电话':'未知类型'))) +'</td>' +
                     '<td class=""><a href="javascript:delExtension(\''+data[i].id+'\')" >删除</a></td>' +
@@ -2876,16 +2876,16 @@
         },"get");
         for(var i =0 ; i<data.length; i++){
             html +='<tr class="playtr" id="play-'+data[i].id+'">' +
-                '<td class="text-center">'+ data[i].certId +'</td>' +
-                '<td class="text-center">'+ data[i].secretKey +'</td>';
+                '<td class="text-center">'+ nulltostr(data[i].certId) +'</td>' +
+                '<td class="text-center">'+ nulltostr(data[i].secretKey) +'</td>';
             if(appServiceType=='msg'){
-                html += '<td class="text-center">' + data[i].ussdNum + '</td>' ;
-                html += '<td class="text-center">' + data[i].smsNum + '</td>' ;
+                html += '<td class="text-center">' + nulltostr(data[i].ussdNum) + '</td>' ;
+                html += '<td class="text-center">' + nulltostr(data[i].smsNum) + '</td>' ;
             }else if(appServiceType=='call_center'){
-                html += '<td class="text-center">' + data[i].voiceNum + '</td>' ;
+                html += '<td class="text-center">' + nulltostr(data[i].voiceNum) + '</td>' ;
 //                html += '<td class="text-center">' + data[i].seatNum + '</td>' ;
             }else if(appServiceType=='voice'){
-                html += '<td class="text-center">' + data[i].voiceNum + '</td>' ;
+                html += '<td class="text-center">' + nulltostr(data[i].voiceNum) + '</td>' ;
             }
             var state = data[i].enabled == 1?"启用":"禁用";
             var color = data[i].enabled == 1?"text-success":"text-danger";
@@ -2950,7 +2950,8 @@
                 editSubAccountFive.initObj(response.data);
                 $('#subAccount_home').hide();
                 $('#subAccount_datail').show();
-                if(appServiceType != 'msg'){
+                if(appServiceType == 'msg'|| '${app.status}'!=1){
+                }else{
                     $('#call-number2').attr("data-num-bind",response.data.id);
                     upnumber2();
                 }
@@ -3009,11 +3010,11 @@
             }
 
             html +='<tr id="agent-'+ data[i].name +'">' +
-                    '<td class="text-center">'+ data[i].name +'</td>' +
-                    '<td class="text-center">'+ skillStr +'</td>' +
-                    '<td class="text-center">'+ (data[i].extension!=null?data[i].extension:'') +'</td>' +
-                     '<td class="text-center">'+ data[i].certId +'</td>' +
-                    '<td class="text-center">' + data[i].state + '</td>' +
+                    '<td class="text-center">'+ nulltostr(data[i].name) +'</td>' +
+                    '<td class="text-center">'+ nulltostr(skillStr) +'</td>' +
+                    '<td class="text-center">'+ nulltostr(data[i].extension) +'</td>' +
+                     '<td class="text-center">'+ nulltostr(data[i].certId) +'</td>' +
+                    '<td class="text-center">' + nulltostr(data[i].state) + '</td>' +
                     '<td class="text-center"><a href="javascript:delAgent(\''+data[i].id+'\')" >删除</a></td>' +
                     '</tr>'
         }
@@ -3041,13 +3042,13 @@
         // $('#playtable').find(".playtr").remove();["✔", "✘"],
         for(var i =0 ; i<data.length; i++){
             html +='<tr id="queue-'+ data[i].id +'">' +
-                '<td class="text-center"><span style="float:left;" >'+ data[i].whereExpression +'</span></td>' +
-                '<td class="text-center"><span style="float:left;" >'+ data[i].sortExpression +'</span></td>' +
-                '<td class="text-center">' + data[i].priority + '</td>' +
-                '<td class="text-center">' + data[i].queueTimeout + '</td>' +
-                '<td class="text-center">' + data[i].fetchTimeout + '</td>' +
-                '<td class="text-center">'+ data[i].certId +'</td>' +
-                '<td class="text-center">' + data[i].remark + '</td>' +
+                '<td class="text-center"><span style="float:left;" >'+ nulltostr(data[i].whereExpression) +'</span></td>' +
+                '<td class="text-center"><span style="float:left;" >'+ nulltostr(data[i].sortExpression) +'</span></td>' +
+                '<td class="text-center">' + nulltostr(data[i].priority) + '</td>' +
+                '<td class="text-center">' + nulltostr(data[i].queueTimeout) + '</td>' +
+                '<td class="text-center">' + nulltostr(data[i].fetchTimeout) + '</td>' +
+                '<td class="text-center">'+ nulltostr(data[i].certId) +'</td>' +
+                '<td class="text-center">' + nulltostr(data[i].remark) + '</td>' +
                 '</tr>'
         }
         $('#queue-list').html(html);
@@ -3092,6 +3093,9 @@
                 }
             });
         }
+    }
+    function nulltostr(val){
+        return val==null||val==undefined ? '':val;
     }
 </script>
 

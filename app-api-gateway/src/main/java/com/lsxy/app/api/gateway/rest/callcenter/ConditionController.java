@@ -52,9 +52,9 @@ public class ConditionController extends AbstractAPIController {
         condition.setSubaccountId(getSubaccountId(request));
         condition.setWhereExpression(dto.getWhereExpression());
         condition.setSortExpression(dto.getSortExpression());
-        condition.setPriority(dto.getPriority());
+        condition.setPriority(dto.getPriority() == null ? 0 : dto.getPriority());
         condition.setQueueTimeout(dto.getQueueTimeout());
-        condition.setFetchTimeout(dto.getFetchTimeout());
+        condition.setFetchTimeout(dto.getFetchTimeout() == null?45:dto.getFetchTimeout());
         condition.setRemark(dto.getRemark());
         condition = conditionService.save(app.getTenant().getId(),appId,condition);
         Map<String,String> result = new HashMap<>();

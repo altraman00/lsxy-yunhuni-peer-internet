@@ -1,6 +1,7 @@
 package com.lsxy.msg.api.service;
 
 import com.lsxy.framework.api.base.BaseService;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.msg.api.model.MsgSendDetail;
 import com.lsxy.msg.api.model.MsgSendRecord;
 
@@ -24,4 +25,6 @@ public interface MsgSendDetailService extends BaseService<MsgSendDetail> {
     void updateStateFromWaitedToSuccessByRecordId(String recordId);
 
     Map getStateCountByRecordId(String recordId);
+    Page<MsgSendDetail> getPageByContiton(Integer pageNo, Integer pageSize, String msgKey, String mobile, String state);
+    List<MsgSendDetail> findByMsgKey(String msgKey);
 }
