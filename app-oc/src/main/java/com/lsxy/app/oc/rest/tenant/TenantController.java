@@ -1041,4 +1041,125 @@ public class TenantController extends AbstractRestController {
         }
         return list1;
     }
+    public static final String TYPE_MONTH = "month";//月统计类型 按年查找输出 返回按年
+    public static final String TYPE_DAY = "day";//日统计类型 按月查找输出 返回按月
+    @ApiOperation(value = "租户(某月所有天/某年所有月)的消息统计数据(succ成功fail失败)")
+    @RequestMapping(value = "/tenants/{tenant}/msg/statistic",method = RequestMethod.GET)
+    public RestResponse msgStatisticList(
+            @PathVariable String tenant,
+            @RequestParam(value = "year") Integer year,
+            @ApiParam(name = "month",value="不传month就是某年所有月的统计")
+            @RequestParam(value = "month",required = false) Integer month,
+            @RequestParam(required = false) String appId
+    ){
+        String type = null;
+        String startTime = null;
+        if(month!=null){
+            type = TYPE_MONTH;
+            startTime = year+"-"+month;
+        }else{
+            type = TYPE_DAY;
+            startTime = year+"";
+        }
+        Date date1 = getStartDate(startTime,type);
+        Date date2 = getLastDate(startTime,type);
+        List list = getList( tenant, appId,date1,date2,type);
+        return RestResponse.success(list);
+    }
+    @ApiOperation(value = "租户(某月所有天/某年所有月)的消息统计数据分页")
+    @RequestMapping(value = "/tenants/{tenant}/msg/statistic/plist",method = RequestMethod.GET)
+    public RestResponse msgStatistic(
+            @PathVariable String tenant,
+            @RequestParam(value = "year") Integer year,
+            @ApiParam(name = "month",value="不传month就是某年所有月的统计")
+            @RequestParam(value = "month",required = false) Integer month,
+            @RequestParam(required = false) String appId,
+            @RequestParam(required = false,defaultValue = "1") Integer pageNo,
+            @RequestParam(required = false,defaultValue = "70") Integer pageSize
+    ){
+        String type = null;
+        String startTime = null;
+        if(month!=null){
+            type = TYPE_MONTH;
+            startTime = year+"-"+month;
+        }else{
+            type = TYPE_DAY;
+            startTime = year+"";
+        }
+        Date date1 = getStartDate(startTime,type);
+        Date date2 = getLastDate(startTime,type);
+        Page page = getPage(tenant, appId , type, date1, date2, pageNo, pageSize);
+        return RestResponse.success(page);
+    }
+    /**
+     * 获取列表数据
+     * @param list 待处理的list
+     * @return
+     */
+    private Map getMsgArrays(List list,Object date) {
+        int leng = getLong(date);
+        Long[] succ = new Long[leng];
+        Long[] fail = new Long[leng];
+        for(int j=0;j<leng;j++){
+            succ[j] = 0L;
+            fail[j] = 0L;
+        }
+        for(int i=0;i<list.size();i++){
+            Object obj = list.get(i);
+            if(obj instanceof MsgStatisticsVo){
+                MsgStatisticsVo temp = (MsgStatisticsVo)obj;
+                int index = temp.getNum()-1;
+                succ[index] = temp.getTotalSucc();
+                fail[index] = temp.getTotalFail();
+            }
+        }
+        return new HashMap<String,Long[]>(){{
+            put("succ",succ);
+            put("fail",fail);
+        }};
+    }
+    private Page<MsgStatisticsVo> getPage(String tenantId,String appId ,String type,Date date1,Date date2,int pageNo,int pageSize){
+        List<MsgStatisticsVo> list = getList(tenantId,appId,date1,date2,type);
+        Page page = new Page( (pageNo-1)*pageSize ,  list.size(),  pageSize, list);
+        return page;
+    }
+    private List<MsgStatisticsVo> getList(String tenantId, String appId, Date date1,Date date2,String type){
+        int len = 0;
+        if(TYPE_MONTH.equals(type)){
+            len = getLong(12);
+        }else{
+            len = getLong(date1);
+        }
+        List<MsgStatisticsVo> list = new ArrayList<>();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date1);
+        for (int i = 0; i < len; i++) {
+            list.add( MsgStatisticsVo.initMsgStatisticsVo(calendar.getTime(),(i+1)) );
+            if(TYPE_MONTH.equals(type)){
+                calendar.add(Calendar.MONTH,1);
+            }else{
+                calendar.add(Calendar.DAY_OF_MONTH,1);
+            }
+        }
+        return list;
+    }
+    private Date getStartDate(String startTime,String type){
+        Date date = null;
+        if(TYPE_MONTH.equals(type)){
+            date = DateUtils.parseDate(startTime,"yyyy");
+        }else{
+            date = DateUtils.parseDate(startTime,"yyyy-MM");
+        }
+        return date;
+    }
+    private Date getLastDate(String endTime,String type){
+        Date date2 = null;
+        if(TYPE_MONTH.equals(type)){
+            date2  = DateUtils.parseDate(DateUtils.getLastYearByDate(endTime)+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+        }else{
+            date2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(endTime,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
+        }
+        return date2;
+    }
+
 }
