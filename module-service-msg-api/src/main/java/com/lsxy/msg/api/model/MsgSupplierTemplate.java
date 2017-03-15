@@ -27,6 +27,20 @@ public class MsgSupplierTemplate extends IdEntity {
     private String remark;
     private String lastUserName;
 
+    public MsgSupplierTemplate() {
+    }
+
+    public MsgSupplierTemplate(String tempId, String tenantId, String appId, String subaccountId, String supplierCode, String supplierTempId,String lastUserName) {
+        this.tempId = tempId;
+        this.tenantId = tenantId;
+        this.appId = appId;
+        this.subaccountId = subaccountId;
+        this.supplierCode = supplierCode;
+        this.supplierTempId = supplierTempId;
+        this.status = STATUS_PASS;
+        this.lastUserName = lastUserName;
+    }
+
     @Column(name = "temp_id")
     public String getTempId() {
         return tempId;

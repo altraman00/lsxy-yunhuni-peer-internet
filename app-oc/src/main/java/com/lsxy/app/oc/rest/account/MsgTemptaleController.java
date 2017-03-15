@@ -3,6 +3,7 @@ package com.lsxy.app.oc.rest.account;
 import com.alibaba.dubbo.common.utils.StringUtils;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.oc.base.AbstractRestController;
+import com.lsxy.app.oc.rest.config.vo.IdsVo;
 import com.lsxy.app.oc.rest.file.VoiceFilePlayVo;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
@@ -12,7 +13,11 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.oc.VoiceFilePlayAuditCompletedEvent;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.msg.api.model.MsgSupplier;
+import com.lsxy.msg.api.model.MsgSupplierTemplate;
 import com.lsxy.msg.api.model.MsgTemplate;
+import com.lsxy.msg.api.service.MsgSupplierService;
+import com.lsxy.msg.api.service.MsgSupplierTemplateService;
 import com.lsxy.msg.api.service.MsgTemplateService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
@@ -42,6 +47,10 @@ public class MsgTemptaleController extends AbstractRestController {
     private static final Logger logger = LoggerFactory.getLogger(MsgTemptaleController.class);
     @Reference(timeout=3000,check = false,lazy = true)
     private MsgTemplateService msgTemplateService;
+    @Reference(timeout=3000,check = false,lazy = true)
+    private MsgSupplierService msgSupplierService;
+    @Reference(timeout=3000,check = false,lazy = true)
+    private MsgSupplierTemplateService msgSupplierTemplateService;
     /**
      * 根据名字和应用id查询用户名下的放音文件
      * @param type await|auditing|unauth
@@ -95,12 +104,21 @@ public class MsgTemptaleController extends AbstractRestController {
     @RequestMapping(value = "/pass/{id}",method = RequestMethod.PUT)
     public RestResponse pass(
             @ApiParam(name = "id",value = "模板ID")
-            @PathVariable String id
+            @PathVariable String id,@RequestBody MsgTemplateUpdateVo idsVo
     ){
         MsgTemplate msgTemplate = msgTemplateService.findById(id);
         if(msgTemplate!=null){
             msgTemplate.setStatus(MsgTemplate.STATUS_PASS);
             msgTemplateService.save(msgTemplate);
+            List<MsgTemplateUpdateVo.Edit> ids= idsVo.getIds();
+            for (int i = 0; i < ids.size(); i++) {
+                MsgTemplateUpdateVo.Edit edit = ids.get(i);
+                MsgSupplier msgSupplier = msgSupplierService.findById(edit.getId());
+                if(msgSupplier!=null) {
+                    MsgSupplierTemplate msgSupplierTemplate = new MsgSupplierTemplate(msgTemplate.getTempId(), msgTemplate.getTenantId(), msgTemplate.getAppId(), msgTemplate.getSubaccountId(), msgSupplier.getCode(), edit.getTempId(), getCurrentUser().getUserName());
+                    msgSupplierTemplateService.save(msgSupplierTemplate);
+                }
+            }
             return RestResponse.success();
         }else{
             return RestResponse.failed("","模板不存在");
@@ -124,4 +142,11 @@ public class MsgTemptaleController extends AbstractRestController {
             return RestResponse.failed("","模板不存在");
         }
     }
+    @ApiOperation(value = "获取消息供应商列表")
+    @RequestMapping(value = "/supplier/list",method = RequestMethod.GET)
+    public RestResponse supplierList(){
+        List<MsgSupplier> list = (List<MsgSupplier>) msgSupplierService.list();
+        return RestResponse.success(list);
+    }
+
 }
