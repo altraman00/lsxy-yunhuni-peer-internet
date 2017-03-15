@@ -110,9 +110,9 @@ public class MsgTemptaleController extends AbstractRestController {
         if(msgTemplate!=null){
             msgTemplate.setStatus(MsgTemplate.STATUS_PASS);
             msgTemplateService.save(msgTemplate);
-            List<MsgTemplateUpdateVo.Edit> ids= idsVo.getIds();
+            List<MsgEdit> ids= idsVo.getIds();
             for (int i = 0; i < ids.size(); i++) {
-                MsgTemplateUpdateVo.Edit edit = ids.get(i);
+                MsgEdit edit = ids.get(i);
                 MsgSupplier msgSupplier = msgSupplierService.findById(edit.getId());
                 if(msgSupplier!=null) {
                     MsgSupplierTemplate msgSupplierTemplate = new MsgSupplierTemplate(msgTemplate.getTempId(), msgTemplate.getTenantId(), msgTemplate.getAppId(), msgTemplate.getSubaccountId(), msgSupplier.getCode(), edit.getTempId(), getCurrentUser().getUserName());
@@ -129,7 +129,7 @@ public class MsgTemptaleController extends AbstractRestController {
     public RestResponse pageList(
             @ApiParam(name = "id",value = "模板ID")
             @PathVariable String id,
-            @ApiParam(name="reason",value = "原因")
+            @ApiParam(name="reason",value = "原因格式：{\"reason\":\"内容\"}")
             @RequestBody Map map
             ){
         MsgTemplate msgTemplate = msgTemplateService.findById(id);

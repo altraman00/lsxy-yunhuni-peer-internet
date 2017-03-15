@@ -93,10 +93,8 @@ public class TenantAppController {
     @Reference(timeout=3000,check = false,lazy = true)
     private MsgTemplateService msgTemplateService;
 
-    @Autowired
     private ACs aCs;
 
-    @Autowired
     private CAs cAs;
 
 
