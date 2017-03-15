@@ -5,9 +5,12 @@ import com.lsxy.app.portal.rest.stastistic.vo.MsgStatisticsVo;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.statistics.service.MsgDayService;
+import com.lsxy.yunhuni.api.statistics.service.MsgMonthService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,18 +29,32 @@ public class MsgStatisticController extends AbstractRestController {
     private static final Logger logger = LoggerFactory.getLogger(MsgStatisticController.class);
     public static final String TYPE_MONTH = "month";//月统计类型 按年查找输出 返回按年
     public static final String TYPE_DAY = "day";//日统计类型 按月查找输出 返回按月
+    @Autowired
+    private MsgDayService msgDayService;
+    @Autowired
+    private MsgMonthService msgMonthService;
     @RequestMapping("/plist")
     public RestResponse pList(@RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize,@RequestParam String tenantId,@RequestParam String appId,@RequestParam String startTime,@RequestParam String type  ){
         Date date1 = getStartDate(startTime,type);
         Date date2 = getLastDate(startTime,type);
-        Page page = getPage(tenantId, appId , type, date1, date2, pageNo, pageSize);
+        Page page = null;//getPage(tenantId, appId , type, date1, date2, pageNo, pageSize);
+        if(TYPE_MONTH.equals(type)){
+            page = msgMonthService.getStatisticsPage(tenantId,appId,date1,date2,pageNo,pageSize);
+        }else{
+            page = msgDayService.getStatisticsPage(tenantId,appId,date1,date2,pageNo,pageSize);
+        }
         return RestResponse.success(page);
     }
     @RequestMapping("/list")
     public RestResponse list(@RequestParam String tenantId,@RequestParam String appId,@RequestParam String startTime,@RequestParam String type ){
         Date date1 = getStartDate(startTime,type);
         Date date2 = getLastDate(startTime,type);
-        List list = getList( tenantId, appId,date1,date2,type);
+        List list = null;//getList( tenantId, appId,date1,date2,type);
+        if(TYPE_MONTH.equals(type)){
+            list = msgMonthService.getStatisticsList(tenantId,appId,date1,date2);
+        }else{
+            list = msgDayService.getStatisticsList(tenantId,appId,date1,date2);
+        }
         return RestResponse.success(list);
     }
     private Page<MsgStatisticsVo> getPage(String tenantId,String appId ,String type,Date date1,Date date2,int pageNo,int pageSize){

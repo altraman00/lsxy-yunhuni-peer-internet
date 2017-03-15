@@ -25,8 +25,7 @@ public interface MsgTemplateService extends BaseService<MsgTemplate> {
 
     void deleteMsgTemplate(String appId, String subaccountId, String tempId, boolean isGW) throws InvocationTargetException, IllegalAccessException;
 
-    void updateMsgTemplate(MsgTemplate msgTemplate, boolean isGW) throws YunhuniApiException;
-
     long findByWait();
+
     MsgTemplate updateMsgTemplate(MsgTemplate msgTemplate, boolean isGW) throws YunhuniApiException;
 }
