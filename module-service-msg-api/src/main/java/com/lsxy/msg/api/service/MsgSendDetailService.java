@@ -5,6 +5,7 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.msg.api.model.MsgSendDetail;
 import com.lsxy.msg.api.model.MsgSendRecord;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -20,9 +21,9 @@ public interface MsgSendDetailService extends BaseService<MsgSendDetail> {
 
     List<String> updateStateAndTaskIdByRecordIdAndPhones(String recordId, List<String> phones, int state, String taskId);
 
-    List<String> updateStateAndSetEndTimeByRecordIdAndPhones(String recordId, List<String> phones, int state);
+    List<String> updateStateAndSetEndTimeByRecordIdAndPhones(String recordId, List<String> phones, int state,Date endTime);
 
-    void updateStateAndSetEndTimeFromWaitedToSuccessByRecordId(String recordId);
+    void updateStateAndSetEndTimeFromWaitedToSuccessByRecordId(String recordId,Date endTime);
 
     Map getStateCountByRecordId(String recordId);
     Page<MsgSendDetail> getPageByContiton(Integer pageNo, Integer pageSize, String msgKey, String mobile, String state);

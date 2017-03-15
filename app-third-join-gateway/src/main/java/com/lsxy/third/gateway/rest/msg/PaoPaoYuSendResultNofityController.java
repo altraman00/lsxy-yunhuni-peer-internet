@@ -119,14 +119,15 @@ public class PaoPaoYuSendResultNofityController extends AbstractAPIController {
                     }
                     String mobiles = msgSendRecord.getMobiles();
                     List<String> mobileList = Arrays.asList(mobiles.split(MsgConstant.NumRegexStr));
-                    List<String> detailIds = msgSendDetailService.updateStateAndSetEndTimeByRecordIdAndPhones(msgSendRecord.getId(), mobileList, state);
+                    Date endTime = new Date();
+                    List<String> detailIds = msgSendDetailService.updateStateAndSetEndTimeByRecordIdAndPhones(msgSendRecord.getId(), mobileList, state,endTime);
                     //查找主记录
                     if (state == MsgSendRecord.STATE_FAIL) {//发送失败
                         // 返还扣费
                         //插入消费
                         BigDecimal cost = BigDecimal.ZERO.subtract(msgSendRecord.getMsgCost());
                         ProductCode product = ProductCode.valueOf(msgSendRecord.getSendType());
-                        msgSendService.batchConsumeMsg(new Date(),product.name(),cost,product.getRemark(),msgSendRecord.getAppId(),msgSendRecord.getTenantId(),msgSendRecord.getSubaccountId(),detailIds);
+                        msgSendService.batchConsumeMsg(endTime,product.name(),cost,product.getRemark(),msgSendRecord.getAppId(),msgSendRecord.getTenantId(),msgSendRecord.getSubaccountId(),detailIds);
                     }
                 }
                 logger.info("[泡泡鱼][消息发送情况回调接口][请求]["+ip+"][处理成功]");

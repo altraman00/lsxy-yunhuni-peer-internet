@@ -71,15 +71,16 @@ public class PaoPaoYuMassTaskLogTask {
                             record.setFailNum(record.getSuccNum() + task.getSendSuccNum());
                             record.setFailNum(task.getPendingNum() + 0L);
                             msgSendRecordService.save(record);
-                            List<String> ids = msgSendDetailService.updateStateAndSetEndTimeByRecordIdAndPhones(record.getId(), task.getFailPhoneList(), MsgSendDetail.STATE_FAIL);
-                            msgSendDetailService.updateStateAndSetEndTimeFromWaitedToSuccessByRecordId(record.getId());
+                            Date endTime = new Date();
+                            List<String> ids = msgSendDetailService.updateStateAndSetEndTimeByRecordIdAndPhones(record.getId(), task.getFailPhoneList(), MsgSendDetail.STATE_FAIL,endTime);
+                            msgSendDetailService.updateStateAndSetEndTimeFromWaitedToSuccessByRecordId(record.getId(),endTime);
 
                             //接口调用成功则不理会，接口调用失败，进行补扣费
                             //处理发送结果
                             if(ids != null && ids.size() > 0){
                                 BigDecimal cost = BigDecimal.ZERO.subtract(record.getMsgCost());
                                 ProductCode product = ProductCode.valueOf(record.getSendType());
-                                msgSendService.batchConsumeMsg(new Date(),record.getSendType(),cost,product.getRemark(),record.getAppId(),record.getTenantId(),record.getSubaccountId(),ids);
+                                msgSendService.batchConsumeMsg(endTime,record.getSendType(),cost,product.getRemark(),record.getAppId(),record.getTenantId(),record.getSubaccountId(),ids);
                             }
                         }else{
                             logger.error("[校验][泡泡鱼][群发事件结果是否合理][不合理][期待结果值："+ record.getPendingNum() +"][实际结果值：(succ)"+task.getSendSuccNum() +
