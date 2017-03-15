@@ -26,6 +26,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -101,10 +102,11 @@ public class QiXunTongSendResultNofityController extends AbstractAPIController {
 
                 if(MsgSendDetail.STATE_FAIL == state){
                     // 扣费返还
-                    ProductCode productCode = ProductCode.valueOf(msgSendDetail.getSendType());
+                    List<String> ids = Arrays.asList(msgSendDetail.getId());
                     BigDecimal cost = BigDecimal.ZERO.subtract(msgSendDetail.getMsgCost());
-                    Consume consume = new Consume(new Date(),productCode.name(),cost,productCode.getRemark(),msgSendDetail.getAppId(),msgSendDetail.getTenantId(),msgSendDetail.getId(),msgSendDetail.getSubaccountId());
-                    consumeService.consume(consume);
+                    ProductCode product = ProductCode.valueOf(msgSendDetail.getSendType());
+                    consumeService.batchConsume(new Date(),product.name(),cost,product.getRemark(),msgSendDetail.getAppId(),msgSendDetail.getTenantId(),msgSendDetail.getSubaccountId(),ids);
+
                 }
                 logger.info("[企讯通][消息发送情况回调接口][请求][处理成功]" + result);
             } else {

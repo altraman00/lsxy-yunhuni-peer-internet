@@ -126,12 +126,9 @@ public class PaoPaoYuSendResultNofityController extends AbstractAPIController {
                     if (state == MsgSendRecord.STATE_FAIL) {//发送失败
                         // 返还扣费
                         //插入消费
-                        for(String detailId : detailIds){
-                            ProductCode productCode = ProductCode.valueOf(msgSendRecord.getSendType());
-                            BigDecimal cost = BigDecimal.ZERO.subtract(msgSendRecord.getMsgCost());
-                            Consume consume = new Consume(new Date(),productCode.name(),cost,productCode.getRemark(),msgSendRecord.getAppId(),msgSendRecord.getTenantId(),detailId,msgSendRecord.getSubaccountId());
-                            consumeService.consume(consume);
-                        }
+                        BigDecimal cost = BigDecimal.ZERO.subtract(msgSendRecord.getMsgCost());
+                        ProductCode product = ProductCode.valueOf(msgSendRecord.getSendType());
+                        consumeService.batchConsume(new Date(),product.name(),cost,product.getRemark(),msgSendRecord.getAppId(),msgSendRecord.getTenantId(),msgSendRecord.getSubaccountId(),detailIds);
                     }
                 }
                 logger.info("[泡泡鱼][消息发送情况回调接口][请求]["+ip+"][处理成功]");

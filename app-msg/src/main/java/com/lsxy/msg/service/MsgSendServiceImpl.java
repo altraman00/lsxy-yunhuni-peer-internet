@@ -149,9 +149,10 @@ public class MsgSendServiceImpl implements MsgSendService {
             //插入消费记录
             if(msgRequest.getMsgCost().compareTo(BigDecimal.ZERO) == 1){
                 //插入消费
-                ProductCode productCode = ProductCode.valueOf(msgRequest.getSendType());
-                Consume consume = new Consume(msgRequest.getCreateTime(),productCode.name(),msgRequest.getMsgCost(),productCode.getRemark(),msgRequest.getAppId(),msgRequest.getTenantId(),msgSendDetail.getId(),msgRequest.getSubaccountId());
-                consumeService.consume(consume);
+                //批量扣费
+                List<String> ids = Arrays.asList(msgSendDetail.getId());
+                ProductCode product = ProductCode.valueOf(sendType);
+                consumeService.batchConsume(new Date(),sendType,cost,product.getRemark(),appId,msgRequest.getTenantId(),subaccountId,ids);
             }
         }else{
             MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,MsgConstant.MSG_USSD,mobile,msg,tempId,tempArgs,new Date(),cost,MsgUserRequest.STATE_FAIL);
