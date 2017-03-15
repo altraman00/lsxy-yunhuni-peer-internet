@@ -56,18 +56,18 @@ public class MsgDayServiceImpl extends AbstractService<MsgDay> implements MsgDay
         if(todayStatistics != null){
             return;
         }
-        String[] groups = {"tenant_id,app_id,subaccount_id","tenant_id,app_id","tenant_id"};
+        String[] selects = {"tenant_id,app_id,subaccount_id,","tenant_id,app_id,","tenant_id,",""};
 
-        for(String group:groups){
-            String sql = "SELECT REPLACE(UUID(), '-', '') AS id,"+ group +",send_type AS TYPE,COUNT(1) AS total," +
+        for(String select:selects){
+            String sql = "SELECT REPLACE(UUID(), '-', '') AS id,"+ select +"send_type AS TYPE,COUNT(1) AS total," +
                     "IFNULL(SUM(CASE WHEN (state=1) THEN 1 ELSE 0 END),0) AS success,IFNULL(SUM(CASE WHEN (state=-1) THEN 1 ELSE 0 END),0) AS fail," +
                     "'"+statisticsDateStr+"' AS dt, "+ day +" AS day ," +
                     "'"+currentDateStr + "' AS create_time, '"+ currentDateStr + "' AS last_time," + " 0 AS deleted,0 AS sortno,0 AS version "+
-                    "FROM db_lsxy_bi_yunhuni.tb_bi_msg_send_detail  WHERE d.end_time >= '"+statisticsDateStr+"' AND d.end_time < '"+ nextDateStr +"' GROUP BY "+ group +",send_type";
+                    "FROM db_lsxy_bi_yunhuni.tb_bi_msg_send_detail  WHERE end_time >= '"+statisticsDateStr+"' AND end_time < '"+ nextDateStr +"' GROUP BY "+ select +"send_type";
             Query query = getEm().createNativeQuery(sql);
             List result = query.getResultList();
             if(result != null && result.size() >0){
-                String values = "id," + group + ",type,total,success,fail,dt,day, create_time,last_time,deleted,sortno,version";
+                String values = "id," + select + "type,total,success,fail,dt,day, create_time,last_time,deleted,sortno,version";
                 String valuesMark = "";
                 int length = values.split(",").length;
                 for(int i = 0;i<length;i++){

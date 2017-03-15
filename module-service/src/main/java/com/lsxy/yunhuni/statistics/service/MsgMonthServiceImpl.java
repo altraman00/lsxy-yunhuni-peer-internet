@@ -8,10 +8,13 @@ import com.lsxy.yunhuni.api.statistics.model.SubaccountMonth;
 import com.lsxy.yunhuni.api.statistics.service.MsgMonthService;
 import com.lsxy.yunhuni.statistics.dao.MsgMonthDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Query;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by liups on 2017/3/14.
@@ -20,6 +23,10 @@ import java.util.Date;
 public class MsgMonthServiceImpl extends AbstractService<MsgMonth> implements MsgMonthService {
     @Autowired
     MsgMonthDao msgMonthDao;
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
+
     @Override
     public BaseDaoInterface<MsgMonth, Serializable> getDao() {
         return this.msgMonthDao;
@@ -33,7 +40,6 @@ public class MsgMonthServiceImpl extends AbstractService<MsgMonth> implements Ms
         Date staticsDate = DateUtils.parseDate(monthStr, "yyyy-MM");
         String statisticsDateStr = DateUtils.formatDate(staticsDate);
         Date preDate = DateUtils.getPrevMonth(staticsDate);
-        String preDateStr = DateUtils.formatDate(preDate);
         String nextDateStr = DateUtils.getNextMonth(statisticsDateStr, "yyyy-MM-dd HH:mm:ss");
         String currentDateStr = DateUtils.formatDate(new Date());
 
@@ -49,9 +55,32 @@ public class MsgMonthServiceImpl extends AbstractService<MsgMonth> implements Ms
         if(todayStatistics != null){
             return;
         }
-        String[] groups = {"tenant_id,app_id,subaccount_id","tenant_id,app_id","tenant_id"};
-        String[] wheres = {};
+        String[] selects = {"tenant_id,app_id,subaccount_id","tenant_id,app_id","tenant_id",""};
 
+        for(String select:selects){
+            String sql = "SELECT REPLACE(UUID(), '-', '') AS id,"+ select +"TYPE,SUM(total) AS total,SUM(success) AS success,SUM(fail) AS fail " +
+                    "'"+statisticsDateStr+"' AS dt, "+ month +" AS month ," +
+                    "'"+currentDateStr + "' AS create_time, '"+ currentDateStr + "' AS last_time," + " 0 AS deleted,0 AS sortno,0 AS version "+
+                    " FROM db_lsxy_bi_yunhuni.tb_bi_msg_day_statistics WHERE tenant_id is not null and app_id is not null and subaccount_id is not null " +
+                    " AND dt >= '"+statisticsDateStr+"' AND dt < '"+ nextDateStr +"' GROUP BY "+ select +"type";
+
+            Query query = getEm().createNativeQuery(sql);
+            List result = query.getResultList();
+            if(result != null && result.size() >0) {
+                String values = "id," + select + "type,total,success,fail,dt,month, create_time,last_time,deleted,sortno,version";
+                String valuesMark = "";
+                int length = values.split(",").length;
+                for (int i = 0; i < length; i++) {
+                    if (i == length - 1) {
+                        valuesMark += "?";
+                    } else {
+                        valuesMark += "?,";
+                    }
+                }
+                String insertSql = "INSERT INTO db_lsxy_bi_yunhuni.tb_bi_msg_month_statistics (" + values + ") values (" + valuesMark + ")";
+                jdbcTemplate.batchUpdate(insertSql, result);
+            }
+        }
 
     }
 
