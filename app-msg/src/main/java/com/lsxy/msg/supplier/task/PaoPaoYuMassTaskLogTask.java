@@ -63,7 +63,11 @@ public class PaoPaoYuMassTaskLogTask {
                         //校验数据合理性
                         if( record.getPendingNum() == ( task.getSendSuccNum() + task.getSendFailNum() )){
                             //更新结果
-                            record.setState(MsgSendRecord.STATE_SUCCESS);
+                            if(record.getPendingNum() == task.getSendFailNum()){
+                                record.setState(MsgSendRecord.STATE_FAIL);
+                            }else{
+                                record.setState(MsgSendRecord.STATE_SUCCESS);
+                            }
                             record.setFailNum(record.getFailNum() + task.getSendFailNum());
                             record.setFailNum(record.getSuccNum() + task.getSendSuccNum());
                             record.setFailNum(task.getPendingNum() + 0L);

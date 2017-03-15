@@ -28,4 +28,5 @@ public interface MsgTemplateService extends BaseService<MsgTemplate> {
     void updateMsgTemplate(MsgTemplate msgTemplate, boolean isGW) throws YunhuniApiException;
 
     long findByWait();
+    MsgTemplate updateMsgTemplate(MsgTemplate msgTemplate, boolean isGW) throws YunhuniApiException;
 }

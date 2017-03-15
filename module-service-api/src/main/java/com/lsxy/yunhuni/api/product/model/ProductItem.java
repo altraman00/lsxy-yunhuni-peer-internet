@@ -14,6 +14,7 @@ import javax.persistence.*;
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_product_item")
 public class ProductItem extends IdEntity {
     public static int CAL_TYPE_TIME = 2;//按时长收
+    public static int CAL_TYPE_NUM = 1;//按数量收
     private Product product;//所属产品类别
     private String name;    //产品名称
     private String code;    //一次写入，不可修改，涉及到编程

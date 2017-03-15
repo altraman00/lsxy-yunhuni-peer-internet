@@ -86,15 +86,8 @@ public class QiXunTongSendResultNofityController extends AbstractAPIController {
                     state = MsgSendDetail.STATE_FAIL;
                 }
                 msgSendDetail.setState(state);
-                msgSendDetailService.save(msgSendDetail);
-                if(MsgSendDetail.STATE_FAIL == state){
-                    // 扣费返还
-                    ProductCode productCode = ProductCode.valueOf(msgSendDetail.getSendType());
-                    BigDecimal cost = BigDecimal.ZERO.subtract(msgSendDetail.getMsgCost());
-                    Consume consume = new Consume(new Date(),productCode.name(),cost,productCode.getRemark(),msgSendDetail.getAppId(),msgSendDetail.getTenantId(),msgSendDetail.getId(),msgSendDetail.getSubaccountId());
-                    consumeService.consume(consume);
-                }
                 if(!msgSendDetail.getIsMass()) {
+                    msgSendDetail.setEndTime(new Date());
                     try{
                         msgUserRequestService.updateStateByMsgKey(msgSendDetail.getMsgKey(),state);
                         msgSendRecordService.updateStateByMsgKey(msgSendDetail.getMsgKey(),state);
@@ -103,10 +96,17 @@ public class QiXunTongSendResultNofityController extends AbstractAPIController {
                         logger.info("[企讯通][消息发送情况回调接口][请求][处理成功]" + result + "[更新主记录异常],msgKey:" + msgSendDetail.getMsgKey());
 
                     }
-
-                }else {
-                    logger.info("[企讯通][消息发送情况回调接口][请求][处理成功]" + result);
                 }
+                msgSendDetailService.save(msgSendDetail);
+
+                if(MsgSendDetail.STATE_FAIL == state){
+                    // 扣费返还
+                    ProductCode productCode = ProductCode.valueOf(msgSendDetail.getSendType());
+                    BigDecimal cost = BigDecimal.ZERO.subtract(msgSendDetail.getMsgCost());
+                    Consume consume = new Consume(new Date(),productCode.name(),cost,productCode.getRemark(),msgSendDetail.getAppId(),msgSendDetail.getTenantId(),msgSendDetail.getId(),msgSendDetail.getSubaccountId());
+                    consumeService.consume(consume);
+                }
+                logger.info("[企讯通][消息发送情况回调接口][请求][处理成功]" + result);
             } else {
                 logger.error("[企讯通][消息发送情况回调接口][请求][签名失败]"+result);
             }

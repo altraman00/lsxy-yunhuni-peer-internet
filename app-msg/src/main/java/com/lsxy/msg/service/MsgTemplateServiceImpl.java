@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 /**
  * Created by liups on 2017/3/1.
@@ -121,15 +122,42 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
     }
 
     @Override
-    public void updateMsgTemplate(MsgTemplate msgTemplate,boolean isGW) throws YunhuniApiException {
+    public MsgTemplate updateMsgTemplate(MsgTemplate msgTemplate,boolean isGW) throws YunhuniApiException {
         String tempId = msgTemplate.getTempId();
         if(StringUtils.isBlank(tempId) || StringUtils.isBlank(msgTemplate.getAppId())){
             throw new RequestIllegalArgumentException();
         }
-        if (StringUtils.isNotBlank(msgTemplate.getSubaccountId()) || isGW) {
-//            msgTemplateDao.updateMsgTemplate(msg);
+        MsgTemplate oldTemplate;
+        if(StringUtils.isNotBlank(msgTemplate.getSubaccountId()) || isGW){
+            oldTemplate = msgTemplateDao.findByAppIdAndSubaccountIdAndTempId(msgTemplate.getAppId(), msgTemplate.getSubaccountId(), tempId);
+        }else {
+            oldTemplate = msgTemplateDao.findByAppIdAndTempId(msgTemplate.getAppId(),tempId);
         }
-
+        if(oldTemplate == null){
+            throw new RequestIllegalArgumentException();
+        }
+        boolean flag = false;
+        if(StringUtils.isNotBlank(msgTemplate.getName())){
+            flag = true;
+            oldTemplate.setName(msgTemplate.getName());
+        }
+        if(StringUtils.isNotBlank(msgTemplate.getType())){
+            flag = true;
+            oldTemplate.setName(msgTemplate.getType());
+        }
+        if(StringUtils.isNotBlank(msgTemplate.getContent())){
+            flag = true;
+            oldTemplate.setName(msgTemplate.getContent());
+        }
+        if(StringUtils.isNotBlank(msgTemplate.getRemark())){
+            flag = true;
+            oldTemplate.setName(msgTemplate.getReason());
+        }
+        if(flag){
+            oldTemplate.setStatus(MsgTemplate.STATUS_WAIT);
+            this.save(oldTemplate);
+        }
+        return oldTemplate;
     }
 
     @Override

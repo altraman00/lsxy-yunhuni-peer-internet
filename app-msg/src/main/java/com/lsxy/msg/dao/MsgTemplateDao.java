@@ -13,7 +13,4 @@ public interface MsgTemplateDao extends BaseDaoInterface<MsgTemplate, Serializab
 
     MsgTemplate findByAppIdAndTempId(String appId, String tempId);
 
-    void deleteByAppIdAndSubaccountIdAndTempId(String appId, String subaccountId, String tempId);
-
-    void deleteByAppIdAndTempId(String appId, String tempId);
 }

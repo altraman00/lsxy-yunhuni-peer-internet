@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,5 +33,10 @@ public interface MsgSendDetailDao extends BaseDaoInterface<MsgSendDetail, Serial
     @Modifying
     @Query("update MsgSendDetail d set d.state = :state where d.recordId = :recordId AND d.state = :stateWait")
     void updateStateFromWaitedToStateByRecordId(@Param("recordId") String recordId, @Param("stateWait") int stateWait, @Param("state") int state);
+
     List<MsgSendDetail> findByMsgKey(String msgKey);
+
+    @Modifying
+    @Query("update MsgSendDetail d set d.endTime = :endTime where d.msgKey = :msgKey AND d.endTime IS NOT NULL ")
+    void setEndTimeByMsgKey(@Param("msgKey") String msgKey,@Param("endTime") Date endTime);
 }
