@@ -1,4 +1,4 @@
-package com.lsxy.msg.supplier.paopaoyu;
+package com.msg.paopaoyu;
 
 /**
  * 泡泡鱼错误码

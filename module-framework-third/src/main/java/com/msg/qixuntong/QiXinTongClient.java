@@ -1,7 +1,7 @@
-package com.lsxy.msg.supplier.qixuntong;
+package com.msg.qixuntong;
 
 import com.lsxy.framework.core.utils.JSONUtil;
-import com.lsxy.msg.supplier.utils.HttpConnectionManager;
+import com.msg.utils.HttpConnectionManager;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;

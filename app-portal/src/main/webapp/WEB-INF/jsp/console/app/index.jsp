@@ -142,16 +142,16 @@
                                             2、呼叫中心服务包含呼叫中心产品适用于企业为售前售后，业务咨询，业务订购，客户反馈投诉受理等而搭建的客服中心或销售中心。
                                         </p>
                                         <div class="form-group app-createbox" id="app-tag">
-                                            <input type="hidden" name="serviceType" id="serviceType" value="voice">
+                                            <input type="hidden" name="serviceType" id="serviceType" value="msg">
                                             <div class="col-md-3 text-right"><span class="text-label" ><strong>选择服务:</strong></span></div>
                                             <div class="col-md-9" >
-                                                <div class="btn app-tag active" data-app="voice"><i class="iconfont icon-call-voice"></i><span>语音</span></div>
-                                                <div class="btn app-tag" data-app="msg"><i class="iconfont icon-xiaoxi"></i><span>消息</span></div>
+                                                <div class="btn app-tag active" data-app="msg"><i class="iconfont icon-xiaoxi"></i><span>消息</span></div>
+                                                <div class="btn app-tag" data-app="voice"><i class="iconfont icon-call-voice"></i><span>语音</span></div>
                                                 <div class="btn app-tag" data-app="call_center"><i class="iconfont icon-call-center" ></i><span>呼叫中心</span></div>
                                             </div>
                                         </div>
                                         <!--语音-->
-                                        <div class="form-group app-createbox app-tap-child" data-child="voice" >
+                                        <div class="form-group app-createbox none app-tap-child" data-child="voice" >
                                             <lable class="col-md-3 text-right"></lable>
                                             <div class="col-md-9" >
                                                 <p><input type="checkbox" name="isVoiceDirectly" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceDirectly=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">语音通知</font>（自动拨打用户电话，并播报自定义的通知内容）</p>
@@ -166,11 +166,11 @@
                                             </div>
                                         </div>
                                         <!--消息-->
-                                        <div class="form-group app-createbox none app-tap-child" data-child="msg" >
+                                        <div class="form-group app-createbox app-tap-child" data-child="msg" >
                                             <lable class="col-md-3 text-right"></lable>
                                             <div class="col-md-9" >
                                                 <p><input type="checkbox" name="isUssd" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isUssd=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">闪印</font>（不惧拦截，批量发送，迅速抢占手机屏幕）</p>
-                                                <p><input type="checkbox" name="isMsm" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isMsm=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">短信</font>（免开发的短信发送平台，接入即用）</p>
+                                                <p><input type="checkbox" name="isSms" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isSms=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">短信</font>（免开发的短信发送平台，接入即用）</p>
                                             </div>
                                         </div>
                                         <!--呼叫中心-->

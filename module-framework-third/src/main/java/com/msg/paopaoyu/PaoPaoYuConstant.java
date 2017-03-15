@@ -1,4 +1,4 @@
-package com.lsxy.msg.supplier.paopaoyu;
+package com.msg.paopaoyu;
 
 /**
  * Created by liups on 2017/3/8.
@@ -10,4 +10,6 @@ public class PaoPaoYuConstant {
     public static final String paopaoyu_replace_symbol = "#*#";
     public static final String PaopaoyuCode = "PaoPaoYu";
     public static final String PaoaoyuTimePartten = "yyyyMMddHHmmss";
+    public static final String PapPaoyuStateSuccess = "0";
+    public static final String PapPaoyuStateFail = "1";
 }

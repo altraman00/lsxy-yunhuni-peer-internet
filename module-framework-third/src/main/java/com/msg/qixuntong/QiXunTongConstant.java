@@ -1,4 +1,4 @@
-package com.lsxy.msg.supplier.qixuntong;
+package com.msg.qixuntong;
 
 /**
  * Created by liups on 2017/3/8.
@@ -9,4 +9,5 @@ public class QiXunTongConstant {
     public static final String QiXunTongParamRegexStr = ";";//多参数用分号分割
     public static final String qixuntong_replace_symbol = "#P#";
     public static final String QixuntongCode = "QiXunTong";
+    public static final int QixuntongStateSuccess = 0;
 }

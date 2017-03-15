@@ -42,16 +42,17 @@ public class App extends IdEntity {
     private Integer isCallCenter;//是否启用呼叫中心服务 是否呼叫中心0否，1是',
     private String serviceType;//服务类型
     private Long callCenterNum; //呼叫中心应用编号
-    private Integer isMsm;//短信
+    private Integer isSms;//短信
     private Integer isUssd;//闪印
-    @Column(name = "is_msm")
-    public Integer getIsMsm() {
-        return isMsm;
+    @Column(name = "is_sms")
+    public Integer getIsSms() {
+        return isSms;
     }
 
-    public void setIsMsm(Integer isMsm) {
-        this.isMsm = isMsm;
+    public void setIsSms(Integer isSms) {
+        this.isSms = isSms;
     }
+
     @Column(name = "is_ussd")
     public Integer getIsUssd() {
         return isUssd;

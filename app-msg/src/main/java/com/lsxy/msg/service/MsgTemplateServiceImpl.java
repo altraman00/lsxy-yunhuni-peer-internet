@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 
 /**
  * Created by liups on 2017/3/1.
@@ -65,6 +66,20 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
     }
 
     @Override
+    public Page<MsgTemplate> getPageByCondition(Integer pageNo, Integer pageSize, int state,Date date1, Date date2, String name) {
+        String hql = " from MsgTemplate obj where obj.status = ?1 ";
+        if(StringUtil.isNotEmpty(name)){
+            hql += " and obj.name like '%"+name+"%' ";
+        }
+        if(date1!=null&&date2!=null){
+            hql += " and obj.lateTime between ?2 and ?3 ";
+            return pageList(hql,pageNo,pageSize,state,date1,date2);
+        }else{
+            return pageList(hql,pageNo,pageSize,state);
+        }
+    }
+
+    @Override
     public Page<MsgTemplate> getPageForGW(String appId, String subaccountId, Integer pageNo, Integer pageSize){
         Page<MsgTemplate> page;
         if(StringUtils.isBlank(subaccountId)){
@@ -108,6 +123,12 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
 //            msgTemplateDao.updateMsgTemplate(msg);
         }
 
+    }
+
+    @Override
+    public long findByWait() {
+        String hql2 = "  from MsgTemplate obj where obj.status=?1  ";
+        return this.countByCustom(hql2, MsgTemplate.STATUS_WAIT);
     }
 
 }
