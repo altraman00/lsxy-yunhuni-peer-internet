@@ -1,5 +1,8 @@
 package com.lsxy.msg.service;
 
+import com.lsxy.framework.core.exceptions.api.BalanceNotEnoughException;
+import com.lsxy.framework.core.exceptions.api.QuotaNotEnoughException;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.msg.api.model.*;
@@ -53,27 +56,27 @@ public class MsgSendServiceImpl implements MsgSendService {
     CalCostService calCostService;
 
     @Override
-    public String sendUssd(String ip,String appId,String subaccountId,String mobile, String tempId, String tempArgs) {
+    public String sendUssd(String ip,String appId,String subaccountId,String mobile, String tempId, String tempArgs) throws YunhuniApiException{
         return sendOne(appId, subaccountId, mobile, tempId, tempArgs, MsgConstant.MSG_USSD);
     }
 
     @Override
-    public String sendUssdMass(String ip, String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) {
+    public String sendUssdMass(String ip, String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) throws YunhuniApiException {
         return sendMass(appId, subaccountId, taskName, tempId, tempArgs, mobiles, sendTimeStr,MsgConstant.MSG_SMS);
     }
 
     @Override
-    public String sendSms(String ip,String appId,String subaccountId,String mobile, String tempId, String tempArgs) {
+    public String sendSms(String ip,String appId,String subaccountId,String mobile, String tempId, String tempArgs) throws YunhuniApiException{
         return sendOne(appId, subaccountId, mobile, tempId, tempArgs,MsgConstant.MSG_SMS);
     }
 
     @Override
-    public String sendSmsMass(String ip, String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) {
+    public String sendSmsMass(String ip, String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) throws YunhuniApiException {
         return sendMass(appId, subaccountId, taskName, tempId, tempArgs, mobiles, sendTimeStr,MsgConstant.MSG_SMS);
     }
 
     @Transactional
-    private String sendOne(String appId, String subaccountId, String mobile, String tempId, String tempArgs,String sendType) {
+    private String sendOne(String appId, String subaccountId, String mobile, String tempId, String tempArgs,String sendType) throws YunhuniApiException {
         App app = appService.findById(appId);
         //TODO 判断红黑名单
 
@@ -110,7 +113,8 @@ public class MsgSendServiceImpl implements MsgSendService {
             //TODO 抛异常
             return ResultCode.ERROR_20009.toString();
         }
-        //TODO 判断余额是否可以发送
+        //判断余额是否可以发送
+        calCostService.isMsgRemainOrBalanceEnough(subaccountId,sendType,app.getTenant().getId(),1L);
 
         //生成任务标识，发送
         ResultOne resultOne = null;
@@ -157,7 +161,7 @@ public class MsgSendServiceImpl implements MsgSendService {
         return key;
     }
 
-    private String sendMass(String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr,String sendType) {
+    private String sendMass(String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr,String sendType) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(StringUtils.isEmpty( taskName )){
             //TODO 抛异常
@@ -208,7 +212,8 @@ public class MsgSendServiceImpl implements MsgSendService {
             return ResultCode.ERROR_20001.toString();
         }
 
-        //TODO 判断余额是否可以发送
+        //判断余额是否可以发送
+        calCostService.isMsgRemainOrBalanceEnough(subaccountId,sendType,app.getTenant().getId(),massMobile.getCount());
 
         //生成任务标识，发送
         String key = UUIDGenerator.uuid();

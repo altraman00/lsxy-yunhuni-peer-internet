@@ -36,8 +36,6 @@ public class CertAccountQuota extends IdEntity {
     private String name;
     @Transient
     private Long currentUsed; //实时使用
-    @Transient
-    private Boolean hasRemain;
 
     public CertAccountQuota(String type, Long value) {
         this.type = type;
@@ -186,11 +184,11 @@ public class CertAccountQuota extends IdEntity {
     }
 
     @Transient
-    public Boolean getHasRemain() {
+    public Boolean getHasRemain(Long need) {
         if(value < 0){
             return true;
         }else{
-            return (value - (this.currentUsed == null ? (this.used == null ? 0L : this.used) : currentUsed)) > 0;
+            return (value - (this.currentUsed == null ? (this.used == null ? 0L : this.used) : currentUsed)) - (need == null?0L:need) > 0;
         }
     }
 
