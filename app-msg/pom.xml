@@ -35,6 +35,11 @@
 
         <dependency>
             <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-third</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.lsxy</groupId>
             <artifactId>module-framework-dubbo</artifactId>
             <exclusions>
                 <exclusion>
@@ -43,11 +48,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
-        </dependency>
+
     </dependencies>
 
 </project>

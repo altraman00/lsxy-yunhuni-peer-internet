@@ -1,11 +1,14 @@
 package com.lsxy.app.oc.rest.tenant.vo;
 
 import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Created by liups on 2016/11/18.
  */
+@ApiModel
 public class ExtensionVO {
     @ApiModelProperty(name="id",value = "id")
     private String id;
@@ -21,11 +24,14 @@ public class ExtensionVO {
     private String telnum;//    telenum              varchar(32) comment '如果是电话分机，该属性记录电话号码（保留，不用）',
     @ApiModelProperty(name="enable",value = "是否可用")
     private Boolean enable; //分机是否可用（不存到数据库）;
-
+    @ApiModelProperty(name = "subaccountId",value = "关联子账号")
+    private String subaccountId;
+    @ApiModelProperty(name = "certId",value = "关联子账号-鉴权账户")
+    private String certId;
     public ExtensionVO() {
     }
 
-    public ExtensionVO(String id, String type, String user, String password, String ipaddr, String telnum,Boolean enable) {
+    public ExtensionVO(String id, String type, String user, String password, String ipaddr, String telnum,Boolean enable,String subaccountId,String certId) {
         this.id = id;
         this.type = type;
         this.user = user;
@@ -33,10 +39,13 @@ public class ExtensionVO {
         this.ipaddr = ipaddr;
         this.telnum = telnum;
         this.enable = enable;
+        this.subaccountId = subaccountId;
+        this.certId = certId;
     }
 
-    public static ExtensionVO changeAppExtensionToExtensionVO(AppExtension ext){
-        return new ExtensionVO(ext.getId(),ext.getType(),ext.getUser(),ext.getPassword(),ext.getIpaddr(),ext.getTelnum(),ext.getEnable());
+    public static ExtensionVO changeAppExtensionToExtensionVO(AppExtension ext, ApiCertificateSubAccount apiCertificateSubAccount){
+        String certId = apiCertificateSubAccount!=null ? apiCertificateSubAccount.getCertId() :"";
+        return new ExtensionVO(ext.getId(),ext.getType(),ext.getUser(),ext.getPassword(),ext.getIpaddr(),ext.getTelnum(),ext.getEnable(),ext.getSubaccountId(),certId);
     }
 
     public String getId() {
@@ -93,5 +102,21 @@ public class ExtensionVO {
 
     public void setEnable(Boolean enable) {
         this.enable = enable;
+    }
+
+    public String getSubaccountId() {
+        return subaccountId;
+    }
+
+    public void setSubaccountId(String subaccountId) {
+        this.subaccountId = subaccountId;
+    }
+
+    public String getCertId() {
+        return certId;
+    }
+
+    public void setCertId(String certId) {
+        this.certId = certId;
     }
 }

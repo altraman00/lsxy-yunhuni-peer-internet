@@ -2,10 +2,11 @@ package com.lsxy.msg.supplier.paopaoyu;
 
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.msg.supplier.AbstractSupplierSendServiceImpl;
-import com.lsxy.msg.supplier.common.MsgConstant;
-import com.lsxy.msg.supplier.common.PaoPaoYuMassNofity;
+import com.lsxy.msg.api.model.MsgConstant;
 import com.lsxy.msg.supplier.common.ResultMass;
 import com.lsxy.msg.supplier.common.ResultOne;
+import com.msg.paopaoyu.PaoPaoYuClient;
+import com.msg.paopaoyu.PaoPaoYuConstant;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ public class PaoPaoYuServiceImpl extends AbstractSupplierSendServiceImpl {
     }
 
     @Override
-    public PaoPaoYuMassNofity getTask(String taskId) {
+    public Object getTask(String taskId) {
         String result = getPaoPaoYuClient().getTask(taskId);
         logger.info("调用[泡泡鱼][查询群发]结果:"+ result);
         return new PaoPaoYuMassNofity(result);
@@ -65,7 +66,7 @@ public class PaoPaoYuServiceImpl extends AbstractSupplierSendServiceImpl {
     }
 
     @Override
-    public ResultMass sendMass(String msgKey ,String taskName, String tempId, List<String> tempArgs,String msg,  List<String> mobiles, Date sendTime,String sendType) {
+    public ResultMass sendMass(String recordId,String tenantId,String appId,String subaccountId,String msgKey ,String taskName, String tempId, List<String> tempArgs,String msg,  List<String> mobiles, Date sendTime,String sendType,String cost) {
         if(MsgConstant.MSG_USSD.equals(sendType)){
             if(mobiles == null || mobiles.size() == 0){
                 //TODO 抛异常

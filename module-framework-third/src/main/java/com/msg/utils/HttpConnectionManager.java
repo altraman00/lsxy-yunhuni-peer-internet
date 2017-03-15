@@ -1,4 +1,4 @@
-package com.lsxy.msg.supplier.utils;
+package com.msg.utils;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.Registry;

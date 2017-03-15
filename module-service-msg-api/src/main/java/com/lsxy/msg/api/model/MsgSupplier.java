@@ -15,6 +15,8 @@ import java.math.BigDecimal;
 @Where(clause = "deleted=0")
 @Table(schema = "db_lsxy_bi_yunhuni", name = "tb_bi_msg_supplier")
 public class MsgSupplier extends IdEntity {
+    public static final String QixuntongCode = "QiXunTong";
+    public static final String PaopaoyuCode = "PaoPaoYu";
     private String supplierName;
     private String code;
     private BigDecimal unitPrice;

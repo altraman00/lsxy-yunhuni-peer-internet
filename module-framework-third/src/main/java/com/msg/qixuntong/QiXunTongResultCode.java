@@ -1,4 +1,4 @@
-package com.lsxy.msg.supplier.qixuntong;
+package com.msg.qixuntong;
 
 /**
  * 企讯通错误码

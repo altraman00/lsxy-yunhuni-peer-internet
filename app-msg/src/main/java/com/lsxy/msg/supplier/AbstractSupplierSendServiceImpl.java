@@ -1,7 +1,6 @@
 package com.lsxy.msg.supplier;
 
 import com.lsxy.msg.api.service.MsgSupplierTemplateService;
-import com.lsxy.msg.supplier.common.PaoPaoYuMassNofity;
 import com.lsxy.msg.supplier.common.ResultMass;
 import com.lsxy.msg.supplier.common.ResultOne;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +22,12 @@ public abstract class AbstractSupplierSendServiceImpl implements SupplierSendSer
     }
 
     @Override
-    public ResultMass sendMass(String msgKey, String taskName, String tempId, List<String> tempArgs, String msg, List<String> mobiles, Date sendTime, String sendType) {
+    public ResultMass sendMass(String recordId,String tenantId, String appId, String subaccountId, String msgKey, String taskName, String tempId, List<String> tempArgs, String msg, List<String> mobiles, Date sendTime, String sendType, String cost) {
         return null;
     }
 
     @Override
-    public PaoPaoYuMassNofity getTask(String taskId) {
+    public Object getTask(String taskId){
         return null;
     }
 

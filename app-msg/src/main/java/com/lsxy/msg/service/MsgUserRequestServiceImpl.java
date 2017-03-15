@@ -4,6 +4,8 @@ import com.alibaba.dubbo.common.utils.StringUtils;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.msg.api.model.MsgConstant;
+import com.lsxy.msg.api.model.MsgSendRecord;
 import com.lsxy.msg.api.model.MsgUserRequest;
 import com.lsxy.msg.api.service.MsgUserRequestService;
 import com.lsxy.msg.dao.MsgUserRequestDao;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by liups on 2017/3/1.
@@ -47,6 +50,16 @@ public class MsgUserRequestServiceImpl extends AbstractService<MsgUserRequest> i
             return pageList( hql,pageNo,pageSize,sendType,flag);
         }
 
+    }
+
+    @Override
+    public void updateStateByMsgKey(String msgKey, int state) {
+        msgUserRequestDao.updateStateByMsgKey(msgKey,state);
+    }
+
+    @Override
+    public List<MsgUserRequest> findAwaitedRequets() {
+        return null;
     }
 
 }
