@@ -15,7 +15,7 @@ import java.util.Date;
 public interface MsgTemplateService extends BaseService<MsgTemplate> {
     Page<MsgTemplate> getPageByCondition(Integer pageNo, Integer pageSize, String appId, String subaccountId, String name);
 
-    Page<MsgTemplate> getPageByCondition(Integer pageNo, Integer pageSize,int state, Date date1 , Date date2,  String name);
+    Page<MsgTemplate> getPageByCondition(Integer pageNo, Integer pageSize,int state, Date date1 , Date date2,  String[]  tenantIds);
 
     MsgTemplate createTemplate(MsgTemplate msgTemplate);
 

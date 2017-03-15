@@ -3,6 +3,7 @@ package com.lsxy.yunhuni.message.service;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.customer.model.Feedback;
 import com.lsxy.framework.api.invoice.model.InvoiceApply;
+import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.message.model.AccountMessage;
 import com.lsxy.framework.api.message.model.Message;
 import com.lsxy.yunhuni.api.message.service.AccountMessageService;
@@ -211,9 +212,11 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
         //审核中心
         String demandHql1 = "  FROM Tenant obj WHERE obj.isRealAuth in('"+Tenant.AUTH_WAIT+"','"+Tenant.AUTH_ONESELF_WAIT+"','"+Tenant.AUTH_UPGRADE_WAIT+"') ";
         String demandHql2 = "  from VoiceFilePlay obj where obj.status='"+VoiceFilePlay.STATUS_WAIT+"'  ";
+        String demandHql3 = "  from App obj where obj.status='"+ App.STATUS_WAIT+"'  ";
         long awaitTenant = this.countByCustom(demandHql1);//会员认证
         long awaitPlayVoiceFile = this.countByCustom(demandHql2);//放音文件
-        long awaitDemand = awaitTenant+awaitPlayVoiceFile;//审核中心
+        long awaitApp = this.countByCustom(demandHql3);//应用
+        long awaitDemand = awaitTenant+awaitPlayVoiceFile+awaitApp;//审核中心
         Map map = new HashMap();
         Map map1 = new HashMap();
         map.put("awaitService",awaitService);//客服中心

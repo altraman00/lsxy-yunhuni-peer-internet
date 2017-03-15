@@ -66,10 +66,17 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
     }
 
     @Override
-    public Page<MsgTemplate> getPageByCondition(Integer pageNo, Integer pageSize, int state,Date date1, Date date2, String name) {
+    public Page<MsgTemplate> getPageByCondition(Integer pageNo, Integer pageSize, int state,Date date1, Date date2, String[] tenantId) {
         String hql = " from MsgTemplate obj where obj.status = ?1 ";
-        if(StringUtil.isNotEmpty(name)){
-            hql += " and obj.name like '%"+name+"%' ";
+        if(tenantId!=null&& tenantId.length>0){
+            String tenantIds = "";
+            for(int i=0;i<tenantId.length;i++){
+                tenantIds += " '"+tenantId[i]+"' ";
+                if(i!=(tenantId.length-1)){
+                    tenantIds+=",";
+                }
+            }
+            hql +=" AND obj.tenantId in("+tenantIds+") ";
         }
         if(date1!=null&&date2!=null){
             hql += " and obj.lateTime between ?2 and ?3 ";
