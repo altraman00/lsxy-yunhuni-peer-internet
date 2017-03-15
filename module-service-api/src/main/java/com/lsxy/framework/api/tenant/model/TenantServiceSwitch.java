@@ -22,7 +22,7 @@ public class TenantServiceSwitch extends IdEntity {
     private Integer isVoiceValidate;//是否语音验证码0否，1是
     private Integer isIvrService;//是否IVR定制服务0否，1是
     private Integer isCallCenter;
-    private Integer isMsm;//短信
+    private Integer isSms;//短信
     private Integer isUssd;//闪印
 
     @ManyToOne
@@ -94,14 +94,15 @@ public class TenantServiceSwitch extends IdEntity {
         this.isCallCenter = isCallCenter;
     }
 
-    @Column(name = "is_msm")
-    public Integer getIsMsm() {
-        return isMsm;
+    @Column(name = "is_sms")
+    public Integer getIsSms() {
+        return isSms;
     }
 
-    public void setIsMsm(Integer isMsm) {
-        this.isMsm = isMsm;
+    public void setIsSms(Integer isSms) {
+        this.isSms = isSms;
     }
+
 
     @Column(name = "is_ussd")
     public Integer getIsUssd() {
