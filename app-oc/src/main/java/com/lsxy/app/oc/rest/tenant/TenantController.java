@@ -3,10 +3,11 @@ package com.lsxy.app.oc.rest.tenant;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.oc.base.AbstractRestController;
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
-import com.lsxy.app.oc.rest.tenant.vo.*;
-import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.app.oc.rest.tenant.vo.ConsumesVO;
+import com.lsxy.app.oc.rest.tenant.vo.RechargeInput;
+import com.lsxy.app.oc.rest.tenant.vo.TenantIndicantVO;
+import com.lsxy.app.oc.rest.tenant.vo.TenantInfoVO;
 import com.lsxy.call.center.api.model.CallCenter;
-import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.api.billing.model.Billing;
 import com.lsxy.framework.api.billing.service.CalBillingService;
@@ -26,17 +27,10 @@ import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.config.service.TenantConfigService;
 import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
-import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
-import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
-import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
-import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
 import com.lsxy.yunhuni.api.recharge.service.RechargeService;
-import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
-import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
 import com.lsxy.yunhuni.api.statistics.model.*;
 import com.lsxy.yunhuni.api.statistics.service.*;
 import io.swagger.annotations.Api;
@@ -56,7 +50,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 
 /**
@@ -110,7 +103,10 @@ public class TenantController extends AbstractRestController {
     private ApiCallMonthService apiCallMonthService;
     @Reference(timeout = 10000,check = false,lazy = true)
     CallCenterService callCenterService;
-
+    @Autowired
+    private MsgDayService msgDayService;
+    @Autowired
+    private MsgMonthService msgMonthService;
 
     @RequestMapping(value = "/list",method = RequestMethod.GET)
     @ApiOperation(value = "获取全部数据")
@@ -1063,7 +1059,12 @@ public class TenantController extends AbstractRestController {
         }
         Date date1 = getStartDate(startTime,type);
         Date date2 = getLastDate(startTime,type);
-        List list = getList( tenant, appId,date1,date2,type);
+        List list = null;//getList( tenantId, appId,date1,date2,type);
+        if(TYPE_MONTH.equals(type)){
+            list = msgMonthService.getStatisticsList(tenant,appId,date1,date2);
+        }else{
+            list = msgDayService.getStatisticsList(tenant,appId,date1,date2);
+        }
         return RestResponse.success(list);
     }
     @ApiOperation(value = "租户(某月所有天/某年所有月)的消息统计数据分页")
@@ -1088,7 +1089,12 @@ public class TenantController extends AbstractRestController {
         }
         Date date1 = getStartDate(startTime,type);
         Date date2 = getLastDate(startTime,type);
-        Page page = getPage(tenant, appId , type, date1, date2, pageNo, pageSize);
+        Page page = null;//getPage(tenantId, appId , type, date1, date2, pageNo, pageSize);
+        if(TYPE_MONTH.equals(type)){
+            page = msgMonthService.getStatisticsPage(tenant,appId,date1,date2,pageNo,pageSize);
+        }else{
+            page = msgDayService.getStatisticsPage(tenant,appId,date1,date2,pageNo,pageSize);
+        }
         return RestResponse.success(page);
     }
     /**

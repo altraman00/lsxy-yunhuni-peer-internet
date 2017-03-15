@@ -34,7 +34,14 @@ public interface AppService extends BaseService<App> {
      * @return
      */
     Page<App> pageList(String tenantId,Integer pageNo,Integer pageSize);
-
+    /**
+     * 获取分页信息
+     * @param tenantId 租户id
+     * @param pageNo 第几页
+     * @param pageSize 每页面记录数
+     * @return
+     */
+    Page<App> pageList(String[] tenantId,Date date1,Date date2, int state,Integer pageNo,Integer pageSize);
     /**
      * 应用是否属于用户
      * @param userName
