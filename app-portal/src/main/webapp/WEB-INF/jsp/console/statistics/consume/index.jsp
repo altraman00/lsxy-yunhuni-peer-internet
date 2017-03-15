@@ -353,7 +353,7 @@
             var app = $('#defaultapp').val();
             var starttime = initialStartTime(type);
             var endtime = initialEndTime(type);
-            var param = {'type':type1,'appId':app,'startTime':starttime,'endTime':endtime,'pageNo':"1",'pageSize':"1",csrfParameterName:csrfToken};
+            var param = {'type':type1,'appId':app,'startTime':starttime,'endTime':endtime,'pageNo':"1",'pageSize':"70",csrfParameterName:csrfToken};
             ajaxsync(ctx+"/console/statistics/consume/page_list",param,function(result) {
                 var resultData = result.data;
                 count = resultData.length;
