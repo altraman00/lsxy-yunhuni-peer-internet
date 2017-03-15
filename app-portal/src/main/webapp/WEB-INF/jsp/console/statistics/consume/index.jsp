@@ -355,7 +355,7 @@
             var endtime = initialEndTime(type);
             var param = {'type':type1,'appId':app,'startTime':starttime,'endTime':endtime,'pageNo':"1",'pageSize':"1",csrfParameterName:csrfToken};
             ajaxsync(ctx+"/console/statistics/consume/page_list",param,function(result) {
-                var resultData = result.data.result;
+                var resultData = result.data;
                 count = resultData.length;
             })
             //var count = 1;
