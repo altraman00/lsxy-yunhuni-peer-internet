@@ -188,7 +188,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         }
         String field = service.getCode();
         try {
-            if(service != ServiceType.CallCenter){//租户功能开关 暂时没有呼叫中心功能
+//            if(service != ServiceType.CallCenter){//租户功能开关 暂时没有呼叫中心功能
                 TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
                 if(serviceSwitch != null){
                     Integer enabled =  (Integer) BeanUtils.getProperty2(serviceSwitch,field);
@@ -196,7 +196,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
                         return false;
                     }
                 }
-            }
+//            }
             App app = this.findById(appId);
             if(app == null){
                 return false;

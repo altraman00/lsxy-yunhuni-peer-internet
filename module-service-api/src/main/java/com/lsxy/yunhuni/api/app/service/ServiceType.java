@@ -10,7 +10,9 @@ public enum ServiceType {
     Recording("isRecording"),//是否录音服务0否，1是
     VoiceValidate("isVoiceValidate"),//是否语音验证码0否，1是
     IvrService("isIvrService"),//是否IVR定制服务0否，1是
-    CallCenter("isCallCenter");//是否呼叫中心
+    CallCenter("isCallCenter"),//是否呼叫中心
+    MSM("isMsm"),//短信
+    USSD("isUssd");//闪印
 
     private String code = null;
     ServiceType(String type){
