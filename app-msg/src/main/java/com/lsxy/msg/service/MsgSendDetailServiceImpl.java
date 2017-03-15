@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -127,5 +128,10 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
     @Override
     public List<MsgSendDetail> findByMsgKey(String msgKey) {
         return msgSendDetailDao.findByMsgKey(msgKey);
+    }
+
+    @Override
+    public void setEndTimeByMsgKey(String msgKey) {
+        msgSendDetailDao.setEndTimeByMsgKey(msgKey,new Date());
     }
 }

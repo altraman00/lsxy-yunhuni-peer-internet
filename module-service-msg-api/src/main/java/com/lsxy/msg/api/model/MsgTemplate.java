@@ -33,9 +33,14 @@ public class MsgTemplate extends IdEntity {
     }
 
     public MsgTemplate(String tenantId, String appId, String name, String type, String content, String remark) {
-        this.status = 0;
+        this(tenantId, appId, null,name, type, content, remark);
+    }
+
+    public MsgTemplate(String tenantId,String appId,String subaccountId,String name,String type,String content,String remark){
+        this.status = STATUS_WAIT;
         this.tenantId = tenantId;
         this.appId = appId;
+        this.subaccountId = subaccountId;
         this.name = name;
         this.type = type;
         this.content = content;

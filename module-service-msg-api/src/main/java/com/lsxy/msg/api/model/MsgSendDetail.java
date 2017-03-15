@@ -38,6 +38,7 @@ public class MsgSendDetail extends IdEntity {
     private String supplierCode;
     private String operator;
     private Integer state;
+    private Date endTime;
     private String reason;
     private String remark;
 
@@ -226,6 +227,15 @@ public class MsgSendDetail extends IdEntity {
 
     public void setState(Integer state) {
         this.state = state;
+    }
+
+    @Column(name = "end_time")
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     @Column(name = "reason")

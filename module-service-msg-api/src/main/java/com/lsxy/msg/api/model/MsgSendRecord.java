@@ -17,7 +17,7 @@ import java.util.Date;
 @Table(schema = "db_lsxy_bi_yunhuni", name = "tb_bi_msg_send_record")
 public class MsgSendRecord extends IdEntity {
     public static final int STATE_WAIT = 0;
-    public static final int STATE_SUCCESS = 1;
+    public static final int STATE_SUCCESS = 1; //发送结束
     public static final int STATE_FAIL = -1;
 
     private String msgKey;

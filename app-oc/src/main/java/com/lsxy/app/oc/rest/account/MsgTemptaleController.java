@@ -51,22 +51,19 @@ public class MsgTemptaleController extends AbstractRestController {
     private MsgSupplierService msgSupplierService;
     @Reference(timeout=3000,check = false,lazy = true)
     private MsgSupplierTemplateService msgSupplierTemplateService;
-    /**
-     * 根据名字和应用id查询用户名下的放音文件
-     * @param type await|auditing|unauth
-     * @param pageNo 第几页
-     * @param pageSize 每页记录数
-     * @param name 名字
-     * @param startTime 开始时间 yyyy-MM-dd
-     * @param endTime 结束时间 yyyy-MM-dd
-     * @return
-     */
-    @ApiOperation(value = "根据名字和应用id查询用户名下的放音文件分页信息")
+    @Autowired
+    private TenantService tenantService;
+    @Autowired
+    AccountMessageService accountMessageService;
+
+
+
+    @ApiOperation(value = "根据名字和时间查询模板审核的分页信息")
     @RequestMapping(value = "/{type}/list",method = RequestMethod.GET)
     public RestResponse pageList(
             @ApiParam(name = "type",value = "状态await待处理auditing审核通过unauth不通过")
             @PathVariable String type,
-            @ApiParam(name = "name",value = "模板名称")
+            @ApiParam(name = "name",value = "会员名")
             @RequestParam(required=false)String name,
             @ApiParam(name = "startTime",value = "开始时间 yyyy-MM-dd")
             @RequestParam(required=false)String startTime,
@@ -97,7 +94,21 @@ public class MsgTemptaleController extends AbstractRestController {
         }catch (Exception e){
             return RestResponse.failed("","日期格式错误");
         }
-        Page page = msgTemplateService.getPageByCondition(pageNo,pageSize,state,date1,date2,name);
+        Page page = null;
+        if (StringUtil.isNotEmpty(name)) {
+            List<Tenant> tList = tenantService.pageListByUserName(name);
+            if (tList.size() == 0) {
+                page = new Page((pageNo-1)*pageSize ,0,pageSize,null);
+            } else {
+                String[] tenantId = new String[tList.size()];
+                for (int i = 0; i < tList.size(); i++) {
+                    tenantId[i] = tList.get(i).getId();
+                }
+                page = msgTemplateService.getPageByCondition(pageNo,pageSize,state,date1,date2,tenantId);
+            }
+        }else{
+            page = msgTemplateService.getPageByCondition(pageNo,pageSize,state,date1,date2,new String[]{});
+        }
         return RestResponse.success(page);
     }
     @ApiOperation(value = "根据模板ID修改模板状态为审核通过")
@@ -119,6 +130,7 @@ public class MsgTemptaleController extends AbstractRestController {
                     msgSupplierTemplateService.save(msgSupplierTemplate);
                 }
             }
+            accountMessageService.sendTenantTempletMessage(null,msgTemplate.getTenantId(), AccountMessage.MESSAGE_MSG_TEMPLATE_SUCCESS );
             return RestResponse.success();
         }else{
             return RestResponse.failed("","模板不存在");
@@ -137,6 +149,7 @@ public class MsgTemptaleController extends AbstractRestController {
             msgTemplate.setStatus(MsgTemplate.STATUS_FAIL);
             msgTemplate.setReason((String)map.get("reason"));
             msgTemplateService.save(msgTemplate);
+            accountMessageService.sendTenantTempletMessage(null,msgTemplate.getTenantId(), AccountMessage.MESSAGE_MSG_TEMPLATE_FAIL );
             return RestResponse.success();
         }else{
             return RestResponse.failed("","模板不存在");

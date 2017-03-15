@@ -57,17 +57,22 @@ public class MassTaskLogUpdateTask {
         long pendingNum = 0; //待发送数
         //泡泡鱼的群发情况
         List<MsgSendRecord> records = msgSendRecordService.findByMsgKey(request.getMsgKey());
+        int state = MsgUserRequest.STATE_FAIL;
         boolean flag = true;
         for(MsgSendRecord record : records){
-            if(MsgSendRecord.STATE_SUCCESS != record.getState()){
+            if(MsgSendRecord.STATE_SUCCESS != record.getState() && MsgSendRecord.STATE_FAIL != record.getState()){
                 flag = false;
+            }
+            if(MsgSendRecord.STATE_SUCCESS == record.getState()){
+                state = MsgUserRequest.STATE_SUCCESS; //只要有一条成功，就算成功
             }
             succNum += record.getSuccNum();
             failNum += record.getFailNum();
             pendingNum += record.getPendingNum();
         }
         if(flag){//任务完成
-            request.setState(MsgUserRequest.STATE_SUCCESS);
+            request.setState(state);
+            msgSendDetailService.setEndTimeByMsgKey(request.getMsgKey());
         }
         request.setPendingNum(pendingNum);
         request.setFailNum(failNum);

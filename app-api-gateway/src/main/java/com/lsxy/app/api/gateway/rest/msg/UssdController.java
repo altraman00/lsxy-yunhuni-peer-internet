@@ -23,8 +23,8 @@ import java.util.Map;
  * Created by liups on 2017/3/7.
  */
 @RestController
-public class SendUssdController extends AbstractAPIController {
-    private static final Logger logger = LoggerFactory.getLogger(SendUssdController.class);
+public class UssdController extends AbstractAPIController {
+    private static final Logger logger = LoggerFactory.getLogger(UssdController.class);
 
     @Reference(timeout=3000,check = false,lazy = true)
     MsgSendService msgSendService;
@@ -41,7 +41,7 @@ public class SendUssdController extends AbstractAPIController {
     }
 
     @RequestMapping(value = "/{account_id}/msg/ussd/mass/task",method = RequestMethod.POST)
-    public ApiGatewayResponse ussdSend(HttpServletRequest request, @Valid @RequestBody UssdSendMassDTO dto, @PathVariable String account_id) throws YunhuniApiException {
+    public ApiGatewayResponse ussdSendMass(HttpServletRequest request, @Valid @RequestBody UssdSendMassDTO dto, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         String ip = WebUtils.getRemoteAddress(request);
         String subaccountId = getSubaccountId(request);
@@ -51,26 +51,5 @@ public class SendUssdController extends AbstractAPIController {
         return ApiGatewayResponse.success(result);
     }
 
-    @RequestMapping(value = "/{account_id}/msg/sms/send",method = RequestMethod.POST)
-    public ApiGatewayResponse ussdSend(HttpServletRequest request, @Valid @RequestBody SmsSendDTO dto, @PathVariable String account_id) throws YunhuniApiException {
-        String appId = request.getHeader("AppID");
-        String ip = WebUtils.getRemoteAddress(request);
-        String subaccountId = getSubaccountId(request);
-        String msgKey = msgSendService.sendSms(ip, appId, subaccountId, dto.getMobile(), dto.getTempId(), dto.getTempArgs());
-        Map<String,String> result = new HashMap<>();
-        result.put("msgKey", msgKey);
-        return ApiGatewayResponse.success(result);
-    }
-
-    @RequestMapping(value = "/{account_id}/msg/sms/mass/task",method = RequestMethod.POST)
-    public ApiGatewayResponse ussdSend(HttpServletRequest request, @Valid @RequestBody SmsSendMassDTO dto, @PathVariable String account_id) throws YunhuniApiException {
-        String appId = request.getHeader("AppID");
-        String ip = WebUtils.getRemoteAddress(request);
-        String subaccountId = getSubaccountId(request);
-        String msgKey = msgSendService.sendSmsMass(ip, appId, subaccountId, dto.getTaskName(),dto.getTempId(),dto.getTempArgs(),dto.getMobiles(),dto.getSendTime());
-        Map<String,String> result = new HashMap<>();
-        result.put("msgKey", msgKey);
-        return ApiGatewayResponse.success(result);
-    }
 
 }
