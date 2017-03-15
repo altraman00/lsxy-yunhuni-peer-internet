@@ -176,234 +176,9 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         String from_uri = (String)params.get("from_uri");//主叫sip地址
         String to_uri = (String)params.get("to_uri");//被叫号码sip地址
 
-        if(SipUrlUtil.isExtensionNum(from_uri)){//是坐席分机呼入，可以呼给其他坐席，热线，外线
-            if(logger.isDebugEnabled()){
-                logger.info("分机直拨{}",params);
-            }
-            AgentLock from_agentLock = null;
-            try{
-                //呼入号码为分机长号码
-                String from_extensionnum = SipUrlUtil.extractTelnum(from_uri);
-                //判断主叫分机是否存在，不合法直接拒绝
-                AppExtension from_appExtension = appExtensionService.getByUser(from_extensionnum);
-                if(from_appExtension == null){
-                    logger.info("分机号不存在对应的分机记录extension_num={}",from_extensionnum);
-                    return res;
-                }
-                //根据分机找到坐席，找不到坐席直接拒绝
-                ExtensionState.Model from_eState = extensionState.get(from_appExtension.getId());
-                if(from_eState == null){
-                    logger.info("分机不存在state,id={}",from_appExtension.getId());
-                    return res;
-                }
-                if(!from_eState.getEnable().equals(ExtensionState.Model.ENABLE_TRUE)){
-                    logger.info("分机不可用,state={}",from_eState);
-                    return res;
-                }
-                String from_agentId = from_eState.getAgent();
-                if(StringUtil.isBlank(from_agentId)){
-                    logger.info("坐席不存在，state={}",from_eState);
-                    return res;
-                }
-                CallCenterAgent from_agent = callCenterAgentService.findById(from_agentId);
-                if(from_agent == null){
-                    logger.info("坐席不存在，id={}",from_agentId);
-                    return res;
-                }
-                AgentState.Model from_aState = agentState.get(from_agentId);
-                if(from_aState == null){
-                    logger.info("坐席state不存在，id={}",from_agentId);
-                    return res;
-                }
-                if(from_aState.getLastRegTime() + AgentState.REG_EXPIRE < System.currentTimeMillis()){
-                    logger.info("坐席不可用，state={}",from_aState);
-                    return res;
-                }
-                //坐席加锁，加锁失败直接拒绝
-                from_agentLock = new AgentLock(redisCacheService,from_agentId);
-                if(!from_agentLock.lock()){
-                    logger.info("坐席加锁失败,id={}",from_agentId);
-                    return res;
-                }
-                //判断坐席状态是否是空闲，非空闲直接拒绝
-                if(!CallCenterAgent.STATE_IDLE.equals(agentState.getState(from_agentId))){
-                    logger.info("坐席正忙,state={}",agentState.getState(from_agentId));
-                    return res;
-                }
-
-                //判断应用是不是呼叫中心应用，非呼叫中心应用拒绝
-                App app = appService.findById(from_appExtension.getAppId());
-                if(app == null){
-                    logger.info("app不存在,appId={}",params,from_appExtension.getAppId());
-                    return res;
-                }
-                if(!appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.CallCenter)){
-                    logger.info("[{}][{}]没有开通呼叫中心",app.getTenant().getId(),app.getId());
-                    return res;
-                }
-                ApiCertificateSubAccount subaccount = null;
-                String subaccountId = from_appExtension.getSubaccountId();
-                String extension_prefix = null;
-                if(subaccountId!=null){
-                    subaccount = apiCertificateSubAccountService.findById(subaccountId);
-                    if(subaccount == null){
-                        logger.info("没有找到子账号{}",subaccountId);
-                        return res;
-                    }
-                    if(!ApiCertificateSubAccount.ENABLED_TRUE.equals(subaccount.getEnabled())){
-                        logger.info("子账号被禁用{}",subaccountId);
-                        return res;
-                    }
-                }
-                if(subaccount!=null){
-                    extension_prefix = subaccount.getExtensionPrefix().toString();
-                }else{
-                    extension_prefix = app.getCallCenterNum().toString();
-                }
-                if(StringUtil.isBlank(extension_prefix)){
-                    logger.info("分机前缀不存在,app={},subaccount={}",app,subaccount);
-                    return res;
-                }
-                if(!from_extensionnum.startsWith(extension_prefix)){
-                    logger.info("分机前缀不一致{},{}",from_extensionnum,extension_prefix);
-                    return res;
-                }
-                String conversationId = UUIDGenerator.uuid();
-                //设置坐席状态为fetching
-                String call_id = saveSessionCall(subaccountId,app,app.getTenant(),
-                        res_id,conversationId,from_agent.getId(),from_agent.getName(),
-                        from_agent.getExtension(),from_uri,to_uri,extension_prefix);
-                agentState.setState(from_agentId,CallCenterAgent.STATE_FETCHING);
-
-                //转换长号码为短号码，显示在被叫的话机上
-                from_extensionnum = from_extensionnum.replace(extension_prefix,"");
-
-                if(SipUrlUtil.isHotNum(to_uri)){//被叫是热线号码
-                    String to = SipUrlUtil.extractTelnum(to_uri);
-                    if(logger.isDebugEnabled()){
-                        logger.info("直拨热线，to={}",to);
-                    }
-                    //流程，应答成功后调用收码，收码完成事件中创建会议，会议创建成功后将call加入会议，加入会议成功事件 呼叫被叫，振铃事件将被叫加入会议
-                    answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app));
-                    businessStateService.updateInnerField(
-                            call_id,
-                            //直拨外线-主叫分机短号
-                            CallCenterUtil.DIRECT_HOT_FIELD,from_extensionnum,
-                            CallCenterUtil.DIRECT_EXTENSIONPREFIX_FIELD,extension_prefix
-                    );
-                }else if(SipUrlUtil.isShortNum(extension_prefix,to_uri)){//被叫是分机短号
-                    //流程：应答成功创建会议，会议创建成功后将call加入会议，加入会议成功事件 呼叫被叫，振铃事件将被叫加入会议
-                    AgentLock to_agentLock = null;
-                    try{
-                        //判断被叫分机是否存在
-                        String to_extensionnum = extension_prefix + SipUrlUtil.extractTelnum(to_uri);//被叫号码要为长号码
-                        if(logger.isDebugEnabled()){
-                            logger.info("直拨分机，to={}",to_extensionnum);
-                        }
-                        //不能自己呼给自己
-                        if(to_extensionnum.equals(extension_prefix+from_extensionnum)){
-                            logger.info("不能自己呼给自己,from={},to={}",(extension_prefix+from_extensionnum),to_extensionnum);
-                            return  res;
-                        }
-                        //判断主叫分机是否存在，不合法直接拒绝
-                        AppExtension to_appExtension = appExtensionService.getByUser(to_extensionnum);
-                        if(to_appExtension == null){
-                            logger.info("分机号不存在对应的分机记录extension_num={}",to_extensionnum);
-                            return res;
-                        }
-                        //根据分机找到坐席，找不到坐席直接拒绝
-                        ExtensionState.Model to_eState = extensionState.get(to_appExtension.getId());
-                        if(to_eState == null){
-                            logger.info("分机不存在state,id={}",to_appExtension.getId());
-                            return res;
-                        }
-                        if(!to_eState.getEnable().equals(ExtensionState.Model.ENABLE_TRUE)){
-                            logger.info("分机不可用,state={}",to_eState);
-                            return res;
-                        }
-                        String to_agentId = to_eState.getAgent();
-                        if(StringUtil.isBlank(to_agentId)){
-                            logger.info("坐席不存在，state={}",to_eState);
-                            return res;
-                        }
-                        CallCenterAgent to_agent = callCenterAgentService.findById(to_agentId);
-                        if(to_agent == null){
-                            logger.info("坐席不存在，id={}",to_agentId);
-                            return res;
-                        }
-                        AgentState.Model to_aState = agentState.get(to_agentId);
-                        if(to_aState == null){
-                            logger.info("坐席state不存在，id={}",to_agentId);
-                            return res;
-                        }
-                        if(to_aState.getLastRegTime() + AgentState.REG_EXPIRE < System.currentTimeMillis()){
-                            logger.info("坐席不可用，state={}",to_aState);
-                            return res;
-                        }
-                        //坐席加锁，加锁失败直接拒绝
-                        to_agentLock = new AgentLock(redisCacheService,to_agentId);
-                        if(!to_agentLock.lock()){
-                            logger.info("坐席加锁失败,id={}",to_agentId);
-                            return res;
-                        }
-                        //判断坐席状态是否是空闲，非空闲直接拒绝
-                        if(!CallCenterAgent.STATE_IDLE.equals(agentState.getState(to_agentId))){
-                            logger.info("坐席正忙,state={}",agentState.getState(to_agentId));
-                            return res;
-                        }
-                        answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app));
-
-                        businessStateService.updateInnerField(
-                                call_id,
-                                //直拨被叫-坐席分机
-                                CallCenterUtil.DIRECT_AGENT_FIELD,to_agentId,
-                                //直拨主叫
-                                CallCenterUtil.DIRECT_FROM_FIELD,from_extensionnum
-                        );
-                    }catch (Throwable t){
-                        logger.info("",t);
-                    }finally {
-                        //finally 坐席解锁
-                        if(to_agentLock!=null){
-                            try{
-                                to_agentLock.unlock();
-                            }catch (Throwable t){
-                                logger.info("",t);
-                            }
-                        }
-                    }
-                }else if(SipUrlUtil.isOut(to_uri)){//被叫是外线
-                    String to = SipUrlUtil.extractTelnum(to_uri);
-                    if(logger.isDebugEnabled()){
-                        logger.info("直拨外线，to={}",to);
-                    }
-                    boolean isRedNum = apiGwRedBlankNumService.isRedNum(to);
-                    if(isRedNum){
-                        throw new NumberNotAllowToCallException(
-                                new ExceptionContext()
-                                        .put("to",to)
-                                        .put("isRedNum",isRedNum)
-                        );
-                    }
-                    answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app));
-                    businessStateService.updateInnerField(
-                            call_id,
-                            //直拨被叫-外线
-                            CallCenterUtil.DIRECT_OUT_FIELD,to
-                    );
-                }
-            }catch (Throwable t){
-                logger.info("",t);
-            }finally {
-                //finally 坐席解锁
-                if(from_agentLock!=null){
-                    try{
-                        from_agentLock.unlock();
-                    }catch (Throwable t){
-                        logger.info("",t);
-                    }
-                }
-            }
+        if(SipUrlUtil.isExtensionNum(from_uri)){
+            //是坐席分机呼入，可以呼给其他坐席，热线，外线
+            doDirectCall(res_id,from_uri,to_uri,params);
         }else{
             //是外线呼入,进入ivr流程
             doIvrAction(res_id,from_uri,to_uri,params);
@@ -411,6 +186,236 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         return res;
     }
 
+
+    private void doDirectCall(String res_id,String from_uri,String to_uri,Map<String,Object> params){
+        if(logger.isDebugEnabled()){
+            logger.info("分机直拨{}",params);
+        }
+        AgentLock from_agentLock = null;
+        try{
+            //呼入号码为分机长号码
+            String from_extensionnum = SipUrlUtil.extractTelnum(from_uri);
+            //判断主叫分机是否存在，不合法直接拒绝
+            AppExtension from_appExtension = appExtensionService.getByUser(from_extensionnum);
+            if(from_appExtension == null){
+                logger.info("分机号不存在对应的分机记录extension_num={}",from_extensionnum);
+                return;
+            }
+            //根据分机找到坐席，找不到坐席直接拒绝
+            ExtensionState.Model from_eState = extensionState.get(from_appExtension.getId());
+            if(from_eState == null){
+                logger.info("分机不存在state,id={}",from_appExtension.getId());
+                return;
+            }
+            if(!from_eState.getEnable().equals(ExtensionState.Model.ENABLE_TRUE)){
+                logger.info("分机不可用,state={}",from_eState);
+                return;
+            }
+            String from_agentId = from_eState.getAgent();
+            if(StringUtil.isBlank(from_agentId)){
+                logger.info("坐席不存在，state={}",from_eState);
+                return;
+            }
+            CallCenterAgent from_agent = callCenterAgentService.findById(from_agentId);
+            if(from_agent == null){
+                logger.info("坐席不存在，id={}",from_agentId);
+                return;
+            }
+            AgentState.Model from_aState = agentState.get(from_agentId);
+            if(from_aState == null){
+                logger.info("坐席state不存在，id={}",from_agentId);
+                return;
+            }
+            if(from_aState.getLastRegTime() + AgentState.REG_EXPIRE < System.currentTimeMillis()){
+                logger.info("坐席不可用，state={}",from_aState);
+                return;
+            }
+            //坐席加锁，加锁失败直接拒绝
+            from_agentLock = new AgentLock(redisCacheService,from_agentId);
+            if(!from_agentLock.lock()){
+                logger.info("坐席加锁失败,id={}",from_agentId);
+                return;
+            }
+            //判断坐席状态是否是空闲，非空闲直接拒绝
+            if(!CallCenterAgent.STATE_IDLE.equals(agentState.getState(from_agentId))){
+                logger.info("坐席正忙,state={}",agentState.getState(from_agentId));
+                return;
+            }
+
+            //判断应用是不是呼叫中心应用，非呼叫中心应用拒绝
+            App app = appService.findById(from_appExtension.getAppId());
+            if(app == null){
+                logger.info("app不存在,appId={}",params,from_appExtension.getAppId());
+                return;
+            }
+            if(!appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.CallCenter)){
+                logger.info("[{}][{}]没有开通呼叫中心",app.getTenant().getId(),app.getId());
+                return;
+            }
+            ApiCertificateSubAccount subaccount = null;
+            String subaccountId = from_appExtension.getSubaccountId();
+            String extension_prefix = null;
+            if(subaccountId!=null){
+                subaccount = apiCertificateSubAccountService.findById(subaccountId);
+                if(subaccount == null){
+                    logger.info("没有找到子账号{}",subaccountId);
+                    return;
+                }
+                if(!ApiCertificateSubAccount.ENABLED_TRUE.equals(subaccount.getEnabled())){
+                    logger.info("子账号被禁用{}",subaccountId);
+                    return;
+                }
+            }
+            if(subaccount!=null){
+                extension_prefix = subaccount.getExtensionPrefix().toString();
+            }else{
+                extension_prefix = app.getCallCenterNum().toString();
+            }
+            if(StringUtil.isBlank(extension_prefix)){
+                logger.info("分机前缀不存在,app={},subaccount={}",app,subaccount);
+                return;
+            }
+            if(!from_extensionnum.startsWith(extension_prefix)){
+                logger.info("分机前缀不一致{},{}",from_extensionnum,extension_prefix);
+                return;
+            }
+            String conversationId = UUIDGenerator.uuid();
+            //设置坐席状态为fetching
+            String call_id = saveSessionCall(subaccountId,app,app.getTenant(),
+                    res_id,conversationId,from_agent.getId(),from_agent.getName(),
+                    from_agent.getExtension(),from_uri,to_uri,extension_prefix);
+            agentState.setState(from_agentId,CallCenterAgent.STATE_FETCHING);
+
+            //转换长号码为短号码，显示在被叫的话机上
+            from_extensionnum = from_extensionnum.replace(extension_prefix,"");
+
+            if(SipUrlUtil.isHotNum(to_uri)){//被叫是热线号码
+                String to = SipUrlUtil.extractTelnum(to_uri);
+                if(logger.isDebugEnabled()){
+                    logger.info("直拨热线，to={}",to);
+                }
+                //流程，应答成功后调用收码，收码完成事件中创建会议，会议创建成功后将call加入会议，加入会议成功事件 呼叫被叫，振铃事件将被叫加入会议
+                answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app));
+                businessStateService.updateInnerField(
+                        call_id,
+                        //直拨外线-主叫分机短号
+                        CallCenterUtil.DIRECT_HOT_FIELD,from_extensionnum,
+                        CallCenterUtil.DIRECT_EXTENSIONPREFIX_FIELD,extension_prefix
+                );
+            }else if(SipUrlUtil.isShortNum(extension_prefix,to_uri)){//被叫是分机短号
+                //流程：应答成功创建会议，会议创建成功后将call加入会议，加入会议成功事件 呼叫被叫，振铃事件将被叫加入会议
+                AgentLock to_agentLock = null;
+                try{
+                    //判断被叫分机是否存在
+                    String to_extensionnum = extension_prefix + SipUrlUtil.extractTelnum(to_uri);//被叫号码要为长号码
+                    if(logger.isDebugEnabled()){
+                        logger.info("直拨分机，to={}",to_extensionnum);
+                    }
+                    //不能自己呼给自己
+                    if(to_extensionnum.equals(extension_prefix+from_extensionnum)){
+                        logger.info("不能自己呼给自己,from={},to={}",(extension_prefix+from_extensionnum),to_extensionnum);
+                        return;
+                    }
+                    //判断主叫分机是否存在，不合法直接拒绝
+                    AppExtension to_appExtension = appExtensionService.getByUser(to_extensionnum);
+                    if(to_appExtension == null){
+                        logger.info("分机号不存在对应的分机记录extension_num={}",to_extensionnum);
+                        return;
+                    }
+                    //根据分机找到坐席，找不到坐席直接拒绝
+                    ExtensionState.Model to_eState = extensionState.get(to_appExtension.getId());
+                    if(to_eState == null){
+                        logger.info("分机不存在state,id={}",to_appExtension.getId());
+                        return;
+                    }
+                    if(!to_eState.getEnable().equals(ExtensionState.Model.ENABLE_TRUE)){
+                        logger.info("分机不可用,state={}",to_eState);
+                        return;
+                    }
+                    String to_agentId = to_eState.getAgent();
+                    if(StringUtil.isBlank(to_agentId)){
+                        logger.info("坐席不存在，state={}",to_eState);
+                        return;
+                    }
+                    CallCenterAgent to_agent = callCenterAgentService.findById(to_agentId);
+                    if(to_agent == null){
+                        logger.info("坐席不存在，id={}",to_agentId);
+                        return;
+                    }
+                    AgentState.Model to_aState = agentState.get(to_agentId);
+                    if(to_aState == null){
+                        logger.info("坐席state不存在，id={}",to_agentId);
+                        return;
+                    }
+                    if(to_aState.getLastRegTime() + AgentState.REG_EXPIRE < System.currentTimeMillis()){
+                        logger.info("坐席不可用，state={}",to_aState);
+                        return;
+                    }
+                    //坐席加锁，加锁失败直接拒绝
+                    to_agentLock = new AgentLock(redisCacheService,to_agentId);
+                    if(!to_agentLock.lock()){
+                        logger.info("坐席加锁失败,id={}",to_agentId);
+                        return;
+                    }
+                    //判断坐席状态是否是空闲，非空闲直接拒绝
+                    if(!CallCenterAgent.STATE_IDLE.equals(agentState.getState(to_agentId))){
+                        logger.info("坐席正忙,state={}",agentState.getState(to_agentId));
+                        return;
+                    }
+                    answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app));
+
+                    businessStateService.updateInnerField(
+                            call_id,
+                            //直拨被叫-坐席分机
+                            CallCenterUtil.DIRECT_AGENT_FIELD,to_agentId,
+                            //直拨主叫
+                            CallCenterUtil.DIRECT_FROM_FIELD,from_extensionnum
+                    );
+                }catch (Throwable t){
+                    logger.info("",t);
+                }finally {
+                    //finally 坐席解锁
+                    if(to_agentLock!=null){
+                        try{
+                            to_agentLock.unlock();
+                        }catch (Throwable t){
+                            logger.info("",t);
+                        }
+                    }
+                }
+            }else if(SipUrlUtil.isOut(to_uri)){//被叫是外线
+                String to = SipUrlUtil.extractTelnum(to_uri);
+                if(logger.isDebugEnabled()){
+                    logger.info("直拨外线，to={}",to);
+                }
+                boolean isRedNum = apiGwRedBlankNumService.isRedNum(to);
+                if(isRedNum){
+                    throw new NumberNotAllowToCallException(
+                            new ExceptionContext()
+                                    .put("to",to)
+                                    .put("isRedNum",isRedNum)
+                    );
+                }
+                answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app));
+                businessStateService.updateInnerField(
+                        call_id,
+                        //直拨被叫-外线
+                        CallCenterUtil.DIRECT_OUT_FIELD,to
+                );
+            }
+        }catch (Throwable t){
+            logger.info("",t);
+        }finally {
+            //finally 坐席解锁
+            if(from_agentLock!=null){
+                try{
+                    from_agentLock.unlock();
+                }catch (Throwable t){
+                    logger.info("",t);
+                }
+            }
+        }
+    }
 
     private void doIvrAction(String res_id,String from_uri,String to_uri,Map<String,Object> params){
         ResourceTelenum to = resourceTelenumService.findNumByCallUri(to_uri);//被叫号码
