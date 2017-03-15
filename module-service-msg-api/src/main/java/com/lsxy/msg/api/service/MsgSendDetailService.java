@@ -20,13 +20,12 @@ public interface MsgSendDetailService extends BaseService<MsgSendDetail> {
 
     List<String> updateStateAndTaskIdByRecordIdAndPhones(String recordId, List<String> phones, int state, String taskId);
 
-    List<String> updateStateByRecordIdAndPhones(String recordId, List<String> phones, int state);
+    List<String> updateStateAndSetEndTimeByRecordIdAndPhones(String recordId, List<String> phones, int state);
 
-    void updateStateFromWaitedToSuccessByRecordId(String recordId);
+    void updateStateAndSetEndTimeFromWaitedToSuccessByRecordId(String recordId);
 
     Map getStateCountByRecordId(String recordId);
     Page<MsgSendDetail> getPageByContiton(Integer pageNo, Integer pageSize, String msgKey, String mobile, String state);
     List<MsgSendDetail> findByMsgKey(String msgKey);
 
-    void setEndTimeByMsgKey(String msgKey);
 }

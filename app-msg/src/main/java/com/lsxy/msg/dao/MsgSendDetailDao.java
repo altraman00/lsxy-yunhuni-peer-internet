@@ -25,14 +25,14 @@ public interface MsgSendDetailDao extends BaseDaoInterface<MsgSendDetail, Serial
     void updateDetailStateAndTaskIdByRecordId(@Param("recordId") String recordId, @Param("phones") List<String> phones, @Param("state") int state, @Param("taskId") String taskId);
 
     @Modifying
-    @Query("update MsgSendDetail d set d.state = :state where d.recordId = :recordId AND d.mobile IN (:phones)")
-    void updateStateByRecordId(@Param("recordId") String recordId, @Param("phones") List<String> phones, @Param("state") int state);
+    @Query("update MsgSendDetail d set d.state = :state,d.endTime=:endTime where d.recordId = :recordId AND d.mobile IN (:phones)")
+    void updateStateByRecordId(@Param("recordId") String recordId, @Param("phones") List<String> phones, @Param("state") int state,@Param("endTime") Date endTime);
 
     List<String> findIdByRecordIdAndMobileIn(String recordId, List<String> phones);
 
     @Modifying
-    @Query("update MsgSendDetail d set d.state = :state where d.recordId = :recordId AND d.state = :stateWait")
-    void updateStateFromWaitedToStateByRecordId(@Param("recordId") String recordId, @Param("stateWait") int stateWait, @Param("state") int state);
+    @Query("update MsgSendDetail d set d.state = :state,d.endTime=:endTime where d.recordId = :recordId AND d.state = :stateWait")
+    void updateStateFromWaitedToSuccessAndSetEndTimeByRecordId(@Param("recordId") String recordId, @Param("stateWait") int stateWait, @Param("state") int state,@Param("endTime") Date endTime);
 
     List<MsgSendDetail> findByMsgKey(String msgKey);
 

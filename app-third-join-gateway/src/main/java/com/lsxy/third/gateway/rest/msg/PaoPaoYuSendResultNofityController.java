@@ -10,7 +10,6 @@ import com.lsxy.msg.api.service.MsgSendRecordService;
 import com.lsxy.msg.api.service.MsgSendService;
 import com.lsxy.msg.api.service.MsgUserRequestService;
 import com.lsxy.third.gateway.base.AbstractAPIController;
-import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.msg.paopaoyu.PaoPaoYuClient;
 import com.msg.paopaoyu.PaoPaoYuConstant;
@@ -18,7 +17,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -116,12 +114,12 @@ public class PaoPaoYuSendResultNofityController extends AbstractAPIController {
                     if(!msgSendRecord.getIsMass()){
                         msgUserRequestService.updateNoMassStateByMsgKey(msgSendRecord.getMsgKey(),state);
                         msgSendRecordService.updateNoMassStateByTaskId(msgSendRecord.getTaskId(),state);
-                        // 结束
-                        msgSendDetailService.setEndTimeByMsgKey(msgSendRecord.getMsgKey());
+                        //TODO 结束
+
                     }
                     String mobiles = msgSendRecord.getMobiles();
                     List<String> mobileList = Arrays.asList(mobiles.split(MsgConstant.NumRegexStr));
-                    List<String> detailIds = msgSendDetailService.updateStateAndTaskIdByRecordIdAndPhones(msgSendRecord.getId(), mobileList, state, msgSendRecord.getTaskId());
+                    List<String> detailIds = msgSendDetailService.updateStateAndSetEndTimeByRecordIdAndPhones(msgSendRecord.getId(), mobileList, state);
                     //查找主记录
                     if (state == MsgSendRecord.STATE_FAIL) {//发送失败
                         // 返还扣费

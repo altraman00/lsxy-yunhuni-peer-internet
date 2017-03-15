@@ -92,8 +92,8 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
     }
 
     @Override
-    public List<String> updateStateByRecordIdAndPhones(String recordId, List<String> phones, int state) {
-        msgSendDetailDao.updateStateByRecordId(recordId, phones, state);
+    public List<String> updateStateAndSetEndTimeByRecordIdAndPhones(String recordId, List<String> phones, int state) {
+        msgSendDetailDao.updateStateByRecordId(recordId, phones, state,new Date());
         if(MsgSendDetail.STATE_FAIL == state){
             return msgSendDetailDao.findIdByRecordIdAndMobileIn(recordId,phones);
         }else{
@@ -102,8 +102,8 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
     }
 
     @Override
-    public void updateStateFromWaitedToSuccessByRecordId(String recordId) {
-        msgSendDetailDao.updateStateFromWaitedToStateByRecordId(recordId, MsgSendDetail.STATE_WAIT ,MsgSendDetail.STATE_SUCCESS);
+    public void updateStateAndSetEndTimeFromWaitedToSuccessByRecordId(String recordId) {
+        msgSendDetailDao.updateStateFromWaitedToSuccessAndSetEndTimeByRecordId(recordId, MsgSendDetail.STATE_WAIT ,MsgSendDetail.STATE_SUCCESS,new Date());
     }
 
     @Override
@@ -130,8 +130,4 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
         return msgSendDetailDao.findByMsgKey(msgKey);
     }
 
-    @Override
-    public void setEndTimeByMsgKey(String msgKey) {
-        msgSendDetailDao.setEndTimeByMsgKey(msgKey,new Date());
-    }
 }

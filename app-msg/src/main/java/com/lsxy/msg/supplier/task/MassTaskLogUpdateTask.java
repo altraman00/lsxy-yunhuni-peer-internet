@@ -72,7 +72,6 @@ public class MassTaskLogUpdateTask {
         }
         if(flag){//任务完成
             request.setState(state);
-            msgSendDetailService.setEndTimeByMsgKey(request.getMsgKey());
         }
         request.setPendingNum(pendingNum);
         request.setFailNum(failNum);

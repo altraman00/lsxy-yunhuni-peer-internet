@@ -8,7 +8,6 @@ import com.lsxy.msg.api.service.MsgSendService;
 import com.lsxy.msg.supplier.SupplierSelector;
 import com.lsxy.msg.supplier.SupplierSendService;
 import com.lsxy.msg.supplier.paopaoyu.PaoPaoYuMassNofity;
-import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.msg.paopaoyu.PaoPaoYuConstant;
 import org.slf4j.Logger;
@@ -72,8 +71,8 @@ public class PaoPaoYuMassTaskLogTask {
                             record.setFailNum(record.getSuccNum() + task.getSendSuccNum());
                             record.setFailNum(task.getPendingNum() + 0L);
                             msgSendRecordService.save(record);
-                            List<String> ids = msgSendDetailService.updateStateByRecordIdAndPhones(record.getId(), task.getFailPhoneList(), MsgSendDetail.STATE_FAIL);
-                            msgSendDetailService.updateStateFromWaitedToSuccessByRecordId(record.getId());
+                            List<String> ids = msgSendDetailService.updateStateAndSetEndTimeByRecordIdAndPhones(record.getId(), task.getFailPhoneList(), MsgSendDetail.STATE_FAIL);
+                            msgSendDetailService.updateStateAndSetEndTimeFromWaitedToSuccessByRecordId(record.getId());
 
                             //接口调用成功则不理会，接口调用失败，进行补扣费
                             //处理发送结果
