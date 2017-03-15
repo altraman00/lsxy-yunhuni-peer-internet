@@ -114,9 +114,8 @@ public class PaoPaoYuSendResultNofityController extends AbstractAPIController {
                     }
                     //更新泡泡鱼记录
                     if(!msgSendRecord.getIsMass()){
-                        msgSendRecord.setState(state);
-                        msgSendRecordService.save(msgSendRecord);
-                        msgUserRequestService.updateStateByMsgKey(msgSendRecord.getMsgKey(),state);
+                        msgUserRequestService.updateNoMassStateByMsgKey(msgSendRecord.getMsgKey(),state);
+                        msgSendRecordService.updateNoMassStateByTaskId(msgSendRecord.getTaskId(),state);
                         // 结束
                         msgSendDetailService.setEndTimeByMsgKey(msgSendRecord.getMsgKey());
                     }

@@ -89,8 +89,8 @@ public class QiXunTongSendResultNofityController extends AbstractAPIController {
                 if(!msgSendDetail.getIsMass()) {
                     msgSendDetail.setEndTime(new Date());
                     try{
-                        msgUserRequestService.updateStateByMsgKey(msgSendDetail.getMsgKey(),state);
-                        msgSendRecordService.updateStateByMsgKey(msgSendDetail.getMsgKey(),state);
+                        msgUserRequestService.updateNoMassStateByMsgKey(msgSendDetail.getTaskId(),state);
+                        msgSendRecordService.updateNoMassStateByTaskId(msgSendDetail.getTaskId(),state);
                         logger.info("[企讯通][消息发送情况回调接口][请求][处理成功]" + result + "[更新主记录],msgKey:" + msgSendDetail.getMsgKey());
                     }catch (Exception e){
                         logger.info("[企讯通][消息发送情况回调接口][请求][处理成功]" + result + "[更新主记录异常],msgKey:" + msgSendDetail.getMsgKey());

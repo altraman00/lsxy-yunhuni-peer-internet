@@ -34,8 +34,19 @@ public class MsgSendRecordServiceImpl extends AbstractService<MsgSendRecord> imp
     }
 
     @Override
-    public void updateStateByMsgKey(String msgKey, int state) {
-        msgSendRecordDao.updateStateByMsgKey(msgKey,state);
+    public void updateNoMassStateByTaskId(String taskId, int state) {
+        MsgSendRecord record = msgSendRecordDao.findFirstByTaskId(taskId);
+        record.setState(state);
+        if(state == MsgSendRecord.STATE_SUCCESS){
+            record.setSuccNum(1L);
+            record.setFailNum(0L);
+            record.setPendingNum(0L);
+        }else{
+            record.setSuccNum(0L);
+            record.setFailNum(1L);
+            record.setPendingNum(0L);
+        }
+        this.save(record);
     }
 
 

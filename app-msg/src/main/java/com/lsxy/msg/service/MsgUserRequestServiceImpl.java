@@ -4,8 +4,6 @@ import com.alibaba.dubbo.common.utils.StringUtils;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.msg.api.model.MsgConstant;
-import com.lsxy.msg.api.model.MsgSendRecord;
 import com.lsxy.msg.api.model.MsgUserRequest;
 import com.lsxy.msg.api.service.MsgUserRequestService;
 import com.lsxy.msg.dao.MsgUserRequestDao;
@@ -53,8 +51,19 @@ public class MsgUserRequestServiceImpl extends AbstractService<MsgUserRequest> i
     }
 
     @Override
-    public void updateStateByMsgKey(String msgKey, int state) {
-        msgUserRequestDao.updateStateByMsgKey(msgKey,state);
+    public void updateNoMassStateByMsgKey(String msgKey, int state) {
+        MsgUserRequest request = msgUserRequestDao.findByMsgKey(msgKey);
+        request.setState(state);
+        if(state == MsgUserRequest.STATE_SUCCESS){
+            request.setSuccNum(1L);
+            request.setFailNum(0L);
+            request.setPendingNum(0L);
+        }else{
+            request.setSuccNum(0L);
+            request.setFailNum(1L);
+            request.setPendingNum(0L);
+        }
+        this.save(request);
     }
 
     @Override
