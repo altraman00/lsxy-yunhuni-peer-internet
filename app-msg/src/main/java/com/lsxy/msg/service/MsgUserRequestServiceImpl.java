@@ -59,7 +59,9 @@ public class MsgUserRequestServiceImpl extends AbstractService<MsgUserRequest> i
 
     @Override
     public List<MsgUserRequest> findAwaitedRequets() {
-        return null;
+        Date current = new Date();
+        Date start = new Date(current.getTime() - 3 * 24 * 60 * 60 * 1000);
+        return msgUserRequestDao.findByStateAndSendTimeBetween(MsgUserRequest.STATE_WAIT,start,current);
     }
 
 }

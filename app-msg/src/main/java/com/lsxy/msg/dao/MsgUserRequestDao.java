@@ -18,4 +18,5 @@ public interface MsgUserRequestDao extends BaseDaoInterface<MsgUserRequest, Seri
     @Query("update MsgUserRequest re set re.state = :state where re.msgKey = :msgKey")
     void updateStateByMsgKey(@Param("msgKey") String msgKey,@Param("state") int state);
 
+    List<MsgUserRequest> findByStateAndSendTimeBetween(int stateWait, Date start, Date current);
 }

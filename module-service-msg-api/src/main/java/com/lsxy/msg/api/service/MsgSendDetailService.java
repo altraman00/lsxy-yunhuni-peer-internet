@@ -27,4 +27,6 @@ public interface MsgSendDetailService extends BaseService<MsgSendDetail> {
     Map getStateCountByRecordId(String recordId);
     Page<MsgSendDetail> getPageByContiton(Integer pageNo, Integer pageSize, String msgKey, String mobile, String state);
     List<MsgSendDetail> findByMsgKey(String msgKey);
+
+    void setEndTimeByMsgKey(String msgKey);
 }
