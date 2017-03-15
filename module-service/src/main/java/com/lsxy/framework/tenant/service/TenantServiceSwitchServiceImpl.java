@@ -77,7 +77,7 @@ public class TenantServiceSwitchServiceImpl extends AbstractService<TenantServic
             s.setIsVoiceDirectly(switchs.getIsVoiceDirectly() == null?0:switchs.getIsVoiceDirectly());
             s.setIsVoiceValidate(switchs.getIsVoiceValidate() == null?0:switchs.getIsVoiceValidate());
             s.setIsCallCenter(switchs.getIsCallCenter() == null?0:switchs.getIsCallCenter());
-            s.setIsMsm(switchs.getIsMsm() == null?0:switchs.getIsMsm());
+            s.setIsSms(switchs.getIsSms() == null?0:switchs.getIsSms());
             s.setIsUssd(switchs.getIsUssd() == null?0:switchs.getIsUssd());
         }else{
             s.setIsIvrService(1);
@@ -87,7 +87,7 @@ public class TenantServiceSwitchServiceImpl extends AbstractService<TenantServic
             s.setIsVoiceDirectly(1);
             s.setIsVoiceValidate(1);
             s.setIsCallCenter(1);
-            s.setIsMsm(1);
+            s.setIsSms(1);
             s.setIsUssd(1);
         }
         return this.save(s);

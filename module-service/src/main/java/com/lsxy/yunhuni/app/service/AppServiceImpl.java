@@ -197,13 +197,13 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         String productCode = service.getProduct();
         String field = service.getCode();
         try {
-            if(productCode!=null){
+            if(productCode!=null){//如果产品不null 判断产品是否可用
                 Product product = productService.getProductByCode(productCode);
                 if(product == null || !"1".equals(product.getStatus())){
                     return false;
                 }
             }
-            if(field != null){
+            if(field != null){//判断租户是否开启该功能
                 TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
                 if(serviceSwitch != null){
                     Integer enabled =  (Integer) BeanUtils.getProperty2(serviceSwitch,field);
@@ -211,6 +211,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
                         return false;
                     }
                 }
+                //判断应用是否开启该功能
                 App app = this.findById(appId);
                 if(app == null){
                     return false;
