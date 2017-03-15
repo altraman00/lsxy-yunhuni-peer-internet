@@ -4,7 +4,7 @@ import com.lsxy.msg.api.model.MsgSendDetail;
 import com.lsxy.msg.api.model.MsgSendRecord;
 import com.lsxy.msg.api.service.MsgSendDetailService;
 import com.lsxy.msg.api.service.MsgSendRecordService;
-import com.lsxy.msg.api.service.MsgUserRequestService;
+import com.lsxy.msg.api.service.MsgSendService;
 import com.lsxy.msg.supplier.SupplierSelector;
 import com.lsxy.msg.supplier.SupplierSendService;
 import com.lsxy.msg.supplier.paopaoyu.PaoPaoYuMassNofity;
@@ -36,7 +36,7 @@ public class PaoPaoYuMassTaskLogTask {
     @Autowired
     SupplierSelector supplierSelector;
     @Autowired
-    ConsumeService consumeService;
+    MsgSendService msgSendService;
 
     /**
      * 每小时的10分钟，检测截止到当前的一个星期内的检测结果
@@ -80,7 +80,7 @@ public class PaoPaoYuMassTaskLogTask {
                             if(ids != null && ids.size() > 0){
                                 BigDecimal cost = BigDecimal.ZERO.subtract(record.getMsgCost());
                                 ProductCode product = ProductCode.valueOf(record.getSendType());
-                                consumeService.batchConsume(new Date(),record.getSendType(),cost,product.getRemark(),record.getAppId(),record.getTenantId(),record.getSubaccountId(),ids);
+                                msgSendService.batchConsumeMsg(new Date(),record.getSendType(),cost,product.getRemark(),record.getAppId(),record.getTenantId(),record.getSubaccountId(),ids);
                             }
                         }else{
                             logger.error("[校验][泡泡鱼][群发事件结果是否合理][不合理][期待结果值："+ record.getPendingNum() +"][实际结果值：(succ)"+task.getSendSuccNum() +

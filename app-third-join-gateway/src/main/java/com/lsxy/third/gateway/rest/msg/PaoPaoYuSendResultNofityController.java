@@ -7,9 +7,9 @@ import com.lsxy.msg.api.model.MsgConstant;
 import com.lsxy.msg.api.model.MsgSendRecord;
 import com.lsxy.msg.api.service.MsgSendDetailService;
 import com.lsxy.msg.api.service.MsgSendRecordService;
+import com.lsxy.msg.api.service.MsgSendService;
 import com.lsxy.msg.api.service.MsgUserRequestService;
 import com.lsxy.third.gateway.base.AbstractAPIController;
-import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.msg.paopaoyu.PaoPaoYuClient;
@@ -48,8 +48,8 @@ public class PaoPaoYuSendResultNofityController extends AbstractAPIController {
     MsgUserRequestService msgUserRequestService;
     @Reference(timeout=3000,check = false,lazy = true)
     MsgSendDetailService msgSendDetailService;
-    @Autowired
-    ConsumeService consumeService;
+    @Reference(timeout=3000,check = false,lazy = true)
+    MsgSendService msgSendService;
 
     @RequestMapping(value = "",method = RequestMethod.POST,produces = "application/json;charset=UTF-8")
     public String handle(HttpServletRequest request){
@@ -128,7 +128,7 @@ public class PaoPaoYuSendResultNofityController extends AbstractAPIController {
                         //插入消费
                         BigDecimal cost = BigDecimal.ZERO.subtract(msgSendRecord.getMsgCost());
                         ProductCode product = ProductCode.valueOf(msgSendRecord.getSendType());
-                        consumeService.batchConsume(new Date(),product.name(),cost,product.getRemark(),msgSendRecord.getAppId(),msgSendRecord.getTenantId(),msgSendRecord.getSubaccountId(),detailIds);
+                        msgSendService.batchConsumeMsg(new Date(),product.name(),cost,product.getRemark(),msgSendRecord.getAppId(),msgSendRecord.getTenantId(),msgSendRecord.getSubaccountId(),detailIds);
                     }
                 }
                 logger.info("[泡泡鱼][消息发送情况回调接口][请求]["+ip+"][处理成功]");

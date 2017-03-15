@@ -1,7 +1,5 @@
 package com.lsxy.msg.service;
 
-import com.lsxy.framework.core.exceptions.api.BalanceNotEnoughException;
-import com.lsxy.framework.core.exceptions.api.QuotaNotEnoughException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
@@ -10,10 +8,11 @@ import com.lsxy.msg.api.service.*;
 import com.lsxy.msg.supplier.SupplierSelector;
 import com.lsxy.msg.supplier.SupplierSendService;
 import com.lsxy.msg.supplier.common.*;
+import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuotaType;
+import com.lsxy.yunhuni.api.apicertificate.service.CertAccountQuotaService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
-import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
@@ -54,6 +53,8 @@ public class MsgSendServiceImpl implements MsgSendService {
     ConsumeService consumeService;
     @Autowired
     CalCostService calCostService;
+    @Autowired
+    CertAccountQuotaService certAccountQuotaService;
 
     @Override
     public String sendUssd(String ip,String appId,String subaccountId,String mobile, String tempId, String tempArgs) throws YunhuniApiException{
@@ -73,6 +74,28 @@ public class MsgSendServiceImpl implements MsgSendService {
     @Override
     public String sendSmsMass(String ip, String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) throws YunhuniApiException {
         return sendMass(appId, subaccountId, taskName, tempId, tempArgs, mobiles, sendTimeStr,MsgConstant.MSG_SMS);
+    }
+
+    @Override
+    public void batchConsumeMsg(Date dt, String type, BigDecimal cost, String remark, String appId, String tenantId, String subaccountId, List<String> detailIds) {
+        consumeService.batchConsume(dt, type, cost, remark, appId, tenantId, subaccountId, detailIds);
+        if(StringUtils.isNotBlank(subaccountId)){
+            Long d = 1L;
+            if(cost.compareTo(BigDecimal.ZERO) == -1){
+                d = -1L;
+            }
+            long use = detailIds.size() * d;
+            String quotaType = null;
+            if(ProductCode.msg_sms.name().equals(type)){
+                quotaType = CertAccountQuotaType.SmsQuota.name();
+            }else if(ProductCode.msg_ussd.name().equals(type)){
+                quotaType = CertAccountQuotaType.UssdQuota.name();
+            }
+            if(StringUtils.isNotBlank(quotaType)){
+                certAccountQuotaService.incQuotaUsed(subaccountId,dt,use, quotaType);
+            }
+
+        }
     }
 
     @Transactional
@@ -152,7 +175,7 @@ public class MsgSendServiceImpl implements MsgSendService {
                 //批量扣费
                 List<String> ids = Arrays.asList(msgSendDetail.getId());
                 ProductCode product = ProductCode.valueOf(sendType);
-                consumeService.batchConsume(new Date(),sendType,cost,product.getRemark(),appId,msgRequest.getTenantId(),subaccountId,ids);
+                this.batchConsumeMsg(new Date(),sendType,cost,product.getRemark(),appId,msgRequest.getTenantId(),subaccountId,ids);
             }
         }else{
             MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,MsgConstant.MSG_USSD,mobile,msg,tempId,tempArgs,new Date(),cost,MsgUserRequest.STATE_FAIL);
@@ -277,7 +300,7 @@ public class MsgSendServiceImpl implements MsgSendService {
             }
             //批量扣费
             ProductCode product = ProductCode.valueOf(sendType);
-            consumeService.batchConsume(new Date(),sendType,cost,product.getRemark(),appId,tenantId,subaccountId,detailIds);
+            this.batchConsumeMsg(new Date(),sendType,cost,product.getRemark(),appId,tenantId,subaccountId,detailIds);
         }
     }
 

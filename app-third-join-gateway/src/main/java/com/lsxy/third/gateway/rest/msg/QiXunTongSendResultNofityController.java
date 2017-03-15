@@ -5,9 +5,9 @@ import com.lsxy.framework.web.utils.WebUtils;
 import com.lsxy.msg.api.model.MsgSendDetail;
 import com.lsxy.msg.api.service.MsgSendDetailService;
 import com.lsxy.msg.api.service.MsgSendRecordService;
+import com.lsxy.msg.api.service.MsgSendService;
 import com.lsxy.msg.api.service.MsgUserRequestService;
 import com.lsxy.third.gateway.base.AbstractAPIController;
-import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.msg.qixuntong.QiXunTongConstant;
@@ -46,8 +46,9 @@ public class QiXunTongSendResultNofityController extends AbstractAPIController {
     MsgUserRequestService msgUserRequestService;
     @Reference(timeout=3000,check = false,lazy = true)
     MsgSendDetailService msgSendDetailService;
-    @Autowired
-    ConsumeService consumeService;
+    @Reference(timeout=3000,check = false,lazy = true)
+    MsgSendService msgSendService;
+
 
     @RequestMapping(value = "",method = RequestMethod.POST,produces = "application/json;charset=UTF-8")
     public String handle(HttpServletRequest request){
@@ -105,8 +106,7 @@ public class QiXunTongSendResultNofityController extends AbstractAPIController {
                     List<String> ids = Arrays.asList(msgSendDetail.getId());
                     BigDecimal cost = BigDecimal.ZERO.subtract(msgSendDetail.getMsgCost());
                     ProductCode product = ProductCode.valueOf(msgSendDetail.getSendType());
-                    consumeService.batchConsume(new Date(),product.name(),cost,product.getRemark(),msgSendDetail.getAppId(),msgSendDetail.getTenantId(),msgSendDetail.getSubaccountId(),ids);
-
+                    msgSendService.batchConsumeMsg(new Date(),product.name(),cost,product.getRemark(),msgSendDetail.getAppId(),msgSendDetail.getTenantId(),msgSendDetail.getSubaccountId(),ids);
                 }
                 logger.info("[企讯通][消息发送情况回调接口][请求][处理成功]" + result);
             } else {

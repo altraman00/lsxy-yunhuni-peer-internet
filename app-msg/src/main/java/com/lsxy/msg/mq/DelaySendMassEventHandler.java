@@ -6,6 +6,7 @@ import com.lsxy.msg.api.model.MsgSendDetail;
 import com.lsxy.msg.api.model.MsgSendRecord;
 import com.lsxy.msg.api.service.MsgSendDetailService;
 import com.lsxy.msg.api.service.MsgSendRecordService;
+import com.lsxy.msg.api.service.MsgSendService;
 import com.lsxy.msg.supplier.SupplierSelector;
 import com.lsxy.msg.supplier.SupplierSendService;
 import com.lsxy.msg.api.model.MsgConstant;
@@ -36,7 +37,7 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
     @Autowired
     MsgSendDetailService msgSendDetailService;
     @Autowired
-    ConsumeService consumeService;
+    MsgSendService msgSendService;
 
     @Override
     public void handleMessage(DelaySendMassEvent message) throws JMSException {
@@ -69,7 +70,7 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
         if(ids != null && ids.size() > 0){
             BigDecimal cost = BigDecimal.ZERO.subtract(new BigDecimal(message.getCost()));
             ProductCode product = ProductCode.valueOf(message.getSendType());
-            consumeService.batchConsume(new Date(),message.getSendType(),cost,product.getRemark(),message.getAppId(),message.getTenantId(),message.getSubaccountId(),ids);
+            msgSendService.batchConsumeMsg(new Date(),message.getSendType(),cost,product.getRemark(),message.getAppId(),message.getTenantId(),message.getSubaccountId(),ids);
         }
     }
 }
