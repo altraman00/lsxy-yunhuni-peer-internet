@@ -15,6 +15,7 @@ import javax.persistence.Query;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by liups on 2017/3/14.
@@ -83,5 +84,41 @@ public class MsgDayServiceImpl extends AbstractService<MsgDay> implements MsgDay
         }
 
     }
+
+
+    @Override
+    public Long getUsed(String tenantId, String appId, String subaccountId,String sendType, Date startTime, Date endTime){
+        String sql1 = "SELECT COUNT(1) AS used FROM db_lsxy_bi_yunhuni.tb_bi_msg_send_detail WHERE send_type='"+sendType+"' ";
+        String sql2 = "SELECT COUNT(1) AS returned FROM db_lsxy_bi_yunhuni.tb_bi_msg_send_detail WHERE send_type='"+sendType+"' AND state=-1 ";
+
+        if(org.apache.commons.lang.StringUtils.isNotEmpty(tenantId)){
+            sql1 +=" AND tenant_id='"+tenantId+"' " ;
+            sql2 +=" AND tenant_id='"+tenantId+"' " ;
+        }
+        if(org.apache.commons.lang.StringUtils.isNotEmpty(appId)){
+            sql1 += " AND app_id='"+appId+"' ";
+            sql2 += " AND app_id='"+appId+"' ";
+        }
+        if(org.apache.commons.lang.StringUtils.isNotEmpty(subaccountId)){
+            sql1 += " AND subaccount_id='"+subaccountId+"' ";
+            sql2 += " AND subaccount_id='"+subaccountId+"' ";
+        }
+        if(startTime != null){
+            String startTimeStr = DateUtils.getDate(startTime,"yyyy-MM-dd HH:mm:ss");
+            sql1 += " AND create_time>='"+startTimeStr+"' " ;
+            sql2 += " AND end_time>='"+startTimeStr+"' " ;
+        }
+        if(endTime != null){
+            String endTimeStr = DateUtils.getDate(endTime,"yyyy-MM-dd HH:mm:ss");
+            sql1 += " AND create_time<'"+endTimeStr+"' " ;
+            sql2 += " AND end_time<'"+endTimeStr+"' " ;
+        }
+        Map map1 = jdbcTemplate.queryForMap(sql1);
+        Map map2 = jdbcTemplate.queryForMap(sql2);
+        Long used = (Long) map1.get("used");
+        Long returned = (Long) map2.get("returned");
+        return used - returned;
+    }
+
 
 }

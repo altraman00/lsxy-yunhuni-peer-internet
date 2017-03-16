@@ -10,4 +10,6 @@ import java.util.Date;
  */
 public interface MsgDayService extends BaseService<MsgDay> {
     void dayStatistics(Date date);
+
+    Long getUsed(String tenantId, String appId, String subaccountId, String sendType, Date startTime, Date endTime);
 }
