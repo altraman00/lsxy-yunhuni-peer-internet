@@ -1147,7 +1147,7 @@
     <div class="modal-loadding loadding"></div>
     <div class="title">文件上传<a class="close_a modalCancel-app-up" data-id="four" ></a></div>
     <div class="content">
-        <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、16位）后再上传,单条语音最大支持 5M。</p>
+        <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、8位）后再上传,单条语音最大支持 5M。</p>
         <form:form action="${ctx}/console/app/file/play/upload" method="post" id="uploadMianForm" enctype="multipart/form-data" target="hidden_frame">
             <div class="input-box ">
                 <div class="row margin-bottom-10">
@@ -1460,6 +1460,7 @@
             $('#progress').hide();
             $('#fileupload').removeAttr('disabled');
 //        }
+        $('#uploadButton').show();
     });
     /**
      *绑定测试电话号码
@@ -2050,7 +2051,6 @@
         var count = 0;
         var name = $('#name').val();
         var subId = $('#voice_file_subId') .val();//$('#voice_file_subId option:selected') .val();
-        console.info(subId);
         ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':1,'pageSize':20,'subId':subId,csrfParameterName:csrfToken},function(response){
             if(response.success){
                 count=response.data.totalCount;
@@ -2100,7 +2100,6 @@
                 var data =[];
                 for(var j=0;j<response.data.result.length;j++){
                     var tempFile = response.data.result[j];
-                    console.info(tempFile)
                     var temp = [
                         tempFile.id,
                         tempFile.name,
