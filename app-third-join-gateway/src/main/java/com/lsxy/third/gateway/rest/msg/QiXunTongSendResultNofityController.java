@@ -87,9 +87,11 @@ public class QiXunTongSendResultNofityController extends AbstractAPIController {
                 } else {//发送失败
                     state = MsgSendDetail.STATE_FAIL;
                 }
+                Date date = new Date();
                 msgSendDetail.setState(state);
+                msgSendDetail.setEndTime(date);
+                msgSendDetailService.save(msgSendDetail);
                 if(!msgSendDetail.getIsMass()) {
-                    msgSendDetail.setEndTime(new Date());
                     try{
                         msgUserRequestService.updateNoMassStateByMsgKey(msgSendDetail.getTaskId(),state);
                         msgSendRecordService.updateNoMassStateByTaskId(msgSendDetail.getTaskId(),state);
@@ -99,14 +101,13 @@ public class QiXunTongSendResultNofityController extends AbstractAPIController {
 
                     }
                 }
-                msgSendDetailService.save(msgSendDetail);
 
                 if(MsgSendDetail.STATE_FAIL == state){
                     // 扣费返还
                     List<String> ids = Arrays.asList(msgSendDetail.getId());
                     BigDecimal cost = BigDecimal.ZERO.subtract(msgSendDetail.getMsgCost());
                     ProductCode product = ProductCode.valueOf(msgSendDetail.getSendType());
-                    msgSendService.batchConsumeMsg(new Date(),product.name(),cost,product.getRemark(),msgSendDetail.getAppId(),msgSendDetail.getTenantId(),msgSendDetail.getSubaccountId(),ids);
+                    msgSendService.batchConsumeMsg(date,product.name(),cost,product.getRemark(),msgSendDetail.getAppId(),msgSendDetail.getTenantId(),msgSendDetail.getSubaccountId(),ids);
                 }
                 logger.info("[企讯通][消息发送情况回调接口][请求][处理成功]" + result);
             } else {
