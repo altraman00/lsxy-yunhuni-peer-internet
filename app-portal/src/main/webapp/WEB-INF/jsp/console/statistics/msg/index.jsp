@@ -366,6 +366,17 @@
             html += '<table class="cost-table table table-striped sync-table-box" ><thead><th>日期</th><th>消费金额（元）</th></thead></table>';
             html +='';
             //获取数据总数
+            var type = $('input[name="stime"]:checked').val();
+            var type1 = 'day';
+            if(type=='year'){type1='month'}
+            var app = $('#defaultapp').val();
+            var starttime = initialStartTime(type);
+            var endtime = initialEndTime(type);
+            var param = {'type':type1,'appId':app,'startTime':starttime,'endTime':endtime,'pageNo':"1",'pageSize':"1",csrfParameterName:csrfToken};
+            ajaxsync(ctx+"/console/statistics/msg/plist",param,function(result) {
+                var resultData = result.data.result;
+                count = resultData.length;
+            });
             //var count = 1;
             //每页显示数量
             var listRow = 70;

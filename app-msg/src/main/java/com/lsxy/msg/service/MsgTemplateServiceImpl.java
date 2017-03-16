@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 /**
@@ -63,6 +64,27 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
             hql += " and obj.name like '%"+name+"%' ";
         }
         return pageList(hql,pageNo,pageSize,appId);
+    }
+
+    @Override
+    public Page<MsgTemplate> getPageByCondition(Integer pageNo, Integer pageSize, int state,Date date1, Date date2, String[] tenantId) {
+        String hql = " from MsgTemplate obj where obj.status = ?1 ";
+        if(tenantId!=null&& tenantId.length>0){
+            String tenantIds = "";
+            for(int i=0;i<tenantId.length;i++){
+                tenantIds += " '"+tenantId[i]+"' ";
+                if(i!=(tenantId.length-1)){
+                    tenantIds+=",";
+                }
+            }
+            hql +=" AND obj.tenantId in("+tenantIds+") ";
+        }
+        if(date1!=null&&date2!=null){
+            hql += " and obj.lateTime between ?2 and ?3 ";
+            return pageList(hql,pageNo,pageSize,state,date1,date2);
+        }else{
+            return pageList(hql,pageNo,pageSize,state);
+        }
     }
 
     @Override
@@ -137,4 +159,11 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
         }
         return oldTemplate;
     }
+
+    @Override
+    public long findByWait() {
+        String hql2 = "  from MsgTemplate obj where obj.status=?1  ";
+        return this.countByCustom(hql2, MsgTemplate.STATUS_WAIT);
+    }
+
 }

@@ -3,19 +3,22 @@ package com.lsxy.yunhuni.statistics.service;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.Page;
+import com.lsxy.utils.StatisticsUtils;
+import com.lsxy.yunhuni.api.statistics.model.ConsumeMonth;
 import com.lsxy.yunhuni.api.statistics.model.MsgDay;
+import com.lsxy.yunhuni.api.statistics.model.MsgStatisticsVo;
 import com.lsxy.yunhuni.api.statistics.model.SubaccountDay;
 import com.lsxy.yunhuni.api.statistics.service.MsgDayService;
 import com.lsxy.yunhuni.statistics.dao.MsgDayDao;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.Query;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by liups on 2017/3/14.
@@ -121,4 +124,55 @@ public class MsgDayServiceImpl extends AbstractService<MsgDay> implements MsgDay
     }
 
 
+    @Override
+    public Page<MsgStatisticsVo> getStatisticsPage(String tenantId, String appId, Date date1, Date date2, Integer pageNo, Integer pageSize) {
+        List<MsgDay> list =  getAllList(tenantId,appId,date1,date2);
+        Map<Object ,MsgStatisticsVo> map = new HashMap<>();
+        for (int i = 0; i < list.size(); i++) {
+            MsgDay msgDay = list.get(i);
+            MsgStatisticsVo msgVo = map.get(msgDay.getDay());
+            if(msgVo==null){
+                msgVo = new MsgStatisticsVo(msgDay);
+            }else{
+                msgVo.add(msgDay);
+            }
+            map.put(msgDay.getDay(),msgVo);
+        }
+        List<MsgStatisticsVo> list2 = null;
+        if(list.size()>0) {
+            list2 = MsgStatisticsVo.initMsgStatisticsVos(date1, 1, map);
+        }else{
+            list2 = new ArrayList<>();
+        }
+        return new Page<>((pageNo-1)*pageSize,list.size(),pageSize,list2);
+    }
+
+    @Override
+    public List<MsgStatisticsVo> getStatisticsList(String tenantId, String appId, Date date1, Date date2) {
+        List<MsgDay> list =  getAllList(tenantId,appId,date1,date2);
+        Map<Object ,MsgStatisticsVo> map = new HashMap<>();
+        for (int i = 0; i < list.size(); i++) {
+            MsgDay msgDay = list.get(i);
+            MsgStatisticsVo msgVo = map.get(msgDay.getDay());
+            if(msgVo==null){
+                msgVo = new MsgStatisticsVo(msgDay);
+            }else{
+                msgVo.add(msgDay);
+            }
+            map.put(msgDay.getDay(),msgVo);
+        }
+        return MsgStatisticsVo.initMsgStatisticsVos(date1,1,map);
+    }
+    private List<MsgDay> getAllList(String tenantId, String appId, Date date1, Date date2){
+        String hql = " from MsgDay obj where obj.tenantId=?1 ";
+        List<MsgDay> list = null;
+        if(StringUtils.isNotEmpty(appId)){
+            hql += " and obj.appId = ?2 and obj.dt between ?2 and ?3 ";
+            list = this.list(hql,tenantId,appId,date1,date2 );
+        }else{
+            hql+= " and obj.dt between ?2 and ?3 ";
+            list = this.list(hql,tenantId,date1,date2 );
+        }
+        return list;
+    }
 }

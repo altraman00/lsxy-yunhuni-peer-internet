@@ -133,19 +133,6 @@ public class SubaccountMonthServiceImpl extends AbstractService<SubaccountMonth>
         String nextDateStr = DateUtils.getNextMonth(statisticsDateStr, "yyyy-MM-dd HH:mm:ss");
         String currentDateStr = DateUtils.formatDate(new Date());
 
-        //子账号最初开始有的日期2017-03-14，之前的日期不用算了
-        Date firstStatisticsDate = DateUtils.parseDate("2017-03", "yyyy-MM");
-        SubaccountMonth lastStatistics = subaccountMonthDao.findFirstByDt(preDate);
-        //如果前一天没有统计数据，并且要统计的时间大于2017-03-14,则先统计前一天的数据
-        if(lastStatistics == null && staticsDate.getTime() >= firstStatisticsDate.getTime()) {
-            monthStatistics(preDate);
-        }
-        //如果今天有统计数据了，则说明不用统计了
-        SubaccountMonth todayStatistics = subaccountMonthDao.findFirstByDt(staticsDate);
-        if(todayStatistics != null){
-            return;
-        }
-
         String sql = "SELECT REPLACE(UUID(), '-', '') AS id,a.app_id,a.tenant_id,a.id AS subaccount_id ,'"+statisticsDateStr+"' AS dt, "+ month +" AS month , IFNULL(b.among_amount,0) AS among_amount, IFNULL(b.among_duration,0) AS among_duration," +
                 "IFNULL((SELECT d.voice_used FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_month d WHERE d.subaccount_id = a.id AND d.dt = '" + preDateStr + "'),0) + IFNULL(b.among_duration,0) AS voice_used, 0 AS msg_used ," +
                 "IFNULL((SELECT qu.value FROM db_lsxy_bi_yunhuni.tb_bi_cert_account_quota qu WHERE qu.type='CallQuota' AND qu.cert_account_id = a.id LIMIT 1),0) AS voice_quota_value, -1 AS msg_quota_value ," +

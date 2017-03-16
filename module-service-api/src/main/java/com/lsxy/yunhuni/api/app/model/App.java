@@ -19,9 +19,12 @@ import javax.persistence.*;
 public class App extends IdEntity {
     public static int STATUS_ONLINE = 1;//上线
     public static int STATUS_OFFLINE = 2;//没上线
+    public static int STATUS_WAIT = 3;//等待审核
+    public static int STATUS_FAIl = 4;//审核失败
     public static String PRODUCT_VOICE = "voice";//语言产品
     public static String PRODUCT_CALL_CENTER = "call_center";//语言产品
     public static String PRODUCT_MSG = "msg";//消息类产品
+    private String reason;//失败原因
     private Tenant tenant;//所属租户
     private String name;//应用名字
     private Integer status;//应用状态
@@ -42,16 +45,17 @@ public class App extends IdEntity {
     private Integer isCallCenter;//是否启用呼叫中心服务 是否呼叫中心0否，1是',
     private String serviceType;//服务类型
     private Long callCenterNum; //呼叫中心应用编号
-    private Integer isMsm;//短信
+    private Integer isSms;//短信
     private Integer isUssd;//闪印
-    @Column(name = "is_msm")
-    public Integer getIsMsm() {
-        return isMsm;
+    @Column(name = "is_sms")
+    public Integer getIsSms() {
+        return isSms;
     }
 
-    public void setIsMsm(Integer isMsm) {
-        this.isMsm = isMsm;
+    public void setIsSms(Integer isSms) {
+        this.isSms = isSms;
     }
+
     @Column(name = "is_ussd")
     public Integer getIsUssd() {
         return isUssd;
@@ -229,5 +233,13 @@ public class App extends IdEntity {
 
     public void setCallCenterNum(Long callCenterNum) {
         this.callCenterNum = callCenterNum;
+    }
+    @Column(name = "reason")
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 }

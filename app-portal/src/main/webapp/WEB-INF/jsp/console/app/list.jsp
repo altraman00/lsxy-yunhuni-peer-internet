@@ -88,14 +88,17 @@
                                                 <c:if test="${result.serviceType=='call_center'}">呼叫中心</c:if>
                                                 <c:if test="${result.serviceType=='voice'}">语音</c:if>
                                             </td>
-                                            <td ><c:if test="${result.status==1}"><span style="color:#9dc940;"  id="statusapp-${result.id}">已上线</span></c:if>
-                                            <c:if test="${result.status==2}"><span style="color:#ff0000;" id="statusapp-${result.id}">未上线</span></c:if>
+                                            <td >
+                                                <c:if test="${result.status==1}"><span style="color:#9dc940;"  id="statusapp-${result.id}">已上线</span></c:if>
+                                                <c:if test="${result.status==2}"><span style="color:#ff0000;" id="statusapp-${result.id}">未上线</span></c:if>
+                                                <c:if test="${result.status==3}"><span style="color:#000000;" id="statusapp-${result.id}">待审核</span></c:if>
+                                                <c:if test="${result.status==4}"><span style="color:#ff0000;" id="statusapp-${result.id}" title="不通过的原因：${result.reason}">审核不通过</span></c:if>
                                             </td>
                                             <td><fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
                                             <td class="operation">
                                                 <a href="${ctx}/console/app/detail?id=${result.id}">详情</a> <span ></span>
                                                 <a onclick="delapp('${result.id}')" >删除</a> <span ></span>
-                                                <c:if test="${result.status==2}"> <a onclick="tabtarget('${result.id}','1')" >申请上线</a></c:if>
+                                                <c:if test="${result.status==2 || result.status==4}"> <a onclick="tabtarget('${result.id}','1')" >申请上线</a></c:if>
                                                 <c:if test="${result.status==1}"> <span class="apply" id="trb-${result.id}"><a onclick="offline('${result.id}','${result.isIvrService}')">下线</a></span></c:if>
                                             </td>
 
@@ -136,7 +139,7 @@
                 <ul class="nav-modal-text navw-270">
                     <li><span class="text">实名认证</span> </li>
                     <li><span class="text">号码绑定</span> </li>
-                    <li class="ml-20 mr-0"><span class="text">上线</span>  </li>
+                    <li class="ml-20 mr-0"><span class="text">申请上线</span>  </li>
                 </ul>
             </div>
 
@@ -227,10 +230,10 @@
             <div class="contentModal" style="display:none " data-action="3">
                 <div class="input text-center" >
                     <img src="${resPrefixUrl }/images/index/l1.png" alt="" class="sre" />
-                    <p>上线成功</p>
+                    <p>申请上线成功，请等待审核</p>
                 </div>
                 <div class="input text-center" >
-                    <a href="" type="button"  class="btn btn-primary btn-box tabModalBtn" data-fun="refreshPage()" >上线成功</a>
+                    <a href="" type="button"  class="btn btn-primary btn-box tabModalBtn" data-fun="refreshPage()" >完成</a>
                 </div>
             </div>
             <div class="input">

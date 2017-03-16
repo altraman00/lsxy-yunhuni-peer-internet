@@ -122,7 +122,7 @@
                                                                 <c:if test="${app.isVoiceValidate=='1'}">语音验证码&nbsp;</c:if>
                                                                 <c:if test="${app.isIvrService=='1'}">自定义IVR&nbsp;</c:if>
                                                                 <c:if test="${app.isCallCenter==1}">呼叫中心&nbsp;</c:if>
-                                                                <c:if test="${app.isMsm=='1'}">短信&nbsp;</c:if>
+                                                                <c:if test="${app.isSms=='1'}">短信&nbsp;</c:if>
                                                                 <c:if test="${app.isUssd==1}">闪印&nbsp;</c:if>
                                                             </p>
                                                         </div>
@@ -500,7 +500,7 @@
                                                         模板内容：
                                                     </div>
                                                     <div class="col-md-6" v-if="isShow(-1)">
-                                                        <div style="height: 70px;position:relative;margin:0;padding:0">
+                                                        <div style="height: 70px;position:relative;margin:0;padding:0;width:620px">
                                                         <textarea class="form-control" v-model="content" placeholder="" style="height:70px;position:absolute;margin:0;padding:2px "
                                                                   id="template_content2" onkeydown="checkMaxInput(this,60)" onkeyup="checkMaxInput(this,60)" onfocus="checkMaxInput(this,60)" onblur="checkMaxInput(this,60);"
                                                         >{{content}}</textarea>
@@ -516,15 +516,15 @@
                                                         备注：
                                                     </div>
                                                     <div class="col-md-6" v-if="isShow(-1)">
-                                                        <div style="height: 70px;position:relative;margin:0;padding:0">
+                                                        <div style="height: 70px;position:relative;margin:0;padding:0;width:620px">
                                                         <textarea class="form-control" v-model="remark" placeholder="" style="height:70px;position:absolute;margin:0;padding:2px "
                                                                   id="template_remark2" onkeydown="checkMaxInput(this,100)" onkeyup="checkMaxInput(this,100)" onfocus="checkMaxInput(this,100)" onblur="checkMaxInput(this,100);"
                                                         >{{remark}}</textarea>
                                                             <div id="template_remark2msg" class="note" style="position:absolute;line-height:117px;padding:3px 555px;height: 0px"><font color="#777">{{remarklength}}/100</font></div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-6" v-if="isShow(1,0)">
-                                                        <textarea  type="text"  class="form-control"  readonly placeholder="">{{remark}}</textarea>
+                                                    <div class="col-md-6" v-if="isShow(1,0)" style="width:620px">
+                                                        <textarea  type="text"  class="form-control"  readonly placeholder="" >{{remark}}</textarea>
                                                     </div>
                                                 </div>
                                                 <div class="row margin-bottom-10">
@@ -542,7 +542,9 @@
                                                         原因：
                                                     </div>
                                                     <div class="col-md-6">
+                                                        <div style="height: 70px;position:relative;margin:0;padding:0;width:620px">
                                                         <textarea type="text"  class="form-control" readonly placeholder="">{{reason}}</textarea>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1145,7 +1147,7 @@
     <div class="modal-loadding loadding"></div>
     <div class="title">文件上传<a class="close_a modalCancel-app-up" data-id="four" ></a></div>
     <div class="content">
-        <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、16位）后再上传,单条语音最大支持 5M。</p>
+        <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、8位）后再上传,单条语音最大支持 5M。</p>
         <form:form action="${ctx}/console/app/file/play/upload" method="post" id="uploadMianForm" enctype="multipart/form-data" target="hidden_frame">
             <div class="input-box ">
                 <div class="row margin-bottom-10">
@@ -1283,6 +1285,7 @@
 
                 $('#modalseven').css("height","510px");
 //                $('#modalseven textarea.form-control').css("height","75px");
+                $('#template_detail div.col-md-6').css("width","650px");
             })
         </script>
 
@@ -1457,6 +1460,7 @@
             $('#progress').hide();
             $('#fileupload').removeAttr('disabled');
 //        }
+        $('#uploadButton').show();
     });
     /**
      *绑定测试电话号码
@@ -2047,7 +2051,6 @@
         var count = 0;
         var name = $('#name').val();
         var subId = $('#voice_file_subId') .val();//$('#voice_file_subId option:selected') .val();
-        console.info(subId);
         ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':1,'pageSize':20,'subId':subId,csrfParameterName:csrfToken},function(response){
             if(response.success){
                 count=response.data.totalCount;
@@ -2097,7 +2100,6 @@
                 var data =[];
                 for(var j=0;j<response.data.result.length;j++){
                     var tempFile = response.data.result[j];
-                    console.info(tempFile)
                     var temp = [
                         tempFile.id,
                         tempFile.name,
@@ -2716,7 +2718,7 @@
                 '<td class="">'+ (data[i].content) +'</td>' +
                 '<td class="">'+ (data[i].certId) +'</td>';
             var state = data[i].state=='1'?'审核已通过':(data[i].state=='0'?'待审核':(data[i].state=='-1'?'审核不通过！':'未知')) ;
-            var color = data[i].enabled == 1?"text-success":"text-danger";
+            var color = data[i].state == 1?"text-success":"text-danger";
             var reason = data[i].reason==null?'':data[i].reason;
             html+= '<td class="'+color+'" id="enable_'+data[i].id+'" title="审核不通过原因:'+reason+'">' + state+ '</td>' +
                 '<td class=""><a href="javascript:totemplateDetail(\''+data[i].id+'\')" >详情</a>&nbsp;<a href="javascript:delTemplate(\''+data[i].id+'\')" >删除</a></td>' +
