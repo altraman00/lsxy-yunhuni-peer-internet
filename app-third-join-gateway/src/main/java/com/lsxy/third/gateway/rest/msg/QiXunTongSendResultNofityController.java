@@ -87,9 +87,9 @@ public class QiXunTongSendResultNofityController extends AbstractAPIController {
                 } else {//发送失败
                     state = MsgSendDetail.STATE_FAIL;
                 }
-                Date date = new Date();
+                Date endTime = new Date();
                 msgSendDetail.setState(state);
-                msgSendDetail.setEndTime(date);
+                msgSendDetail.setEndTime(endTime);
                 msgSendDetailService.save(msgSendDetail);
                 if(!msgSendDetail.getIsMass()) {
                     try{
@@ -107,7 +107,7 @@ public class QiXunTongSendResultNofityController extends AbstractAPIController {
                     List<String> ids = Arrays.asList(msgSendDetail.getId());
                     BigDecimal cost = BigDecimal.ZERO.subtract(msgSendDetail.getMsgCost());
                     ProductCode product = ProductCode.valueOf(msgSendDetail.getSendType());
-                    msgSendService.batchConsumeMsg(date,product.name(),cost,product.getRemark(),msgSendDetail.getAppId(),msgSendDetail.getTenantId(),msgSendDetail.getSubaccountId(),ids);
+                    msgSendService.batchConsumeMsg(endTime,product.name(),cost,product.getRemark(),msgSendDetail.getAppId(),msgSendDetail.getTenantId(),msgSendDetail.getSubaccountId(),ids);
                 }
                 logger.info("[企讯通][消息发送情况回调接口][请求][处理成功]" + result);
             } else {

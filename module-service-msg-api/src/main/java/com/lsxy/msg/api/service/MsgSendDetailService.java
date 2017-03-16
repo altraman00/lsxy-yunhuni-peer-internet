@@ -15,11 +15,9 @@ import java.util.Map;
 public interface MsgSendDetailService extends BaseService<MsgSendDetail> {
     List<String> batchInsertDetail(MsgSendRecord msgSendRecord, List<String> pendingPhones,int state);
 
-    void updateStateByMsgKey(String msgKey, int state);
-
     MsgSendDetail findByTaskIdAndMobile(String taskId, String mobile);
 
-    List<String> updateStateAndTaskIdByRecordIdAndPhones(String recordId, List<String> phones, int state, String taskId);
+    List<String> updateStateAndTaskIdAndEndTimeByRecordIdAndPhones(String recordId, List<String> phones, int state, String taskId,Date endTime);
 
     List<String> updateStateAndSetEndTimeByRecordIdAndPhones(String recordId, List<String> phones, int state,Date endTime);
 

@@ -201,6 +201,11 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
                     BigDecimal costTimeLong = (BigDecimal) staticCdr.get("costTimeLong");
                     Long oleUsed = quota.getUsed() == null ? 0L : quota.getUsed();
                     quota.setUsed(oleUsed + costTimeLong.longValue());
+                    break;
+                }case SmsQuota:{
+                    break;
+                }case UssdQuota:{
+                    break;
                 }
             }
             quota.setBalanceDt(staticsDate);

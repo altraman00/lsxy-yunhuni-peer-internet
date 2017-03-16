@@ -114,7 +114,6 @@ public class PaoPaoYuSendResultNofityController extends AbstractAPIController {
                     if(!msgSendRecord.getIsMass()){
                         msgUserRequestService.updateNoMassStateByMsgKey(msgSendRecord.getMsgKey(),state);
                         msgSendRecordService.updateNoMassStateByTaskId(msgSendRecord.getTaskId(),state);
-                        //TODO 结束
 
                     }
                     String mobiles = msgSendRecord.getMobiles();

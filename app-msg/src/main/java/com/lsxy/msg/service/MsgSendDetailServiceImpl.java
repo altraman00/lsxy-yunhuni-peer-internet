@@ -72,18 +72,13 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
     }
 
     @Override
-    public void updateStateByMsgKey(String msgKey, int state) {
-        msgSendDetailDao.updateStateByMsgKey(msgKey,state);
-    }
-
-    @Override
     public MsgSendDetail findByTaskIdAndMobile(String taskId, String mobile) {
         return msgSendDetailDao.findFirstByTaskIdAndMobile(taskId,mobile);
     }
 
     @Override
-    public List<String> updateStateAndTaskIdByRecordIdAndPhones(String recordId, List<String> phones, int state, String taskId) {
-        msgSendDetailDao.updateDetailStateAndTaskIdByRecordId(recordId, phones, state,taskId);
+    public List<String> updateStateAndTaskIdAndEndTimeByRecordIdAndPhones(String recordId, List<String> phones, int state, String taskId,Date endTime) {
+        msgSendDetailDao.updateDetailStateAndTaskIdByRecordId(recordId, phones, state,taskId,endTime);
         if(MsgSendDetail.STATE_FAIL == state){
              return msgSendDetailDao.findIdByRecordIdAndMobileIn(recordId,phones);
         }else{
