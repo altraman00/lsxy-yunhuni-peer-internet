@@ -142,7 +142,7 @@ public class AppController extends AbstractPortalController {
     @ResponseBody
     public RestResponse delete(HttpServletRequest request,String id){
         App app = (App)findById(request,id).getData();
-        if(App.STATUS_OFFLINE==app.getStatus()) {
+        if(App.STATUS_OFFLINE==app.getStatus()||App.STATUS_WAIT==app.getStatus()||App.STATUS_FAIl==app.getStatus()) {
             //Rest删除应用
             String token = getSecurityToken(request);
             String uri = PortalConstants.REST_PREFIX_URL  + "/rest/app/delete?id={1}";

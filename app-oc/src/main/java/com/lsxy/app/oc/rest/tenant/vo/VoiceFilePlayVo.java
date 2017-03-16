@@ -5,6 +5,8 @@ import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.Date;
+
 /**
  * Created by zhangxb on 2017/3/1.
  */
@@ -30,8 +32,9 @@ public class VoiceFilePlayVo {
     private String subaccountId;
     @ApiModelProperty(name = "fileKey",value = "文件下载使用")
     private String fileKey;
-
-    public VoiceFilePlayVo(String id, String name, Integer status, Long size, String remark, String reason, Integer sync, String certId, String subaccountId, String fileKey) {
+    @ApiModelProperty(name = "checkTime",value = "审核时间")
+    private Date checkTime;//审核时间
+    public VoiceFilePlayVo(String id, String name, Integer status, Long size, String remark, String reason, Integer sync, String certId, String subaccountId, String fileKey,Date checkTime) {
         this.id = id;
         this.name = name;
         this.status = status;
@@ -42,10 +45,11 @@ public class VoiceFilePlayVo {
         this.certId = certId;
         this.subaccountId = subaccountId;
         this.fileKey = fileKey;
+        this.checkTime = checkTime;
     }
     public static VoiceFilePlayVo changeAppVoiceFileToVoiceFileVO(VoiceFilePlay ext, ApiCertificateSubAccount apiCertificateSubAccount){
         String certId = apiCertificateSubAccount!=null ? apiCertificateSubAccount.getCertId() :"";
-        return new VoiceFilePlayVo(ext.getId(),ext.getName(),ext.getStatus(),ext.getSize(),ext.getRemark(),ext.getReason(),ext.getSync(),certId,ext.getSubaccountId(), ext.getFileKey());
+        return new VoiceFilePlayVo(ext.getId(),ext.getName(),ext.getStatus(),ext.getSize(),ext.getRemark(),ext.getReason(),ext.getSync(),certId,ext.getSubaccountId(), ext.getFileKey(),ext.getCheckTime());
     }
 
     public String getFileKey() {
