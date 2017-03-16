@@ -96,7 +96,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             action = actionList.get(0);
         }
         //应用上线--选号
-        if( app.getStatus() == App.STATUS_OFFLINE ){
+        if( app.getStatus() == App.STATUS_OFFLINE ||app.getStatus() == App.STATUS_FAIl){
             if(action == null){
                 AppOnlineAction newAction = new AppOnlineAction(app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_SELECT_NUM,AppOnlineAction.STATUS_AVTIVE);
                 this.save(newAction);
