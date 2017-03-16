@@ -257,7 +257,7 @@
                                         <li data-id="number"><a href="#number" data-toggle="tab">号码绑定</a></li>
                                         <li data-id="subAccount"><a href="#subAccount" data-toggle="tab">子账号</a></li>
                                     </c:if>
-                                    <li class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
+
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
                                     <!-- 放音文件-->
@@ -270,7 +270,8 @@
                                             <div class="col-md-3 remove-padding" style="padding-left:15px;">
                                                 <input type="text" class="form-control" placeholder="关联子账号" id="voice_file_subId"/>
                                             </div>
-                                            <div class="col-md-1"><button class="btn btn-primary" type="button" onclick="upplay()">查询</button></div>
+                                            <div class="col-md-1 voice-find-btn"><button class="btn btn-primary" type="button" onclick="upplay()">查询</button></div>
+                                            <div class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></div>
                                             <div class="col-md-8 sizebox  remove-padding " id="voiceFilePlay">
                                             </div>
                                         </div>
