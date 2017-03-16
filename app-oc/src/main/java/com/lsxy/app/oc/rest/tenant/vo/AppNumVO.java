@@ -1,5 +1,6 @@
 package com.lsxy.app.oc.rest.tenant.vo;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
@@ -7,6 +8,7 @@ import java.util.Date;
 /**
  * Created by liups on 2017/1/11.
  */
+@ApiModel
 public class AppNumVO {
     @ApiModelProperty(name = "rentId",value = "租用记录Id")
     String rentId;
@@ -22,7 +24,10 @@ public class AppNumVO {
     String areaCode;
     @ApiModelProperty(name = "expireTime",value = "过期时间")
     Date expireTime;
-
+    @ApiModelProperty(name = "certId",value = " 关联子账号-鉴权账户")
+    private String certId;
+    @ApiModelProperty(name = "subaccountId",value = " 关联子账号")
+    private String subaccountId;
     public String getRentId() {
         return rentId;
     }
@@ -77,5 +82,21 @@ public class AppNumVO {
 
     public void setExpireTime(Date expireTime) {
         this.expireTime = expireTime;
+    }
+
+    public String getCertId() {
+        return certId;
+    }
+
+    public void setCertId(String certId) {
+        this.certId = certId;
+    }
+
+    public String getSubaccountId() {
+        return subaccountId;
+    }
+
+    public void setSubaccountId(String subaccountId) {
+        this.subaccountId = subaccountId;
     }
 }

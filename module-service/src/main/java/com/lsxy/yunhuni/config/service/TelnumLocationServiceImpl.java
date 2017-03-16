@@ -159,4 +159,17 @@ public class TelnumLocationServiceImpl extends AbstractService<TelnumLocation> i
         List<Map<String,Object>> list = jdbcTemplate.queryForList(sql);
         return list;
     }
+
+    @Override
+    public String getOperator(String mobile) {
+        if(mobile == null || mobile.length() < 11){
+            return "";
+        }
+        String subMobile = mobile.substring(0, 7);
+        TelnumLocation telnumLocation = telnumLocationDao.findFirstByMobile( subMobile);
+        if(telnumLocation != null){
+            return telnumLocation.getCorp();
+        }
+        return "";
+    }
 }

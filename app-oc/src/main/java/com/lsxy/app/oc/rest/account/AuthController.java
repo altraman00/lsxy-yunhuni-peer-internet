@@ -1,6 +1,8 @@
 package com.lsxy.app.oc.rest.account;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.oc.base.AbstractRestController;
+import com.lsxy.msg.api.service.MsgTemplateService;
 import com.lsxy.yunhuni.api.message.model.AccountMessage;
 import com.lsxy.yunhuni.api.message.service.AccountMessageService;
 import com.lsxy.framework.api.tenant.model.RealnameCorp;
@@ -35,7 +37,8 @@ public class AuthController extends AbstractRestController {
     TenantService tenantService;
     @Autowired
     AccountMessageService accountMessageService;
-
+    @Reference(timeout=3000,check = false,lazy = true)
+    private MsgTemplateService msgTemplateService;
     /**
      * 查找用户下的分页信息
      * @param authStatus await|auditing|unauth
@@ -251,11 +254,12 @@ public class AuthController extends AbstractRestController {
      * 等待处理数量
      * @return
      */
-    @ApiOperation(value = "等待处理数量,tenant表示会员未处理，voiceFilePlay表示放音文件未处理")
+    @ApiOperation(value = "等待处理数量,tenant表示会员未处理，voiceFilePlay表示放音文件未处理msgTemplate表示模板未处理")
     @RequestMapping(value = "/await/num",method = RequestMethod.GET)
     public RestResponse getAwaitNum(){
         Map map = new HashMap();
         map.putAll(tenantService.getAwaitNum());
+        map.put("msgTemplat",msgTemplateService.findByWait());
         return RestResponse.success(map);
     }
 }
