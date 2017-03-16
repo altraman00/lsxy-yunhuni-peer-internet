@@ -51,18 +51,18 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
                     message.getTempId(),tempArgsList,message.getMsg(),mobiles,sendTime,message.getSendType(),message.getCost());
         }
         List<String> ids = null;
-        Date date = new Date();
+        Date endTime = new Date();
         if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode())){
             //成功发送
             //更新发送记录，
             msgSendRecordService.updateStateAndTaskIdById(message.getRecordId(),MsgSendRecord.STATE_WAIT,resultMass.getTaskId());
             msgSendDetailService.updateStateAndTaskIdAndEndTimeByRecordIdAndPhones(message.getRecordId(),resultMass.getPendingPhones(), MsgSendDetail.STATE_WAIT,resultMass.getTaskId(),null);
-            ids = msgSendDetailService.updateStateAndTaskIdAndEndTimeByRecordIdAndPhones(message.getRecordId(),resultMass.getBadPhones(), MsgSendDetail.STATE_FAIL,resultMass.getTaskId(),date);
+            ids = msgSendDetailService.updateStateAndTaskIdAndEndTimeByRecordIdAndPhones(message.getRecordId(),resultMass.getBadPhones(), MsgSendDetail.STATE_FAIL,resultMass.getTaskId(),endTime);
         }else if(resultMass == null || !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){
             //发送失败
             //更新发送记录，
             msgSendRecordService.updateStateAndTaskIdById(message.getRecordId(),MsgSendRecord.STATE_FAIL,resultMass.getTaskId());
-            ids = msgSendDetailService.updateStateAndTaskIdAndEndTimeByRecordIdAndPhones(message.getRecordId(),resultMass.getBadPhones(), MsgSendDetail.STATE_FAIL,resultMass.getTaskId(),date);
+            ids = msgSendDetailService.updateStateAndTaskIdAndEndTimeByRecordIdAndPhones(message.getRecordId(),resultMass.getBadPhones(), MsgSendDetail.STATE_FAIL,resultMass.getTaskId(),endTime);
         }
 
         //接口调用成功则不理会，接口调用失败，进行补扣费
@@ -70,7 +70,7 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
         if(ids != null && ids.size() > 0){
             BigDecimal cost = BigDecimal.ZERO.subtract(new BigDecimal(message.getCost()));
             ProductCode product = ProductCode.valueOf(message.getSendType());
-            msgSendService.batchConsumeMsg(date,message.getSendType(),cost,product.getRemark(),message.getAppId(),message.getTenantId(),message.getSubaccountId(),ids);
+            msgSendService.batchConsumeMsg(endTime,message.getSendType(),cost,product.getRemark(),message.getAppId(),message.getTenantId(),message.getSubaccountId(),ids);
         }
     }
 }

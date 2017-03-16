@@ -176,7 +176,7 @@ public class MsgSendServiceImpl implements MsgSendService {
                 //批量扣费
                 List<String> ids = Arrays.asList(msgSendDetail.getId());
                 ProductCode product = ProductCode.valueOf(sendType);
-                this.batchConsumeMsg(new Date(),sendType,cost,product.getRemark(),appId,msgRequest.getTenantId(),subaccountId,ids);
+                this.batchConsumeMsg(createTime,sendType,cost,product.getRemark(),appId,msgRequest.getTenantId(),subaccountId,ids);
             }
         }else{
             MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,MsgConstant.MSG_USSD,mobile,msg,tempId,tempArgs,new Date(),cost,MsgUserRequest.STATE_FAIL,createTime);
@@ -302,7 +302,7 @@ public class MsgSendServiceImpl implements MsgSendService {
             }
             //批量扣费
             ProductCode product = ProductCode.valueOf(sendType);
-            this.batchConsumeMsg(new Date(),sendType,cost,product.getRemark(),appId,tenantId,subaccountId,detailIds);
+            this.batchConsumeMsg(createTime,sendType,cost,product.getRemark(),appId,tenantId,subaccountId,detailIds);
         }
     }
 
