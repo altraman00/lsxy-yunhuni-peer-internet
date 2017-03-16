@@ -46,7 +46,7 @@ public class MsgSendDetail extends IdEntity {
     }
 
     public MsgSendDetail(String msgKey, String tenantId, String appId, String subaccountId, String taskId,String recordId, String mobile, String msg, String tempId,
-                         String supplierTempId, String tempArgs, Date sendTime, BigDecimal msgCost, String sendType, String supplierCode, String operator) {
+                         String supplierTempId, String tempArgs, Date sendTime, BigDecimal msgCost, String sendType, String supplierCode, String operator,Date createTime) {
         this.msgKey = msgKey;
         this.tenantId = tenantId;
         this.appId = appId;
@@ -65,6 +65,7 @@ public class MsgSendDetail extends IdEntity {
         this.supplierCode = supplierCode;
         this.operator = operator;
         this.state = STATE_WAIT;
+        this.createTime = createTime;
     }
 
     @Column(name = "msg_key")
