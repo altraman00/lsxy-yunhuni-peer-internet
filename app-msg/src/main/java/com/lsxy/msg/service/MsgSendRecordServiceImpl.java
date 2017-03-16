@@ -59,7 +59,7 @@ public class MsgSendRecordServiceImpl extends AbstractService<MsgSendRecord> imp
     @Override
     public List<MsgSendRecord> findUssdSendOneFailAndSendNotOver() {
         Date date = new Date(System.currentTimeMillis() - 1000 * 120);
-        String hql = "from MsgSendRecord obj where obj.isMass = false obj.state = ?1 and obj.sendType = ?2 and obj.sendFailTime <= ?3 and obj.lastTime >= ?4 ";
+        String hql = "from MsgSendRecord obj where obj.isMass = false and obj.state = ?1 and obj.sendType = ?2 and obj.sendFailNum <= ?3 and obj.lastTime >= ?4 ";
         return this.list(hql,MsgSendRecord.STATE_FAIL, MsgConstant.MSG_USSD,3,date);
     }
 
