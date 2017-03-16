@@ -1,21 +1,21 @@
 package com.lsxy.app.backend.task;
 
+import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.utils.StatisticsUtils;
 import com.lsxy.yunhuni.api.statistics.service.ConsumeDayService;
 import com.lsxy.yunhuni.api.statistics.service.ConsumeHourService;
 import com.lsxy.yunhuni.api.statistics.service.ConsumeMonthService;
-import com.lsxy.framework.cache.exceptions.TransactionExecFailedException;
-import com.lsxy.framework.cache.manager.RedisCacheService;
-import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.core.utils.StringUtil;
-import com.lsxy.utils.StatisticsUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 消费记录定时统计任务
@@ -36,45 +36,10 @@ public class ConsumeStatisticsTask {
      * 每月1号2：00：00触发执行
      */
     @Scheduled(cron="0 0 2 1 * ? ")
-    public void month(){
+    public void scheduled_month_yyyyMM(){
         Date date=new Date();
-        String month = DateUtils.formatDate(date, "yyyy-MM");
-        String cacheKey = "scheduled_" + Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName() + " " + month;
-        //执行互斥处理消息
-        String flagValue = redisCacheService.get( cacheKey);
-        if(StringUtil.isNotEmpty(flagValue)){
-            if(logger.isDebugEnabled()){
-                logger.debug("["+cacheKey+"]缓存中已被设置标记，该任务被"+flagValue+"处理了");
-            }
-        }else{
-            try {
-                if(logger.isDebugEnabled()){
-                    logger.debug("["+cacheKey+"]准备处理该任务:"+cacheKey);
-                }
-                redisCacheService.setTransactionFlag(cacheKey, SystemConfig.id,30*24*60*60);
-                String currentCacheValue = redisCacheService.get(cacheKey);
-                if(logger.isDebugEnabled()){
-                    logger.debug("["+cacheKey+"]当前cacheValue:"+currentCacheValue);
-                }
-                if(currentCacheValue.equals(SystemConfig.id)){
-                    if(logger.isDebugEnabled()){
-                        logger.debug("["+cacheKey+"]马上处理该任务："+cacheKey);
-                    }
-                    //执行语句
-                    monthStatistics(date);
-                }else{
-                    if(logger.isDebugEnabled()){
-                        logger.debug("["+cacheKey+"]标记位不一致"+currentCacheValue+"  vs "+ SystemConfig.id);
-                    }
-                }
-            } catch (TransactionExecFailedException e) {
-                if(logger.isDebugEnabled()){
-                    logger.debug("["+cacheKey+"]设置标记位异常了，该任务被另一节点处理了");
-                }
-            }
-        }
-
-
+        //执行语句
+        monthStatistics(date);
     }
 
     public void monthStatistics(Date date) {
@@ -113,47 +78,10 @@ public class ConsumeStatisticsTask {
      * 每天01：00：00触发执行
      */
     @Scheduled(cron="0 0 1 * * ?")
-    public void day(){
+    public void scheduled_day_yyyyMMdd(){
         Date date=new Date();
-        String day = DateUtils.formatDate(date, "yyyy-MM-dd");
-        String cacheKey = "scheduled_" + Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName() + " " + day;
-
-        //执行互斥处理消息
-        String flagValue = redisCacheService.get( cacheKey);
-        if(StringUtil.isNotEmpty(flagValue)){
-            if(logger.isDebugEnabled()){
-                logger.debug("["+cacheKey+"]缓存中已被设置标记，该任务被"+flagValue+"处理了");
-            }
-        }else{
-            try {
-                if(logger.isDebugEnabled()){
-                    logger.debug("["+cacheKey+"]准备处理该任务:"+cacheKey);
-                }
-                redisCacheService.setTransactionFlag(cacheKey, SystemConfig.id,24*60*60);
-                String currentCacheValue = redisCacheService.get(cacheKey);
-                if(logger.isDebugEnabled()){
-                    logger.debug("["+cacheKey+"]当前cacheValue:"+currentCacheValue);
-                }
-                if(currentCacheValue.equals(SystemConfig.id)){
-                    if(logger.isDebugEnabled()){
-                        logger.debug("["+cacheKey+"]马上处理该任务："+cacheKey);
-                    }
-                    //执行语句
-                    dayStatistics(date);
-                }else{
-                    if(logger.isDebugEnabled()){
-                        logger.debug("["+cacheKey+"]标记位不一致"+currentCacheValue+"  vs "+ SystemConfig.id);
-                    }
-                }
-            } catch (TransactionExecFailedException e) {
-                if(logger.isDebugEnabled()){
-                    logger.debug("["+cacheKey+"]设置标记位异常了，该任务被另一节点处理了");
-                }
-            }
-        }
-
-
-
+        //执行语句
+        dayStatistics(date);
     }
 
     public void dayStatistics(Date date) {
@@ -193,45 +121,10 @@ public class ConsumeStatisticsTask {
      *每个小时的执行一次
      */
     @Scheduled(cron="0 30 0/1 * * ?")
-    public void hour(){
+    public void scheduled_hour_yyyyMMddHH(){
         Date date=new Date();
-        String hour = DateUtils.formatDate(date, "yyyy-MM-dd HH");
-        String cacheKey = "scheduled_" + Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName()+ " " + hour;
-        //执行互斥处理消息
-        String flagValue = redisCacheService.get( cacheKey);
-        if(StringUtil.isNotEmpty(flagValue)){
-            if(logger.isDebugEnabled()){
-                logger.debug("["+cacheKey+"]缓存中已被设置标记，该任务被"+flagValue+"处理了");
-            }
-        }else{
-            try {
-                if(logger.isDebugEnabled()){
-                    logger.debug("["+cacheKey+"]准备处理该任务:"+cacheKey);
-                }
-                redisCacheService.setTransactionFlag(cacheKey, SystemConfig.id,60*60);
-                String currentCacheValue = redisCacheService.get(cacheKey);
-                if(logger.isDebugEnabled()){
-                    logger.debug("["+cacheKey+"]当前cacheValue:"+currentCacheValue);
-                }
-                if(currentCacheValue.equals(SystemConfig.id)){
-                    if(logger.isDebugEnabled()){
-                        logger.debug("["+cacheKey+"]马上处理该任务："+cacheKey);
-                    }
-                    //执行语句
-                    hourStatistics(date);
-                }else{
-                    if(logger.isDebugEnabled()){
-                        logger.debug("["+cacheKey+"]标记位不一致"+currentCacheValue+"  vs "+ SystemConfig.id);
-                    }
-                }
-            } catch (TransactionExecFailedException e) {
-                if(logger.isDebugEnabled()){
-                    logger.debug("["+cacheKey+"]设置标记位异常了，该任务被另一节点处理了");
-                }
-            }
-        }
-
-
+        //执行语句
+        hourStatistics(date);
     }
 
     public void hourStatistics(Date date) {

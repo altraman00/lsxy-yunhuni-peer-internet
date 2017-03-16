@@ -22,7 +22,9 @@ import java.util.Map;
 
 /**
  * 任务执行Aspectj类，确保几台机器只会有一台机器执行任务
- * 定时任务的方法命名规则为：scheduled_testTask11111_yyyyMMddHHmmss
+ * 注意：
+ *      定时任务的方法命名规则为：scheduled_自定义名称_时间粒度
+ *
  * 只有以scheduled_开头的方法才会被切入，第二个'_'后面的为时间粒度，年执行为yyyy，月执行为yyyyMM,天执行为yyyyMMdd,小时执行为yyyyMMddHH,分钟执行为yyyyMMddHHmm
  * 秒执行时间间隔太短，不建议用这种方式切入，最好另实现redis锁机制
  * Created by liups on 2017/3/16.
@@ -56,9 +58,15 @@ public class TaskInterceptor {
         Signature sig = pjp.getSignature();
         String name = sig.getName(); //获取方法名
         String[] split = name.split("_"); //分析方法
-        String date = DateUtils.getDate(new Date(), split[2]);
+        String timePattern;
+        if(split.length > 2){
+            timePattern = split[2];
+        }else{
+            timePattern = "yyyyMMddHHmm";
+        }
+        String date = DateUtils.getDate(new Date(), timePattern);
         String cacheKey = "scheduled_" + pjp.getTarget().getClass().getName()+"."+ name + " " + date; //组装cacheKey
-        Long expire = expireMap.get(split[2]);//获取cacheKey超时时长
+        Long expire = expireMap.get(timePattern);//获取cacheKey超时时长
 
         if(logger.isDebugEnabled()){
             logger.debug("执行任务，cacheKey：{}",cacheKey );
@@ -98,4 +106,5 @@ public class TaskInterceptor {
         }
         return null;
     }
+
 }
