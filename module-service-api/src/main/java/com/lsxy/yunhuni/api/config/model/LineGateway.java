@@ -54,6 +54,7 @@ public class LineGateway extends IdEntity {
     private String sipAuthIp;//sip接入点的外网IP地址
     private String status;//状态 1为可用，0为不可用
     private String isPublicLine;//是否全局线路
+    private String codecs;//线路支持的语音编码，优先级高的放前面用,分隔
 
     private Integer priority;//优先级，临时数据，数据库不保存
 
@@ -238,6 +239,15 @@ public class LineGateway extends IdEntity {
 
     public void setIsPublicLine(String isPublicLine) {
         this.isPublicLine = isPublicLine;
+    }
+
+    @Column(name = "codecs")
+    public String getCodecs() {
+        return codecs;
+    }
+
+    public void setCodecs(String codecs) {
+        this.codecs = codecs;
     }
 
     @Transient

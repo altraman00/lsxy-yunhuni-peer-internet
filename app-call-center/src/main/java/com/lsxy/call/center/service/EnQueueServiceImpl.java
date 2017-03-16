@@ -216,7 +216,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                 queueTimout = condition.getQueueTimeout();
             }else if(lookupForAgent){
                 agentName = enQueue.getRoute().getAgent().getName();
-                agent = callCenterAgentService.get(appId,subaccountId,agentName);
+                agent = callCenterAgentService.getSimple(appId,subaccountId,agentName);
                 if(agent == null){
                     throw new AgentNotExistException(
                             new ExceptionContext().put("tenantId",tenantId)

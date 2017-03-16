@@ -46,6 +46,8 @@ public class LineGatewayVo {
     private int quality;
     @ApiModelProperty(name="capacity",value = "并发容量：数字")
     private String capacity;
+    @ApiModelProperty(name="codecs",value = "语音编码")
+    private String codecs;
 
     public String getSipAuthIp() {
         return sipAuthIp;
@@ -189,5 +191,13 @@ public class LineGatewayVo {
 
     public void setCapacity(String capacity) {
         this.capacity = capacity;
+    }
+
+    public String getCodecs() {
+        return codecs;
+    }
+
+    public void setCodecs(String codecs) {
+        this.codecs = codecs;
     }
 }

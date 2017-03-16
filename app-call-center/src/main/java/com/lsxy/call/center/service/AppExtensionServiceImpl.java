@@ -89,7 +89,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
                     );
                 }
                 //只能是纯数字
-                String reg = "^\\d{6,12}$";
+                String reg = "^\\d{2,6}$";
                 boolean uB = Pattern.compile(reg).matcher(appExtension.getUser()).find();
                 boolean pB = Pattern.compile(reg).matcher(appExtension.getPassword()).find();
                 if(!uB || !pB){
@@ -377,5 +377,10 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
             }
         }
         return exs;
+    }
+
+    @Override
+    public AppExtension getByUser(String user) {
+        return appExtensionDao.findByUser(user);
     }
 }

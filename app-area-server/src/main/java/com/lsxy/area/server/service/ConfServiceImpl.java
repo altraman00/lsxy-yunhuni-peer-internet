@@ -9,6 +9,7 @@ import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.area.server.util.SipUrlUtil;
+import com.lsxy.area.server.voicecodec.VoiceCodec;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
@@ -24,6 +25,7 @@ import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountServi
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.app.service.ServiceType;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
@@ -379,6 +381,7 @@ public class ConfServiceImpl implements ConfService {
         String oneTelnumber = selector.getOneTelnumber();
 
         String lineId = selector.getLineId();
+        String codecs = VoiceCodec.filteLineCodecs(lineGatewayService.findById(lineId).getCodecs());
 
         CallSession callSession = new CallSession();
         callSession.setStatus(CallSession.STATUS_PREPARING);
@@ -394,6 +397,7 @@ public class ConfServiceImpl implements ConfService {
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("to_uri",selector.getToUri())
                 .putIfNotEmpty("from_uri",oneTelnumber)
+                .putIfNotEmpty("codecs", codecs)
                 .putIfNotEmpty("max_answer_seconds",maxDuration)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)

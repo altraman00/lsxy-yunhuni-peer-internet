@@ -90,6 +90,34 @@ public class CallCenterUtil {
     /**交谈holding 提示音**/
     public static final String HOLD_VOICE_FIELD = "HOLD_VOICE";
 
+    /**直拨热线标记**/
+    public static final String DIRECT_HOT_FIELD = "DIRECT_HOT";
+
+    /**直拨热线-等待收码**/
+    public static final String DIRECT_RECEIVE_ING_FIELD = "DIRECT_RECEIVE_ING";
+
+    /**分机前缀**/
+    public static final String DIRECT_EXTENSIONPREFIX_FIELD = "DIRECT_EXTENSION_PREFIX";
+
+
+    /**直拨被叫-坐席**/
+    public static final String DIRECT_AGENT_FIELD = "DIRECT_AGENT";
+
+    /**直拨主叫**/
+    public static final String DIRECT_FROM_FIELD = "DIRECT_FROM";
+
+    /**直拨被叫-外线**/
+    public static final String DIRECT_OUT_FIELD = "DIRECT_OUT";
+
+    /**被邀请方**/
+    public static final String INVITETO_FIELD = "INVITE_TO";
+
+    /**邀请方**/
+    public static final String INVITEFROM_FIELD = "INVITE_FROM";
+
+    /**被邀请方-排队邀请-xml**/
+    public static final String ENQUEUEXML_FIELD = "ENQUEUE_XML";
+
     @Autowired
     private BusinessStateService businessStateService;
 

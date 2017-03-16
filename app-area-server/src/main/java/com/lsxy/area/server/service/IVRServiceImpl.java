@@ -11,6 +11,7 @@ import com.lsxy.area.server.batch.VoiceIvrBatchInserter;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.area.server.util.SipUrlUtil;
+import com.lsxy.area.server.voicecodec.VoiceCodec;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
@@ -24,6 +25,7 @@ import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.app.service.ServiceType;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
@@ -161,6 +163,7 @@ public class IVRServiceImpl implements IVRService {
         String oneTelnumber = selector.getOneTelnumber();
         String lineId = selector.getLineId();
         String callId = UUIDGenerator.uuid();
+        String codecs = VoiceCodec.filteLineCodecs(lineGatewayService.findById(lineId).getCodecs());
 
         if(isCallCenter){
             CallCenter callCenter = new CallCenter();
@@ -205,6 +208,7 @@ public class IVRServiceImpl implements IVRService {
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("to_uri",selector.getToUri())
                 .putIfNotEmpty("from_uri",oneTelnumber)
+                .putIfNotEmpty("codecs", codecs)
                 .putIfNotEmpty("max_answer_seconds",maxCallDuration)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)

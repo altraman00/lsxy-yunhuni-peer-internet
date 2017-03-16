@@ -2,6 +2,7 @@ package com.lsxy.area.server.service;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.server.util.CallbackUrlUtil;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import org.slf4j.Logger;
@@ -35,7 +36,21 @@ public class BusinessStateServiceImpl implements BusinessStateService {
         return "business_state_" + id;
     }
 
-    private static final String inner_hash_field_prefix = "_inner_";
+    /**为了节省redis内存使用代码替代通用信息的key**/
+    private static final String ID = ("1");
+    private static final String TENANTID = ("2");
+    private static final String APPID = ("3");
+    private static final String SUBACCOUNTID = ("4");
+    private static final String TYPE = ("5");
+    private static final String USERDATA = ("6");
+    private static final String RESID = ("7");
+    private static final String CALLBACKURL = ("8");
+    private static final String AREAID = ("9");
+    private static final String LINEGATEWAYID = ("A");
+    private static final String CLOSED = ("B");
+
+    /**每个业务自己的字段的前缀**/
+    private static final String inner_hash_field_prefix = "__";
 
     private String getInnerField(String field){
         return inner_hash_field_prefix + field;
@@ -60,17 +75,17 @@ public class BusinessStateServiceImpl implements BusinessStateService {
         try{
             String key = getKey(state.getId());
             Map<String,String> datas = new MapBuilder<String,String>()
-                    .putIfNotEmpty("tenantId",state.getTenantId())
-                    .putIfNotEmpty("appId",state.getAppId())
-                    .putIfNotEmpty("subaccountId",state.getSubaccountId())
-                    .putIfNotEmpty("id",state.getId())
-                    .putIfNotEmpty("type",state.getType())
-                    .putIfNotEmpty("userdata",state.getUserdata())
-                    .putIfNotEmpty("resId",state.getResId())
-                    .putIfNotEmpty("callBackUrl",state.getCallBackUrl())
-                    .putIfNotEmpty("areaId",state.getAreaId())
-                    .putIfNotEmpty("lineGatewayId",state.getLineGatewayId())
-                    .putIfNotEmpty("closed",state.getClosed()==null?null:state.getClosed().toString())
+                    .putIfNotEmpty(TENANTID,state.getTenantId())
+                    .putIfNotEmpty(APPID,state.getAppId())
+                    .putIfNotEmpty(SUBACCOUNTID,state.getSubaccountId())
+                    .putIfNotEmpty(ID,state.getId())
+                    .putIfNotEmpty(TYPE,state.getType())
+                    .putIfNotEmpty(USERDATA,state.getUserdata())
+                    .putIfNotEmpty(RESID,state.getResId())
+                    .putIfNotEmpty(CALLBACKURL,state.getCallBackUrl())
+                    .putIfNotEmpty(AREAID,state.getAreaId())
+                    .putIfNotEmpty(LINEGATEWAYID,state.getLineGatewayId())
+                    .putIfNotEmpty(CLOSED,state.getClosed()==null?null:state.getClosed().toString())
                     .build();
             if(state.getBusinessData()!=null){
                 Set<Map.Entry<String,String>> entrySet = state.getBusinessData().entrySet();
@@ -104,37 +119,37 @@ public class BusinessStateServiceImpl implements BusinessStateService {
                         continue;
                     }
                     switch (key){
-                        case "tenantId":
+                        case TENANTID:
                             builder.setTenantId(value);
                             break;
-                        case "appId":
+                        case APPID:
                             builder.setAppId(value);
                             break;
-                        case "subaccountId":
+                        case SUBACCOUNTID:
                             builder.setSubaccountId(value);
                             break;
-                        case "id":
+                        case ID:
                             builder.setId(value);
                             break;
-                        case "type":
+                        case TYPE:
                             builder.setType(value);
                             break;
-                        case "userdata":
+                        case USERDATA:
                             builder.setUserdata(value);
                             break;
-                        case "resId":
+                        case RESID:
                             builder.setResId(value);
                             break;
-                        case "callBackUrl":
+                        case CALLBACKURL:
                             builder.setCallBackUrl(value);
                             break;
-                        case "areaId":
+                        case AREAID:
                             builder.setAreaId(value);
                             break;
-                        case "lineGatewayId":
+                        case LINEGATEWAYID:
                             builder.setLineGatewayId(value);
                             break;
-                        case "closed":
+                        case CLOSED:
                             builder.setClosed(Boolean.parseBoolean(value));
                             break;
                     }
@@ -149,7 +164,7 @@ public class BusinessStateServiceImpl implements BusinessStateService {
     }
 
     public boolean closed(String id){
-        boolean result = Boolean.parseBoolean((String)redisCacheService.hget(getKey(id),"closed"));
+        boolean result = Boolean.parseBoolean((String)redisCacheService.hget(getKey(id),CLOSED));
         if(logger.isDebugEnabled()){
             logger.debug("businessStateid={},closed={}",id,result);
         }
@@ -157,7 +172,7 @@ public class BusinessStateServiceImpl implements BusinessStateService {
     }
 
     public String subaccountId(String id){
-        String result = (String)redisCacheService.hget(getKey(id),"subaccountId");
+        String result = (String)redisCacheService.hget(getKey(id),SUBACCOUNTID);
         if(logger.isDebugEnabled()){
             logger.debug("businessStateid={},subaccountId={}",id,result);
         }
@@ -176,32 +191,32 @@ public class BusinessStateServiceImpl implements BusinessStateService {
 
     @Override
     public void updateUserdata(String id,String userdata) {
-        updateField(id,"userdata",userdata);
+        updateField(id,USERDATA,userdata);
     }
 
     @Override
     public void updateResId(String id,String resId) {
-        updateField(id,"resId",resId);
+        updateField(id,RESID,resId);
     }
 
     @Override
     public void updateCallBackUrl(String id,String callBackUrl) {
-        updateField(id,"callBackUrl",callBackUrl);
+        updateField(id,CALLBACKURL,callBackUrl);
     }
 
     @Override
     public void updateAreaId(String id,String areaId) {
-        updateField(id,"areaId",areaId);
+        updateField(id,AREAID,areaId);
     }
 
     @Override
     public void updateLineGatewayId(String id,String lineGatewayId) {
-        updateField(id,"lineGatewayId",lineGatewayId);
+        updateField(id,LINEGATEWAYID,lineGatewayId);
     }
 
     @Override
     public void updateClosed(String id,Boolean closed) {
-        updateField(id,"closed",closed==null?Boolean.FALSE.toString():closed.toString());
+        updateField(id,CLOSED,closed==null?Boolean.FALSE.toString():closed.toString());
     }
 
     @Override
