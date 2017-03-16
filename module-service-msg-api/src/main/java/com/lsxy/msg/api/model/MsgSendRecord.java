@@ -42,7 +42,7 @@ public class MsgSendRecord extends IdEntity {
     private Long succNum;
     private Long failNum;
     private Long pendingNum;
-    private Integer sendFailTime;
+    private Integer sendFailNum;
     private String reason;
     private String remark;
 
@@ -284,13 +284,13 @@ public class MsgSendRecord extends IdEntity {
         this.pendingNum = pendingNum;
     }
 
-    @Column(name = "send_fail_time")
-    public Integer getSendFailTime() {
-        return sendFailTime;
+    @Column(name = "send_fail_num ")
+    public Integer getSendFailNum() {
+        return sendFailNum;
     }
 
-    public void setSendFailTime(Integer sendFailTime) {
-        this.sendFailTime = sendFailTime;
+    public void setSendFailNum(Integer sendFailNum) {
+        this.sendFailNum = sendFailNum;
     }
 
     @Column(name = "reason")

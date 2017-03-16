@@ -177,8 +177,8 @@ public class MsgTaskServiceImpl implements MsgTaskService{
                 logger.info("重发成功：requestId:" + record.getId());
             }else{//重发失败，更新失败记录
                 logger.info("重发失败：requestId:"+ record.getId()+"结果："+resultOne.toString());
-                record.setSendFailTime(record.getSendFailTime() + 1);//失败次数+1
-                if(MsgConstant.SEND_FIAL_MAX_NUM <= record.getSendFailTime()){//需要重发
+                record.setSendFailNum(record.getSendFailNum() + 1);//失败次数+1
+                if(MsgConstant.SEND_FIAL_MAX_NUM <= record.getSendFailNum()){//需要重发
                     //任务标记为失败，进行补扣费
                     //更新泡泡鱼记录
                     record.setState(MsgUserRequest.STATE_FAIL);

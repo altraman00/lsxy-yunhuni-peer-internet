@@ -91,9 +91,9 @@ public class PaoPaoYuSendResultNofityController extends AbstractAPIController {
                 boolean isUpdateMain = true;
                 if(PaoPaoYuConstant.PapPaoyuStateFail.equals(status)){//发送失败检查是否需要重发
                     //检查是否需要重发，更新泡泡鱼记录
-                    if(MsgConstant.MSG_USSD.equals(msgSendRecord.getSendType()) && !msgSendRecord.getIsMass() && MsgConstant.SEND_FIAL_MAX_NUM > msgSendRecord.getSendFailTime() ){//需要重发
-                        int failTime = msgSendRecord.getSendFailTime() == null ? 0 : msgSendRecord.getSendFailTime();
-                        msgSendRecord.setSendFailTime( failTime + 1 );//失败次数+1
+                    if(MsgConstant.MSG_USSD.equals(msgSendRecord.getSendType()) && !msgSendRecord.getIsMass() && MsgConstant.SEND_FIAL_MAX_NUM > msgSendRecord.getSendFailNum() ){//需要重发
+                        int failTime = msgSendRecord.getSendFailNum() == null ? 0 : msgSendRecord.getSendFailNum();
+                        msgSendRecord.setSendFailNum( failTime + 1 );//失败次数+1
                         msgSendRecordService.save(msgSendRecord);//更新泡泡鱼记录
                         logger.info("[泡泡鱼][消息发送情况回调接口][等待重发]任务："+msgSendRecord.getTaskId());
                         isUpdateMain = false;
