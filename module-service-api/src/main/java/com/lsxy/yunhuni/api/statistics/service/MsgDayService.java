@@ -13,6 +13,8 @@ import java.util.List;
  */
 public interface MsgDayService extends BaseService<MsgDay> {
     void dayStatistics(Date date);
+
+    Long getUsed(String tenantId, String appId, String subaccountId, String sendType, Date startTime, Date endTime);
     Page<MsgStatisticsVo> getStatisticsPage(String tenantId, String appId , Date date1, Date date2, Integer pageNo, Integer pageSize);
     List<MsgStatisticsVo> getStatisticsList(String tenantId, String appId , Date date1, Date date2);
 }

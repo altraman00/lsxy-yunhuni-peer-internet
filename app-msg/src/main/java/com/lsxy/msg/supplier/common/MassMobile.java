@@ -16,9 +16,9 @@ public class MassMobile {
     //无效号码
     private List<String> no ;
     //总号码数
-    private int count;
+    private long count;
     //有效号码个数
-    private int countVaild;
+    private long countVaild;
     public MassMobile(List<String> allNum, List<String> unicom, List<String> mobile, List<String> telecom, List<String> no) {
         this.allNum = allNum;
         this.count = allNum.size();
@@ -33,11 +33,11 @@ public class MassMobile {
     }
 
 
-    public int getCount() {
+    public long getCount() {
         return count;
     }
 
-    public void setCount(int count) {
+    public void setCount(long count) {
         this.count = count;
     }
 
@@ -73,11 +73,11 @@ public class MassMobile {
         this.no = no;
     }
 
-    public int getCountVaild() {
+    public long getCountVaild() {
         return countVaild;
     }
 
-    public void setCountVaild(int countVaild) {
+    public void setCountVaild(long countVaild) {
         this.countVaild = countVaild;
     }
 

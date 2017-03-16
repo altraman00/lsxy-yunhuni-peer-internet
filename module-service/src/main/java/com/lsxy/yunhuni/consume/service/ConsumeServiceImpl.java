@@ -9,6 +9,7 @@ import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.UUIDGenerator;
+import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuotaType;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.consume.dao.ConsumeDao;
@@ -173,10 +174,11 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
             }
             allCost = cost.multiply(new BigDecimal(detailIds.size()));
         }
-        if(resultList != null && resultList.size() > 0){
-            jdbcTemplate.batchUpdate(insertSql,resultList);
-        }
+
         if(allCost != null && allCost.compareTo(BigDecimal.ZERO) != 0){
+            if(resultList != null && resultList.size() > 0){
+                jdbcTemplate.batchUpdate(insertSql,resultList);
+            }
             //Redis中消费增加
             calBillingService.incConsume(tenantId,dt,allCost);
         }

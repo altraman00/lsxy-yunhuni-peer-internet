@@ -49,13 +49,13 @@ public class MsgUserRequest extends IdEntity {
 
 
     public MsgUserRequest(String msgKey, String tenantId, String appId, String subaccountId, String sendType,String mobile, String msg, String tempId,
-                          String tempArgs, Date sendTime,BigDecimal msgCost,Integer state) {
+                          String tempArgs, Date sendTime,BigDecimal msgCost,Integer state,Date createTime) {
 
-        this(msgKey, tenantId, appId, subaccountId,null, sendType, mobile,null, msg, tempId, tempArgs, sendTime, msgCost,false,1L,state,1L,null,null);
+        this(msgKey, tenantId, appId, subaccountId,null, sendType, mobile,null, msg, tempId, tempArgs, sendTime, msgCost,false,1L,state,1L,null,null,createTime);
     }
 
     public MsgUserRequest(String msgKey, String tenantId, String appId, String subaccountId, String taskName, String sendType, String mobile, String mobiles, String msg, String tempId,
-                          String tempArgs, Date sendTime, BigDecimal msgCost, Boolean isMass, Long sumNum, Integer state, Long pendingNum, Long invalidNum, String reason) {
+                          String tempArgs, Date sendTime, BigDecimal msgCost, Boolean isMass, Long sumNum, Integer state, Long pendingNum, Long invalidNum, String reason,Date createTime) {
         this.msgKey = msgKey;
         this.tenantId = tenantId;
         this.appId = appId;
@@ -75,6 +75,7 @@ public class MsgUserRequest extends IdEntity {
         this.pendingNum = pendingNum;
         this.invalidNum = invalidNum;
         this.reason = reason;
+        this.createTime = createTime;
     }
 
     @Column(name = "msg_key")
