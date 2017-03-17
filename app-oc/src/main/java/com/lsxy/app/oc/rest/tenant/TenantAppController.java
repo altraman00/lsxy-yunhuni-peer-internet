@@ -481,14 +481,14 @@ public class TenantAppController {
             @RequestParam(defaultValue = "10") Integer pageSize,
             @ApiParam(name = "id",value = "子账号ID")@RequestParam(required = false) String id
     ){
-        if(org.apache.commons.lang3.StringUtils.isNotEmpty(id)){
-            String subId1 = getSubIdsByCerbId(id);
-            if(org.apache.commons.lang3.StringUtils.isEmpty(subId1)){
-                return RestResponse.success(new Page((pageNo-1)*pageSize,pageNo*pageSize,pageSize,null));
-            }else{
-                id = subId1;
-            }
-        }
+//        if(org.apache.commons.lang3.StringUtils.isNotEmpty(id)){
+//            String subId1 = getSubIdsByCerbId(id);
+//            if(org.apache.commons.lang3.StringUtils.isEmpty(subId1)){
+//                return RestResponse.success(new Page((pageNo-1)*pageSize,pageNo*pageSize,pageSize,null));
+//            }else{
+//                id = subId1;
+//            }
+//        }
         Page<ResourcesRent> page = resourcesRentService.findBySubaccount(appId,id,pageNo,pageSize);
         List<ResourcesRent> result = page.getResult();
         if(result != null && result.size() > 0){
