@@ -215,7 +215,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     }
 
     @Override
-    @Cacheable(value = "entity", key = "'entity_' + #tenantId + #appId + #service.code")
+    @Cacheable(value = "entity", key = "'entity_' + #tenantId + #appId + #service.product + #service.code")
     public boolean enabledService(String tenantId, String appId, ServiceType service) {
         if(tenantId == null){
             return false;
