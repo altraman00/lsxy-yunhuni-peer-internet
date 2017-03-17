@@ -17,4 +17,7 @@ public interface MsgUserRequestService extends BaseService<MsgUserRequest> {
 
     List<MsgUserRequest> findAwaitedRequets();
 
+    MsgUserRequest findByMsgKeyAndSendType(String appId, String subaccountId, String msgKey, String sendType);
+
+    Page<MsgUserRequest> findPageBySendTypeForGW(String appId, String subaccountId, String sendType, Integer pageNo, Integer pageSize);
 }

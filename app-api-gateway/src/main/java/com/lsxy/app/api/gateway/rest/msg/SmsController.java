@@ -6,8 +6,12 @@ import com.lsxy.app.api.gateway.rest.AbstractAPIController;
 import com.lsxy.app.api.gateway.rest.msg.dto.SmsSendDTO;
 import com.lsxy.app.api.gateway.rest.msg.dto.SmsSendMassDTO;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.utils.WebUtils;
+import com.lsxy.msg.api.model.MsgUserRequest;
 import com.lsxy.msg.api.service.MsgSendService;
+import com.lsxy.msg.api.service.MsgUserRequestService;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +30,8 @@ public class SmsController extends AbstractAPIController {
 
     @Reference(timeout=3000,check = false,lazy = true)
     MsgSendService msgSendService;
-
+    @Reference(timeout=3000,check = false,lazy = true)
+    MsgUserRequestService msgUserRequestService;
 
     @RequestMapping(value = "/{account_id}/msg/sms/send",method = RequestMethod.POST)
     public ApiGatewayResponse smsSend(HttpServletRequest request, @Valid @RequestBody SmsSendDTO dto, @PathVariable String account_id) throws YunhuniApiException {
@@ -48,6 +53,26 @@ public class SmsController extends AbstractAPIController {
         Map<String,String> result = new HashMap<>();
         result.put("msgKey", msgKey);
         return ApiGatewayResponse.success(result);
+    }
+
+    @RequestMapping(value = "/{account_id}/msg/sms/{msgKey}",method = RequestMethod.GET)
+    public ApiGatewayResponse ussdSendMass(HttpServletRequest request, @PathVariable String msgKey, @PathVariable String account_id) throws YunhuniApiException {
+        String appId = request.getHeader("AppID");
+        String ip = WebUtils.getRemoteAddress(request);
+        String subaccountId = getSubaccountId(request);
+        MsgUserRequest msgUserRequest = msgUserRequestService.findByMsgKeyAndSendType(appId,subaccountId,msgKey, ProductCode.msg_sms.name());
+        return ApiGatewayResponse.success(msgUserRequest);
+    }
+
+    @RequestMapping(value = "/{account_id}/msg/sms",method = RequestMethod.GET)
+    public ApiGatewayResponse ussdSendMass(HttpServletRequest request, @PathVariable String account_id,
+                                           @RequestParam(defaultValue = "1") Integer pageNo,
+                                           @RequestParam(defaultValue = "10") Integer pageSize) throws YunhuniApiException {
+        String appId = request.getHeader("AppID");
+        String ip = WebUtils.getRemoteAddress(request);
+        String subaccountId = getSubaccountId(request);
+        Page<MsgUserRequest> page = msgUserRequestService.findPageBySendTypeForGW(appId, subaccountId, ProductCode.msg_sms.name(), pageNo, pageSize);
+        return ApiGatewayResponse.success(page);
     }
 
 }
