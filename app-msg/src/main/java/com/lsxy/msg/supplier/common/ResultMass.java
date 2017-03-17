@@ -15,10 +15,6 @@ public class ResultMass  extends BaseResult {
     public ResultMass() {
     }
 
-    public ResultMass(ResultCode result) {
-        super(result);
-    }
-
     public List<String> getBadPhones() {
         return badPhones;
     }
