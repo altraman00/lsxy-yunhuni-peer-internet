@@ -9,4 +9,5 @@ import java.io.Serializable;
  * Created by liups on 2017/3/1.
  */
 public interface MsgSupplierDao extends BaseDaoInterface<MsgSupplier, Serializable> {
+    MsgSupplier findByCode(String code);
 }
