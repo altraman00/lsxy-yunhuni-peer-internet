@@ -139,7 +139,7 @@
                 <ul class="nav-modal-text navw-270">
                     <li><span class="text">实名认证</span> </li>
                     <li><span class="text">号码绑定</span> </li>
-                    <li class="ml-20 mr-0"><span class="text">申请上线</span>  </li>
+                    <li class="mr-0"><span class="text">申请上线</span>  </li>
                 </ul>
             </div>
 

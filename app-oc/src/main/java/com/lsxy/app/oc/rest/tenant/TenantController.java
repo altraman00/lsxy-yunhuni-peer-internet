@@ -15,13 +15,12 @@ import com.lsxy.framework.api.tenant.model.*;
 import com.lsxy.framework.api.tenant.service.*;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
-import com.lsxy.framework.core.utils.BeanUtils;
-import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.*;
 import com.lsxy.framework.mail.MailConfigNotEnabledException;
 import com.lsxy.framework.mail.MailContentNullException;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.portal.ResetPwdVerifySuccessEvent;
+import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
@@ -37,12 +36,16 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -1167,5 +1170,127 @@ public class TenantController extends AbstractRestController {
         }
         return date2;
     }
+    @Autowired
+    private SubaccountMonthService subaccountMonthService;
+    @Autowired
+    private SubaccountDayService subaccountDayService;
+    @ApiOperation(value = "租户(某月所有天/某年所有月)的子账户统计数据分页")
+    @RequestMapping(value = "/tenants/{tenant}/sub/statistic/{type}/plist",method = RequestMethod.GET)
+    public RestResponse msgStatistic(
+            @PathVariable String tenant,
+            @ApiParam(name = "type",value="day日统计格式（yyyy-MM-dd）month月统计(yyyy-MM)")
+            @PathVariable String type,
+            @ApiParam(name = "endTime",value="开始时间")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime",value="结束时间")
+            @RequestParam(value = "endTime",required = false) String endTime,
+            @RequestParam(required = false) String appId,
+            @RequestParam(required = false) String subId,
+            @RequestParam(required = false,defaultValue = "1") Integer pageNo,
+            @RequestParam(required = false,defaultValue = "70") Integer pageSize
+    ){
+        if("month".equals(type)){
+            Date date1 = DateUtils.parseDate(startTime,"yyyy-MM");
+            if(StringUtils.isEmpty(endTime)){
+                endTime = startTime;
+            }
+            Date date2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(endTime,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
+            Page page = subaccountMonthService.getPageByConditions(pageNo,pageSize,date1,date2,tenant,appId,subId);
+            Map map = subaccountMonthService.sum(date1,date2,tenant,appId,subId);
+            map.put("page",page);
+            return RestResponse.success(map);
+        }else if("day".equals(type)){
+            Date date1 = DateUtils.parseDate(startTime+" 00:00:00","yyyy-MM-dd HH:mm:ss");
+            if(StringUtils.isEmpty(endTime)){
+                endTime = startTime;
+            }
+            Date date2 =  DateUtils.parseDate(endTime+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+            Page page = subaccountDayService.getPageByConditions(pageNo,pageSize,date1,date2,tenant,appId,subId);
+            Map map = subaccountDayService.sum(date1,date2,tenant,appId,subId);
+            map.put("page",page);
+            return RestResponse.success(map);
+        }else{
+            return RestResponse.failed("","类型错误");
+        }
+    }
+    @ApiOperation(value = "租户(某月所有天/某年所有月)的子账户统计数据下载")
+    @RequestMapping(value = "/tenants/{tenant}/sub/statistic/{type}/download",method = RequestMethod.GET)
+    public void msgStatistic(
+            HttpServletResponse response,
+            @PathVariable String tenant,
+            @ApiParam(name = "type",value="day日统计格式（yyyy-MM-dd）month月统计(yyyy-MM)")
+            @PathVariable String type,
+            @ApiParam(name = "time",value="下载时间")
+            @RequestParam(value = "time") String time,
+            @RequestParam(required = false) String appId,
+            @RequestParam(required = false) String subId,
+            @RequestParam(required = false,defaultValue = "1") Integer pageNo,
+            @RequestParam(required = false,defaultValue = "70") Integer pageSize
+    ){
+        String appId1 = appId;
+        //初始化数据
+        if(StringUtil.isEmpty(appId)){
+            appId = "all";
+        }
+        if("all".equals(appId)){
+            appId1 = "";
+        }
+        String startTime ;
+        String title = "子账号综合统计";
+        String one = "";
+        String[] headers = null;
+        String[] values = null;
+        Map result2;
+        List list ;
+        if("month".equals(type)){
+            Date date1 = DateUtils.parseDate(time,"yyyy-MM");
+            Date date2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(time,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
+            startTime = time;
+            one +=" 类型：月统计 时间："+startTime;
+            result2 = subaccountMonthService.sum(date1,date2,tenant,appId1,subId);
+            list = subaccountMonthService.getListByConditions(date1,date2,tenant,appId,subId);
+        }else if("day".equals(type)){
+            Date date1 = DateUtils.parseDate(time+" 00:00:00","yyyy-MM-dd HH:mm:ss");
+            Date date2 =  DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+            startTime = time;
+            one +=" 类型：日统计 时间："+startTime;
+            result2 = subaccountDayService.sum(date1,date2,tenant,appId1,subId);
+            list = subaccountDayService.getListByConditions(date1,date2,tenant,appId,subId);
+        }else{
+            return ;
+        }
+        if("all".equals(appId)){
+            one += " 选中应用：全部应用 ";
+            headers = new String[]{"鉴权账号", "密钥", "所属应用", "话务量（分钟）", "消费金额（元）","语音总用量 /配额（分钟）","坐席数/配额（个）"};
+            values = new String[]{"certId", "secretKey", "appName", "amongDuration", "amongAmount","voiceNum","seatNum"};
+        }else{
+            App app = appService.findById(appId);
+            one += " 选中应用："+app.getName();
+            headers = new String[]{"鉴权账号", "密钥", "话务量（分钟）", "消费金额（元）","语音总用量 /配额（分钟）","坐席数/配额（个）"};
+            values = new String[]{"certId", "secretKey", "amongDuration", "cost", "amongAmount","voiceNum","seatNum"};
+        }
 
+        String amongAmount = result2.get("amongAmount")==null? "": result2.get("amongAmount").toString();
+        if(StringUtils.isNotEmpty(amongAmount)){
+            one += " 总消费："+amongAmount+"元";
+        }else{
+            one += " 总消费：0元";
+        }
+        downloadExcel(title, one, headers, values, list, null, "amongAmount", response);
+    }
+    public <T>  void downloadExcel(String title,String one, String[] headers, String[] values, Collection<T> dataset, String pattern, String money,HttpServletResponse response) {
+        try {
+            Date d = new Date();
+            String name = org.apache.http.client.utils.DateUtils.formatDate(d,"yyyyMMdd")+ d.getTime();
+            HSSFWorkbook wb = ExportExcel.exportExcel(title,one,headers,values,dataset,pattern,money);
+            response.setContentType("application/vnd.ms-excel");
+            response.setHeader("Content-disposition", "attachment;filename="+name+".xls");
+            OutputStream ouputStream = response.getOutputStream();
+            wb.write(ouputStream);
+            ouputStream.flush();
+            ouputStream.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 }
