@@ -53,4 +53,9 @@ public class MsgSupplierTemplateServiceImpl extends AbstractService<MsgSupplierT
         }
     }
 
+    @Override
+    public MsgSupplierTemplate findByTempId(String tempId) {
+        return msgSupplierTemplateDao.findByTempId(tempId);
+    }
+
 }

@@ -419,7 +419,7 @@
                                     <!--模板列表-->
                                     <div class="tab-pane fade<c:if test="${app.serviceType=='msg'}"> in active</c:if>" id="template">
                                         <p class="application_info">
-                                            1.提交模板申请前，请仔细阅读文档：<a href="#" onclick="window.open('${globalWebsite}')">模板使用说明</a></br>
+                                            1.提交模板申请前，请仔细阅读文档：<a href="#" onclick="window.open('${globalWebsite}/develop/book/platform?page=template')">模板使用说明</a></br>
                                             2.短信模板只能在所属应用下使用，不允许跨应用使用</br>
                                             3.会员需进行公司认证，并审核通过后才能新增模板</br>
                                             4.会员在进行闪印和短信的测试时，可以使用平台提供测试模板
