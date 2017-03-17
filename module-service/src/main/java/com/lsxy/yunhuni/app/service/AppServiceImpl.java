@@ -94,15 +94,15 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         String hql = "from App obj where obj.status = ?1 ";
         if(date1!=null&&date2!=null){
             if(tenantId!=null&&tenantId.length>0) {
-                hql += " and obj.tenant.id in (?2) and obj.lastTime between ?3 and ?4 ";
+                hql += " and obj.tenant.id in (?2) and obj.lastTime between ?3 and ?4 order by obj.applyTime desc";
                 return  this.pageList(hql, pageNo, pageSize, state,tenantId,date1,date2);
             }else{
-                hql += " and obj.lastTime between ?2 and ?3 ";
+                hql += " and obj.lastTime between ?2 and ?3 order by obj.applyTime desc";
                 return  this.pageList(hql, pageNo, pageSize, state,date1,date2);
             }
         }else{
             if(tenantId!=null&&tenantId.length>0) {
-                hql += " and obj.tenant.id in (?2) ";
+                hql += " and obj.tenant.id in (?2) order by obj.applyTime desc";
                 return  this.pageList(hql, pageNo, pageSize, state,tenantId);
             }else{
                 return  this.pageList(hql, pageNo, pageSize, state);
