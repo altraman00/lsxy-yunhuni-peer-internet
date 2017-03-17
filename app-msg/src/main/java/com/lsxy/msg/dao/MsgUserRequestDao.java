@@ -18,4 +18,6 @@ public interface MsgUserRequestDao extends BaseDaoInterface<MsgUserRequest, Seri
     List<MsgUserRequest> findByStateAndSendTimeBetween(int stateWait, Date start, Date current);
 
     MsgUserRequest findByMsgKey(String msgKey);
+
+    MsgUserRequest findFirstByAppIdAndSubaccountIdAndMsgKey(String appId, String subaccountId, String msgKey);
 }

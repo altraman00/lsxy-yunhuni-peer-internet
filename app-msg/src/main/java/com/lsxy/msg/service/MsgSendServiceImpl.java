@@ -1,6 +1,7 @@
 package com.lsxy.msg.service;
 
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
+import com.lsxy.framework.core.exceptions.api.msg.*;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.msg.api.model.*;
@@ -109,32 +110,33 @@ public class MsgSendServiceImpl implements MsgSendService {
         String tempContent = temp.getContent();
 
         if(temp == null){
-            //TODO 抛异常
-            throw new RuntimeException("模板不存在");
+            // 抛异常
+            throw new MsgTemplateErrorException();
         }
 
         //检查参数格式是否合法
         if(!checkTempArgs(tempArgs)){
-            //TODO 抛异常
-            return ResultCode.ERROR_20004.toString();
+            //抛异常
+            throw new MsgTemplateArgsErrorException();
         }
         String msg = getMsg(tempContent, tempArgs);
         if(!checkMsgLength(msg,sendType)){
-            //TODO 抛异常
+            // 抛异常
+            throw new MsgContentTooLargeException();
         }
 
         //检验号码的合法性
         mobile = mobile.trim();
         if(!checkMobile(mobile)){
-            //TODO 抛异常
-            return ResultCode.ERROR_20001.toString();
+            //抛异常
+            throw new MsgIllegalMobileException();
         }
         //判断号码运营商
         String operator = telnumLocationService.getOperator(mobile);
         //判断是否支持发送
         if(!isSend( operator , MsgConstant.MSG_USSD )){
-            //TODO 抛异常
-            return ResultCode.ERROR_20009.toString();
+            //抛异常
+            throw new MsgOperatorNotAvailableException();
         }
         //判断余额是否可以发送
         calCostService.isMsgRemainOrBalanceEnough(subaccountId,sendType,app.getTenant().getId(),1L);
@@ -144,15 +146,16 @@ public class MsgSendServiceImpl implements MsgSendService {
         String key = UUIDGenerator.uuid();
         SupplierSendService smsSendOneService = supplierSelector.getSendOneService(operator,sendType);
         if(smsSendOneService == null){
-            //TODO 抛异常 找不到短信服务商
+            //抛异常 找不到短信服务商
+            throw new MsgOperatorNotAvailableException();
         }
         String[] split = tempArgs.split(MsgConstant.ParamRegexStr);
         List<String> tempArgsList = Arrays.asList(split);
         resultOne = smsSendOneService.sendOne(tempId, tempArgsList, msg, mobile,sendType);
 
         if(resultOne == null){
-            //TODO 抛异常
-            resultOne = new ResultOne(ResultCode.ERROR_20008);
+            // 抛异常
+            throw new MsgSendMsgFailException();
         }
 
         //开始发送
@@ -189,8 +192,8 @@ public class MsgSendServiceImpl implements MsgSendService {
     private String sendMass(String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr,String sendType) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(StringUtils.isEmpty( taskName )){
-            //TODO 抛异常
-            return ResultCode.ERROR_20003.toString();
+            // 抛异常
+            throw new MsgTaskNameIsEmptyException();
         }
         taskName = taskName.trim();
         Date sendTime;
@@ -199,8 +202,8 @@ public class MsgSendServiceImpl implements MsgSendService {
             try{
                 sendTime = DateUtils.parseDate(sendTimeStr, MsgConstant.TimePartten);
             }catch (Exception e){
-                //TODO 抛异常
-                return ResultCode.ERROR_200010.toString();
+                //抛异常
+                throw new MsgSendTimeFormatErrorException();
             }
         }else{
             sendTime = new Date();
@@ -209,32 +212,33 @@ public class MsgSendServiceImpl implements MsgSendService {
         tempArgs = tempArgs.trim();
         MsgTemplate temp = msgTemplateService.findByTempId(appId, subaccountId, tempId, true);
         if(temp == null){
-            //TODO 抛异常
-            throw new RuntimeException("模板不存在");
+            //抛异常
+            throw new MsgTemplateErrorException();
         }
 
         String tempContent = temp.getContent();
         //检查参数格式是否合法
         if(!checkTempArgs(tempArgs)){
-            //TODO 抛异常
-            return ResultCode.ERROR_20004.toString();
+            //抛异常
+            throw new MsgTemplateArgsErrorException();
         }
         String msg = getMsg(tempContent, tempArgs).trim();
 
         //检查消息长度
         if(!checkMsgLength(msg,sendType)){
-            //TODO 抛异常
+            //抛异常
+            throw new MsgContentTooLargeException();
         }
 
         //检查有效号码-并按运营商处理
         MassMobile massMobile = vaildMobiles(mobiles,MsgConstant.MSG_USSD);
         if(massMobile.getCountVaild() > MsgConstant.MaxNum){
-            //TODO 抛异常
-            return ResultCode.ERROR_20005.toString();
+            //抛异常
+            throw new MsgMobileNumTooLargeException();
         }
         if(massMobile.getCountVaild() <= 0){
-            //TODO 抛异常
-            return ResultCode.ERROR_20001.toString();
+            //抛异常
+            throw new MsgIllegalMobileException();
         }
 
         //判断余额是否可以发送
@@ -398,11 +402,11 @@ public class MsgSendServiceImpl implements MsgSendService {
     }
 
     //检查多个号码的合法性
-    public MassMobile vaildMobiles(String mobiles, String sendType) {
+    public MassMobile vaildMobiles(String mobiles, String sendType) throws YunhuniApiException {
         String[] de = mobiles.split(MsgConstant.NumRegexStr);
         if( de.length > MsgConstant.MaxNum ){
-            //TODO 抛异常
-            throw new RuntimeException("号码超过最大限制");
+            //抛异常
+            throw new MsgMobileNumTooLargeException();
         }
         Set<String> allNum = new HashSet<>();
         //联通号码
