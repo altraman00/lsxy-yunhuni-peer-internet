@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 
@@ -158,6 +159,8 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
 
                 //应用状态改为上线//改为待审核edit zhangxb by2017-03-15
                 app.setStatus(App.STATUS_WAIT);
+                app.setApplyTime(new Date());
+                app.setAuditTime(null);
                 appService.save(app);
 
                 return newAction;
