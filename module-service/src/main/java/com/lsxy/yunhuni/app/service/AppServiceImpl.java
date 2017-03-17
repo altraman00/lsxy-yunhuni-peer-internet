@@ -199,7 +199,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         try {
             if(productCode!=null){//如果产品不null 判断产品是否可用
                 Product product = productService.getProductByCode(productCode);
-                if(product == null || product.getStatus() ==null || product.getStatus() != 1){
+                if(product == null || product.getStatus() ==null || product.getStatus().intValue() != 1){
                     return false;
                 }
             }
