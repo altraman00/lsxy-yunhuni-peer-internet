@@ -101,6 +101,7 @@ public class AppAuditController extends AbstractRestController {
         App app = appService.findById(id);
         if(app!=null){
             app.setStatus(App.STATUS_ONLINE);
+            app.setAuditTime(new Date());
             appService.save(app);
             accountMessageService.sendTenantTempletMessage(null,app.getTenant().getId(), AccountMessage.MESSAGE_TYPE_APP_SUCCESS );
             return RestResponse.success();
@@ -120,6 +121,7 @@ public class AppAuditController extends AbstractRestController {
         if(app!=null){
             app = appOnlineActionService.offline(app.getId());
             app.setReason((String)map.get("reason"));
+            app.setAuditTime(new Date());
             appService.save(app);
             accountMessageService.sendTenantTempletMessage(null,app.getTenant().getId(), AccountMessage.MESSAGE_TYPE_APP_FAIL );
             return RestResponse.success();
