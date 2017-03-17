@@ -73,4 +73,20 @@ public class MsgUserRequestServiceImpl extends AbstractService<MsgUserRequest> i
         return msgUserRequestDao.findByStateAndSendTimeBetween(MsgUserRequest.STATE_WAIT,start,current);
     }
 
+    @Override
+    public MsgUserRequest findByMsgKeyAndSendType(String appId, String subaccountId, String msgKey, String sendType) {
+        return msgUserRequestDao.findFirstByAppIdAndSubaccountIdAndMsgKey(appId,subaccountId,msgKey);
+    }
+
+    @Override
+    public Page<MsgUserRequest> findPageBySendTypeForGW(String appId, String subaccountId,String sendType,Integer pageNo, Integer pageSize) {
+        if(StringUtils.isNotEmpty(subaccountId)){
+            String hql = " from MsgUserRequest obj where obj.appId=?1 and obj.subaccountId=?2 and obj.sendType=?3 ";
+            return pageList( hql, pageNo, pageSize,appId,subaccountId,sendType);
+        }else{
+            String hql = " from MsgUserRequest obj where obj.appId=?1 and obj.subaccountId is null and obj.sendType=?3 ";
+            return pageList( hql, pageNo, pageSize,appId,subaccountId,sendType);
+        }
+    }
+
 }
