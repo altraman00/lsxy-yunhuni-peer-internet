@@ -120,19 +120,19 @@ public class TenantController extends AbstractRestController {
     @ApiOperation(value = "租户列表")
     @RequestMapping(value = "/tenants",method = RequestMethod.GET)
     public RestResponse tenants(
-    @RequestParam(required = false) String name,
-    @ApiParam(name = "begin",value = "格式:yyyy-MM-dd")
-    @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date begin,
-    @ApiParam(name = "end",value = "格式:yyyy-MM-dd")
-    @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date end,
-    @ApiParam(name = "authStatus",value = "认证状态，1已认证，0未认证")
-    @RequestParam(required = false) Integer authStatus,
-    @ApiParam(name = "accStatus",value = "账号状态，2正常/启用，1被锁定/禁用")
-    @RequestParam(required = false) Integer accStatus,
-    @ApiParam(name = "isCost",value = "消费状态，1已消费，0未消费")
-    @RequestParam(required = false,defaultValue = "0") int isCost,
-    @RequestParam(required = false,defaultValue = "1") Integer pageNo,
-    @RequestParam(required = false,defaultValue = "10") Integer pageSize){
+            @RequestParam(required = false) String name,
+            @ApiParam(name = "begin",value = "格式:yyyy-MM-dd")
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date begin,
+            @ApiParam(name = "end",value = "格式:yyyy-MM-dd")
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date end,
+            @ApiParam(name = "authStatus",value = "认证状态，1已认证，0未认证")
+            @RequestParam(required = false) Integer authStatus,
+            @ApiParam(name = "accStatus",value = "账号状态，2正常/启用，1被锁定/禁用")
+            @RequestParam(required = false) Integer accStatus,
+            @ApiParam(name = "isCost",value = "消费状态，1已消费，0未消费")
+            @RequestParam(required = false,defaultValue = "0") int isCost,
+            @RequestParam(required = false,defaultValue = "1") Integer pageNo,
+            @RequestParam(required = false,defaultValue = "10") Integer pageSize){
         if(begin!=null){
             begin = DateUtils.getFirstTimeOfDate(begin);
         }
@@ -714,9 +714,9 @@ public class TenantController extends AbstractRestController {
     @ApiOperation(value = "租户的月结账单")
     @RequestMapping(value="/tenants/{tenant}/consume_month",method = RequestMethod.GET)
     public RestResponse get(@PathVariable String tenant,
-        @RequestParam(required = false) String appId,
-        @ApiParam(name = "month",value = "格式:yyyy-MM")
-        @RequestParam(required = false) String month){
+                            @RequestParam(required = false) String appId,
+                            @ApiParam(name = "month",value = "格式:yyyy-MM")
+                            @RequestParam(required = false) String month){
         if(StringUtils.isBlank(month)){
             String curMonth = DateUtils.getDate("yyyy-MM");
             month = DateUtils.getPrevMonth(curMonth,"yyyy-MM");
