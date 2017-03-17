@@ -96,11 +96,17 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
         int pageSize = 100;
         List list = new ArrayList();
         Page<SubaccountStatisticalVO> page = getPageByConditions(pageNo,pageSize,startTime,  endTime,  tenantId,  appId,  subaccountId);
-        list.addAll(page.getResult());
-        while(page.getCurrentPageNo() < page.getTotalPageCount()){
-            pageNo = Long.valueOf(page.getCurrentPageNo()).intValue()+1;
-            page = getPageByConditions(pageNo,pageSize,startTime,  endTime,  tenantId,  appId,  subaccountId);
+        if(page.getResult()!=null) {
             list.addAll(page.getResult());
+            while (page.getCurrentPageNo() < page.getTotalPageCount()) {
+                pageNo = Long.valueOf(page.getCurrentPageNo()).intValue() + 1;
+                page = getPageByConditions(pageNo, pageSize, startTime, endTime, tenantId, appId, subaccountId);
+                if(page.getResult()!=null) {
+                    list.addAll(page.getResult());
+                }else{
+                    break;
+                }
+            }
         }
         return list;
     }
