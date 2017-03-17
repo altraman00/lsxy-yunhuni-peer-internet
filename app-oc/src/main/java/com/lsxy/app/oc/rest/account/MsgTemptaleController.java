@@ -19,6 +19,8 @@ import com.lsxy.msg.api.model.MsgTemplate;
 import com.lsxy.msg.api.service.MsgSupplierService;
 import com.lsxy.msg.api.service.MsgSupplierTemplateService;
 import com.lsxy.msg.api.service.MsgTemplateService;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
 import com.lsxy.yunhuni.api.message.model.AccountMessage;
@@ -31,9 +33,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Field;
+import java.util.*;
 
 
 /**
@@ -54,9 +55,32 @@ public class MsgTemptaleController extends AbstractRestController {
     @Autowired
     private TenantService tenantService;
     @Autowired
+    private AppService appService;
+    @Autowired
     AccountMessageService accountMessageService;
 
+    @ApiOperation(value = "根据id查看详情")
+    @RequestMapping(value = "/detail/{id}",method = RequestMethod.GET)
+    public RestResponse detail(
+            @ApiParam(name = "id",value = "模板ID")
+            @PathVariable String id
 
+    ){
+        MsgTemplate msgTemplate = msgTemplateService.findById(id);
+        if(msgTemplate!=null){
+            App app = appService.findById(msgTemplate.getAppId());
+            MsgTemplateDetailVo msgTemplateDetailVo = new MsgTemplateDetailVo(msgTemplate,app.getTenant().getTenantName(),app.getName());
+            MsgSupplierTemplate msgSupplierTemplate = msgSupplierTemplateService.findByTempId(msgTemplate.getTempId());
+            if(msgSupplierTemplate!=null) {
+                MsgSupplier msgSupplier = msgSupplierService.findByCode(msgSupplierTemplate.getSupplierCode());
+                msgTemplateDetailVo.setMsgSupplierId(msgSupplier.getId());
+                msgTemplateDetailVo.setMsgSupplierName(msgSupplier.getSupplierName());
+            }
+            return RestResponse.success(msgTemplateDetailVo);
+        }
+
+        return RestResponse.failed("","记录不存在");
+    }
 
     @ApiOperation(value = "根据名字和时间查询模板审核的分页信息")
     @RequestMapping(value = "/{type}/list",method = RequestMethod.GET)
@@ -94,7 +118,7 @@ public class MsgTemptaleController extends AbstractRestController {
         }catch (Exception e){
             return RestResponse.failed("","日期格式错误");
         }
-        Page page = null;
+        Page<MsgTemplate> page = null;
         if (StringUtil.isNotEmpty(name)) {
             List<Tenant> tList = tenantService.pageListByUserName(name);
             if (tList.size() == 0) {
@@ -109,6 +133,13 @@ public class MsgTemptaleController extends AbstractRestController {
         }else{
             page = msgTemplateService.getPageByCondition(pageNo,pageSize,state,date1,date2,new String[]{});
         }
+        List<MsgTemplateVo> list = new ArrayList<>();
+        for (int i = 0; i < page.getResult().size(); i++) {
+            MsgTemplate msgTemplate = page.getResult().get(i);
+            App app = appService.findById(msgTemplate.getAppId());
+            list.add(new MsgTemplateVo( page.getResult().get(i),app.getTenant().getTenantName(),app.getName()));
+        }
+        page.setResult(list);
         return RestResponse.success(page);
     }
     @ApiOperation(value = "根据模板ID修改模板状态为审核通过")

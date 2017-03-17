@@ -32,6 +32,8 @@ public class TenantAppVO implements Serializable {
     private Integer isIvrService;//是否IVR定制服务0否，1是
     private String serviceType;//服务类型
     private Integer isCallCenter;//是否启用呼叫中心服务 是否呼叫中心0否，1是',
+    private Integer isSms;//短信
+    private Integer isUssd;//闪印
     private BigDecimal consume;
     private Long sessionCount;
     private Long amongDuration;
@@ -230,5 +232,21 @@ public class TenantAppVO implements Serializable {
 
     public void setTestPhone(List<String> testPhone) {
         this.testPhone = testPhone;
+    }
+
+    public Integer getIsSms() {
+        return isSms;
+    }
+
+    public void setIsSms(Integer isSms) {
+        this.isSms = isSms;
+    }
+
+    public Integer getIsUssd() {
+        return isUssd;
+    }
+
+    public void setIsUssd(Integer isUssd) {
+        this.isUssd = isUssd;
     }
 }

@@ -12,4 +12,5 @@ public interface MsgSupplierTemplateService extends BaseService<MsgSupplierTempl
     void deleteMsgTemplate(String appId, String subaccountId, String tempId, boolean isGW) throws InvocationTargetException, IllegalAccessException;
 
     String findSupplierTempIdByTempIdAndSupplierCode(String tempId, String supplierCode);
+    MsgSupplierTemplate findByTempId(String tempId);
 }

@@ -188,7 +188,12 @@ public class MessageController extends AbstractRestController {
     public RestResponse getAwaitNum(){
         Map map = new HashMap();
         map.putAll(accountMessageService.getAwaitNum());
-        map.put("msgTemplat",msgTemplateService.findByWait());
+        Long awaitDemand = (Long)map.get("awaitDemand");
+        Long msgTemplat = msgTemplateService.findByWait();
+        map.put("awaitDemand",awaitDemand+msgTemplat);
+        Map map1 = (HashMap)map.get("son");
+        map1.put("msgTemplat",msgTemplat);
+        map.put("son",map1);
         return RestResponse.success(map);
     }
 
