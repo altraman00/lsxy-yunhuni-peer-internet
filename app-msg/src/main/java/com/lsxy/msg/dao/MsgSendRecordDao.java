@@ -17,14 +17,11 @@ public interface MsgSendRecordDao extends BaseDaoInterface<MsgSendRecord, Serial
     MsgSendRecord findFirstByTaskId(String taskId);
 
     @Modifying
-    @Query("update MsgSendRecord r set r.state = :state where r.msgKey = :msgKey")
-    void updateStateByMsgKey(@Param("msgKey") String msgKey, @Param("state") int state);
-
-    @Modifying
     @Query("update MsgSendRecord r set r.state = :state,r.taskId = :taskId where r.id = :id")
     void updateStateAndTaskIdById(@Param("id")String id,@Param("state") int state,@Param("taskId") String taskId);
 
     List<MsgSendRecord> findBySupplierCodeAndStateAndIsMass(String supplierCode, int stateWait, boolean isMass);
 
     List<MsgSendRecord> findByMsgKey(String msgKey);
+
 }

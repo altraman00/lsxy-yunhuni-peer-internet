@@ -72,18 +72,13 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
     }
 
     @Override
-    public void updateStateByMsgKey(String msgKey, int state) {
-        msgSendDetailDao.updateStateByMsgKey(msgKey,state);
-    }
-
-    @Override
     public MsgSendDetail findByTaskIdAndMobile(String taskId, String mobile) {
         return msgSendDetailDao.findFirstByTaskIdAndMobile(taskId,mobile);
     }
 
     @Override
-    public List<String> updateStateAndTaskIdByRecordIdAndPhones(String recordId, List<String> phones, int state, String taskId) {
-        msgSendDetailDao.updateDetailStateAndTaskIdByRecordId(recordId, phones, state,taskId);
+    public List<String> updateStateAndTaskIdAndEndTimeByRecordIdAndPhones(String recordId, List<String> phones, int state, String taskId,Date endTime) {
+        msgSendDetailDao.updateDetailStateAndTaskIdByRecordId(recordId, phones, state,taskId,endTime);
         if(MsgSendDetail.STATE_FAIL == state){
              return msgSendDetailDao.findIdByRecordIdAndMobileIn(recordId,phones);
         }else{
@@ -92,8 +87,8 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
     }
 
     @Override
-    public List<String> updateStateByRecordIdAndPhones(String recordId, List<String> phones, int state) {
-        msgSendDetailDao.updateStateByRecordId(recordId, phones, state);
+    public List<String> updateStateAndSetEndTimeByRecordIdAndPhones(String recordId, List<String> phones, int state,Date endTime) {
+        msgSendDetailDao.updateStateByRecordId(recordId, phones, state,endTime);
         if(MsgSendDetail.STATE_FAIL == state){
             return msgSendDetailDao.findIdByRecordIdAndMobileIn(recordId,phones);
         }else{
@@ -102,8 +97,8 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
     }
 
     @Override
-    public void updateStateFromWaitedToSuccessByRecordId(String recordId) {
-        msgSendDetailDao.updateStateFromWaitedToStateByRecordId(recordId, MsgSendDetail.STATE_WAIT ,MsgSendDetail.STATE_SUCCESS);
+    public void updateStateAndSetEndTimeFromWaitedToSuccessByRecordId(String recordId,Date endTime) {
+        msgSendDetailDao.updateStateFromWaitedToSuccessAndSetEndTimeByRecordId(recordId, MsgSendDetail.STATE_WAIT ,MsgSendDetail.STATE_SUCCESS,endTime);
     }
 
     @Override
@@ -130,8 +125,4 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
         return msgSendDetailDao.findByMsgKey(msgKey);
     }
 
-    @Override
-    public void setEndTimeByMsgKey(String msgKey) {
-        msgSendDetailDao.setEndTimeByMsgKey(msgKey,new Date());
-    }
 }

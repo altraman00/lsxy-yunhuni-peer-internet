@@ -22,4 +22,9 @@ public class MsgSupplierServiceImpl extends AbstractService<MsgSupplier> impleme
     public BaseDaoInterface<MsgSupplier, Serializable> getDao() {
         return this.msgSupplierDao;
     }
+
+    @Override
+    public MsgSupplier findByCode(String code) {
+        return msgSupplierDao.findByCode(code);
+    }
 }

@@ -257,7 +257,7 @@
                                         <li data-id="number"><a href="#number" data-toggle="tab">号码绑定</a></li>
                                         <li data-id="subAccount"><a href="#subAccount" data-toggle="tab">子账号</a></li>
                                     </c:if>
-                                    <li class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
+
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
                                     <!-- 放音文件-->
@@ -270,7 +270,8 @@
                                             <div class="col-md-3 remove-padding" style="padding-left:15px;">
                                                 <input type="text" class="form-control" placeholder="关联子账号" id="voice_file_subId"/>
                                             </div>
-                                            <div class="col-md-1"><button class="btn btn-primary" type="button" onclick="upplay()">查询</button></div>
+                                            <div class="col-md-1 voice-find-btn"><button class="btn btn-primary" type="button" onclick="upplay()">查询</button></div>
+                                            <div class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></div>
                                             <div class="col-md-8 sizebox  remove-padding " id="voiceFilePlay">
                                             </div>
                                         </div>
@@ -418,7 +419,7 @@
                                     <!--模板列表-->
                                     <div class="tab-pane fade<c:if test="${app.serviceType=='msg'}"> in active</c:if>" id="template">
                                         <p class="application_info">
-                                            1.提交模板申请前，请仔细阅读文档：<a href="#" onclick="window.open('${globalWebsite}')">模板使用说明</a></br>
+                                            1.提交模板申请前，请仔细阅读文档：<a href="#" onclick="window.open('${globalWebsite}/develop/book/platform?page=template')">模板使用说明</a></br>
                                             2.短信模板只能在所属应用下使用，不允许跨应用使用</br>
                                             3.会员需进行公司认证，并审核通过后才能新增模板</br>
                                             4.会员在进行闪印和短信的测试时，可以使用平台提供测试模板
@@ -1147,7 +1148,7 @@
     <div class="modal-loadding loadding"></div>
     <div class="title">文件上传<a class="close_a modalCancel-app-up" data-id="four" ></a></div>
     <div class="content">
-        <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、16位）后再上传,单条语音最大支持 5M。</p>
+        <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、8位）后再上传,单条语音最大支持 5M。</p>
         <form:form action="${ctx}/console/app/file/play/upload" method="post" id="uploadMianForm" enctype="multipart/form-data" target="hidden_frame">
             <div class="input-box ">
                 <div class="row margin-bottom-10">
@@ -1460,6 +1461,7 @@
             $('#progress').hide();
             $('#fileupload').removeAttr('disabled');
 //        }
+        $('#uploadButton').show();
     });
     /**
      *绑定测试电话号码
@@ -2050,7 +2052,6 @@
         var count = 0;
         var name = $('#name').val();
         var subId = $('#voice_file_subId') .val();//$('#voice_file_subId option:selected') .val();
-        console.info(subId);
         ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':1,'pageSize':20,'subId':subId,csrfParameterName:csrfToken},function(response){
             if(response.success){
                 count=response.data.totalCount;
@@ -2100,7 +2101,6 @@
                 var data =[];
                 for(var j=0;j<response.data.result.length;j++){
                     var tempFile = response.data.result[j];
-                    console.info(tempFile)
                     var temp = [
                         tempFile.id,
                         tempFile.name,

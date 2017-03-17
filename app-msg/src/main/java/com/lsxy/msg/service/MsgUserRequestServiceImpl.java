@@ -4,8 +4,6 @@ import com.alibaba.dubbo.common.utils.StringUtils;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.msg.api.model.MsgConstant;
-import com.lsxy.msg.api.model.MsgSendRecord;
 import com.lsxy.msg.api.model.MsgUserRequest;
 import com.lsxy.msg.api.service.MsgUserRequestService;
 import com.lsxy.msg.dao.MsgUserRequestDao;
@@ -53,8 +51,19 @@ public class MsgUserRequestServiceImpl extends AbstractService<MsgUserRequest> i
     }
 
     @Override
-    public void updateStateByMsgKey(String msgKey, int state) {
-        msgUserRequestDao.updateStateByMsgKey(msgKey,state);
+    public void updateNoMassStateByMsgKey(String msgKey, int state) {
+        MsgUserRequest request = msgUserRequestDao.findByMsgKey(msgKey);
+        request.setState(state);
+        if(state == MsgUserRequest.STATE_SUCCESS){
+            request.setSuccNum(1L);
+            request.setFailNum(0L);
+            request.setPendingNum(0L);
+        }else{
+            request.setSuccNum(0L);
+            request.setFailNum(1L);
+            request.setPendingNum(0L);
+        }
+        this.save(request);
     }
 
     @Override
@@ -62,6 +71,22 @@ public class MsgUserRequestServiceImpl extends AbstractService<MsgUserRequest> i
         Date current = new Date();
         Date start = new Date(current.getTime() - 3 * 24 * 60 * 60 * 1000);
         return msgUserRequestDao.findByStateAndSendTimeBetween(MsgUserRequest.STATE_WAIT,start,current);
+    }
+
+    @Override
+    public MsgUserRequest findByMsgKeyAndSendType(String appId, String subaccountId, String msgKey, String sendType) {
+        return msgUserRequestDao.findFirstByAppIdAndSubaccountIdAndMsgKey(appId,subaccountId,msgKey);
+    }
+
+    @Override
+    public Page<MsgUserRequest> findPageBySendTypeForGW(String appId, String subaccountId,String sendType,Integer pageNo, Integer pageSize) {
+        if(StringUtils.isNotEmpty(subaccountId)){
+            String hql = " from MsgUserRequest obj where obj.appId=?1 and obj.subaccountId=?2 and obj.sendType=?3 ";
+            return pageList( hql, pageNo, pageSize,appId,subaccountId,sendType);
+        }else{
+            String hql = " from MsgUserRequest obj where obj.appId=?1 and obj.subaccountId is null and obj.sendType=?3 ";
+            return pageList( hql, pageNo, pageSize,appId,subaccountId,sendType);
+        }
     }
 
 }

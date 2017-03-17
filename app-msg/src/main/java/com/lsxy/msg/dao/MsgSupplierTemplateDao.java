@@ -15,5 +15,5 @@ public interface MsgSupplierTemplateDao extends BaseDaoInterface<MsgSupplierTemp
     List<MsgSupplierTemplate> findByAppIdAndTempId(String appId, String tempId);
 
     MsgSupplierTemplate findFirstByTempIdAndSupplierCode(String tempId, String supplierCode);
-
+    MsgSupplierTemplate findByTempId(String tempId);
 }

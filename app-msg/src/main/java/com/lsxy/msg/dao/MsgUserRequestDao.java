@@ -14,9 +14,10 @@ import java.util.List;
  * Created by liups on 2017/3/1.
  */
 public interface MsgUserRequestDao extends BaseDaoInterface<MsgUserRequest, Serializable> {
-    @Modifying
-    @Query("update MsgUserRequest re set re.state = :state where re.msgKey = :msgKey")
-    void updateStateByMsgKey(@Param("msgKey") String msgKey,@Param("state") int state);
 
     List<MsgUserRequest> findByStateAndSendTimeBetween(int stateWait, Date start, Date current);
+
+    MsgUserRequest findByMsgKey(String msgKey);
+
+    MsgUserRequest findFirstByAppIdAndSubaccountIdAndMsgKey(String appId, String subaccountId, String msgKey);
 }

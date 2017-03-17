@@ -13,8 +13,11 @@ import java.util.List;
 public interface MsgUserRequestService extends BaseService<MsgUserRequest> {
     Page<MsgUserRequest> getPageByCondition(Integer pageNo, Integer pageSize, String sendType,String appId,Date start, Date end, int isMass, String taskName, String mobile );
 
-    void updateStateByMsgKey(String msgKey, int state);
+    void updateNoMassStateByMsgKey(String msgKey, int state);
 
     List<MsgUserRequest> findAwaitedRequets();
 
+    MsgUserRequest findByMsgKeyAndSendType(String appId, String subaccountId, String msgKey, String sendType);
+
+    Page<MsgUserRequest> findPageBySendTypeForGW(String appId, String subaccountId, String sendType, Integer pageNo, Integer pageSize);
 }

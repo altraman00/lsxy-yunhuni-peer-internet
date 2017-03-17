@@ -42,22 +42,25 @@ public class MsgSendRecord extends IdEntity {
     private Long succNum;
     private Long failNum;
     private Long pendingNum;
-    private Integer sendFailTime;
+    private Integer sendFailNum;
     private String reason;
     private String remark;
+
+    public MsgSendRecord() {
+    }
 
     public MsgSendRecord(String msgKey) {
         this.msgKey = msgKey;
     }
 
     public MsgSendRecord(String msgKey, String tenantId, String appId, String subaccountId, String taskId,String mobiles, String sendType, String supplierCode, String operator, String msg,
-                         String tempId, String supplierTempId, String tempArgs, Date sendTime, BigDecimal msgCost) {
-        this(null,msgKey,tenantId,appId,subaccountId,taskId,null,mobiles,sendType,supplierCode,operator,msg,tempId,supplierTempId,tempArgs,sendTime,msgCost,false,1L,1L,0L,STATE_WAIT);
+                         String tempId, String supplierTempId, String tempArgs, Date sendTime, BigDecimal msgCost,Date createTime) {
+        this(null,msgKey,tenantId,appId,subaccountId,taskId,null,mobiles,sendType,supplierCode,operator,msg,tempId,supplierTempId,tempArgs,sendTime,msgCost,false,1L,1L,0L,STATE_WAIT,createTime);
 
     }
 
     public MsgSendRecord(String id,String msgKey, String tenantId, String appId, String subaccountId, String taskId, String taskName,String mobiles, String sendType, String supplierCode, String operator,
-                         String msg, String tempId, String supplierTempId, String tempArgs, Date sendTime, BigDecimal msgCost, Boolean isMass, Long sumNum, Long pendingNum,Long failNum,Integer state) {
+                         String msg, String tempId, String supplierTempId, String tempArgs, Date sendTime, BigDecimal msgCost, Boolean isMass, Long sumNum, Long pendingNum,Long failNum,Integer state,Date createTime) {
         this.id = id;
         this.msgKey = msgKey;
         this.tenantId = tenantId;
@@ -80,6 +83,7 @@ public class MsgSendRecord extends IdEntity {
         this.pendingNum = pendingNum;
         this.failNum = failNum;
         this.state = state;
+        this.createTime = createTime;
     }
 
     @Column(name = "msg_key")
@@ -280,13 +284,13 @@ public class MsgSendRecord extends IdEntity {
         this.pendingNum = pendingNum;
     }
 
-    @Column(name = "send_fail_time")
-    public Integer getSendFailTime() {
-        return sendFailTime;
+    @Column(name = "send_fail_num ")
+    public Integer getSendFailNum() {
+        return sendFailNum;
     }
 
-    public void setSendFailTime(Integer sendFailTime) {
-        this.sendFailTime = sendFailTime;
+    public void setSendFailNum(Integer sendFailNum) {
+        this.sendFailNum = sendFailNum;
     }
 
     @Column(name = "reason")

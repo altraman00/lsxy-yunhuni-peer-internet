@@ -12,7 +12,7 @@ import java.util.List;
 public interface MsgSendRecordService extends BaseService<MsgSendRecord> {
     MsgSendRecord findByTaskId(String taskId);
 
-    void updateStateByMsgKey(String msgKey, int state);
+    void updateNoMassStateByTaskId(String msgKey, int state);
 
     void updateStateAndTaskIdById(String id, int state, String taskId);
 

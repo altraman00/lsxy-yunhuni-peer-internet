@@ -34,8 +34,19 @@ public class MsgSendRecordServiceImpl extends AbstractService<MsgSendRecord> imp
     }
 
     @Override
-    public void updateStateByMsgKey(String msgKey, int state) {
-        msgSendRecordDao.updateStateByMsgKey(msgKey,state);
+    public void updateNoMassStateByTaskId(String taskId, int state) {
+        MsgSendRecord record = msgSendRecordDao.findFirstByTaskId(taskId);
+        record.setState(state);
+        if(state == MsgSendRecord.STATE_SUCCESS){
+            record.setSuccNum(1L);
+            record.setFailNum(0L);
+            record.setPendingNum(0L);
+        }else{
+            record.setSuccNum(0L);
+            record.setFailNum(1L);
+            record.setPendingNum(0L);
+        }
+        this.save(record);
     }
 
 
@@ -48,7 +59,7 @@ public class MsgSendRecordServiceImpl extends AbstractService<MsgSendRecord> imp
     @Override
     public List<MsgSendRecord> findUssdSendOneFailAndSendNotOver() {
         Date date = new Date(System.currentTimeMillis() - 1000 * 120);
-        String hql = "from MsgSendRecord obj where obj.isMass = false obj.state = ?1 and obj.sendType = ?2 and obj.sendFailTime <= ?3 and obj.lastTime >= ?4 ";
+        String hql = "from MsgSendRecord obj where obj.isMass = false and obj.state = ?1 and obj.sendType = ?2 and obj.sendFailNum <= ?3 and obj.lastTime >= ?4 ";
         return this.list(hql,MsgSendRecord.STATE_FAIL, MsgConstant.MSG_USSD,3,date);
     }
 

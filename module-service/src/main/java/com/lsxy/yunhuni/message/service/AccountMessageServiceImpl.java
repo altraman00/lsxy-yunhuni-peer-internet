@@ -222,11 +222,13 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
         map.put("awaitService",awaitService);//客服中心
         map.put("awaitInvoice",awaitInvoice);//财务中心
         map.put("awaitDemand",awaitDemand);//审核中心
+
         map1.put("awaitService",awaitService);//客服中心
         map1.put("awaitInvoiceApply",awaitInvoiceApply);//发票审核
         map1.put("awaitInvoiceApplySend",awaitInvoiceApplySend);//发票审核发送
         map1.put("awaitTenant",awaitTenant);//会员认证
         map1.put("awaitPlayVoiceFile",awaitPlayVoiceFile);//放音文件
+        map1.put("awaitApp",awaitApp);//应用审核
         map.put("son",map1);
         return map;
     }
