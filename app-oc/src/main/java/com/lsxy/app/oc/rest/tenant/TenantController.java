@@ -1220,8 +1220,10 @@ public class TenantController extends AbstractRestController {
             @PathVariable String tenant,
             @ApiParam(name = "type",value="day日统计格式（yyyy-MM-dd）month月统计(yyyy-MM)")
             @PathVariable String type,
-            @ApiParam(name = "time",value="下载时间")
-            @RequestParam(value = "time") String time,
+            @ApiParam(name = "endTime",value="开始时间")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime",value="结束时间")
+            @RequestParam(value = "endTime",required = false) String endTime,
             @RequestParam(required = false) String appId,
             @RequestParam(required = false) String subId,
             @RequestParam(required = false,defaultValue = "1") Integer pageNo,
@@ -1235,7 +1237,6 @@ public class TenantController extends AbstractRestController {
         if("all".equals(appId)){
             appId1 = "";
         }
-        String startTime ;
         String title = "子账号综合统计";
         String one = "";
         String[] headers = null;
@@ -1243,17 +1244,21 @@ public class TenantController extends AbstractRestController {
         Map result2;
         List list ;
         if("month".equals(type)){
-            Date date1 = DateUtils.parseDate(time,"yyyy-MM");
-            Date date2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(time,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
-            startTime = time;
-            one +=" 类型：月统计 时间："+startTime;
+            Date date1 = DateUtils.parseDate(startTime,"yyyy-MM");
+            if(StringUtils.isEmpty(endTime)){
+                endTime = startTime;
+            }
+            Date date2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(endTime,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
+            one +=" 类型：月统计 时间："+startTime+"-"+endTime;
             result2 = subaccountMonthService.sum(date1,date2,tenant,appId1,subId);
             list = subaccountMonthService.getListByConditions(date1,date2,tenant,appId,subId);
         }else if("day".equals(type)){
-            Date date1 = DateUtils.parseDate(time+" 00:00:00","yyyy-MM-dd HH:mm:ss");
-            Date date2 =  DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
-            startTime = time;
-            one +=" 类型：日统计 时间："+startTime;
+            Date date1 = DateUtils.parseDate(startTime+" 00:00:00","yyyy-MM-dd HH:mm:ss");
+            if(StringUtils.isEmpty(endTime)){
+                endTime = startTime;
+            }
+            Date date2 =  DateUtils.parseDate(endTime+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+            one +=" 类型：日统计 时间："+startTime+"-"+endTime;
             result2 = subaccountDayService.sum(date1,date2,tenant,appId1,subId);
             list = subaccountDayService.getListByConditions(date1,date2,tenant,appId,subId);
         }else{

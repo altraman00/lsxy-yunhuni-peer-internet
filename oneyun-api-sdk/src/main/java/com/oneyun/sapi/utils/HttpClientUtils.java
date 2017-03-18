@@ -171,7 +171,7 @@ public class HttpClientUtils {
             }
         }
         String str = stringBuilder.toString();
-        Map map = new HashMap<>();
+        Map map = new HashMap();
         if(StringUtils.isNotEmpty(str)) {
             map = JsonUtils.toMap(str);
         }
