@@ -48,4 +48,8 @@ public interface VoiceFileRecordService extends BaseService<VoiceFileRecord> {
 
     /** 对录音进行扣费*/
     boolean recordCost(String tenantId,String appId);
+
+    Page<VoiceFileRecord> getPageListForGW(String appId, String subaccountId, Date start, Date end, Integer pageNo, Integer pageSize);
+
+    Integer setWaitedUpload(List<String> ids);
 }
