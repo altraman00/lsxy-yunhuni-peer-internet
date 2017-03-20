@@ -13,6 +13,7 @@ import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuotaType;
 import com.lsxy.yunhuni.api.apicertificate.service.CertAccountQuotaService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.app.service.ServiceType;
 import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
@@ -58,22 +59,22 @@ public class MsgSendServiceImpl implements MsgSendService {
     CertAccountQuotaService certAccountQuotaService;
 
     @Override
-    public String sendUssd(String ip,String appId,String subaccountId,String mobile, String tempId, String tempArgs) throws YunhuniApiException{
+    public String sendUssd(String appId,String subaccountId,String mobile, String tempId, String tempArgs) throws YunhuniApiException{
         return sendOne(appId, subaccountId, mobile, tempId, tempArgs, MsgConstant.MSG_USSD);
     }
 
     @Override
-    public String sendUssdMass(String ip, String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) throws YunhuniApiException {
+    public String sendUssdMass(String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) throws YunhuniApiException {
         return sendMass(appId, subaccountId, taskName, tempId, tempArgs, mobiles, sendTimeStr,MsgConstant.MSG_SMS);
     }
 
     @Override
-    public String sendSms(String ip,String appId,String subaccountId,String mobile, String tempId, String tempArgs) throws YunhuniApiException{
+    public String sendSms(String appId,String subaccountId,String mobile, String tempId, String tempArgs) throws YunhuniApiException{
         return sendOne(appId, subaccountId, mobile, tempId, tempArgs,MsgConstant.MSG_SMS);
     }
 
     @Override
-    public String sendSmsMass(String ip, String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) throws YunhuniApiException {
+    public String sendSmsMass(String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) throws YunhuniApiException {
         return sendMass(appId, subaccountId, taskName, tempId, tempArgs, mobiles, sendTimeStr,MsgConstant.MSG_SMS);
     }
 
@@ -102,8 +103,13 @@ public class MsgSendServiceImpl implements MsgSendService {
     @Transactional
     private String sendOne(String appId, String subaccountId, String mobile, String tempId, String tempArgs,String sendType) throws YunhuniApiException {
         App app = appService.findById(appId);
-        //TODO 判断红黑名单
+        if(ProductCode.msg_sms.name().equals(sendType)){
+            appService.enabledService(app.getTenant().getId(),appId, ServiceType.SMS);
+        }else if(ProductCode.msg_ussd.name().equals(sendType)){
+            appService.enabledService(app.getTenant().getId(),appId, ServiceType.USSD);
+        }
 
+        //TODO 判断红黑名单
         tempId = tempId.trim();
         tempArgs = tempArgs.trim();
         MsgTemplate temp = msgTemplateService.findByTempId(appId, subaccountId, tempId, true);
@@ -191,6 +197,13 @@ public class MsgSendServiceImpl implements MsgSendService {
 
     private String sendMass(String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr,String sendType) throws YunhuniApiException {
         App app = appService.findById(appId);
+
+        if(ProductCode.msg_sms.name().equals(sendType)){
+            appService.enabledService(app.getTenant().getId(),appId, ServiceType.SMS);
+        }else if(ProductCode.msg_ussd.name().equals(sendType)){
+            appService.enabledService(app.getTenant().getId(),appId, ServiceType.USSD);
+        }
+
         if(StringUtils.isEmpty( taskName )){
             // 抛异常
             throw new MsgTaskNameIsEmptyException();

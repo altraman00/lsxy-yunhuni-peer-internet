@@ -7,15 +7,21 @@ import com.lsxy.app.api.gateway.rest.msg.dto.SmsSendDTO;
 import com.lsxy.app.api.gateway.rest.msg.dto.SmsSendMassDTO;
 import com.lsxy.app.api.gateway.rest.msg.dto.UssdSendDTO;
 import com.lsxy.app.api.gateway.rest.msg.dto.UssdSendMassDTO;
+import com.lsxy.framework.core.exceptions.api.IPNotInWhiteListException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.utils.WebUtils;
 import com.lsxy.msg.api.model.MsgUserRequest;
 import com.lsxy.msg.api.service.MsgSendService;
 import com.lsxy.msg.api.service.MsgUserRequestService;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.app.service.ServiceType;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,13 +40,23 @@ public class UssdController extends AbstractAPIController {
     MsgSendService msgSendService;
     @Reference(timeout=3000,check = false,lazy = true)
     MsgUserRequestService msgUserRequestService;
+    @Autowired
+    AppService appService;
 
     @RequestMapping(value = "/{account_id}/msg/ussd/send",method = RequestMethod.POST)
     public ApiGatewayResponse ussdSend(HttpServletRequest request, @Valid @RequestBody UssdSendDTO dto, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
+        App app = appService.findById(appId);
+        appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.USSD);
         String ip = WebUtils.getRemoteAddress(request);
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList)){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
         String subaccountId = getSubaccountId(request);
-        String msgKey = msgSendService.sendUssd(ip, appId, subaccountId, dto.getMobile(), dto.getTempId(), dto.getTempArgs());
+        String msgKey = msgSendService.sendUssd(appId, subaccountId, dto.getMobile(), dto.getTempId(), dto.getTempArgs());
         Map<String,String> result = new HashMap<>();
         result.put("msgKey", msgKey);
         return ApiGatewayResponse.success(result);
@@ -49,9 +65,17 @@ public class UssdController extends AbstractAPIController {
     @RequestMapping(value = "/{account_id}/msg/ussd/mass/task",method = RequestMethod.POST)
     public ApiGatewayResponse ussdSendMass(HttpServletRequest request, @Valid @RequestBody UssdSendMassDTO dto, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
+        App app = appService.findById(appId);
+        appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.USSD);
         String ip = WebUtils.getRemoteAddress(request);
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList)){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
         String subaccountId = getSubaccountId(request);
-        String msgKey = msgSendService.sendUssdMass(ip, appId, subaccountId, dto.getTaskName(),dto.getTempId(),dto.getTempArgs(),dto.getMobiles(),dto.getSendTime());
+        String msgKey = msgSendService.sendUssdMass(appId, subaccountId, dto.getTaskName(),dto.getTempId(),dto.getTempArgs(),dto.getMobiles(),dto.getSendTime());
         Map<String,String> result = new HashMap<>();
         result.put("msgKey", msgKey);
         return ApiGatewayResponse.success(result);
@@ -60,7 +84,15 @@ public class UssdController extends AbstractAPIController {
     @RequestMapping(value = "/{account_id}/msg/ussd/{msgKey}",method = RequestMethod.GET)
     public ApiGatewayResponse ussdSendMass(HttpServletRequest request, @PathVariable String msgKey, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
+        App app = appService.findById(appId);
+        appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.USSD);
         String ip = WebUtils.getRemoteAddress(request);
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList)){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
         String subaccountId = getSubaccountId(request);
         MsgUserRequest msgUserRequest = msgUserRequestService.findByMsgKeyAndSendType(appId,subaccountId,msgKey, ProductCode.msg_ussd.name());
         return ApiGatewayResponse.success(msgUserRequest);
@@ -71,7 +103,15 @@ public class UssdController extends AbstractAPIController {
                                            @RequestParam(defaultValue = "1") Integer pageNo,
                                            @RequestParam(defaultValue = "10") Integer pageSize) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
+        App app = appService.findById(appId);
+        appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.USSD);
         String ip = WebUtils.getRemoteAddress(request);
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList)){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
         String subaccountId = getSubaccountId(request);
         Page<MsgUserRequest> page = msgUserRequestService.findPageBySendTypeForGW(appId, subaccountId, ProductCode.msg_ussd.name(), pageNo, pageSize);
         return ApiGatewayResponse.success(page);
