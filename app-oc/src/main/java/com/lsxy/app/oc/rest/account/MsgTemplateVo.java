@@ -31,6 +31,8 @@ public class MsgTemplateVo {
     private String reason;
     private String remark;
     private String lastUserName;
+    private String msgSupplierId;
+    private String msgSupplierName;
     public MsgTemplateVo(MsgTemplate msgTemplate,String tenantName,String appName){
         try {
             BeanUtils.copyProperties(this,msgTemplate);
@@ -177,5 +179,21 @@ public class MsgTemplateVo {
 
     public void setLastUserName(String lastUserName) {
         this.lastUserName = lastUserName;
+    }
+
+    public String getMsgSupplierId() {
+        return msgSupplierId;
+    }
+
+    public void setMsgSupplierId(String msgSupplierId) {
+        this.msgSupplierId = msgSupplierId;
+    }
+
+    public String getMsgSupplierName() {
+        return msgSupplierName;
+    }
+
+    public void setMsgSupplierName(String msgSupplierName) {
+        this.msgSupplierName = msgSupplierName;
     }
 }
