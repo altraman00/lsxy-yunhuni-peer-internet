@@ -20,8 +20,6 @@ import java.util.Date;
 public class CertAccountQuota extends IdEntity {
     public static int CALTYPE_SUM = 1;
     public static int CALTYPE_COUNT = 2;
-    public static int SMS_COUNT = 3;
-    public static int USSD_COUNT = 4;
     private String tenantId;
     private String appId;
     private String certAccountId;
