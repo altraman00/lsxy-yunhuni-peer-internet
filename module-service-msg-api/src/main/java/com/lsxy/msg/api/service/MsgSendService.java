@@ -11,13 +11,13 @@ import java.util.List;
  */
 public interface MsgSendService {
     //单发闪印
-    String sendUssd(String ip,String appId,String accountId,String mobile,String tempId,String tempArgs) throws YunhuniApiException;
+    String sendUssd(String appId,String accountId,String mobile,String tempId,String tempArgs) throws YunhuniApiException;
     //群发闪印
-    String sendUssdMass(String ip, String appId, String accountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) throws YunhuniApiException;
+    String sendUssdMass(String appId, String accountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) throws YunhuniApiException;
     //单发短信
-    String sendSms(String ip,String appId,String accountId,String mobile,String tempId,String tempArgs) throws YunhuniApiException;
+    String sendSms(String appId,String accountId,String mobile,String tempId,String tempArgs) throws YunhuniApiException;
     //群发短信
-    String sendSmsMass(String ip, String appId, String accountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) throws YunhuniApiException;
+    String sendSmsMass(String appId, String accountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) throws YunhuniApiException;
 
     void batchConsumeMsg(Date dt, String type, BigDecimal cost, String remark, String appId, String tenantId, String subaccountId, List<String> detailIds);
 }

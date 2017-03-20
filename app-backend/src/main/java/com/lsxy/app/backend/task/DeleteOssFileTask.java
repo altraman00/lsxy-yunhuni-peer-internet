@@ -51,13 +51,13 @@ public class DeleteOssFileTask {
     }
     private void deleteOssPlayFile(){
         try {
-            List<Map> list = voiceFilePlaydService.getOssListByDeleted();
+            List<Map<String,Object>> list = voiceFilePlaydService.getOssListByDeleted();
             List<String> list1 = new ArrayList<>();
             for (int i = 0; i < list.size(); i++) {
-                Map<String, String> map = list.get(i);
+                Map<String, Object> map = list.get(i);
                 int status = VoiceFilePlay.DELETED_FAIL;
                 try {
-                    ossService.deleteObject(repository, map.get("ossUrl"));
+                    ossService.deleteObject(repository, (String) map.get("ossUrl"));
                     status = VoiceFilePlay.DELETED_SUCCESS;
                 } catch (Exception e) {
                     logger.error("删除OSS文件：{1}失败，异常{2}", map.get("ossUrl"), e);

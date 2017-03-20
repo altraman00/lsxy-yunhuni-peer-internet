@@ -5,15 +5,22 @@ import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.app.api.gateway.rest.AbstractAPIController;
 import com.lsxy.app.api.gateway.rest.msg.dto.SmsSendDTO;
 import com.lsxy.app.api.gateway.rest.msg.dto.SmsSendMassDTO;
+import com.lsxy.framework.core.exceptions.api.ExceptionContext;
+import com.lsxy.framework.core.exceptions.api.IPNotInWhiteListException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.utils.WebUtils;
 import com.lsxy.msg.api.model.MsgUserRequest;
 import com.lsxy.msg.api.service.MsgSendService;
 import com.lsxy.msg.api.service.MsgUserRequestService;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.app.service.ServiceType;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,13 +39,24 @@ public class SmsController extends AbstractAPIController {
     MsgSendService msgSendService;
     @Reference(timeout=3000,check = false,lazy = true)
     MsgUserRequestService msgUserRequestService;
+    @Autowired
+    AppService appService;
 
     @RequestMapping(value = "/{account_id}/msg/sms/send",method = RequestMethod.POST)
     public ApiGatewayResponse smsSend(HttpServletRequest request, @Valid @RequestBody SmsSendDTO dto, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
+        App app = appService.findById(appId);
+        appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.SMS);
         String ip = WebUtils.getRemoteAddress(request);
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList)){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
+
         String subaccountId = getSubaccountId(request);
-        String msgKey = msgSendService.sendSms(ip, appId, subaccountId, dto.getMobile(), dto.getTempId(), dto.getTempArgs());
+        String msgKey = msgSendService.sendSms(appId, subaccountId, dto.getMobile(), dto.getTempId(), dto.getTempArgs());
         Map<String,String> result = new HashMap<>();
         result.put("msgKey", msgKey);
         return ApiGatewayResponse.success(result);
@@ -47,9 +65,17 @@ public class SmsController extends AbstractAPIController {
     @RequestMapping(value = "/{account_id}/msg/sms/mass/task",method = RequestMethod.POST)
     public ApiGatewayResponse smsSendMass(HttpServletRequest request, @Valid @RequestBody SmsSendMassDTO dto, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
+        App app = appService.findById(appId);
+        appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.SMS);
         String ip = WebUtils.getRemoteAddress(request);
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList)){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
         String subaccountId = getSubaccountId(request);
-        String msgKey = msgSendService.sendSmsMass(ip, appId, subaccountId, dto.getTaskName(),dto.getTempId(),dto.getTempArgs(),dto.getMobiles(),dto.getSendTime());
+        String msgKey = msgSendService.sendSmsMass(appId, subaccountId, dto.getTaskName(),dto.getTempId(),dto.getTempArgs(),dto.getMobiles(),dto.getSendTime());
         Map<String,String> result = new HashMap<>();
         result.put("msgKey", msgKey);
         return ApiGatewayResponse.success(result);
@@ -58,7 +84,15 @@ public class SmsController extends AbstractAPIController {
     @RequestMapping(value = "/{account_id}/msg/sms/{msgKey}",method = RequestMethod.GET)
     public ApiGatewayResponse ussdSendMass(HttpServletRequest request, @PathVariable String msgKey, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
+        App app = appService.findById(appId);
+        appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.SMS);
         String ip = WebUtils.getRemoteAddress(request);
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList)){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
         String subaccountId = getSubaccountId(request);
         MsgUserRequest msgUserRequest = msgUserRequestService.findByMsgKeyAndSendType(appId,subaccountId,msgKey, ProductCode.msg_sms.name());
         return ApiGatewayResponse.success(msgUserRequest);
@@ -69,7 +103,15 @@ public class SmsController extends AbstractAPIController {
                                            @RequestParam(defaultValue = "1") Integer pageNo,
                                            @RequestParam(defaultValue = "10") Integer pageSize) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
+        App app = appService.findById(appId);
+        appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.SMS);
         String ip = WebUtils.getRemoteAddress(request);
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList)){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
         String subaccountId = getSubaccountId(request);
         Page<MsgUserRequest> page = msgUserRequestService.findPageBySendTypeForGW(appId, subaccountId, ProductCode.msg_sms.name(), pageNo, pageSize);
         return ApiGatewayResponse.success(page);
