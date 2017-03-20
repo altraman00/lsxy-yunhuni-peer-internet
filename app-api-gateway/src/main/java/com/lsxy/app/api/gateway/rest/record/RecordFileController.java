@@ -3,7 +3,6 @@ package com.lsxy.app.api.gateway.rest.record;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.app.api.gateway.rest.AbstractAPIController;
 import com.lsxy.app.api.gateway.rest.record.vo.RecordFileVo;
-import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.exceptions.api.RecordFileNotExistException;
 import com.lsxy.framework.core.exceptions.api.RequestIllegalArgumentException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
@@ -11,6 +10,7 @@ import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.OssTempUriUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.apigw.RecordFileDownloadNotificationEvent;
 import com.lsxy.framework.mq.events.portal.VoiceFileRecordSyncEvent;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -93,7 +92,7 @@ public class RecordFileController extends AbstractAPIController {
         }
 
         if(voiceFileRecord.getStatus()!=null&&voiceFileRecord.getStatus()==1){
-            String ossUri = getOssTempUri(voiceFileRecord.getOssUrl());
+            String ossUri = OssTempUriUtils.getOssTempUri(voiceFileRecord.getOssUrl());
             if(logger.isDebugEnabled()) {
                 logger.debug("生成ossUri地址：[{}]", ossUri);
             }
@@ -118,25 +117,13 @@ public class RecordFileController extends AbstractAPIController {
         //发起文件上传
         if(flag) {
             mqService.publish(new VoiceFileRecordSyncEvent(app.getTenant().getId(), voiceFileRecord.getAppId(), voiceFileRecord.getId(), VoiceFileRecordSyncEvent.TYPE_FILE));
-            return ApiGatewayResponse.success(null);
+            //TODO 延时处理录音同步查询时间
+            mqService.publish(new RecordFileDownloadNotificationEvent(appId,subaccountId,voiceFileRecord.getId(),1));
+            return ApiGatewayResponse.success();
         }else {
-            String ossUri = getOssTempUri(list.get(0).getOssUrl());
+            String ossUri = OssTempUriUtils.getOssTempUri(list.get(0).getOssUrl());
             return ApiGatewayResponse.success(ossUri);
         }
-    }
-
-    protected String getOssTempUri(String resource){
-        String host = SystemConfig.getProperty("global.oss.aliyun.endpoint.internet","http://oss-cn-beijing.aliyuncs.com");
-        String accessId = SystemConfig.getProperty("global.aliyun.key","nfgEUCKyOdVMVbqQ");
-        String accessKey = SystemConfig.getProperty("global.aliyun.secret","HhmxAMZ2jCrE0fTa2kh9CLXF9JPcOW");
-        String resource1 = SystemConfig.getProperty("global.oss.aliyun.bucket");
-        try {
-            URL url = new URL(host);
-            host = url.getHost();
-        }catch (Exception e){}
-        resource = "/"+resource1+"/"+resource;
-        String result = OssTempUriUtils.getOssTempUri( accessId, accessKey, host, "GET",resource ,60);
-        return result;
     }
 
 }
