@@ -11,7 +11,6 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 /**
  * Created by liups on 2016/12/5.
@@ -23,24 +22,27 @@ public class AgentAndExtension {
 
 
     public List<String> getExtIds() throws KeyManagementException, NoSuchAlgorithmException, InvalidKeyException, IOException {
-        List<String> extIds = new ArrayList<>();
+        List<String> extIds = new ArrayList<String>();
         String result = sapiSdk.CallcenterExtensionGetPage(appId, 1, 500);
         Map map = JsonUtils.toMap(result);
         Map page = (Map) map.get("data");
         List<Map> list = (List<Map>) page.get("result");
-        list.parallelStream().forEach(ext -> extIds.add(ext.get("id").toString()));
+        for (int i = 0; i < list.size(); i++) {
+            extIds.add(list.get(i).get("id").toString());
+        }
         return extIds;
     }
 
     @Test
     public void creatExtension() throws InterruptedException {
-        List<String> extIds = new ArrayList<>();
+        List<String> extIds = new ArrayList<String>();
         ExecutorService executorService = Executors.newFixedThreadPool(50);
-        List<Future> results = new ArrayList<>();
+        List<Future> results = new ArrayList<Future>();
         for(int i=0;i<500;i++){
             String user = i + "";
             Thread.sleep(20);
-            results.add(executorService.submit(() -> sapiSdk.CallcenterExtensionNew(appId, 1, user, "123456", null, null)));
+
+//            results.add(executorService.submit(() -> sapiSdk.CallcenterExtensionNew(appId, 1, user, "123456", null, null)));
         }
         for(Future f : results){
             try {
@@ -60,9 +62,9 @@ public class AgentAndExtension {
     public void deleteExts() throws IOException, NoSuchAlgorithmException, InvalidKeyException, KeyManagementException {
         List<String> extIds = getExtIds();
         ExecutorService executorService = Executors.newFixedThreadPool(50);
-        List<Future> results = new ArrayList<>();
+        List<Future> results = new ArrayList<Future>();
         //删除座席
-        extIds.parallelStream().forEach(extId -> results.add(executorService.submit(() -> sapiSdk.CallcenterExtensionDelete(appId,extId))));
+//        extIds.parallelStream().forEach(extId -> results.add(executorService.submit(() -> sapiSdk.CallcenterExtensionDelete(appId,extId))));
 
         for(Future f : results){
             try {
@@ -78,18 +80,18 @@ public class AgentAndExtension {
     public void createAgent() throws IOException, NoSuchAlgorithmException, InvalidKeyException, KeyManagementException, InterruptedException {
         List<String> extIds = searchUsableExtensionIds();
         ExecutorService executorService = Executors.newFixedThreadPool(50);
-        List<Future> results = new ArrayList<>();
+        List<Future> results = new ArrayList<Future>();
         //建立座席
         for(int i=0;i<100;i++){
             Thread.sleep(20);
             String extId = extIds.get(i);
-            List<AgentSkill> skills = new ArrayList<>();
+            List<AgentSkill> skills = new ArrayList<AgentSkill>();
             AgentSkill agentSkill1 = new AgentSkill("投诉", 60, true);
             skills.add(agentSkill1);
             AgentSkill agentSkill2 = new AgentSkill("建议", 60, true);
             skills.add(agentSkill2);
             String user = i + "";
-            results.add(executorService.submit(() -> sapiSdk.CallcenterAgentLogin(appId, user,  "8a2a6a4a58cdd3fe0158cdfce2de0005",  user,  "idle", skills, extId)));
+//            results.add(executorService.submit(() -> sapiSdk.CallcenterAgentLogin(appId, user,  "8a2a6a4a58cdd3fe0158cdfce2de0005",  user,  "idle", skills, extId)));
         }
 
         for(Future f : results){
@@ -105,12 +107,12 @@ public class AgentAndExtension {
     @Test
     public void deleteAgent() throws InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(50);
-        List<Future> results = new ArrayList<>();
+        List<Future> results = new ArrayList<Future>();
         //删除座席
         for(int i=0;i<500;i++){
             Thread.sleep(20);
             String user = i + "";
-            results.add(executorService.submit(() -> sapiSdk.CallcenterAgentLogout(appId,user,true)));
+//            results.add(executorService.submit(() -> sapiSdk.CallcenterAgentLogout(appId,user,true)));
         }
 
         for(Future f : results){
@@ -150,8 +152,8 @@ public class AgentAndExtension {
         Map date = (Map) map.get("data");
         List<Map> agents = (List<Map>) date.get("result");
         System.out.println(agents.size());
-        agents.parallelStream().filter(agent -> !"idle".equals(agent.get("state"))).forEach(agent -> {System.out.println(agent.get("name") + ":" + agent.get("state") + "," +  agent.get("extension"));
-        });
+//        agents.parallelStream().filter(agent -> !"idle".equals(agent.get("state"))).forEach(agent -> {System.out.println(agent.get("name") + ":" + agent.get("state") + "," +  agent.get("extension"));
+//        });
     }
 
     @Test
@@ -160,17 +162,17 @@ public class AgentAndExtension {
         String result = sapiSdk.extensionListTest(appId, 1, 500);
         Map map = JsonUtils.toMap(result);
         List<Map> list = (List<Map>) map.get("data");
-        List<Map> collect = list.parallelStream().filter(ext -> {
-            Set<String> set = ext.keySet();
-            String key = null;
-            for (String k : set) {
-                key = k;
-                break;
-            }
-            Collection values = ext.values();
-            return extIds.contains(key) && values.contains(true);
-        }).collect(Collectors.toList());
-        System.out.println(collect.size());
+//        List<Map> collect = list.parallelStream().filter(ext -> {
+//            Set<String> set = ext.keySet();
+//            String key = null;
+//            for (String k : set) {
+//                key = k;
+//                break;
+//            }
+//            Collection values = ext.values();
+//            return extIds.contains(key) && values.contains(true);
+//        }).collect(Collectors.toList());
+//        System.out.println(collect.size());
 
 //        collect.parallelStream().forEach(ext -> {
 //                    System.out.println(ext.keySet());
@@ -189,19 +191,19 @@ public class AgentAndExtension {
         String result = sapiSdk.extensionListTest(appId, 1, 500);
         Map map = JsonUtils.toMap(result);
         List<Map> list = (List<Map>) map.get("data");
-        List<String> usableExtIds = new ArrayList<>();
-        list.parallelStream().forEach(ext -> {
-            Set<String> set = ext.keySet();
+        List<String> usableExtIds = new ArrayList<String>();
+        for (int i = 0; i < list.size(); i++) {
+            Set<String> set = list.get(i).keySet();
             String key = null;
             for (String k : set) {
                 key = k;
                 break;
             }
-            Collection values = ext.values();
+            Collection values = list.get(i).values();
             if(values.contains(true)){
                 usableExtIds.add(key);
             }
-        });
+        }
         return usableExtIds;
     }
 
