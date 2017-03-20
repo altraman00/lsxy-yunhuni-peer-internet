@@ -101,11 +101,15 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
     }
 
     @Override
-    public MsgTemplate findByTempId(String appId, String subaccountId, String tempId, boolean isGW){
+    public MsgTemplate findByTempId(String appId, String subaccountId, String tempId, boolean isGW) throws YunhuniApiException {
         if(StringUtils.isNotBlank(subaccountId) || isGW){
-            return msgTemplateDao.findByAppIdAndSubaccountIdAndTempId(appId,subaccountId,tempId);
+            MsgTemplate msgTemplate = msgTemplateDao.findByAppIdAndSubaccountIdAndTempId(appId,subaccountId,tempId);
+            if(isGW && msgTemplate == null){
+                throw new RequestIllegalArgumentException();
+            }
+            return msgTemplate;
         }else{
-            return msgTemplateDao.findByAppIdAndTempId(appId,tempId);
+           return msgTemplateDao.findByAppIdAndTempId(appId,tempId);
         }
     }
 
@@ -143,15 +147,15 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
         }
         if(StringUtils.isNotBlank(msgTemplate.getType())){
             flag = true;
-            oldTemplate.setName(msgTemplate.getType());
+            oldTemplate.setType(msgTemplate.getType());
         }
         if(StringUtils.isNotBlank(msgTemplate.getContent())){
             flag = true;
-            oldTemplate.setName(msgTemplate.getContent());
+            oldTemplate.setContent(msgTemplate.getContent());
         }
         if(StringUtils.isNotBlank(msgTemplate.getRemark())){
             flag = true;
-            oldTemplate.setName(msgTemplate.getReason());
+            oldTemplate.setRemark(msgTemplate.getRemark());
         }
         if(flag){
             oldTemplate.setStatus(MsgTemplate.STATUS_WAIT);

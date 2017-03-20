@@ -64,8 +64,8 @@ public class TemplateController extends AbstractAPIController {
         return ApiGatewayResponse.success(template);
     }
 
-    @RequestMapping(value = "/{account_id}/msg/template/{templateId}",method = RequestMethod.POST)
-    public ApiGatewayResponse updateTemplate(HttpServletRequest request,@PathVariable String templateId, @Valid @RequestBody TemplateDTO dto, @PathVariable String account_id) throws YunhuniApiException {
+    @RequestMapping(value = "/{account_id}/msg/template/{tempId}",method = RequestMethod.POST)
+    public ApiGatewayResponse updateTemplate(HttpServletRequest request,@PathVariable String tempId, @Valid @RequestBody TemplateDTO dto, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         App app = appService.findById(appId);
         String ip = WebUtils.getRemoteAddress(request);
@@ -77,13 +77,13 @@ public class TemplateController extends AbstractAPIController {
         }
         String subaccountId = getSubaccountId(request);
         MsgTemplate msgTemplate = new MsgTemplate(app.getTenant().getId(),appId,subaccountId,dto.getName(),dto.getType(),dto.getContent(),dto.getRemark());
-        msgTemplate.setTempId(templateId);
+        msgTemplate.setTempId(tempId);
         msgTemplate = msgTemplateService.updateMsgTemplate(msgTemplate, true);
         return ApiGatewayResponse.success(msgTemplate);
     }
 
-    @RequestMapping(value = "/{account_id}/msg/template/{templateId}",method = RequestMethod.DELETE)
-    public ApiGatewayResponse delTemplate(HttpServletRequest request, @PathVariable String templateId, @PathVariable String account_id) throws YunhuniApiException, InvocationTargetException, IllegalAccessException {
+    @RequestMapping(value = "/{account_id}/msg/template/{tempId}",method = RequestMethod.DELETE)
+    public ApiGatewayResponse delTemplate(HttpServletRequest request, @PathVariable String tempId, @PathVariable String account_id) throws YunhuniApiException, InvocationTargetException, IllegalAccessException {
         String appId = request.getHeader("AppID");
         App app = appService.findById(appId);
         String ip = WebUtils.getRemoteAddress(request);
@@ -94,12 +94,12 @@ public class TemplateController extends AbstractAPIController {
             }
         }
         String subaccountId = getSubaccountId(request);
-        msgTemplateService.deleteMsgTemplate(appId,subaccountId,templateId,true);
+        msgTemplateService.deleteMsgTemplate(appId,subaccountId,tempId,true);
         return ApiGatewayResponse.success();
     }
 
-    @RequestMapping(value = "/{account_id}/msg/template/{templateId}",method = RequestMethod.GET)
-    public ApiGatewayResponse getTemplate(HttpServletRequest request, @PathVariable String templateId, @PathVariable String account_id) throws YunhuniApiException {
+    @RequestMapping(value = "/{account_id}/msg/template/{tempId}",method = RequestMethod.GET)
+    public ApiGatewayResponse getTemplate(HttpServletRequest request, @PathVariable String tempId, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         App app = appService.findById(appId);
         String ip = WebUtils.getRemoteAddress(request);
@@ -110,7 +110,7 @@ public class TemplateController extends AbstractAPIController {
             }
         }
         String subaccountId = getSubaccountId(request);
-        MsgTemplate temp = msgTemplateService.findByTempId(appId, subaccountId, templateId, true);
+        MsgTemplate temp = msgTemplateService.findByTempId(appId, subaccountId, tempId, true);
         return ApiGatewayResponse.success(temp);
     }
 
