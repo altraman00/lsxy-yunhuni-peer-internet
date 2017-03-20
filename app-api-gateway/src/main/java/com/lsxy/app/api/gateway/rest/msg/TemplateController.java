@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.app.api.gateway.rest.AbstractAPIController;
 import com.lsxy.app.api.gateway.rest.msg.dto.TemplateDTO;
+import com.lsxy.app.api.gateway.rest.msg.vo.TemplateVO;
 import com.lsxy.framework.core.exceptions.api.IPNotInWhiteListException;
 import com.lsxy.framework.core.exceptions.api.RequestIllegalArgumentException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by liups on 2017/3/14.
@@ -61,7 +64,7 @@ public class TemplateController extends AbstractAPIController {
         String subaccountId = getSubaccountId(request);
         MsgTemplate msgTemplate = new MsgTemplate(app.getTenant().getId(),appId,subaccountId,dto.getName(),dto.getType(),dto.getContent(),dto.getRemark());
         MsgTemplate template = msgTemplateService.createTemplate(msgTemplate);
-        return ApiGatewayResponse.success(template);
+        return ApiGatewayResponse.success(new TemplateVO(template));
     }
 
     @RequestMapping(value = "/{account_id}/msg/template/{tempId}",method = RequestMethod.POST)
@@ -79,7 +82,7 @@ public class TemplateController extends AbstractAPIController {
         MsgTemplate msgTemplate = new MsgTemplate(app.getTenant().getId(),appId,subaccountId,dto.getName(),dto.getType(),dto.getContent(),dto.getRemark());
         msgTemplate.setTempId(tempId);
         msgTemplate = msgTemplateService.updateMsgTemplate(msgTemplate, true);
-        return ApiGatewayResponse.success(msgTemplate);
+        return ApiGatewayResponse.success(new TemplateVO(msgTemplate));
     }
 
     @RequestMapping(value = "/{account_id}/msg/template/{tempId}",method = RequestMethod.DELETE)
@@ -111,7 +114,7 @@ public class TemplateController extends AbstractAPIController {
         }
         String subaccountId = getSubaccountId(request);
         MsgTemplate temp = msgTemplateService.findByTempId(appId, subaccountId, tempId, true);
-        return ApiGatewayResponse.success(temp);
+        return ApiGatewayResponse.success(new TemplateVO(temp));
     }
 
     @RequestMapping(value = "/{account_id}/msg/template",method = RequestMethod.GET)
@@ -128,6 +131,14 @@ public class TemplateController extends AbstractAPIController {
         }
         String subaccountId = getSubaccountId(request);
         Page<MsgTemplate> page = msgTemplateService.getPageForGW(appId, subaccountId, pageNo, pageSize);
+        List<MsgTemplate> result = page.getResult();
+        if(result != null && result.size() >0){
+            List<TemplateVO> vos = new ArrayList<>();
+            for(MsgTemplate msgTemplate:result ){
+                vos.add(new TemplateVO(msgTemplate));
+            }
+            page.setResult(vos);
+        }
         return ApiGatewayResponse.success(page);
     }
 
