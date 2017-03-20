@@ -137,7 +137,14 @@ public class MsgTemptaleController extends AbstractRestController {
         for (int i = 0; i < page.getResult().size(); i++) {
             MsgTemplate msgTemplate = page.getResult().get(i);
             App app = appService.findById(msgTemplate.getAppId());
-            list.add(new MsgTemplateVo( page.getResult().get(i),app.getTenant().getTenantName(),app.getName()));
+            MsgTemplateVo templateVo = new MsgTemplateVo( page.getResult().get(i),app.getTenant().getTenantName(),app.getName());
+            MsgSupplierTemplate msgSupplierTemplate = msgSupplierTemplateService.findByTempId(msgTemplate.getTempId());
+            if(msgSupplierTemplate!=null) {
+                MsgSupplier msgSupplier = msgSupplierService.findByCode(msgSupplierTemplate.getSupplierCode());
+                templateVo.setMsgSupplierId(msgSupplier.getId());
+                templateVo.setMsgSupplierName(msgSupplier.getSupplierName());
+            }
+            list.add(templateVo);
         }
         page.setResult(list);
         return RestResponse.success(page);
