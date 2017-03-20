@@ -20,6 +20,7 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.app.dao.AppDao;
+import com.lsxy.yunhuni.product.dao.ProductDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -54,7 +55,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     private TenantServiceSwitchService tenantServiceSwitchService;
 
     @Autowired
-    private ProductService productService;
+    private ProductDao productDao;
 
     @Override
     public BaseDaoInterface<App, Serializable> getDao() {
@@ -215,7 +216,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     }
 
     @Override
-    @Cacheable(value = "entity", key = "'entity_' + #tenantId + #appId + #service.code")
+    @Cacheable(value = "entity", key = "'entity_' + #tenantId + #appId + #service.product + #service.code")
     public boolean enabledService(String tenantId, String appId, ServiceType service) {
         if(tenantId == null){
             return false;
@@ -233,8 +234,8 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         String field = service.getCode();
         try {
             if(productCode!=null){//如果产品不null 判断产品是否可用
-                Product product = productService.getProductByCode(productCode);
-                if(product == null || product.getStatus() ==null || product.getStatus() != 1){
+                Product product = productDao.findByCode(productCode);
+                if(product == null || product.getStatus() ==null || product.getStatus().intValue() != 1){
                     return false;
                 }
             }
