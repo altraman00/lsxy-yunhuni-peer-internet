@@ -50,7 +50,7 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
                 valuesMark += "?,";
             }
         }
-        String insertSql = " insert into db_lsxy_bi_yunhuni.tb_bi_voice_cdr_month("+ values + ") values ("+valuesMark+")";
+        String insertSql = " insert into db_lsxy_bi_yunhuni.tb_bi_msg_send_detail("+ values + ") values ("+valuesMark+")";
         List resultList = new ArrayList();
         List<String> ids = new ArrayList<>();
         if(phones != null && phones.size() > 0){
