@@ -274,12 +274,12 @@ public class MsgSendServiceImpl implements MsgSendService {
         }
 
         if(massMobile.getUnicom().size() > 0){//处理联通号码
-            List<String> mobileList = massMobile.getMobile();
+            List<String> mobileList = massMobile.getUnicom();
             sendMassByOperator(app.getTenant().getId(),appId,subaccountId,taskName, tempId, tempArgs, sendType, sendTime, msg, key, list, mobileList, MsgConstant.ChinaUnicom,cost,createTime);
         }
 
         if(massMobile.getTelecom().size() > 0){//处理电信号码
-            List<String> mobileList = massMobile.getMobile();
+            List<String> mobileList = massMobile.getTelecom();
             sendMassByOperator(app.getTenant().getId(),appId,subaccountId,taskName, tempId, tempArgs, sendType, sendTime, msg, key, list, mobileList, MsgConstant.ChinaTelecom,cost,createTime);
         }
 
