@@ -7,6 +7,7 @@ import com.lsxy.app.api.gateway.rest.msg.dto.SmsSendDTO;
 import com.lsxy.app.api.gateway.rest.msg.dto.SmsSendMassDTO;
 import com.lsxy.app.api.gateway.rest.msg.dto.UssdSendDTO;
 import com.lsxy.app.api.gateway.rest.msg.dto.UssdSendMassDTO;
+import com.lsxy.app.api.gateway.rest.msg.vo.MsgRequestVO;
 import com.lsxy.framework.core.exceptions.api.IPNotInWhiteListException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.Page;
@@ -26,7 +27,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -95,7 +98,7 @@ public class UssdController extends AbstractAPIController {
         }
         String subaccountId = getSubaccountId(request);
         MsgUserRequest msgUserRequest = msgUserRequestService.findByMsgKeyAndSendType(appId,subaccountId,msgKey, ProductCode.msg_ussd.name());
-        return ApiGatewayResponse.success(msgUserRequest);
+        return ApiGatewayResponse.success(new MsgRequestVO(msgUserRequest));
     }
 
     @RequestMapping(value = "/{account_id}/msg/ussd",method = RequestMethod.GET)
@@ -114,6 +117,14 @@ public class UssdController extends AbstractAPIController {
         }
         String subaccountId = getSubaccountId(request);
         Page<MsgUserRequest> page = msgUserRequestService.findPageBySendTypeForGW(appId, subaccountId, ProductCode.msg_ussd.name(), pageNo, pageSize);
+        List<MsgUserRequest> result = page.getResult();
+        if(result != null && result.size() > 0){
+            List<MsgRequestVO> vos = new ArrayList<>();
+            for(MsgUserRequest re:result){
+                vos.add(new MsgRequestVO(re));
+            }
+            page.setResult(vos);
+        }
         return ApiGatewayResponse.success(page);
     }
 

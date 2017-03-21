@@ -111,7 +111,9 @@ public class MsgSendServiceImpl implements MsgSendService {
 
         //TODO 判断红黑名单
         tempId = tempId.trim();
-        tempArgs = tempArgs.trim();
+        if(StringUtils.isNotBlank(tempArgs)){
+            tempArgs = tempArgs.trim();
+        }
         MsgTemplate temp = msgTemplateService.findByTempId(appId, subaccountId, tempId, true);
         String tempContent = temp.getContent();
 
@@ -140,7 +142,7 @@ public class MsgSendServiceImpl implements MsgSendService {
         //判断号码运营商
         String operator = telnumLocationService.getOperator(mobile);
         //判断是否支持发送
-        if(!isSend( operator , MsgConstant.MSG_USSD )){
+        if(!isSend( operator , sendType )){
             //抛异常
             throw new MsgOperatorNotAvailableException();
         }
@@ -171,13 +173,13 @@ public class MsgSendServiceImpl implements MsgSendService {
         if(MsgConstant.SUCCESS.equals( resultOne.getResultCode() )) {
             // 计算每条费用
             //插入记录
-            MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,MsgConstant.MSG_USSD,mobile,msg,tempId,tempArgs,createTime,cost,MsgUserRequest.STATE_WAIT,createTime);
+            MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,sendType,mobile,msg,tempId,tempArgs,createTime,cost,MsgUserRequest.STATE_WAIT,createTime);
             msgUserRequestService.save(msgRequest);
-            MsgSendRecord msgSendRecord = new MsgSendRecord(key,app.getTenant().getId(),appId,subaccountId,resultOne.getTaskId(),mobile,MsgConstant.MSG_USSD,resultOne.getHandlers(),
+            MsgSendRecord msgSendRecord = new MsgSendRecord(key,app.getTenant().getId(),appId,subaccountId,resultOne.getTaskId(),mobile,sendType,resultOne.getHandlers(),
                     operator,msg,tempId,resultOne.getSupplierTempId(),tempArgs,createTime,cost,createTime);
             msgSendRecordService.save(msgSendRecord);
             MsgSendDetail msgSendDetail = new MsgSendDetail(key,app.getTenant().getId(),appId,subaccountId,resultOne.getTaskId(),msgSendRecord.getId(),mobile,msg,
-                    tempId,resultOne.getSupplierTempId(),tempArgs,createTime,cost,MsgConstant.MSG_USSD,resultOne.getHandlers(),operator,createTime);
+                    tempId,resultOne.getSupplierTempId(),tempArgs,createTime,cost,sendType,resultOne.getHandlers(),operator,createTime);
             msgSendDetailService.save(msgSendDetail);
             //插入消费记录
             if(msgRequest.getMsgCost().compareTo(BigDecimal.ZERO) == 1){
@@ -188,7 +190,7 @@ public class MsgSendServiceImpl implements MsgSendService {
                 this.batchConsumeMsg(createTime,sendType,cost,product.getRemark(),appId,msgRequest.getTenantId(),subaccountId,ids);
             }
         }else{
-            MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,MsgConstant.MSG_USSD,mobile,msg,tempId,tempArgs,new Date(),cost,MsgUserRequest.STATE_FAIL,createTime);
+            MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,sendType,mobile,msg,tempId,tempArgs,new Date(),cost,MsgUserRequest.STATE_FAIL,createTime);
             msgUserRequestService.save(msgRequest);
         }
         logger.info("发送器："+resultOne.getHandlers()+"|发送类型：单发闪印|手机号码："+mobile+"|模板id："+tempId+"|模板参数："+tempArgs+"|短信内容："+msg+"|发送结果："+resultOne.toString2());
@@ -222,7 +224,9 @@ public class MsgSendServiceImpl implements MsgSendService {
             sendTime = new Date();
         }
         tempId = tempId.trim();
-        tempArgs = tempArgs.trim();
+        if(StringUtils.isNotBlank(tempArgs)){
+            tempArgs = tempArgs.trim();
+        }
         MsgTemplate temp = msgTemplateService.findByTempId(appId, subaccountId, tempId, true);
         if(temp == null){
             //抛异常
@@ -244,7 +248,7 @@ public class MsgSendServiceImpl implements MsgSendService {
         }
 
         //检查有效号码-并按运营商处理
-        MassMobile massMobile = vaildMobiles(mobiles,MsgConstant.MSG_USSD);
+        MassMobile massMobile = vaildMobiles(mobiles,sendType);
         if(massMobile.getCountVaild() > MsgConstant.MaxNum){
             //抛异常
             throw new MsgMobileNumTooLargeException();
@@ -270,12 +274,12 @@ public class MsgSendServiceImpl implements MsgSendService {
         }
 
         if(massMobile.getUnicom().size() > 0){//处理联通号码
-            List<String> mobileList = massMobile.getMobile();
+            List<String> mobileList = massMobile.getUnicom();
             sendMassByOperator(app.getTenant().getId(),appId,subaccountId,taskName, tempId, tempArgs, sendType, sendTime, msg, key, list, mobileList, MsgConstant.ChinaUnicom,cost,createTime);
         }
 
         if(massMobile.getTelecom().size() > 0){//处理电信号码
-            List<String> mobileList = massMobile.getMobile();
+            List<String> mobileList = massMobile.getTelecom();
             sendMassByOperator(app.getTenant().getId(),appId,subaccountId,taskName, tempId, tempArgs, sendType, sendTime, msg, key, list, mobileList, MsgConstant.ChinaTelecom,cost,createTime);
         }
 
@@ -320,14 +324,26 @@ public class MsgSendServiceImpl implements MsgSendService {
             //批量扣费
             ProductCode product = ProductCode.valueOf(sendType);
             this.batchConsumeMsg(createTime,sendType,cost,product.getRemark(),appId,tenantId,subaccountId,detailIds);
+        }else{
+            ResultMass mass = new ResultMass();
+            mass.setBadPhones(mobileList);
+            mass.setFailNum(mobileList.size());
+            mass.setPendingNum(0);
+            mass.setSumNum(0);
+            list.add(mass);
         }
     }
 
     public String getMsg(String temp,String arg){
         //判断有几个参数替换符
         int count = countStr(temp,MsgConstant.REPLACE_SYMBOL);
-        String[] args = arg.split(MsgConstant.ParamRegexStr);
-        if(count != args.length){
+        int argsLength = 0;
+        String[] args = null;
+        if(StringUtils.isNotBlank(arg)){
+            args = arg.split(MsgConstant.ParamRegexStr);
+            argsLength = args.length;
+        }
+        if(count != argsLength){
             return null;
         }else{
             return repStr(temp,MsgConstant.REPLACE_SYMBOL,args);

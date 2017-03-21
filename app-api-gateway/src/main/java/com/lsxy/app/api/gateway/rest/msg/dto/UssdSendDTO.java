@@ -2,11 +2,15 @@ package com.lsxy.app.api.gateway.rest.msg.dto;
 
 import com.lsxy.app.api.gateway.dto.CommonDTO;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * Created by liups on 2017/3/9.
  */
 public class UssdSendDTO extends CommonDTO {
+    @NotNull
     private String mobile;
+    @NotNull
     private String tempId;
     private String tempArgs;
 
