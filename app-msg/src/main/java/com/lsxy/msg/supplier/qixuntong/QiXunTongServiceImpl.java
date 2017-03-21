@@ -60,7 +60,7 @@ public class QiXunTongServiceImpl extends AbstractSupplierSendServiceImpl {
                 //TODO 抛异常
             }
             long delay = sendTime.getTime() - new Date().getTime();
-            if(delay < 0){
+            if(delay <= 0){
                 String mobilesStr = StringUtils.join(mobiles, QiXunTongConstant.QiXunTongNumRegexStr);
                 String result = getQiXinTongClient().sendTempleMSM(taskName,tempId, msg ,  mobilesStr);
                 logger.info("调用[企信通][群发][模板短信]结果:"+ result);

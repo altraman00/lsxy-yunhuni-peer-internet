@@ -320,14 +320,26 @@ public class MsgSendServiceImpl implements MsgSendService {
             //批量扣费
             ProductCode product = ProductCode.valueOf(sendType);
             this.batchConsumeMsg(createTime,sendType,cost,product.getRemark(),appId,tenantId,subaccountId,detailIds);
+        }else{
+            ResultMass mass = new ResultMass();
+            mass.setBadPhones(mobileList);
+            mass.setFailNum(mobileList.size());
+            mass.setPendingNum(0);
+            mass.setSumNum(0);
+            list.add(mass);
         }
     }
 
     public String getMsg(String temp,String arg){
         //判断有几个参数替换符
         int count = countStr(temp,MsgConstant.REPLACE_SYMBOL);
-        String[] args = arg.split(MsgConstant.ParamRegexStr);
-        if(count != args.length){
+        int argsLength = 0;
+        String[] args = null;
+        if(StringUtils.isNotBlank(arg)){
+            args = arg.split(MsgConstant.ParamRegexStr);
+            argsLength = args.length;
+        }
+        if(count != argsLength){
             return null;
         }else{
             return repStr(temp,MsgConstant.REPLACE_SYMBOL,args);
