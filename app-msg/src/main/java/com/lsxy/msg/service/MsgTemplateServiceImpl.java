@@ -3,6 +3,7 @@ package com.lsxy.msg.service;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.exceptions.api.msg.MsgTemplateErrorException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.exceptions.api.RequestIllegalArgumentException;
@@ -105,7 +106,7 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
         if(StringUtils.isNotBlank(subaccountId) || isGW){
             MsgTemplate msgTemplate = msgTemplateDao.findByAppIdAndSubaccountIdAndTempId(appId,subaccountId,tempId);
             if(isGW && msgTemplate == null){
-                throw new RequestIllegalArgumentException();
+                throw new MsgTemplateErrorException();
             }
             return msgTemplate;
         }else{
