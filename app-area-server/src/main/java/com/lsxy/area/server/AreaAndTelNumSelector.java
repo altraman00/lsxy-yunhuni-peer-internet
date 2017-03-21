@@ -1,10 +1,7 @@
 package com.lsxy.area.server;
 
 import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.core.exceptions.api.AppOffLineException;
-import com.lsxy.framework.core.exceptions.api.NotAvailableLineException;
-import com.lsxy.framework.core.exceptions.api.UserNumberHasNotAvailableLineException;
-import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
+import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.config.model.Area;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
@@ -69,23 +66,36 @@ public class AreaAndTelNumSelector {
      * @throws YunhuniApiException
      */
     public ResourceTelenum getTelnumber(String subaccountId, App app) throws YunhuniApiException {
-        //查找租户私有线路
-        List<LineGatewayVO> lineGateways = lineGatewayToTenantService.findByTenantIdAndAreaId(app.getTenant().getId(),app.getAreaId());
-        if(lineGateways == null || lineGateways.size() == 0){
-            //如果没有私有线路，找公共线路
-            lineGateways = lineGatewayToPublicService.findAllLineGatewayByAreaId(app.getAreaId());
-        }
-        if(lineGateways == null || lineGateways.size() == 0){
-            //TODO 没有线路，则抛出异常
-            throw new NotAvailableLineException();
-        }
-        //所拥有的线路ID列表
-        List<String> lineIds = lineGateways.stream().map(LineGatewayVO::getId).collect(Collectors.toList());
-        List<ResourceTelenum> telnumbers = resourceTelenumService.findDialingTelnumber(subaccountId,lineIds,app);
-        if(telnumbers != null && telnumbers.size() > 0){
-            return telnumbers.get(0);
+        if(app.getStatus() == app.STATUS_ONLINE){
+            //查找租户私有线路
+            List<LineGatewayVO> lineGateways = lineGatewayToTenantService.findByTenantIdAndAreaId(app.getTenant().getId(),app.getAreaId());
+            if(lineGateways == null || lineGateways.size() == 0){
+                //如果没有私有线路，找公共线路
+                lineGateways = lineGatewayToPublicService.findAllLineGatewayByAreaId(app.getAreaId());
+            }
+            if(lineGateways == null || lineGateways.size() == 0){
+                //TODO 没有线路，则抛出异常
+                throw new NotAvailableLineException();
+            }
+            //所拥有的线路ID列表
+            List<String> lineIds = lineGateways.stream().map(LineGatewayVO::getId).collect(Collectors.toList());
+            List<ResourceTelenum> telnumbers = resourceTelenumService.findDialingTelnumber(subaccountId,lineIds,app);
+            if(telnumbers != null && telnumbers.size() > 0){
+                return telnumbers.get(0);
+            }else{
+                return null;
+            }
         }else{
-            return null;
+                ResourceTelenum callNum = null;
+                //获取测试用的号码
+                String testNum = SystemConfig.getProperty("portal.test.call.number");
+                if(StringUtils.isNotBlank(testNum)){
+                    callNum = resourceTelenumService.findByTelNumber(testNum);
+                }
+                if(callNum == null){
+                    throw new UserNumberHasNotAvailableLineException();
+                }
+                return callNum;
         }
     }
 
@@ -172,7 +182,7 @@ public class AreaAndTelNumSelector {
                     addToTelnumSortEntity(to1, lineGateways, toNum, callNum);
                 }
             }else{
-                throw new AppOffLineException();
+                throw new NumberNotAllowToCallException();
             }
         }
         selector = new Selector(app.getAreaId(),toNum,to1Num,to2Num);
