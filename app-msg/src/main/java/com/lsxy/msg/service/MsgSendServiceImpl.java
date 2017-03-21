@@ -111,7 +111,9 @@ public class MsgSendServiceImpl implements MsgSendService {
 
         //TODO 判断红黑名单
         tempId = tempId.trim();
-        tempArgs = tempArgs.trim();
+        if(StringUtils.isNotBlank(tempArgs)){
+            tempArgs = tempArgs.trim();
+        }
         MsgTemplate temp = msgTemplateService.findByTempId(appId, subaccountId, tempId, true);
         String tempContent = temp.getContent();
 
@@ -222,7 +224,9 @@ public class MsgSendServiceImpl implements MsgSendService {
             sendTime = new Date();
         }
         tempId = tempId.trim();
-        tempArgs = tempArgs.trim();
+        if(StringUtils.isNotBlank(tempArgs)){
+            tempArgs = tempArgs.trim();
+        }
         MsgTemplate temp = msgTemplateService.findByTempId(appId, subaccountId, tempId, true);
         if(temp == null){
             //抛异常
