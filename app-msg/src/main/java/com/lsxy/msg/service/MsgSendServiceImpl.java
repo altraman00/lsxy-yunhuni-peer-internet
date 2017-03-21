@@ -142,7 +142,7 @@ public class MsgSendServiceImpl implements MsgSendService {
         //判断号码运营商
         String operator = telnumLocationService.getOperator(mobile);
         //判断是否支持发送
-        if(!isSend( operator , MsgConstant.MSG_USSD )){
+        if(!isSend( operator , sendType )){
             //抛异常
             throw new MsgOperatorNotAvailableException();
         }
@@ -173,13 +173,13 @@ public class MsgSendServiceImpl implements MsgSendService {
         if(MsgConstant.SUCCESS.equals( resultOne.getResultCode() )) {
             // 计算每条费用
             //插入记录
-            MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,MsgConstant.MSG_USSD,mobile,msg,tempId,tempArgs,createTime,cost,MsgUserRequest.STATE_WAIT,createTime);
+            MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,sendType,mobile,msg,tempId,tempArgs,createTime,cost,MsgUserRequest.STATE_WAIT,createTime);
             msgUserRequestService.save(msgRequest);
-            MsgSendRecord msgSendRecord = new MsgSendRecord(key,app.getTenant().getId(),appId,subaccountId,resultOne.getTaskId(),mobile,MsgConstant.MSG_USSD,resultOne.getHandlers(),
+            MsgSendRecord msgSendRecord = new MsgSendRecord(key,app.getTenant().getId(),appId,subaccountId,resultOne.getTaskId(),mobile,sendType,resultOne.getHandlers(),
                     operator,msg,tempId,resultOne.getSupplierTempId(),tempArgs,createTime,cost,createTime);
             msgSendRecordService.save(msgSendRecord);
             MsgSendDetail msgSendDetail = new MsgSendDetail(key,app.getTenant().getId(),appId,subaccountId,resultOne.getTaskId(),msgSendRecord.getId(),mobile,msg,
-                    tempId,resultOne.getSupplierTempId(),tempArgs,createTime,cost,MsgConstant.MSG_USSD,resultOne.getHandlers(),operator,createTime);
+                    tempId,resultOne.getSupplierTempId(),tempArgs,createTime,cost,sendType,resultOne.getHandlers(),operator,createTime);
             msgSendDetailService.save(msgSendDetail);
             //插入消费记录
             if(msgRequest.getMsgCost().compareTo(BigDecimal.ZERO) == 1){
@@ -248,7 +248,7 @@ public class MsgSendServiceImpl implements MsgSendService {
         }
 
         //检查有效号码-并按运营商处理
-        MassMobile massMobile = vaildMobiles(mobiles,MsgConstant.MSG_USSD);
+        MassMobile massMobile = vaildMobiles(mobiles,sendType);
         if(massMobile.getCountVaild() > MsgConstant.MaxNum){
             //抛异常
             throw new MsgMobileNumTooLargeException();
