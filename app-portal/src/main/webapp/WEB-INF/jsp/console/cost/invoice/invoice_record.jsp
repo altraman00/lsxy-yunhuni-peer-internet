@@ -222,7 +222,7 @@
                                                     </c:if>
                                                     <c:if test="${result.status == 2}">
                                                         <span class="nosuccess" data-toggle="tooltip" title="审核不通过原因:${result.reason}">
-                                                            异常<i class="fa fa-exclamation-triangle tips-warning"></i>
+                                                            异常<i class="iconfont icon-uc_no_pass"></i>
                                                         </span>
                                                     </c:if>
                                                 </td>

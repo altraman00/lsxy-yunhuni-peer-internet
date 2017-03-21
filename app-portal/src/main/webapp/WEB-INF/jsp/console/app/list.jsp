@@ -95,7 +95,7 @@
                                                 <c:if test="${result.status==4}">
                                                     <%--<span style="color:#ff0000;" id="statusapp-${result.id}" title="不通过的原因：${result.reason}">审核不通过</span>--%>
                                                     <span class="nosuccess" id="statusapp-${result.id}" data-toggle="tooltip" title="不通过的原因:${result.reason}">
-                                                            审核不通过<i class="fa fa-exclamation-triangle"></i>
+                                                            审核不通过 <i class="iconfont icon-uc_no_pass"></i>
                                                         </span>
                                                 </c:if>
 
