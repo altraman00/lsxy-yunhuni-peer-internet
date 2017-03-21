@@ -27,6 +27,9 @@ public class ResultAllMass extends BaseResult {
         }else{
             this.invalidPhones = new ArrayList<>();
         }
+        if(this.pendingPhones == null){
+            this.pendingPhones = new ArrayList<>();
+        }
         for (int i = 0; i < list.size(); i++) {
             ResultMass resultMass = list.get(i);
             // 一开始的所有号码为所有等待的号码
@@ -35,6 +38,9 @@ public class ResultAllMass extends BaseResult {
             this.failNum += resultMass.getFailNum();
             if(resultMass.getBadPhones() != null){
                 this.invalidPhones.addAll(resultMass.getBadPhones());//上游不通过的号码也算无效号码，不存数据库
+            }
+            if(resultMass.getPendingPhones() != null){
+                this.pendingPhones.addAll(resultMass.getPendingPhones());
             }
 
             if( !MsgConstant.SUCCESS.equals( resultMass.getResultCode() )) {

@@ -320,6 +320,13 @@ public class MsgSendServiceImpl implements MsgSendService {
             //批量扣费
             ProductCode product = ProductCode.valueOf(sendType);
             this.batchConsumeMsg(createTime,sendType,cost,product.getRemark(),appId,tenantId,subaccountId,detailIds);
+        }else{
+            ResultMass mass = new ResultMass();
+            mass.setBadPhones(mobileList);
+            mass.setFailNum(mobileList.size());
+            mass.setPendingNum(0);
+            mass.setSumNum(0);
+            list.add(mass);
         }
     }
 
