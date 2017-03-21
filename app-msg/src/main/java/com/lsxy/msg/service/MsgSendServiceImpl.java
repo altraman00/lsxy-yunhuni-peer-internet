@@ -333,8 +333,13 @@ public class MsgSendServiceImpl implements MsgSendService {
     public String getMsg(String temp,String arg){
         //判断有几个参数替换符
         int count = countStr(temp,MsgConstant.REPLACE_SYMBOL);
-        String[] args = arg.split(MsgConstant.ParamRegexStr);
-        if(count != args.length){
+        int argsLength = 0;
+        String[] args = null;
+        if(StringUtils.isNotBlank(arg)){
+            args = arg.split(MsgConstant.ParamRegexStr);
+            argsLength = args.length;
+        }
+        if(count != argsLength){
             return null;
         }else{
             return repStr(temp,MsgConstant.REPLACE_SYMBOL,args);
