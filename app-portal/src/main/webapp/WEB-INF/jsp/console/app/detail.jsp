@@ -477,9 +477,9 @@
                                                     </div>
                                                     <div class="col-md-9">
                                                         <p>
-                                                            <input type="radio" id="ussd2" disabled value="ussd" v-model="type" name="type">
+                                                            <input type="radio" id="ussd2" disabled value="msg_ussd" v-model="type" name="type">
                                                             <label for="ussd2">闪印</label>
-                                                            <input type="radio" id="sms2" disabled value="sms" v-model="type" name="type">
+                                                            <input type="radio" id="sms2" disabled value="msg_sms" v-model="type" name="type">
                                                             <label for="sms2">短信</label>
                                                         </p>
                                                     </div>
@@ -1038,9 +1038,9 @@
                 <div class="row margin-bottom-10">
                     <lable class="col-md-3 text-right line-height-32">模板类型：</lable>
                     <div class="col-md-8 remove-padding-right">
-                        <input type="radio" id="ussd" checked value="ussd" v-model="type" name="type">
+                        <input type="radio" id="ussd" checked value="msg_ussd" v-model="type" name="type">
                         <label for="ussd">闪印</label>
-                        <input type="radio" id="sms" value="sms" v-model="type" name="type">
+                        <input type="radio" id="sms" value="msg_sms" v-model="type" name="type">
                         <label for="sms">短信</label>
                         <br>
                     </div>
@@ -1566,14 +1566,14 @@
     var createSeven = new Vue({
         el:'#createSeven',
         data:{
-            type:'ussd',
+            type:'msg_ussd',
             name:'',
             content:'',
             remark:''
         },
         methods:{
             init:function(){
-                this.type='ussd';
+                this.type='msg_ussd';
                 this.name=this.content=this.remark='';
             }
         }
@@ -2714,7 +2714,7 @@
         for(var i =0 ; i<data.length; i++){
             html +='<tr id="template-'+ data[i].id +'">' +
                 '<td class="">' + data[i].tempId + '</td>' +
-                '<td class="">'+ (data[i].type == 'sms'?'短信':( data[i].type=='ussd'?'闪印':'未知')) +'</td>' +
+                '<td class="">'+ (data[i].type == 'msg_sms'?'短信':( data[i].type=='msg_ussd'?'闪印':'未知')) +'</td>' +
                 '<td class="">'+ data[i].name +'</td>' +
                 '<td class="">'+ (data[i].content) +'</td>' +
                 '<td class="">'+ (data[i].certId) +'</td>';

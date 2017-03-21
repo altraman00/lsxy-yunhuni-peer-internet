@@ -115,7 +115,7 @@ public class MessageSapiSdk extends SapiSdkConfig {
      * tempArgs 模板内容
      * sendTime 手机号码集合
      */
-    public String  MsgUssdSend(String appId,String taskName, String tempId, String mobiles, String tempArgs, String sendTime) throws IOException, NoSuchAlgorithmException, InvalidKeyException, KeyManagementException {
+    public String  MsgUssdMassTask(String appId,String taskName, String tempId, String mobiles, String tempArgs, String sendTime) throws IOException, NoSuchAlgorithmException, InvalidKeyException, KeyManagementException {
         Map<String,Object> params = new HashMap<String,Object>();
         params.put("taskName",taskName);
         params.put("tempId",tempId);
@@ -161,7 +161,7 @@ public class MessageSapiSdk extends SapiSdkConfig {
      * tempArgs 模板内容
      * sendTime 手机号码集合
      */
-    public String  MsgSmsSend(String appId,String taskName, String tempId, String mobiles, String tempArgs, String sendTime) throws IOException, NoSuchAlgorithmException, InvalidKeyException, KeyManagementException {
+    public String  MsgSmsMassTask(String appId,String taskName, String tempId, String mobiles, String tempArgs, String sendTime) throws IOException, NoSuchAlgorithmException, InvalidKeyException, KeyManagementException {
         Map<String,Object> params = new HashMap<String,Object>();
         params.put("taskName",taskName);
         params.put("tempId",tempId);
