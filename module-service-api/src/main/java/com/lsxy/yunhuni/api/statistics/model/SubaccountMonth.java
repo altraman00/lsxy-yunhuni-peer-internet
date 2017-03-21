@@ -25,10 +25,12 @@ public class SubaccountMonth extends IdEntity {
     private BigDecimal amongAmount;
     private Long amongDuration;
     private Long voiceUsed;
-    private Long msgUsed;
+    private Long ussdUsed;
+    private Long smsUser;
     private Long voiceQuotaValue;
     private Long msgQuotaValue;
-
+    private Long smsQuotaValue;
+    private Long ussdQuotaValue;
 
     @Column(name = "app_id")
     public String getAppId() {
@@ -101,15 +103,25 @@ public class SubaccountMonth extends IdEntity {
     public void setVoiceUsed(Long voiceUsed) {
         this.voiceUsed = voiceUsed;
     }
-
-    @Column(name = "msg_used")
-    public Long getMsgUsed() {
-        return msgUsed;
+    @Column(name = "ussd_used")
+    public Long getUssdUsed() {
+        return ussdUsed;
     }
 
-    public void setMsgUsed(Long msgUsed) {
-        this.msgUsed = msgUsed;
+    public void setUssdUsed(Long ussdUsed) {
+        this.ussdUsed = ussdUsed;
     }
+    @Column(name = "sms_used")
+    public Long getSmsUser() {
+        return smsUser;
+    }
+
+    public void setSmsUser(Long smsUser) {
+        this.smsUser = smsUser;
+    }
+
+
+
 
     @Column(name = "voice_quota_value")
     public Long getVoiceQuotaValue() {
@@ -127,5 +139,21 @@ public class SubaccountMonth extends IdEntity {
 
     public void setMsgQuotaValue(Long msgQuotaValue) {
         this.msgQuotaValue = msgQuotaValue;
+    }
+    @Column(name = "sms_quota_value")
+    public Long getSmsQuotaValue() {
+        return smsQuotaValue;
+    }
+
+    public void setSmsQuotaValue(Long smsQuotaValue) {
+        this.smsQuotaValue = smsQuotaValue;
+    }
+    @Column(name = "ussd_quota_value")
+    public Long getUssdQuotaValue() {
+        return ussdQuotaValue;
+    }
+
+    public void setUssdQuotaValue(Long ussdQuotaValue) {
+        this.ussdQuotaValue = ussdQuotaValue;
     }
 }
