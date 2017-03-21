@@ -23,20 +23,20 @@ public class MessageSapiSdk extends SapiSdkConfig {
     //POST ${BASE_URL}/msg/template/{tempId} 修改模板
     //DELETE ${BASE_URL}/msg/template/{tempId} 删除模板
     //GET ${BASE_URL}/msg/template[/{tempId}] 查询模板
-    public static final String msg_template =  "/msg/template";
+    public static final String msg_template =  "msg/template";
 
     // POST ${BASE_URL}/msg/ussd/send 发送USSD模板短信
     // POST ${BASE_URL}/msg/ussd/mass/task 群发模板闪印任务接口
     // GET ${BASE_URL}/msg/ussd[/{msgKey}] 发送结果查询
-    public static final String msg_ussd_send =  "/msg/ussd/send";
-    public static final String msg_ussd_mass_task =  "/msg/ussd/mass/task";
-    public static final String msg_ussd =  "/msg/ussd";
+    public static final String msg_ussd_send =  "msg/ussd/send";
+    public static final String msg_ussd_mass_task =  "msg/ussd/mass/task";
+    public static final String msg_ussd =  "msg/ussd";
     // POST ${BASE_URL}/msg/sms/send 模板短信单发
     // POST ${BASE_URL}/msg/sms/mass/task 模板短信群发
     // GET ${BASE_URL}/msg/sms[/{msgKey}] 发送结果查询
-    public static final String msg_sms_send =  "/msg/sms/send";
-    public static final String msg_sms_mass_task =  "/msg/sms/mass/task";
-    public static final String msg_sms=  "/msg/sms";
+    public static final String msg_sms_send =  "msg/sms/send";
+    public static final String msg_sms_mass_task =  "msg/sms/mass/task";
+    public static final String msg_sms=  "msg/sms";
     /**
      * 发送USSD模板短信
      */
