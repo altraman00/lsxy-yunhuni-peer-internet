@@ -154,7 +154,7 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
         }
 
         String sql = "SELECT REPLACE(UUID(), '-', '') AS id,a.app_id,a.tenant_id,a.id AS subaccount_id ,? AS dt, ? AS day , IFNULL(c.among_amount,0) AS among_amount, IFNULL(b.among_duration,0) AS among_duration," +
-                "IFNULL(c.among_sms,0) AS among_sms, IFNULL(b.among_ussd,0) AS among_ussd,"+
+                "IFNULL(d.among_sms,0) AS among_sms, IFNULL(d.among_ussd,0) AS among_ussd,"+
                 "IFNULL((SELECT da.voice_used FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day da WHERE da.subaccount_id = a.id AND da.dt = ?),0) + IFNULL(b.among_duration,0) AS voice_used," +
                 "IFNULL((SELECT da.sms_used FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day da WHERE da.subaccount_id = a.id AND da.dt = ?),0) + IFNULL(d.among_sms,0) AS sms_used, " +
                 "IFNULL((SELECT da.ussd_used FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day da WHERE da.subaccount_id = a.id AND da.dt = ?),0) + IFNULL(d.among_ussd,0) AS ussd_used,  " +

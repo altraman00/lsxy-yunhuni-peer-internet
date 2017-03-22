@@ -147,13 +147,13 @@ public class SubaccountMonthServiceImpl extends AbstractService<SubaccountMonth>
                 "? AS create_time, ? AS last_time, 0 AS deleted,0 AS sortno,0 AS version "+
                 "FROM (SELECT p.tenant_id ,s.app_id ,p.id FROM db_lsxy_bi_yunhuni.tb_bi_api_cert p INNER JOIN db_lsxy_bi_yunhuni.tb_bi_api_cert_subaccount s ON p.id = s.id WHERE p.deleted = 0) a " +
                 "LEFT JOIN " +
-                "(SELECT tenant_id,app_id,subaccount_id,SUM(among_duration) AS among_duration,SUM(among_amount) AS among_amount  " +
+                "(SELECT tenant_id,app_id,subaccount_id,SUM(among_duration) AS among_duration,SUM(among_amount) AS among_amount,SUM(among_sms) AS among_sms,SUM(among_ussd) AS among_ussd  " +
                 "FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day WHERE dt >= ?  AND dt < ? GROUP BY tenant_id,app_id,subaccount_id) b " +
                 "ON a.id = b.subaccount_id";
         Query query = getEm().createNativeQuery(sql);
 
         Object[] obj = new Object[]{
-                staticsDate,month,preDate,currentDate,currentDate,staticsDate,nextDate
+                staticsDate,month,preDate,preDate,preDate,currentDate,currentDate,staticsDate,nextDate
         };
         for(int i=0;i<obj.length;i++){
             query.setParameter(i+1,obj[i]);
