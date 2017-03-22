@@ -24,6 +24,8 @@ public class SubaccountMonth extends IdEntity {
     private Integer month;
     private BigDecimal amongAmount;
     private Long amongDuration;
+    private Long amongSms;
+    private Long amongUssd;
     private Long voiceUsed;
     private Long msgUsed;
     private Long ussdUsed;
@@ -94,6 +96,25 @@ public class SubaccountMonth extends IdEntity {
 
     public void setAmongDuration(Long amongDuration) {
         this.amongDuration = amongDuration;
+    }
+
+
+    @Column(name = "among_sms")
+    public Long getAmongSms() {
+        return amongSms;
+    }
+
+    public void setAmongSms(Long amongSms) {
+        this.amongSms = amongSms;
+    }
+
+    @Column(name = "among_ussd")
+    public Long getAmongUssd() {
+        return amongUssd;
+    }
+
+    public void setAmongUssd(Long amongUssd) {
+        this.amongUssd = amongUssd;
     }
 
     @Column(name = "voice_used")

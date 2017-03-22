@@ -263,7 +263,8 @@
                                     <!-- 放音文件-->
                                     <div class="tab-pane fade<c:if test="${app.serviceType=='voice'}"> in active</c:if>" id="play">
                                         <p class="application_info">
-                                            当您的应用需要开通语音通知、自定义IVR或者云呼叫中心时，请上传语音文件至放音媒体库，语音文件均需要审核
+                                            1.当您的应用需要开通语音通知、自定义IVR或者呼叫中心时，请上传语音文件至放音媒体库，语音文件均需要审核。
+                                            2.只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、8位）后再上传,单条语音最大支持 5M。详情请查看<a href="#" onclick="window.open('${globalWebsite}/develop/book/platform?page=playvoicefile')">放音文件上传说明</a>
                                         </p>
                                         <div class="form-group">
                                             <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="文件名" id="name"/></div>

@@ -42,7 +42,7 @@ public class BillDetailController extends AbstractPortalController {
     public ModelAndView sms(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize,
                             @RequestParam(defaultValue = "1") Integer pageNo1, @RequestParam(defaultValue = "20") Integer pageSize1,
                             String start,String end, String appId,String isMass,String taskName,String mobile,String msgKey,String state,String mobile1){
-        String sendType = "sms";
+        String sendType = "msg_sms";
         return toMsg(request,pageNo,pageSize,pageNo1,pageSize1,start,end,appId,isMass,taskName,mobile,msgKey,state,mobile1,sendType);
     }
     /**闪印*/
@@ -50,7 +50,7 @@ public class BillDetailController extends AbstractPortalController {
     public ModelAndView ussd(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize,
                              @RequestParam(defaultValue = "1") Integer pageNo1, @RequestParam(defaultValue = "20") Integer pageSize1,
                              String start,String end, String appId,String isMass,String taskName,String mobile,String msgKey,String state,String mobile1){
-        String sendType = "ussd";
+        String sendType = "msg_ussd";
         return toMsg(request,pageNo,pageSize,pageNo1,pageSize1,start,end,appId,isMass,taskName,mobile,msgKey,state,mobile1,sendType);
     }
     private ModelAndView toMsg(HttpServletRequest request, Integer pageNo, Integer pageSize,
@@ -113,7 +113,7 @@ public class BillDetailController extends AbstractPortalController {
                 MsgUserRequest msgUserRequest = result.getData();
                 if(msgUserRequest != null){
                     String title = "msg".equals(msgUserRequest.getSendType())?"短信":"闪印" ;
-                    String one = "任务名字："+msgUserRequest.getTaskName()+"  任务状态："+( msgUserRequest.getState()==MsgUserRequest.STATE_FAIL ? "任务失败":(msgUserRequest.getState()==MsgUserRequest.STATE_SUCCESS?"任务结束":"待处理"))+"  成功数："+msgUserRequest.getSuccNum()+" 失败数："+msgUserRequest.getFailNum()+" 待发数："+msgUserRequest.getPendingNum();
+                    String one = "任务名字："+msgUserRequest.getTaskName()+"  任务状态："+( msgUserRequest.getState()==MsgUserRequest.STATE_FAIL ? "任务失败":(msgUserRequest.getState()==MsgUserRequest.STATE_SUCCESS?"任务结束":"待处理"))+"  成功数："+(msgUserRequest.getSuccNum()!=null?msgUserRequest.getSuccNum():0)+" 失败数："+(msgUserRequest.getFailNum()!=null?msgUserRequest.getFailNum():0)+" 待发数："+(msgUserRequest.getPendingNum()!=null?msgUserRequest.getPendingNum():0);
                     String[] headers =  new String[]{"手机号码","发送结果","原因"};
                     String[] values = new String[]{"mobile","state:-1=发送失败;0=未发送;1=发送失败"};
                     String uri1 =  PortalConstants.REST_PREFIX_URL  + "/rest/msg_user_detail/list?msgKey={1}";

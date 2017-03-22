@@ -156,7 +156,7 @@
                                             <thead>
                                             <c:if test="${isMass==1}">
                                                 <tr>
-                                                    <th>序号</th>
+                                                    <th>编号</th>
                                                     <th>任务名称</th>
                                                     <th>任务状态</th>
                                                     <th>创建时间</th>
@@ -168,7 +168,7 @@
                                             </c:if>
                                             <c:if test="${isMass==0}">
                                                 <tr>
-                                                    <th>序号</th>
+                                                    <th>编号</th>
                                                     <th>创建时间</th>
                                                     <th>手机号码</th>
                                                     <th>发送内容</th>
@@ -196,7 +196,14 @@
                                                                 <fmt:formatDate value="${result.lastTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate>
                                                             </c:if>
                                                         </td>
-                                                        <td>成功数：${result.succNum}&nbsp;失败数：${result.failNum}&nbsp;待发数：${result.pendingNum}</td>
+                                                        <td><c:if test="${result.succNum == null}">0</c:if>
+                                                            <c:if test="${result.succNum != null}">${result.succNum}</c:if>
+                                                            &nbsp;失败数：
+                                                            <c:if test="${result.failNum == null}">0</c:if>
+                                                            <c:if test="${result.failNum != null}">${result.failNum}</c:if>
+                                                            &nbsp;待发数：
+                                                            <c:if test="${result.pendingNum == null}">0</c:if>
+                                                            <c:if test="${result.pendingNum != null}">${result.pendingNum}</c:if></td>
                                                         <td><span style="float:left;width: 80px" ><span style="float:right;" >￥<fmt:formatNumber value="${result.msgCost}" pattern="0.000"></fmt:formatNumber></span></span></td>
                                                         <td>
                                                             <a href="#" onclick="toDetail('${result.msgKey}')">详情</a>
