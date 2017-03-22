@@ -8,6 +8,7 @@ import com.lsxy.app.api.gateway.rest.msg.dto.SmsSendMassDTO;
 import com.lsxy.app.api.gateway.rest.msg.dto.UssdSendDTO;
 import com.lsxy.app.api.gateway.rest.msg.dto.UssdSendMassDTO;
 import com.lsxy.app.api.gateway.rest.msg.vo.MsgRequestVO;
+import com.lsxy.framework.core.exceptions.api.AppServiceInvalidException;
 import com.lsxy.framework.core.exceptions.api.IPNotInWhiteListException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.Page;
@@ -50,7 +51,10 @@ public class UssdController extends AbstractAPIController {
     public ApiGatewayResponse ussdSend(HttpServletRequest request, @Valid @RequestBody UssdSendDTO dto, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         App app = appService.findById(appId);
-        appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.USSD);
+        if(!appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.USSD)){
+            throw new AppServiceInvalidException();
+        }
+
         String ip = WebUtils.getRemoteAddress(request);
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
@@ -69,7 +73,9 @@ public class UssdController extends AbstractAPIController {
     public ApiGatewayResponse ussdSendMass(HttpServletRequest request, @Valid @RequestBody UssdSendMassDTO dto, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         App app = appService.findById(appId);
-        appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.USSD);
+        if(!appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.USSD)){
+            throw new AppServiceInvalidException();
+        }
         String ip = WebUtils.getRemoteAddress(request);
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
@@ -88,7 +94,9 @@ public class UssdController extends AbstractAPIController {
     public ApiGatewayResponse ussdSendMass(HttpServletRequest request, @PathVariable String msgKey, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         App app = appService.findById(appId);
-        appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.USSD);
+        if(!appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.USSD)){
+            throw new AppServiceInvalidException();
+        }
         String ip = WebUtils.getRemoteAddress(request);
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
@@ -107,7 +115,9 @@ public class UssdController extends AbstractAPIController {
                                            @RequestParam(defaultValue = "10") Integer pageSize) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         App app = appService.findById(appId);
-        appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.USSD);
+        if(!appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.USSD)){
+            throw new AppServiceInvalidException();
+        }
         String ip = WebUtils.getRemoteAddress(request);
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){

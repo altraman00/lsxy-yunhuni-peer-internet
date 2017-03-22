@@ -25,9 +25,9 @@ import java.security.cert.X509Certificate;
 public class HttpConnectionManager {
     private static final int maxTotalPool = 200;// 最大连接数
     private static final int maxConPerRoute = 200;// 每个路由最大连接数
-    private static final int socketTimeout = 2000;
-    private static final int connectionRequestTimeout = 3000;
-    private static final int connectTimeout = 1000;
+    private static final int socketTimeout = 8000;
+    private static final int connectionRequestTimeout = 10000;
+    private static final int connectTimeout = 8000;
 
     private static PoolingHttpClientConnectionManager cm = null;
 

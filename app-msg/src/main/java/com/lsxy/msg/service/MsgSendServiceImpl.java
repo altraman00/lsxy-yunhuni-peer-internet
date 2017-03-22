@@ -1,5 +1,6 @@
 package com.lsxy.msg.service;
 
+import com.lsxy.framework.core.exceptions.api.AppServiceInvalidException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.exceptions.api.msg.*;
 import com.lsxy.framework.core.utils.DateUtils;
@@ -103,11 +104,6 @@ public class MsgSendServiceImpl implements MsgSendService {
     @Transactional
     private String sendOne(String appId, String subaccountId, String mobile, String tempId, String tempArgs,String sendType) throws YunhuniApiException {
         App app = appService.findById(appId);
-        if(ProductCode.msg_sms.name().equals(sendType)){
-            appService.enabledService(app.getTenant().getId(),appId, ServiceType.SMS);
-        }else if(ProductCode.msg_ussd.name().equals(sendType)){
-            appService.enabledService(app.getTenant().getId(),appId, ServiceType.USSD);
-        }
 
         //TODO 判断红黑名单
         tempId = tempId.trim();
@@ -117,7 +113,7 @@ public class MsgSendServiceImpl implements MsgSendService {
         MsgTemplate temp = msgTemplateService.findByTempId(appId, subaccountId, tempId, true);
         String tempContent = temp.getContent();
 
-        if(temp == null){
+        if(temp == null|| MsgTemplate.STATUS_PASS != temp.getStatus()){
             // 抛异常
             throw new MsgTemplateErrorException();
         }
@@ -200,12 +196,6 @@ public class MsgSendServiceImpl implements MsgSendService {
     private String sendMass(String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr,String sendType) throws YunhuniApiException {
         App app = appService.findById(appId);
 
-        if(ProductCode.msg_sms.name().equals(sendType)){
-            appService.enabledService(app.getTenant().getId(),appId, ServiceType.SMS);
-        }else if(ProductCode.msg_ussd.name().equals(sendType)){
-            appService.enabledService(app.getTenant().getId(),appId, ServiceType.USSD);
-        }
-
         if(StringUtils.isEmpty( taskName )){
             // 抛异常
             throw new MsgTaskNameIsEmptyException();
@@ -228,7 +218,7 @@ public class MsgSendServiceImpl implements MsgSendService {
             tempArgs = tempArgs.trim();
         }
         MsgTemplate temp = msgTemplateService.findByTempId(appId, subaccountId, tempId, true);
-        if(temp == null){
+        if(temp == null || MsgTemplate.STATUS_PASS != temp.getStatus()){
             //抛异常
             throw new MsgTemplateErrorException();
         }
