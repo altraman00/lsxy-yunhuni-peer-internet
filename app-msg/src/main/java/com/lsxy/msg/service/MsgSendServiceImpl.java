@@ -406,9 +406,9 @@ public class MsgSendServiceImpl implements MsgSendService {
         boolean flag = false;
         if(MsgConstant.ChinaMobile.equals(operator)){//移动号码
             if(MsgConstant.MSG_USSD.equals(sendType)){//闪印
-                flag = true;
+                flag = false;
             }else if(MsgConstant.MSG_SMS.equals(sendType)){//短信
-                flag = true;
+                flag = false;
             }
         }else if(MsgConstant.ChinaUnicom.equals(operator )){//联通号码
             if(MsgConstant.MSG_USSD.equals(sendType)){//闪印
