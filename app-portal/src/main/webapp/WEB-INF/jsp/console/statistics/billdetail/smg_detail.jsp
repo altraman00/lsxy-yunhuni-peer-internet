@@ -10,7 +10,12 @@
                 <c:if test="${detail_1.state==1}">任务完成</c:if>
                 <c:if test="${detail_1.state==0}">待处理</c:if>
                 <c:if test="${detail_1.state==-1}">任务失败</c:if>&nbsp;&nbsp;&nbsp;&nbsp;
-                成功数：${detail_1.succNum}&nbsp;失败数：${detail_1.failNum}&nbsp;待发数：${detail_1.pendingNum}
+                成功数：<c:if test="${detail_1.succNum == null}">0</c:if>
+                <c:if test="${detail_1.succNum != null}">${detail_1.succNum}</c:if>&nbsp;失败数：
+                <c:if test="${detail_1.failNum == null}">0</c:if>
+                <c:if test="${detail_1.failNum != null}">${detail_1.failNum}</c:if>&nbsp;待发数：
+                <c:if test="${detail_1.pendingNum == null}">0</c:if>
+                <c:if test="${detail_1.pendingNum != null}">${detail_1.pendingNum}</c:if>
             </small>
         </div>
         <div class="row statistics_row" >
