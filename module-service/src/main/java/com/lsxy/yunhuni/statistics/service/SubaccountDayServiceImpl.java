@@ -135,12 +135,9 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
         int day = Integer.parseInt(dd);
         String dateStr = DateUtils.formatDate(date, "yyyy-MM-dd");
         Date staticsDate = DateUtils.parseDate(dateStr, "yyyy-MM-dd");
-        String statisticsDateStr = DateUtils.formatDate(staticsDate);
         Date preDate = DateUtils.getPreDate(staticsDate);
-        String preDateStr = DateUtils.formatDate(preDate);
         Date nextDate = DateUtils.nextDate(staticsDate);
-        String nextDateStr = DateUtils.formatDate(nextDate);
-        String currentDateStr = DateUtils.formatDate(new Date());
+        Date currentDate = new Date();
 
         //子账号最初开始有的日期2017-02-22，之前的日期不用算了
         Date firstStatisticsDate = DateUtils.parseDate("2017-02-22", "yyyy-MM-dd");
@@ -156,26 +153,47 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
             return;
         }
 
-        String sql = "SELECT REPLACE(UUID(), '-', '') AS id,a.app_id,a.tenant_id,a.id AS subaccount_id ,'"+statisticsDateStr+"' AS dt, "+ day +" AS day , IFNULL(c.among_amount,0) AS among_amount, IFNULL(b.among_duration,0) AS among_duration," +
-                "IFNULL((SELECT d.voice_used FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day d WHERE d.subaccount_id = a.id AND d.dt = '" + preDateStr + "'),0) + IFNULL(b.among_duration,0) AS voice_used, 0 AS msg_used ," +
+        String sql = "SELECT REPLACE(UUID(), '-', '') AS id,a.app_id,a.tenant_id,a.id AS subaccount_id ,? AS dt, ? AS day , IFNULL(c.among_amount,0) AS among_amount, IFNULL(b.among_duration,0) AS among_duration," +
+                "IFNULL((SELECT d.voice_used FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day d WHERE d.subaccount_id = a.id AND d.dt = ?),0) + IFNULL(b.among_duration,0) AS voice_used, 0 AS msg_used ," +
                 "IFNULL((SELECT qu.value FROM db_lsxy_bi_yunhuni.tb_bi_cert_account_quota qu WHERE qu.type='CallQuota' AND qu.cert_account_id = a.id LIMIT 1),0) AS voice_quota_value, -1 AS msg_quota_value ," +
-                "'"+currentDateStr + "' AS create_time, '"+ currentDateStr + "' AS last_time," + " 0 AS deleted,0 AS sortno,0 AS version "+
-                "FROM (SELECT p.tenant_id ,s.app_id ,p.id FROM db_lsxy_bi_yunhuni.tb_bi_api_cert p INNER JOIN db_lsxy_bi_yunhuni.tb_bi_api_cert_subaccount s ON p.id = s.id WHERE (p.deleted = 0 OR (p.deleted = 1 AND p.delete_time > '" + statisticsDateStr + "')) AND p.create_time < '" + nextDateStr +"') a " +
+                "? AS create_time, ? AS last_time, 0 AS deleted,0 AS sortno,0 AS version "+
+                "FROM (SELECT p.tenant_id ,s.app_id ,p.id FROM db_lsxy_bi_yunhuni.tb_bi_api_cert p INNER JOIN db_lsxy_bi_yunhuni.tb_bi_api_cert_subaccount s ON p.id = s.id WHERE (p.deleted = 0 OR (p.deleted = 1 AND p.delete_time > ?)) AND p.create_time < ?) a " +
                 "LEFT JOIN " +
                 "(SELECT tenant_id,app_id,subaccount_id,SUM(cost_time_long) AS among_duration  " +
-                "FROM db_lsxy_bi_yunhuni.tb_bi_voice_cdr WHERE call_end_dt >= '" + statisticsDateStr + "'  AND call_end_dt < '" + nextDateStr + "' GROUP BY tenant_id,app_id,subaccount_id) b " +
+                "FROM db_lsxy_bi_yunhuni.tb_bi_voice_cdr WHERE call_end_dt >= ?  AND call_end_dt < ? GROUP BY tenant_id,app_id,subaccount_id) b " +
                 "ON a.id = b.subaccount_id AND a.tenant_id = b.tenant_id AND a.app_id = b.app_id " +
                 "LEFT JOIN " +
                 "(SELECT tenant_id,app_id,subaccount_id,SUM(amount) AS among_amount " +
-                "FROM db_lsxy_bi_yunhuni.tb_bi_consume WHERE dt >= '" + statisticsDateStr + "' AND dt < '" + nextDateStr + "' GROUP BY tenant_id,app_id,subaccount_id) c " +
+                "FROM db_lsxy_bi_yunhuni.tb_bi_consume WHERE dt >= ? AND dt < ? GROUP BY tenant_id,app_id,subaccount_id) c " +
                 "ON a.id = c.subaccount_id AND a.tenant_id = c.tenant_id AND a.app_id = c.app_id " ;
 
         Query query = getEm().createNativeQuery(sql);
+
+        Object[] obj = new Object[]{
+                staticsDate,day,preDate,currentDate,currentDate,
+                staticsDate,nextDate,staticsDate,
+                nextDate,staticsDate,nextDate
+        };
+        for(int i=0;i<obj.length;i++){
+            query.setParameter(i+1,obj[i]);
+        }
+
         List result = query.getResultList();
         if(result != null && result.size() >0){
 
-            String insertSql = "INSERT INTO db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day (id,app_id,tenant_id,subaccount_id,dt,day,among_amount,among_duration,voice_used," +
-                    "msg_used,voice_quota_value,msg_quota_value,create_time,last_time,deleted,sortno,version) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            String values = "id,app_id,tenant_id,subaccount_id,dt,day,among_amount,among_duration,voice_used," +
+                    "msg_used,voice_quota_value,msg_quota_value,create_time,last_time,deleted,sortno,version";
+            String valuesMark = "";
+            int length = values.split(",").length;
+            for(int i = 0;i<length;i++){
+                if(i == length -1){
+                    valuesMark += "?";
+                }else{
+                    valuesMark += "?,";
+                }
+            }
+
+            String insertSql = "INSERT INTO db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day ("+ values +") values ("+valuesMark+")";
 
             jdbcTemplate.batchUpdate(insertSql,result);
         }
