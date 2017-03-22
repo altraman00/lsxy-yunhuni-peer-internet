@@ -317,7 +317,7 @@ public class BillDetailController extends AbstractRestController {
     public RestResponse msg(
             @ApiParam(name = "uid",value = "用户id")
             @PathVariable String uid,
-            @ApiParam(name = "type",value = "短信sms,闪印ussd")
+            @ApiParam(name = "type",value = "短信msg_sms,闪印msg_ussd")
             @RequestParam(required = false) String type,
             @ApiParam(name = "isMass",value = "0单发1群发")
             @RequestParam(required = false) int isMass,
