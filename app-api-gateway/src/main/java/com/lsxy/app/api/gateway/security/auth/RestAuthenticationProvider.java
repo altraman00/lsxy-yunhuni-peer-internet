@@ -5,6 +5,8 @@ import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +37,8 @@ public class RestAuthenticationProvider implements AuthenticationProvider {
 
     @Autowired
     private ApiCertificateService apiCertificateService;
+    @Autowired
+    private AppService appService;
 
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         RestToken restToken = (RestToken) authentication;
@@ -57,6 +61,12 @@ public class RestAuthenticationProvider implements AuthenticationProvider {
         if(apiCertificate != null){
             secretKey = apiCertificate.getSecretKey();
             tenantId = apiCertificate.getTenantId();
+        }else{
+            throw new BadCredentialsException("无效的鉴权账号");
+        }
+        App app = appService.findById(restToken.getAppId());
+        if(app == null || !app.getTenant().getId().equals(tenantId)){
+            throw new BadCredentialsException("无效的appid");
         }
 
         if(logger.isDebugEnabled()){
@@ -98,9 +108,12 @@ public class RestAuthenticationProvider implements AuthenticationProvider {
         if(apiCertificate.getType()!=null && apiCertificate.getType().intValue() == ApiCertificate.TYPE_PRIMARY_ACCOUNT){
             //是主账号
             restToken = new RestToken(apiKey, credentials, restToken.getTimestamp(),tenantId,null, roles(SpringSecurityConfig.PRIMARY_ACCOUNT));
-        }else if(apiCertificate.getType().intValue() == ApiCertificate.TYPE_SUBACCOUNT){
+        }else if(apiCertificate instanceof ApiCertificateSubAccount){
             if(!ApiCertificateSubAccount.ENABLED_TRUE.equals(((ApiCertificateSubAccount)apiCertificate).getEnabled())){
                 throw new DisabledException("子账号被禁用");
+            }
+            if(!app.getId().equals (((ApiCertificateSubAccount) apiCertificate).getAppId())){
+                throw new BadCredentialsException("子账号不属于应用");
             }
             restToken = new RestToken(apiKey, credentials, restToken.getTimestamp(),tenantId,apiCertificate.getId(), null);
         }

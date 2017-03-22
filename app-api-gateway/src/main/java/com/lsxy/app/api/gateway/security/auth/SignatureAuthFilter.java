@@ -133,7 +133,7 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
 
 
             // Create an authentication token
-            Authentication authentication = new RestToken(certID, restCredential, date);
+            Authentication authentication = new RestToken(certID, restCredential, date,appid);
 
             Authentication successfulAuthentication = authenticationManager.authenticate(authentication);
 

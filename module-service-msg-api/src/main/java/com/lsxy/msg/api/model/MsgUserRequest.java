@@ -50,8 +50,13 @@ public class MsgUserRequest extends IdEntity {
 
     public MsgUserRequest(String msgKey, String tenantId, String appId, String subaccountId, String sendType,String mobile, String msg, String tempId,
                           String tempArgs, Date sendTime,BigDecimal msgCost,Integer state,Date createTime) {
-
-        this(msgKey, tenantId, appId, subaccountId,null, sendType, mobile,null, msg, tempId, tempArgs, sendTime, msgCost,false,1L,state,1L,null,null,createTime);
+        this(msgKey, tenantId, appId, subaccountId,null, sendType, mobile,null, msg, tempId, tempArgs, sendTime, msgCost,false,1L,state,null,null,null,createTime);
+        if(STATE_WAIT == state){
+            this.pendingNum = 1L;
+        }
+        if(STATE_FAIL == state){
+            this.failNum = 1L;
+        }
     }
 
     public MsgUserRequest(String msgKey, String tenantId, String appId, String subaccountId, String taskName, String sendType, String mobile, String mobiles, String msg, String tempId,
