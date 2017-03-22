@@ -166,6 +166,7 @@
                                                     <th>创建时间</th>
                                                     <th>结束时间</th>
                                                     <th>发送结果</th>
+                                                    <th><span style="float:left;width: 80px" ><span style="float:right;" >消费金额</span></span></th>
                                                     <th>操作</th>
                                                 </tr>
                                             </c:if>
@@ -177,6 +178,7 @@
                                                     <th>发送内容</th>
                                                     <th>发送结果</th>
                                                     <th>备注</th>
+                                                    <th><span style="float:left;width: 80px" ><span style="float:right;" >消费金额</span></span></th>
                                                 </tr>
                                             </c:if>
 
@@ -200,6 +202,7 @@
                                                             </c:if>
                                                         </td>
                                                         <td>成功数：${result.succNum}&nbsp;失败数：${result.failNum}&nbsp;待发数：${result.pendingNum}</td>
+                                                        <td><span style="float:left;width: 80px" ><span style="float:right;" >￥<fmt:formatNumber value="${result.msgCost}" pattern="0.000"></fmt:formatNumber></span></span></td>
                                                         <td>
                                                             <a href="#" onclick="toDetail('${result.msgKey}')">详情</a>
                                                             &nbsp;&nbsp;
@@ -221,6 +224,7 @@
                                                             <c:if test="${result.state=='-1'}">发送失败</c:if>
                                                         </td>
                                                         <td>${result.reason}</td>
+                                                        <td><span style="float:left;width: 80px" ><span style="float:right;" >￥<fmt:formatNumber value="${result.msgCost}" pattern="0.000"></fmt:formatNumber></span></span></td>
                                                     </tr>
                                                 </c:forEach>
                                             </c:if>

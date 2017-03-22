@@ -8,6 +8,7 @@ import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * 应用
@@ -47,6 +48,25 @@ public class App extends IdEntity {
     private Long callCenterNum; //呼叫中心应用编号
     private Integer isSms;//短信
     private Integer isUssd;//闪印
+    private Date applyTime;//申请时间
+    private Date auditTime;//审核时间
+    @Column(name = "apply_time")
+    public Date getApplyTime() {
+        return applyTime;
+    }
+
+    public void setApplyTime(Date applyTime) {
+        this.applyTime = applyTime;
+    }
+    @Column(name = "audit_time")
+    public Date getAuditTime() {
+        return auditTime;
+    }
+
+    public void setAuditTime(Date auditTime) {
+        this.auditTime = auditTime;
+    }
+
     @Column(name = "is_sms")
     public Integer getIsSms() {
         return isSms;

@@ -257,7 +257,7 @@
                                         <li data-id="number"><a href="#number" data-toggle="tab">号码绑定</a></li>
                                         <li data-id="subAccount"><a href="#subAccount" data-toggle="tab">子账号</a></li>
                                     </c:if>
-                                    <li class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
+
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
                                     <!-- 放音文件-->
@@ -270,7 +270,8 @@
                                             <div class="col-md-3 remove-padding" style="padding-left:15px;">
                                                 <input type="text" class="form-control" placeholder="关联子账号" id="voice_file_subId"/>
                                             </div>
-                                            <div class="col-md-1"><button class="btn btn-primary" type="button" onclick="upplay()">查询</button></div>
+                                            <div class="col-md-1 voice-find-btn"><button class="btn btn-primary" type="button" onclick="upplay()">查询</button></div>
+                                            <div class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></div>
                                             <div class="col-md-8 sizebox  remove-padding " id="voiceFilePlay">
                                             </div>
                                         </div>
@@ -418,7 +419,7 @@
                                     <!--模板列表-->
                                     <div class="tab-pane fade<c:if test="${app.serviceType=='msg'}"> in active</c:if>" id="template">
                                         <p class="application_info">
-                                            1.提交模板申请前，请仔细阅读文档：<a href="#" onclick="window.open('${globalWebsite}')">模板使用说明</a></br>
+                                            1.提交模板申请前，请仔细阅读文档：<a href="#" onclick="window.open('${globalWebsite}/develop/book/platform?page=template')">模板使用说明</a></br>
                                             2.短信模板只能在所属应用下使用，不允许跨应用使用</br>
                                             3.会员需进行公司认证，并审核通过后才能新增模板</br>
                                             4.会员在进行闪印和短信的测试时，可以使用平台提供测试模板
@@ -476,9 +477,9 @@
                                                     </div>
                                                     <div class="col-md-9">
                                                         <p>
-                                                            <input type="radio" id="ussd2" disabled value="ussd" v-model="type" name="type">
+                                                            <input type="radio" id="ussd2" disabled value="msg_ussd" v-model="type" name="type">
                                                             <label for="ussd2">闪印</label>
-                                                            <input type="radio" id="sms2" disabled value="sms" v-model="type" name="type">
+                                                            <input type="radio" id="sms2" disabled value="msg_sms" v-model="type" name="type">
                                                             <label for="sms2">短信</label>
                                                         </p>
                                                     </div>
@@ -1037,9 +1038,9 @@
                 <div class="row margin-bottom-10">
                     <lable class="col-md-3 text-right line-height-32">模板类型：</lable>
                     <div class="col-md-8 remove-padding-right">
-                        <input type="radio" id="ussd" checked value="ussd" v-model="type" name="type">
+                        <input type="radio" id="ussd" checked value="msg_ussd" v-model="type" name="type">
                         <label for="ussd">闪印</label>
-                        <input type="radio" id="sms" value="sms" v-model="type" name="type">
+                        <input type="radio" id="sms" value="msg_sms" v-model="type" name="type">
                         <label for="sms">短信</label>
                         <br>
                     </div>
@@ -1565,14 +1566,14 @@
     var createSeven = new Vue({
         el:'#createSeven',
         data:{
-            type:'ussd',
+            type:'msg_ussd',
             name:'',
             content:'',
             remark:''
         },
         methods:{
             init:function(){
-                this.type='ussd';
+                this.type='msg_ussd';
                 this.name=this.content=this.remark='';
             }
         }
@@ -2118,7 +2119,7 @@
                 for(var i = 0 ; i<data.length; i++){
                     html +='<tr class="playtr" id="play-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
                     if(data[i][2]==-1){
-                        html+='<td  title="审核不通过原因：'+data[i][5]+'"><span class="nosuccess">审核不通过</span><i class="fa fa-exclamation-triangle"></i></td>';
+                        html+='<td ><span class="nosuccess" title="审核不通过原因：'+data[i][5]+'">审核不通过<i class="iconfont icon-uc_no_pass"></i></span></td>';
                     }else if(data[i][2]==1&&data[i][6]==1){
                         html+='<td ><span class="success">已审核</span></td>';
                     }else{
@@ -2713,15 +2714,19 @@
         for(var i =0 ; i<data.length; i++){
             html +='<tr id="template-'+ data[i].id +'">' +
                 '<td class="">' + data[i].tempId + '</td>' +
-                '<td class="">'+ (data[i].type == 'sms'?'短信':( data[i].type=='ussd'?'闪印':'未知')) +'</td>' +
+                '<td class="">'+ (data[i].type == 'msg_sms'?'短信':( data[i].type=='msg_ussd'?'闪印':'未知')) +'</td>' +
                 '<td class="">'+ data[i].name +'</td>' +
                 '<td class="">'+ (data[i].content) +'</td>' +
                 '<td class="">'+ (data[i].certId) +'</td>';
-            var state = data[i].state=='1'?'审核已通过':(data[i].state=='0'?'待审核':(data[i].state=='-1'?'审核不通过！':'未知')) ;
+            var state = data[i].state=='1'?'审核已通过':(data[i].state=='0'?'待审核':(data[i].state=='-1'?'审核不通过':'未知')) ;
             var color = data[i].state == 1?"text-success":"text-danger";
             var reason = data[i].reason==null?'':data[i].reason;
-            html+= '<td class="'+color+'" id="enable_'+data[i].id+'" title="审核不通过原因:'+reason+'">' + state+ '</td>' +
-                '<td class=""><a href="javascript:totemplateDetail(\''+data[i].id+'\')" >详情</a>&nbsp;<a href="javascript:delTemplate(\''+data[i].id+'\')" >删除</a></td>' +
+            if(data[i].state=='-1'){
+                html+= '<td class="'+color+'" id="enable_'+data[i].id+'" title="审核不通过原因:'+reason+'">' + state+ '<i class="iconfont icon-uc_no_pass"></i></td>' ;
+            }else{
+                html+= '<td class="'+color+'" id="enable_'+data[i].id+'" >' + state+ '</td>' ;
+            }
+               html+= '<td class=""><a href="javascript:totemplateDetail(\''+data[i].id+'\')" >详情</a>&nbsp;<a href="javascript:delTemplate(\''+data[i].id+'\')" >删除</a></td>' +
                 '</tr>'
         }
         $('#template-list').html(html);

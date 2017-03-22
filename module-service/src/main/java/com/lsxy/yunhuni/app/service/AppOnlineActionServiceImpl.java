@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 
@@ -96,7 +97,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             action = actionList.get(0);
         }
         //应用上线--选号
-        if( app.getStatus() == App.STATUS_OFFLINE ){
+        if( app.getStatus() == App.STATUS_OFFLINE ||app.getStatus() == App.STATUS_FAIl){
             if(action == null){
                 AppOnlineAction newAction = new AppOnlineAction(app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_SELECT_NUM,AppOnlineAction.STATUS_AVTIVE);
                 this.save(newAction);
@@ -158,6 +159,8 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
 
                 //应用状态改为上线//改为待审核edit zhangxb by2017-03-15
                 app.setStatus(App.STATUS_WAIT);
+                app.setApplyTime(new Date());
+                app.setAuditTime(null);
                 appService.save(app);
 
                 return newAction;
