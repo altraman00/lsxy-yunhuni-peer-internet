@@ -5,6 +5,7 @@ import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.app.api.gateway.rest.AbstractAPIController;
 import com.lsxy.app.api.gateway.rest.msg.dto.TemplateDTO;
 import com.lsxy.app.api.gateway.rest.msg.vo.TemplateVO;
+import com.lsxy.framework.core.exceptions.api.AppServiceInvalidException;
 import com.lsxy.framework.core.exceptions.api.IPNotInWhiteListException;
 import com.lsxy.framework.core.exceptions.api.RequestIllegalArgumentException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
@@ -53,7 +54,10 @@ public class TemplateController extends AbstractAPIController {
 
         String appId = request.getHeader("AppID");
         App app = appService.findById(appId);
-        appService.enabledService(app.getTenant().getId(),app.getId(), serviceType);
+        if(!appService.enabledService(app.getTenant().getId(),app.getId(), serviceType)){
+            throw new AppServiceInvalidException();
+        }
+
         String ip = WebUtils.getRemoteAddress(request);
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
