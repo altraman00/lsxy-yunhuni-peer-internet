@@ -38,7 +38,13 @@ public class SessionStatisticsController extends AbstractPortalController {
     @RequestMapping("/index")
     public ModelAndView index(HttpServletRequest request){
         ModelAndView mav = new ModelAndView();
-        mav.addObject("appList",getAppList(request).getData());
+        List<App> list = (List<App>) getAppList(request).getData();
+        for (int i = 0; i <list.size() ; i++) {
+            if("msg".equals( list.get(i).getServiceType() )){
+                list.remove(list.get(i));
+            }
+        }
+        mav.addObject("appList",list);
         Date date = new Date();
         mav.addObject("startTimeMonth", DateUtils.formatDate(date,"yyyy-MM"));
         mav.addObject("startTimeYear", DateUtils.formatDate(date,"yyyy"));

@@ -92,7 +92,13 @@
                                                 <c:if test="${result.status==1}"><span style="color:#9dc940;"  id="statusapp-${result.id}">已上线</span></c:if>
                                                 <c:if test="${result.status==2}"><span style="color:#ff0000;" id="statusapp-${result.id}">未上线</span></c:if>
                                                 <c:if test="${result.status==3}"><span style="color:#000000;" id="statusapp-${result.id}">待审核</span></c:if>
-                                                <c:if test="${result.status==4}"><span style="color:#ff0000;" id="statusapp-${result.id}" title="不通过的原因：${result.reason}">审核不通过</span></c:if>
+                                                <c:if test="${result.status==4}">
+                                                    <%--<span style="color:#ff0000;" id="statusapp-${result.id}" title="不通过的原因：${result.reason}">审核不通过</span>--%>
+                                                    <span class="nosuccess" id="statusapp-${result.id}" data-toggle="tooltip" title="不通过的原因:${result.reason}">
+                                                            审核不通过 <i class="iconfont icon-uc_no_pass"></i>
+                                                        </span>
+                                                </c:if>
+
                                             </td>
                                             <td><fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
                                             <td class="operation">
