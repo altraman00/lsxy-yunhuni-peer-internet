@@ -62,7 +62,10 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
                 "obj.among_amount as among_amount," +
                 "ROUND(obj.among_duration/60,0) as among_duration," +
                 "concat( (CASE WHEN obj.voice_used IS NULL THEN '0'ELSE ROUND(obj.voice_used/60,0) END) ,'/', (CASE WHEN obj.voice_quota_value IS NULL THEN '0' WHEN obj.voice_quota_value<0 THEN '∞' ELSE ROUND(obj.voice_quota_value/60,0) END) ) as voice_num," +
-                "concat( (CASE WHEN obj.msg_used IS NULL THEN '0'ELSE obj.msg_used END)  ,'/', (CASE WHEN obj.msg_quota_value IS NULL THEN '0' WHEN obj.msg_quota_value<0 THEN '∞' ELSE obj.msg_quota_value END)) as seat_num "+sql;
+                "concat( (CASE WHEN obj.msg_used IS NULL THEN '0'ELSE obj.msg_used END)  ,'/', (CASE WHEN obj.msg_quota_value IS NULL THEN '0' WHEN obj.msg_quota_value<0 THEN '∞' ELSE obj.msg_quota_value END)) as seat_num ," +
+                "concat( (CASE WHEN obj.ussd_used IS NULL THEN '0'ELSE obj.ussd_used END)  ,'/', (CASE WHEN obj.ussd_quota_value IS NULL THEN '0' WHEN obj.ussd_quota_value<0 THEN '∞' ELSE obj.ussd_quota_value END)) as ussd_num ," +
+                "concat( (CASE WHEN obj.sms_used IS NULL THEN '0'ELSE obj.sms_used END)  ,'/', (CASE WHEN obj.sms_quota_value IS NULL THEN '0' WHEN obj.sms_quota_value<0 THEN '∞' ELSE obj.sms_quota_value END)) as sms_num ," +
+                "sum( (CASE WHEN obj.sms_used IS NULL THEN '0'ELSE obj.sms_used END) + (CASE WHEN obj.ussd_used IS NULL THEN '0'ELSE obj.ussd_used END) ) as among_msg  "+sql;
         Query countQuery = em.createNativeQuery(countSql);
         Query pageQuery = em.createNativeQuery(pageSql,SubaccountStatisticalVO.class);
         if(StringUtils.isNotEmpty(appId)){
