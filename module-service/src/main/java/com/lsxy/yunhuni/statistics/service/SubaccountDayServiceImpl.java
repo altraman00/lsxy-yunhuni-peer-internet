@@ -154,8 +154,12 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
         }
 
         String sql = "SELECT REPLACE(UUID(), '-', '') AS id,a.app_id,a.tenant_id,a.id AS subaccount_id ,? AS dt, ? AS day , IFNULL(c.among_amount,0) AS among_amount, IFNULL(b.among_duration,0) AS among_duration," +
-                "IFNULL((SELECT d.voice_used FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day d WHERE d.subaccount_id = a.id AND d.dt = ?),0) + IFNULL(b.among_duration,0) AS voice_used, 0 AS msg_used ," +
-                "IFNULL((SELECT qu.value FROM db_lsxy_bi_yunhuni.tb_bi_cert_account_quota qu WHERE qu.type='CallQuota' AND qu.cert_account_id = a.id LIMIT 1),0) AS voice_quota_value, -1 AS msg_quota_value ," +
+                "IFNULL((SELECT d.voice_used FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day d WHERE d.subaccount_id = a.id AND d.dt = ?),0) + IFNULL(b.among_duration,0) AS voice_used," +
+                "IFNULL((SELECT d.sms_used FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day d WHERE d.subaccount_id = a.id AND d.dt = ?),0) + IFNULL(d.sms_used,0) AS sms_used, " +
+                "IFNULL((SELECT d.ussd_used FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day d WHERE d.subaccount_id = a.id AND d.dt = ?),0) + IFNULL(d.ussd_used,0) AS ussd_used,  " +
+                "IFNULL((SELECT qu.value FROM db_lsxy_bi_yunhuni.tb_bi_cert_account_quota qu WHERE qu.type='CallQuota' AND qu.cert_account_id = a.id LIMIT 1),0) AS voice_quota_value, " +
+                "IFNULL((SELECT qu.value FROM db_lsxy_bi_yunhuni.tb_bi_cert_account_quota qu WHERE qu.type='SmsQuota' AND qu.cert_account_id = a.id LIMIT 1),0) AS sms_quota_value, " +
+                "IFNULL((SELECT qu.value FROM db_lsxy_bi_yunhuni.tb_bi_cert_account_quota qu WHERE qu.type='UssdQuota' AND qu.cert_account_id = a.id LIMIT 1),0) AS ussd_quota_value, " +
                 "? AS create_time, ? AS last_time, 0 AS deleted,0 AS sortno,0 AS version "+
                 "FROM (SELECT p.tenant_id ,s.app_id ,p.id FROM db_lsxy_bi_yunhuni.tb_bi_api_cert p INNER JOIN db_lsxy_bi_yunhuni.tb_bi_api_cert_subaccount s ON p.id = s.id WHERE (p.deleted = 0 OR (p.deleted = 1 AND p.delete_time > ?)) AND p.create_time < ?) a " +
                 "LEFT JOIN " +
@@ -165,14 +169,26 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
                 "LEFT JOIN " +
                 "(SELECT tenant_id,app_id,subaccount_id,SUM(amount) AS among_amount " +
                 "FROM db_lsxy_bi_yunhuni.tb_bi_consume WHERE dt >= ? AND dt < ? GROUP BY tenant_id,app_id,subaccount_id) c " +
-                "ON a.id = c.subaccount_id AND a.tenant_id = c.tenant_id AND a.app_id = c.app_id " ;
+                "ON a.id = c.subaccount_id AND a.tenant_id = c.tenant_id AND a.app_id = c.app_id " +
+                "LEFT JOIN ( " +
+                "SELECT tenant_id,app_id,subaccount_id, " +
+                "SUM(CASE WHEN (create_time >= ? AND create_time < ? AND send_type = 'msg_sms') THEN 1 ELSE 0 END)- SUM(CASE WHEN (end_time >= ? AND end_time < ? AND state = -1 AND send_type = 'msg_sms') THEN 1 ELSE 0 END) AS sms_used, " +
+                "SUM(CASE WHEN (create_time >= ? AND create_time < ? AND send_type = 'msg_ussd') THEN 1 ELSE 0 END)- SUM(CASE WHEN (end_time >= ? AND end_time < ? AND state = -1 AND send_type = 'msg_ussd') THEN 1 ELSE 0 END) AS ussd_used " +
+                " FROM db_lsxy_bi_yunhuni.tb_bi_msg_send_detail WHERE (create_time >= ? AND create_time < ?) OR (end_time >= ? AND end_time < ? AND state = -1) GROUP BY tenant_id,app_id,subaccount_id " +
+                ") d ON a.id = d.subaccount_id AND a.tenant_id = d.tenant_id AND a.app_id = d.app_id ";
 
         Query query = getEm().createNativeQuery(sql);
 
         Object[] obj = new Object[]{
-                staticsDate,day,preDate,currentDate,currentDate,
+                staticsDate,day,preDate,preDate,preDate,currentDate,currentDate,
                 staticsDate,nextDate,staticsDate,
-                nextDate,staticsDate,nextDate
+                nextDate,staticsDate,nextDate,
+                staticsDate,nextDate,
+                staticsDate,nextDate,
+                staticsDate,nextDate,
+                staticsDate,nextDate,
+                staticsDate,nextDate,
+                staticsDate,nextDate
         };
         for(int i=0;i<obj.length;i++){
             query.setParameter(i+1,obj[i]);
@@ -182,7 +198,7 @@ public class SubaccountDayServiceImpl extends AbstractService<SubaccountDay> imp
         if(result != null && result.size() >0){
 
             String values = "id,app_id,tenant_id,subaccount_id,dt,day,among_amount,among_duration,voice_used," +
-                    "msg_used,voice_quota_value,msg_quota_value,create_time,last_time,deleted,sortno,version";
+                    "sms_used,ussd_used,voice_quota_value,sms_quota_value,ussd_quota_value,create_time,last_time,deleted,sortno,version";
             String valuesMark = "";
             int length = values.split(",").length;
             for(int i = 0;i<length;i++){

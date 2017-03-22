@@ -10,6 +10,7 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.utils.WebUtils;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
 import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuota;
+import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuotaType;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.apicertificate.service.CertAccountQuotaService;
 import com.lsxy.yunhuni.api.app.model.App;
@@ -74,7 +75,11 @@ public class SubaccountController extends AbstractAPIController {
             for(QuotaDTO q : qs){
                 CertAccountQuota quota = new CertAccountQuota();
                 quota.setType(q.getType());
-                quota.setValue(q.getValue() * 60);
+                if(CertAccountQuotaType.CallQuota.name().equals(q.getType())){
+                    quota.setValue(q.getValue() * 60);
+                }else{
+                    quota.setValue(q.getValue());
+                }
                 quotas.add(quota);
             }
             subAccount.setQuotas(quotas);
@@ -153,7 +158,11 @@ public class SubaccountController extends AbstractAPIController {
             for(QuotaDTO q : qs){
                 CertAccountQuota quota = new CertAccountQuota();
                 quota.setType(q.getType());
-                quota.setValue(q.getValue() * 60);
+                if(CertAccountQuotaType.CallQuota.name().equals(q.getType())){
+                    quota.setValue(q.getValue() * 60);
+                }else{
+                    quota.setValue(q.getValue());
+                }
                 quotas.add(quota);
             }
         }
