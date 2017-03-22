@@ -42,9 +42,10 @@ public class MsgUserRequestServiceImpl extends AbstractService<MsgUserRequest> i
             hql += " and obj.mobile like '%"+mobile+"%' ";
         }
         if(start !=null && end != null) {
-            hql += "and obj.sendTime between ?3 and ?4 ";
+            hql += "and obj.sendTime between ?3 and ?4 order by obj.sendTime desc ";
             return pageList( hql, pageNo, pageSize,sendType,flag,start,end);
         }else{
+            hql += " order by obj.sendTime desc ";
             return pageList( hql,pageNo,pageSize,sendType,flag);
         }
 
