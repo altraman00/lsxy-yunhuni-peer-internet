@@ -42,7 +42,7 @@ public class BillDetailController extends AbstractPortalController {
     public ModelAndView sms(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize,
                             @RequestParam(defaultValue = "1") Integer pageNo1, @RequestParam(defaultValue = "20") Integer pageSize1,
                             String start,String end, String appId,String isMass,String taskName,String mobile,String msgKey,String state,String mobile1){
-        String sendType = "sms";
+        String sendType = "msg_sms";
         return toMsg(request,pageNo,pageSize,pageNo1,pageSize1,start,end,appId,isMass,taskName,mobile,msgKey,state,mobile1,sendType);
     }
     /**闪印*/
@@ -50,7 +50,7 @@ public class BillDetailController extends AbstractPortalController {
     public ModelAndView ussd(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize,
                              @RequestParam(defaultValue = "1") Integer pageNo1, @RequestParam(defaultValue = "20") Integer pageSize1,
                              String start,String end, String appId,String isMass,String taskName,String mobile,String msgKey,String state,String mobile1){
-        String sendType = "ussd";
+        String sendType = "msg_ussd";
         return toMsg(request,pageNo,pageSize,pageNo1,pageSize1,start,end,appId,isMass,taskName,mobile,msgKey,state,mobile1,sendType);
     }
     private ModelAndView toMsg(HttpServletRequest request, Integer pageNo, Integer pageSize,
