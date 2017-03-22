@@ -25,6 +25,7 @@ public class SubaccountDay extends IdEntity {
     private BigDecimal amongAmount;
     private Long amongDuration;
     private Long voiceUsed;
+    private Long msgUsed;
     private Long ussdUsed;
     private Long smsUser;
     private Long voiceQuotaValue;
@@ -120,9 +121,14 @@ public class SubaccountDay extends IdEntity {
     public void setSmsUser(Long smsUser) {
         this.smsUser = smsUser;
     }
+    @Column(name = "msg_used")
+    public Long getMsgUsed() {
+        return msgUsed;
+    }
 
-
-
+    public void setMsgUsed(Long msgUsed) {
+        this.msgUsed = msgUsed;
+    }
 
     @Column(name = "voice_quota_value")
     public Long getVoiceQuotaValue() {

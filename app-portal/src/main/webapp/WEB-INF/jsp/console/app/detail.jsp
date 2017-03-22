@@ -2119,7 +2119,7 @@
                 for(var i = 0 ; i<data.length; i++){
                     html +='<tr class="playtr" id="play-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
                     if(data[i][2]==-1){
-                        html+='<td  title="审核不通过原因：'+data[i][5]+'"><span class="nosuccess">审核不通过</span><i class="fa fa-exclamation-triangle"></i></td>';
+                        html+='<td ><span class="nosuccess" title="审核不通过原因：'+data[i][5]+'">审核不通过<i class="iconfont icon-uc_no_pass"></i></span></td>';
                     }else if(data[i][2]==1&&data[i][6]==1){
                         html+='<td ><span class="success">已审核</span></td>';
                     }else{
@@ -2718,11 +2718,15 @@
                 '<td class="">'+ data[i].name +'</td>' +
                 '<td class="">'+ (data[i].content) +'</td>' +
                 '<td class="">'+ (data[i].certId) +'</td>';
-            var state = data[i].state=='1'?'审核已通过':(data[i].state=='0'?'待审核':(data[i].state=='-1'?'审核不通过！':'未知')) ;
+            var state = data[i].state=='1'?'审核已通过':(data[i].state=='0'?'待审核':(data[i].state=='-1'?'审核不通过':'未知')) ;
             var color = data[i].state == 1?"text-success":"text-danger";
             var reason = data[i].reason==null?'':data[i].reason;
-            html+= '<td class="'+color+'" id="enable_'+data[i].id+'" title="审核不通过原因:'+reason+'">' + state+ '</td>' +
-                '<td class=""><a href="javascript:totemplateDetail(\''+data[i].id+'\')" >详情</a>&nbsp;<a href="javascript:delTemplate(\''+data[i].id+'\')" >删除</a></td>' +
+            if(data[i].state=='-1'){
+                html+= '<td class="'+color+'" id="enable_'+data[i].id+'" title="审核不通过原因:'+reason+'">' + state+ '<i class="iconfont icon-uc_no_pass"></i></td>' ;
+            }else{
+                html+= '<td class="'+color+'" id="enable_'+data[i].id+'" >' + state+ '</td>' ;
+            }
+               html+= '<td class=""><a href="javascript:totemplateDetail(\''+data[i].id+'\')" >详情</a>&nbsp;<a href="javascript:delTemplate(\''+data[i].id+'\')" >删除</a></td>' +
                 '</tr>'
         }
         $('#template-list').html(html);
