@@ -6,6 +6,7 @@ import com.lsxy.app.api.gateway.rest.AbstractAPIController;
 import com.lsxy.app.api.gateway.rest.msg.dto.SmsSendDTO;
 import com.lsxy.app.api.gateway.rest.msg.dto.SmsSendMassDTO;
 import com.lsxy.app.api.gateway.rest.msg.vo.MsgRequestVO;
+import com.lsxy.framework.core.exceptions.api.AppServiceInvalidException;
 import com.lsxy.framework.core.exceptions.api.ExceptionContext;
 import com.lsxy.framework.core.exceptions.api.IPNotInWhiteListException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
@@ -49,7 +50,9 @@ public class SmsController extends AbstractAPIController {
     public ApiGatewayResponse smsSend(HttpServletRequest request, @Valid @RequestBody SmsSendDTO dto, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         App app = appService.findById(appId);
-        appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.SMS);
+        if(!appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.SMS)){
+            throw new AppServiceInvalidException();
+        }
         String ip = WebUtils.getRemoteAddress(request);
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
@@ -69,7 +72,9 @@ public class SmsController extends AbstractAPIController {
     public ApiGatewayResponse smsSendMass(HttpServletRequest request, @Valid @RequestBody SmsSendMassDTO dto, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         App app = appService.findById(appId);
-        appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.SMS);
+        if(!appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.SMS)){
+            throw new AppServiceInvalidException();
+        }
         String ip = WebUtils.getRemoteAddress(request);
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
@@ -88,7 +93,9 @@ public class SmsController extends AbstractAPIController {
     public ApiGatewayResponse ussdSendMass(HttpServletRequest request, @PathVariable String msgKey, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         App app = appService.findById(appId);
-        appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.SMS);
+        if(!appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.SMS)){
+            throw new AppServiceInvalidException();
+        }
         String ip = WebUtils.getRemoteAddress(request);
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
@@ -107,7 +114,9 @@ public class SmsController extends AbstractAPIController {
                                            @RequestParam(defaultValue = "10") Integer pageSize) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         App app = appService.findById(appId);
-        appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.SMS);
+        if(!appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.SMS)){
+            throw new AppServiceInvalidException();
+        }
         String ip = WebUtils.getRemoteAddress(request);
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){

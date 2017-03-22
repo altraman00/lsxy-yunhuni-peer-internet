@@ -54,7 +54,7 @@ public enum ApiReturnCodeEnum {
     AgentNotConversationMember("040503","坐席不是交谈的成员"),
     QueueTaskNotExist("040601","排队任务不存在"),
     MsgIllegalMobile("050101","手机号码不合法"),
-    MsgTemplateError("050102","模板不存在或模板为空"),
+    MsgTemplateError("050102","模板不存在或模板审核不通过"),
     MsgTaskNameIsEmpty("050103","任务名不能为空"),
     MsgTemplateArgsError("050104","模板参数不正确"),
     MsgMobileNumTooLarge("050105","手机号码集合数量大于最大限制"),
