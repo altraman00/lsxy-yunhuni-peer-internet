@@ -122,10 +122,10 @@ public class MsgTemptaleController extends AbstractRestController {
         Date date2 = null;
         try{
             if(StringUtils.isNotEmpty(startTime)) {
-                date1 = DateUtils.parseDate(startTime, "yyyy-MM-dd");
+                date1 = DateUtils.parseDate(startTime+" 00:00:00", "yyyy-MM-dd hh:mm:ss");
             }
             if(StringUtils.isNotEmpty(endTime)) {
-                date2 = DateUtils.parseDate(endTime, "yyyy-MM-dd");
+                date2 = DateUtils.parseDate(endTime+" 23:59:59", "yyyy-MM-dd hh:mm:ss");
             }
         }catch (Exception e){
             return RestResponse.failed("","日期格式错误");
