@@ -1,11 +1,12 @@
 package com.lsxy.msg.service;
 
-import com.lsxy.framework.core.exceptions.api.AppServiceInvalidException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.exceptions.api.msg.*;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.msg.api.model.*;
+import com.lsxy.msg.api.result.MsgSendMassResult;
+import com.lsxy.msg.api.result.MsgSendOneResult;
 import com.lsxy.msg.api.service.*;
 import com.lsxy.msg.supplier.SupplierSelector;
 import com.lsxy.msg.supplier.SupplierSendService;
@@ -14,7 +15,6 @@ import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuotaType;
 import com.lsxy.yunhuni.api.apicertificate.service.CertAccountQuotaService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.app.service.ServiceType;
 import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
@@ -60,22 +60,22 @@ public class MsgSendServiceImpl implements MsgSendService {
     CertAccountQuotaService certAccountQuotaService;
 
     @Override
-    public String sendUssd(String appId,String subaccountId,String mobile, String tempId, String tempArgs) throws YunhuniApiException{
+    public MsgSendOneResult sendUssd(String appId, String subaccountId, String mobile, String tempId, String tempArgs) throws YunhuniApiException{
         return sendOne(appId, subaccountId, mobile, tempId, tempArgs, MsgConstant.MSG_USSD);
     }
 
     @Override
-    public String sendUssdMass(String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) throws YunhuniApiException {
+    public MsgSendMassResult sendUssdMass(String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) throws YunhuniApiException {
         return sendMass(appId, subaccountId, taskName, tempId, tempArgs, mobiles, sendTimeStr,MsgConstant.MSG_SMS);
     }
 
     @Override
-    public String sendSms(String appId,String subaccountId,String mobile, String tempId, String tempArgs) throws YunhuniApiException{
+    public MsgSendOneResult sendSms(String appId, String subaccountId, String mobile, String tempId, String tempArgs) throws YunhuniApiException{
         return sendOne(appId, subaccountId, mobile, tempId, tempArgs,MsgConstant.MSG_SMS);
     }
 
     @Override
-    public String sendSmsMass(String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) throws YunhuniApiException {
+    public MsgSendMassResult sendSmsMass(String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr) throws YunhuniApiException {
         return sendMass(appId, subaccountId, taskName, tempId, tempArgs, mobiles, sendTimeStr,MsgConstant.MSG_SMS);
     }
 
@@ -102,7 +102,7 @@ public class MsgSendServiceImpl implements MsgSendService {
     }
 
     @Transactional
-    private String sendOne(String appId, String subaccountId, String mobile, String tempId, String tempArgs,String sendType) throws YunhuniApiException {
+    private MsgSendOneResult sendOne(String appId, String subaccountId, String mobile, String tempId, String tempArgs, String sendType) throws YunhuniApiException {
         App app = appService.findById(appId);
 
         //TODO 判断红黑名单
@@ -166,6 +166,7 @@ public class MsgSendServiceImpl implements MsgSendService {
         //处理发送结果
         BigDecimal cost = calCostService.calCost(sendType,app.getTenant().getId());
         Date createTime = new Date();
+        boolean state;
         if(MsgConstant.SUCCESS.equals( resultOne.getResultCode() )) {
             // 计算每条费用
             //插入记录
@@ -185,15 +186,17 @@ public class MsgSendServiceImpl implements MsgSendService {
                 ProductCode product = ProductCode.valueOf(sendType);
                 this.batchConsumeMsg(createTime,sendType,cost,product.getRemark(),appId,msgRequest.getTenantId(),subaccountId,ids);
             }
+            state = true;
         }else{
             MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,sendType,mobile,msg,tempId,tempArgs,new Date(),cost,MsgUserRequest.STATE_FAIL,createTime);
             msgUserRequestService.save(msgRequest);
+            state = false;
         }
         logger.info("发送器："+resultOne.getHandlers()+"|发送类型：单发闪印|手机号码："+mobile+"|模板id："+tempId+"|模板参数："+tempArgs+"|短信内容："+msg+"|发送结果："+resultOne.toString2());
-        return key;
+        return new MsgSendOneResult(key,state);
     }
 
-    private String sendMass(String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr,String sendType) throws YunhuniApiException {
+    private MsgSendMassResult sendMass(String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr, String sendType) throws YunhuniApiException {
         App app = appService.findById(appId);
 
         if(StringUtils.isEmpty( taskName )){
@@ -276,14 +279,16 @@ public class MsgSendServiceImpl implements MsgSendService {
         ResultAllMass resultAllMass = new ResultAllMass(list,massMobile.getNo());
         //处理发送结果
         int state = MsgUserRequest.STATE_FAIL;
+        boolean returnState = false;
         if(MsgConstant.SUCCESS.equals(resultAllMass.getResultCode())){
             state = MsgUserRequest.STATE_WAIT;
+            returnState = true;
         }
         MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,taskName,sendType,null,mobiles,msg,tempId,tempArgs,sendTime,cost,true,
                 resultAllMass.getSumNum(),state,resultAllMass.getPendingNum(),resultAllMass.getInvalidNum(),resultAllMass.getResultDesc(),createTime);
         msgUserRequestService.save(msgRequest);
-
-        return key;
+        MsgSendMassResult msgSendResult = new MsgSendMassResult(key,returnState, resultAllMass.getInvalidPhones());
+        return msgSendResult;
     }
 
     private void sendMassByOperator(String tenantId,String appId,String subaccountId,String taskName, String tempId, String tempArgs, String sendType, Date sendTime, String msg, String key,
@@ -406,9 +411,9 @@ public class MsgSendServiceImpl implements MsgSendService {
         boolean flag = false;
         if(MsgConstant.ChinaMobile.equals(operator)){//移动号码
             if(MsgConstant.MSG_USSD.equals(sendType)){//闪印
-                flag = true;
+                flag = false;
             }else if(MsgConstant.MSG_SMS.equals(sendType)){//短信
-                flag = true;
+                flag = false;
             }
         }else if(MsgConstant.ChinaUnicom.equals(operator )){//联通号码
             if(MsgConstant.MSG_USSD.equals(sendType)){//闪印
