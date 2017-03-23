@@ -235,8 +235,8 @@ public class MsgSendRecord extends IdEntity {
         return isMass;
     }
 
-    public void setIsMass(Boolean mass) {
-        isMass = mass;
+    public void setIsMass(Boolean isMass) {
+        this.isMass = isMass;
     }
 
     @Column(name = "sum_num")

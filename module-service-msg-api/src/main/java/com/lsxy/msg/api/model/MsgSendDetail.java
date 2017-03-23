@@ -146,7 +146,7 @@ public class MsgSendDetail extends IdEntity {
     }
 
     public void setIsMass(Boolean isMass) {
-        isMass = isMass;
+        this.isMass = isMass;
     }
 
     @Column(name = "temp_id")
