@@ -86,6 +86,9 @@ public class QiXunTongSendResultNofityController extends AbstractAPIController {
             logger.info("[企讯通][消息发送情况回调接口][请求][没有存在的记录]"+result);
         }else {
             if (isSign()) {
+                if(MsgSendDetail.STATE_WAIT != msgSendDetail.getState()){
+                    logger.info("[企讯通][消息发送情况回调接口][请求][已被处理]"+result);
+                }
                 int detailState;
                 int recordState;
                 int requestState;

@@ -94,6 +94,10 @@ public class PaoPaoYuSendResultNofityController extends AbstractAPIController {
         }
         boolean flag = isSign( serialId, taskId, sign);
         if(flag) {
+            if(msgSendRecord.getState() != MsgSendRecord.STATE_WAIT){
+                //已经结束的不用处理
+                return SUCCESS;
+            }
             if (PaoPaoYuConstant.PapPaoyuStateSuccess.equals(status) || PaoPaoYuConstant.PapPaoyuStateFail.equals(status)) {
                 boolean isUpdateMain = true;
                 if(PaoPaoYuConstant.PapPaoyuStateFail.equals(status)){//发送失败检查是否需要重发
