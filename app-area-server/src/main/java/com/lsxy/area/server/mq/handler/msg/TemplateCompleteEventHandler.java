@@ -12,6 +12,8 @@ import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountServi
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.jms.JMSException;
@@ -21,6 +23,7 @@ import java.util.Map;
  * Created by liups on 2017/3/23.
  */
 public class TemplateCompleteEventHandler implements MQMessageHandler<TemplateCompleteEvent> {
+    private static final Logger logger = LoggerFactory.getLogger(TemplateCompleteEventHandler.class);
     @Reference(timeout=3000,check = false,lazy = true)
     MsgTemplateService msgTemplateService;
     @Autowired
@@ -32,6 +35,10 @@ public class TemplateCompleteEventHandler implements MQMessageHandler<TemplateCo
 
     @Override
     public void handleMessage(TemplateCompleteEvent message) throws JMSException {
+
+        if(logger.isDebugEnabled()){
+            logger.debug("模板完成回调事件{}",message.toJson());
+        }
         String tempId = message.getTempId();
         MsgTemplate template = msgTemplateService.findByTempId(tempId);
         if(MsgTemplate.STATUS_PASS == template.getStatus() ||  MsgTemplate.STATUS_FAIL == template.getStatus()){
@@ -59,6 +66,10 @@ public class TemplateCompleteEventHandler implements MQMessageHandler<TemplateCo
                 // 发送通知
                 notifyCallbackUtil.postNotify(callbackUrl,notify_data,null,3);
             }
+        }
+
+        if(logger.isDebugEnabled()){
+            logger.debug("模板完成回调事件完成{}",message.toJson());
         }
     }
 }
