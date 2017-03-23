@@ -1,5 +1,6 @@
 package com.lsxy.msg.service;
 
+import com.lsxy.framework.core.exceptions.api.AppOffLineException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.exceptions.api.msg.*;
 import com.lsxy.framework.core.utils.DateUtils;
@@ -19,6 +20,7 @@ import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
+import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +60,8 @@ public class MsgSendServiceImpl implements MsgSendService {
     CalCostService calCostService;
     @Autowired
     CertAccountQuotaService certAccountQuotaService;
+    @Autowired
+    TestNumBindService testNumBindService;
 
     @Override
     public MsgSendOneResult sendUssd(String appId, String subaccountId, String mobile, String tempId, String tempArgs) throws YunhuniApiException{
@@ -104,6 +108,12 @@ public class MsgSendServiceImpl implements MsgSendService {
     @Transactional
     private MsgSendOneResult sendOne(String appId, String subaccountId, String mobile, String tempId, String tempArgs, String sendType) throws YunhuniApiException {
         App app = appService.findById(appId);
+        if(App.STATUS_OFFLINE == app.getStatus()){
+            List<String> testNums = testNumBindService.findNumByAppId(app.getId());
+            if(!testNums.contains(mobile)){
+                throw new AppOffLineException();
+            }
+        }
 
         //TODO 判断红黑名单
         tempId = tempId.trim();
@@ -198,6 +208,13 @@ public class MsgSendServiceImpl implements MsgSendService {
 
     private MsgSendMassResult sendMass(String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr, String sendType) throws YunhuniApiException {
         App app = appService.findById(appId);
+
+        if(App.STATUS_OFFLINE == app.getStatus()){
+            List<String> testNums = testNumBindService.findNumByAppId(app.getId());
+            if(!testNums.containsAll(Arrays.asList(mobiles.split(MsgConstant.NumRegexStr)))){
+                throw new AppOffLineException();
+            }
+        }
 
         if(StringUtils.isEmpty( taskName )){
             // 抛异常
