@@ -7,12 +7,12 @@ import java.io.Serializable;
  */
 public class MsgSendOneResult implements Serializable {
     private String msgKey;
-    private boolean state;
+    private int state;
 
     public MsgSendOneResult() {
     }
 
-    public MsgSendOneResult(String msgKey, boolean state) {
+    public MsgSendOneResult(String msgKey, int state) {
         this.msgKey = msgKey;
         this.state = state;
     }
@@ -25,11 +25,11 @@ public class MsgSendOneResult implements Serializable {
         this.msgKey = msgKey;
     }
 
-    public boolean isState() {
+    public int isState() {
         return state;
     }
 
-    public void setState(boolean state) {
+    public void setState(int state) {
         this.state = state;
     }
 }
