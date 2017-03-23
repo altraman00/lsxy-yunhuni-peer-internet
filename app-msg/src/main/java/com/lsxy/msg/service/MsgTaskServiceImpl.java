@@ -14,6 +14,7 @@ import com.lsxy.msg.supplier.paopaoyu.PaoPaoYuMassNofity;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.msg.paopaoyu.PaoPaoYuConstant;
+import com.msg.qixuntong.QiXunTongConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -242,7 +243,7 @@ public class MsgTaskServiceImpl implements MsgTaskService{
     @Override
     public void qiXunTongMassTaskUpdate(){
         logger.info("[群发任务][检测开始]");
-        List<MsgSendRecord> records = msgSendRecordService.findWaitedSendMassBySupplier(PaoPaoYuConstant.PaopaoyuCode);
+        List<MsgSendRecord> records = msgSendRecordService.findWaitedSendMassBySupplier(QiXunTongConstant.QixuntongCode);
         for(MsgSendRecord record : records){
             checkQiXunTongMassTask(record);
         }
