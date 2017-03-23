@@ -13,6 +13,8 @@ import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountServi
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.jms.JMSException;
@@ -22,7 +24,7 @@ import java.util.Map;
  * Created by liups on 2017/3/23.
  */
 public class MsgRequestCompletedEventHandler implements MQMessageHandler<MsgRequestCompletedEvent> {
-
+    private static final Logger logger = LoggerFactory.getLogger(MsgRequestCompletedEventHandler.class);
     @Reference(timeout=3000,check = false,lazy = true)
     MsgUserRequestService msgUserRequestService;
     @Reference(timeout=3000,check = false,lazy = true)
@@ -35,6 +37,10 @@ public class MsgRequestCompletedEventHandler implements MQMessageHandler<MsgRequ
     AppService appService;
     @Override
     public void handleMessage(MsgRequestCompletedEvent message) throws JMSException {
+        if(logger.isDebugEnabled()){
+            logger.debug("请求完成回调事件{}",message.toJson());
+        }
+
         String msgKey = message.getMsgKey();
         MsgUserRequest request = msgUserRequestService.findByMsgKey(msgKey);
         String subaccountId = request.getSubaccountId();
@@ -61,6 +67,10 @@ public class MsgRequestCompletedEventHandler implements MQMessageHandler<MsgRequ
                     .build();
             // 发送通知
             notifyCallbackUtil.postNotify(callbackUrl,notify_data,null,3);
+        }
+
+        if(logger.isDebugEnabled()){
+            logger.debug("请求完成回调事件完成{}",message.toJson());
         }
 
     }
