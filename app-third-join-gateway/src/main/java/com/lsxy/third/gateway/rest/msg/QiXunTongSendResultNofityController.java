@@ -1,8 +1,12 @@
 package com.lsxy.third.gateway.rest.msg;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.msg.MsgRequestCompletedEvent;
 import com.lsxy.framework.web.utils.WebUtils;
 import com.lsxy.msg.api.model.MsgSendDetail;
+import com.lsxy.msg.api.model.MsgSendRecord;
+import com.lsxy.msg.api.model.MsgUserRequest;
 import com.lsxy.msg.api.service.MsgSendDetailService;
 import com.lsxy.msg.api.service.MsgSendRecordService;
 import com.lsxy.msg.api.service.MsgSendService;
@@ -48,7 +52,8 @@ public class QiXunTongSendResultNofityController extends AbstractAPIController {
     MsgSendDetailService msgSendDetailService;
     @Reference(timeout=3000,check = false,lazy = true)
     MsgSendService msgSendService;
-
+    @Autowired
+    MQService mqService;
 
     @RequestMapping(value = "",method = RequestMethod.POST,produces = "application/json;charset=UTF-8")
     public String handle(HttpServletRequest request){
@@ -81,20 +86,30 @@ public class QiXunTongSendResultNofityController extends AbstractAPIController {
             logger.info("[企讯通][消息发送情况回调接口][请求][没有存在的记录]"+result);
         }else {
             if (isSign()) {
-                int state;
+                if(MsgSendDetail.STATE_WAIT != msgSendDetail.getState()){
+                    logger.info("[企讯通][消息发送情况回调接口][请求][已被处理]"+result);
+                }
+                int detailState;
+                int recordState;
+                int requestState;
                 if (QiXunTongConstant.QixuntongStateSuccess == result.getState()) {//发送成功
-                    state = MsgSendDetail.STATE_SUCCESS;
+                    detailState = MsgSendDetail.STATE_SUCCESS;
+                    recordState = MsgSendRecord.STATE_SUCCESS;
+                    requestState = MsgUserRequest.STATE_SUCCESS;
                 } else {//发送失败
-                    state = MsgSendDetail.STATE_FAIL;
+                    detailState = MsgSendDetail.STATE_FAIL;
+                    recordState = MsgSendRecord.STATE_FAIL;
+                    requestState = MsgUserRequest.STATE_FAIL;
                 }
                 Date endTime = new Date();
-                msgSendDetail.setState(state);
+                msgSendDetail.setState(detailState);
                 msgSendDetail.setEndTime(endTime);
                 msgSendDetailService.save(msgSendDetail);
                 if(!msgSendDetail.getIsMass()) {
                     try{
-                        msgUserRequestService.updateNoMassStateByMsgKey(msgSendDetail.getTaskId(),state);
-                        msgSendRecordService.updateNoMassStateByTaskId(msgSendDetail.getTaskId(),state);
+                        msgSendRecordService.updateNoMassStateByTaskId(msgSendDetail.getTaskId(),recordState);
+                        msgUserRequestService.updateNoMassStateByMsgKey(msgSendDetail.getMsgKey(),requestState);
+                        mqService.publish(new MsgRequestCompletedEvent(msgSendDetail.getMsgKey()));
                         logger.info("[企讯通][消息发送情况回调接口][请求][处理成功]" + result + "[更新主记录],msgKey:" + msgSendDetail.getMsgKey());
                     }catch (Exception e){
                         logger.info("[企讯通][消息发送情况回调接口][请求][处理成功]" + result + "[更新主记录异常],msgKey:" + msgSendDetail.getMsgKey());
@@ -102,7 +117,7 @@ public class QiXunTongSendResultNofityController extends AbstractAPIController {
                     }
                 }
 
-                if(MsgSendDetail.STATE_FAIL == state){
+                if(MsgSendDetail.STATE_FAIL == detailState){
                     // 扣费返还
                     List<String> ids = Arrays.asList(msgSendDetail.getId());
                     BigDecimal cost = BigDecimal.ZERO.subtract(msgSendDetail.getMsgCost());
