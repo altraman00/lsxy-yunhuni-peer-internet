@@ -75,6 +75,13 @@ public class MsgUserRequestServiceImpl extends AbstractService<MsgUserRequest> i
     }
 
     @Override
+    public List<MsgUserRequest> findAwaitedButOverdueRequets() {
+        Date current = new Date();
+        Date end = new Date(current.getTime() - 3 * 24 * 60 * 60 * 1000);
+        return msgUserRequestDao.findByStateAndSendTimeLessThanEqual(MsgUserRequest.STATE_WAIT,end);
+    }
+
+    @Override
     public MsgUserRequest findByMsgKeyAndSendType(String appId, String subaccountId, String msgKey, String sendType) {
         return msgUserRequestDao.findFirstByAppIdAndSubaccountIdAndMsgKey(appId,subaccountId,msgKey);
     }
