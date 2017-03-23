@@ -80,7 +80,7 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
             hql +=" AND obj.tenantId in("+tenantIds+") ";
         }
         if(date1!=null&&date2!=null){
-            hql += " and obj.lateTime between ?2 and ?3 ";
+            hql += " and obj.lastTime between ?2 and ?3 order by obj.lastTime desc ";
             return pageList(hql,pageNo,pageSize,state,date1,date2);
         }else{
             return pageList(hql,pageNo,pageSize,state);
