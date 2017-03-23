@@ -176,7 +176,7 @@ public class MsgSendServiceImpl implements MsgSendService {
         //处理发送结果
         BigDecimal cost = calCostService.calCost(sendType,app.getTenant().getId());
         Date createTime = new Date();
-        int state = 0;
+        int resultState = MsgSendOneResult.STATE_SUCCESS;
         if(MsgConstant.SUCCESS.equals( resultOne.getResultCode() )) {
             // 计算每条费用
             //插入记录
@@ -199,10 +199,10 @@ public class MsgSendServiceImpl implements MsgSendService {
         }else{
             MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,sendType,mobile,msg,tempId,tempArgs,new Date(),cost,MsgUserRequest.STATE_FAIL,createTime);
             msgUserRequestService.save(msgRequest);
-            state = -1;
+            resultState = MsgSendOneResult.STATE_FAIL;
         }
         logger.info("发送器："+resultOne.getHandlers()+"|发送类型：单发闪印|手机号码："+mobile+"|模板id："+tempId+"|模板参数："+tempArgs+"|短信内容："+msg+"|发送结果："+resultOne.toString2());
-        return new MsgSendOneResult(key,state);
+        return new MsgSendOneResult(key,resultState);
     }
 
     private MsgSendMassResult sendMass(String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr, String sendType) throws YunhuniApiException {
@@ -295,13 +295,15 @@ public class MsgSendServiceImpl implements MsgSendService {
         ResultAllMass resultAllMass = new ResultAllMass(list,massMobile.getNo());
         //处理发送结果
         int state = MsgUserRequest.STATE_FAIL;
+        int resultState = MsgSendMassResult.STATE_FAIL;
         if(MsgConstant.SUCCESS.equals(resultAllMass.getResultCode())){
             state = MsgUserRequest.STATE_WAIT;
+            resultState = MsgSendMassResult.STATE_SUCCESS;
         }
         MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,taskName,sendType,null,mobiles,msg,tempId,tempArgs,sendTime,cost,true,
                 resultAllMass.getSumNum(),state,resultAllMass.getPendingNum(),resultAllMass.getInvalidNum(),resultAllMass.getResultDesc(),createTime);
         msgUserRequestService.save(msgRequest);
-        MsgSendMassResult msgSendResult = new MsgSendMassResult(key,state, resultAllMass.getInvalidPhones());
+        MsgSendMassResult msgSendResult = new MsgSendMassResult(key,resultState, resultAllMass.getInvalidPhones());
         return msgSendResult;
     }
 

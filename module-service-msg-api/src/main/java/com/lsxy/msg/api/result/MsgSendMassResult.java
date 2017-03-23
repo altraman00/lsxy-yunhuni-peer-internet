@@ -7,6 +7,8 @@ import java.util.List;
  * Created by liups on 2017/3/23.
  */
 public class MsgSendMassResult implements Serializable {
+    public static final int STATE_SUCCESS = 1;
+    public static final int STATE_FAIL = 0;
     private String msgKey;
     private int state;
     private List<String> invalidMobiles;

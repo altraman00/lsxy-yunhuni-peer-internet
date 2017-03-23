@@ -65,7 +65,8 @@ public class TemplateCompleteEventHandler implements MQMessageHandler<TemplateCo
                 Map<String,Object> notify_data = new MapBuilder<String,Object>()
                         .putIfNotEmpty("event","msg.template_complete")
                         .putIfNotEmpty("tempId",tempId)
-                        .putIfNotEmpty("status",template.getStatus())
+                        .putIfNotEmpty("state",MsgTemplate.STATUS_PASS == template.getStatus()?1:0)
+                        .putIfNotEmpty("reason",template.getReason())
                         .putIfNotEmpty("url",callbackUrl)
                         .build();
                 // 发送通知
