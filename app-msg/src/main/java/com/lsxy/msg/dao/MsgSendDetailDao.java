@@ -25,7 +25,7 @@ public interface MsgSendDetailDao extends BaseDaoInterface<MsgSendDetail, Serial
     @Query("update MsgSendDetail d set d.state = :state,d.endTime=:endTime where d.recordId = :recordId AND d.mobile IN (:phones)")
     void updateStateByRecordId(@Param("recordId") String recordId, @Param("phones") List<String> phones, @Param("state") int state,@Param("endTime") Date endTime);
 
-    List<String> findIdByRecordIdAndMobileIn(String recordId, List<String> phones);
+    List<MsgSendDetail> findByRecordIdAndMobileIn(String recordId, List<String> phones);
 
     @Modifying
     @Query("update MsgSendDetail d set d.state = :state,d.endTime=:endTime where d.recordId = :recordId AND d.state = :stateWait")
@@ -33,4 +33,5 @@ public interface MsgSendDetailDao extends BaseDaoInterface<MsgSendDetail, Serial
 
     List<MsgSendDetail> findByMsgKey(String msgKey);
 
+    List<MsgSendDetail> findByMsgKeyAndState(String msgKey, int stateFail);
 }

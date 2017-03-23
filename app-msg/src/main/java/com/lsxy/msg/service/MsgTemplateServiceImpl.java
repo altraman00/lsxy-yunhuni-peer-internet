@@ -166,6 +166,11 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
     }
 
     @Override
+    public MsgTemplate findByTempId(String tempId) {
+        return msgTemplateDao.findByTempId(tempId);
+    }
+
+    @Override
     public long findByWait() {
         String hql2 = "  from MsgTemplate obj where obj.status=?1  ";
         return this.countByCustom(hql2, MsgTemplate.STATUS_WAIT);

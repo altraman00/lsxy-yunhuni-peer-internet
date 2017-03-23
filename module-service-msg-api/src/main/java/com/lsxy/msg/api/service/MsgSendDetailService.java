@@ -27,4 +27,5 @@ public interface MsgSendDetailService extends BaseService<MsgSendDetail> {
     Page<MsgSendDetail> getPageByContiton(Integer pageNo, Integer pageSize, String msgKey, String mobile, String state);
     List<MsgSendDetail> findByMsgKey(String msgKey);
 
+    String findFailMobilesByMsgKey(String msgKey);
 }

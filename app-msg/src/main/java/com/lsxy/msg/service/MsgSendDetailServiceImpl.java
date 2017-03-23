@@ -5,6 +5,7 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.msg.api.model.MsgConstant;
 import com.lsxy.msg.api.model.MsgSendDetail;
 import com.lsxy.msg.api.model.MsgSendRecord;
 import com.lsxy.msg.api.service.MsgSendDetailService;
@@ -80,7 +81,16 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
     public List<String> updateStateAndTaskIdAndEndTimeByRecordIdAndPhones(String recordId, List<String> phones, int state, String taskId,Date endTime) {
         msgSendDetailDao.updateDetailStateAndTaskIdByRecordId(recordId, phones, state,taskId,endTime);
         if(MsgSendDetail.STATE_FAIL == state){
-             return msgSendDetailDao.findIdByRecordIdAndMobileIn(recordId,phones);
+            List<MsgSendDetail> details = msgSendDetailDao.findByRecordIdAndMobileIn(recordId, phones);
+            if(details != null && details.size()>0){
+                List<String> ids = new ArrayList<>();
+                for(MsgSendDetail detail : details){
+                    ids.add(detail.getId());
+                }
+                return ids;
+            }else{
+                return null;
+            }
         }else{
             return null;
         }
@@ -90,7 +100,16 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
     public List<String> updateStateAndSetEndTimeByRecordIdAndPhones(String recordId, List<String> phones, int state,Date endTime) {
         msgSendDetailDao.updateStateByRecordId(recordId, phones, state,endTime);
         if(MsgSendDetail.STATE_FAIL == state){
-            return msgSendDetailDao.findIdByRecordIdAndMobileIn(recordId,phones);
+            List<MsgSendDetail> details = msgSendDetailDao.findByRecordIdAndMobileIn(recordId, phones);
+            if(details != null && details.size()>0){
+                List<String> ids = new ArrayList<>();
+                for(MsgSendDetail detail : details){
+                    ids.add(detail.getId());
+                }
+                return ids;
+            }else{
+                return null;
+            }
         }else{
             return null;
         }
@@ -123,6 +142,20 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
     @Override
     public List<MsgSendDetail> findByMsgKey(String msgKey) {
         return msgSendDetailDao.findByMsgKey(msgKey);
+    }
+
+    @Override
+    public String findFailMobilesByMsgKey(String msgKey) {
+        String result = null;
+        List<MsgSendDetail> failMobiles = msgSendDetailDao.findByMsgKeyAndState(msgKey,MsgSendDetail.STATE_WAIT);
+        if(failMobiles != null && failMobiles.size() > 0){
+            List<String> strings = new ArrayList<>();
+            for(MsgSendDetail detail : failMobiles){
+                strings.add(detail.getMobile());
+            }
+            result = StringUtils.join(strings,MsgConstant.NumRegexStr);
+        }
+        return result;
     }
 
 }

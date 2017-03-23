@@ -90,4 +90,9 @@ public class MsgUserRequestServiceImpl extends AbstractService<MsgUserRequest> i
         }
     }
 
+    @Override
+    public MsgUserRequest findByMsgKey(String msgKey) {
+        return msgUserRequestDao.findByMsgKey(msgKey);
+    }
+
 }

@@ -9,6 +9,7 @@ import com.lsxy.framework.monitor.FrameworkMonitorConfig;
 import com.lsxy.msg.MsgServiceConfig;
 import com.lsxy.msg.api.MsgApiConfig;
 import com.lsxy.msg.api.model.MsgSendRecord;
+import com.lsxy.msg.api.service.MsgSendDetailService;
 import com.lsxy.msg.api.service.MsgSendRecordService;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
 import com.lsxy.yunhuni.api.YunhuniApiConfig;
@@ -59,5 +60,15 @@ public class MsgTest {
     public void test(){
         List<MsgSendRecord> ussdSendOneFailAndSendNotOver = msgSendRecordService.findUssdSendOneFailAndSendNotOver();
     }
+
+
+    @Autowired
+    MsgSendDetailService msgSendDetailService;
+    @Test
+    public void testDe(){
+        String fail = msgSendDetailService.findFailMobilesByMsgKey("67861a1c4a3091101e3e817b28c73641");
+        System.out.println(fail);
+    }
+
 
 }
