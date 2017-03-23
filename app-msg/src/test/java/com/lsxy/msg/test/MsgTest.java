@@ -8,6 +8,7 @@ import com.lsxy.framework.dubbo.EnableDubboConfiguration;
 import com.lsxy.framework.monitor.FrameworkMonitorConfig;
 import com.lsxy.msg.MsgServiceConfig;
 import com.lsxy.msg.api.MsgApiConfig;
+import com.lsxy.msg.api.model.MsgSendDetail;
 import com.lsxy.msg.api.model.MsgSendRecord;
 import com.lsxy.msg.api.service.MsgSendDetailService;
 import com.lsxy.msg.api.service.MsgSendRecordService;
@@ -27,6 +28,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by liups on 2017/2/14.
@@ -66,8 +68,16 @@ public class MsgTest {
     MsgSendDetailService msgSendDetailService;
     @Test
     public void testDe(){
-        String fail = msgSendDetailService.findFailMobilesByMsgKey("67861a1c4a3091101e3e817b28c73641");
-        System.out.println(fail);
+        Map result = msgSendDetailService.getStateCountByRecordId("8a2bc5445af0311d015af0362a590001");
+        long succNum = 0;//成功次数
+        long failNum = 0;//失败次数
+        long pendingNum = 0;//待发送数
+        if(result != null){
+            succNum = result.get(MsgSendDetail.STATE_SUCCESS) == null? 0L : (Long)result.get(MsgSendDetail.STATE_SUCCESS);
+            failNum = result.get(MsgSendDetail.STATE_FAIL) == null? 0L : (Long)result.get(MsgSendDetail.STATE_FAIL);
+            pendingNum = result.get(MsgSendDetail.STATE_WAIT) == null? 0L : (Long)result.get(MsgSendDetail.STATE_WAIT);
+        }
+        System.out.println(succNum + "," + failNum + "," + pendingNum);
     }
 
 
