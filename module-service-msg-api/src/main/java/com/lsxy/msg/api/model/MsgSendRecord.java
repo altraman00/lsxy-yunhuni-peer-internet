@@ -80,6 +80,8 @@ public class MsgSendRecord extends IdEntity {
         this.msgCost = msgCost;
         this.isMass = isMass;
         this.sumNum = sumNum;
+        this.succNum = 0L;
+        this.failNum = 0L;
         this.pendingNum = pendingNum;
         this.failNum = failNum;
         this.state = state;
