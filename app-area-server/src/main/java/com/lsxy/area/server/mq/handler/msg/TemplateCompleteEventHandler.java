@@ -58,11 +58,15 @@ public class TemplateCompleteEventHandler implements MQMessageHandler<TemplateCo
                 App app = appService.findById(template.getAppId());
                 callbackUrl = app.getUrl();
             }
-            if(StringUtils.isBlank(callbackUrl)){
+            if(StringUtils.isNotBlank(callbackUrl)){
+                if(logger.isDebugEnabled()){
+                    logger.debug("回调地址{}",callbackUrl);
+                }
                 Map<String,Object> notify_data = new MapBuilder<String,Object>()
                         .putIfNotEmpty("event","msg.template_complete")
                         .putIfNotEmpty("tempId",tempId)
-                        .putIfNotEmpty("status",template.getStatus())
+                        .putIfNotEmpty("state",MsgTemplate.STATUS_PASS == template.getStatus()?1:0)
+                        .putIfNotEmpty("reason",template.getReason())
                         .putIfNotEmpty("url",callbackUrl)
                         .build();
                 // 发送通知

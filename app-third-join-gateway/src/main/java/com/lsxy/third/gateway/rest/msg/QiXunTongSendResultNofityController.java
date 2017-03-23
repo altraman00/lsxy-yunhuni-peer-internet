@@ -105,7 +105,7 @@ public class QiXunTongSendResultNofityController extends AbstractAPIController {
                 msgSendDetail.setState(detailState);
                 msgSendDetail.setEndTime(endTime);
                 msgSendDetailService.save(msgSendDetail);
-                if(!msgSendDetail.getIsMass()) {
+                if(msgSendDetail.getIsMass() == null || !msgSendDetail.getIsMass()) {
                     try{
                         msgSendRecordService.updateNoMassStateByTaskId(msgSendDetail.getTaskId(),recordState);
                         msgUserRequestService.updateNoMassStateByMsgKey(msgSendDetail.getMsgKey(),requestState);

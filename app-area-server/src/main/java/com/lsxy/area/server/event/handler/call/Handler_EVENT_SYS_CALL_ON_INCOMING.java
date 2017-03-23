@@ -475,7 +475,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 return;
             }
             tenant = app.getTenant();
-            if(app.getStatus() == null || app.getStatus() == App.STATUS_OFFLINE){
+            if(app.getStatus() == null || app.getStatus() != App.STATUS_ONLINE){
                 logger.info("应用未上线appId={}",app.getId());
                 return;
             }

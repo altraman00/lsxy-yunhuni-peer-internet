@@ -58,13 +58,17 @@ public class MsgRequestCompletedEventHandler implements MQMessageHandler<MsgRequ
             App app = appService.findById(request.getAppId());
             callbackUrl = app.getUrl();
         }
-        if(StringUtils.isBlank(callbackUrl)){
+        if(StringUtils.isNotBlank(callbackUrl)){
+            if(logger.isDebugEnabled()){
+                logger.debug("回调地址{}",callbackUrl);
+            }
             String failMobiles = msgSendDetailService.findFailMobilesByMsgKey(msgKey);
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","msg.sending_complete")
                     .putIfNotEmpty("msgKey",msgKey)
                     .putIfNotEmpty("state",request.getState())
                     .putIfNotEmpty("failMobiles",failMobiles)
+                    .putIfNotEmpty("type",(request.getIsMass()!=null&&request.getIsMass())?1:0)
                     .putIfNotEmpty("url",callbackUrl)
                     .build();
             // 发送通知

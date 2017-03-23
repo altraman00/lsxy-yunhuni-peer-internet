@@ -108,7 +108,7 @@ public class MsgSendServiceImpl implements MsgSendService {
     @Transactional
     private MsgSendOneResult sendOne(String appId, String subaccountId, String mobile, String tempId, String tempArgs, String sendType) throws YunhuniApiException {
         App app = appService.findById(appId);
-        if(App.STATUS_OFFLINE == app.getStatus()){
+        if(app.getStatus() == null || App.STATUS_ONLINE != app.getStatus()){
             List<String> testNums = testNumBindService.findNumByAppId(app.getId());
             if(!testNums.contains(mobile)){
                 throw new AppOffLineException();
@@ -176,7 +176,7 @@ public class MsgSendServiceImpl implements MsgSendService {
         //处理发送结果
         BigDecimal cost = calCostService.calCost(sendType,app.getTenant().getId());
         Date createTime = new Date();
-        int state = 0;
+        int resultState = MsgSendOneResult.STATE_SUCCESS;
         if(MsgConstant.SUCCESS.equals( resultOne.getResultCode() )) {
             // 计算每条费用
             //插入记录
@@ -199,16 +199,16 @@ public class MsgSendServiceImpl implements MsgSendService {
         }else{
             MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,sendType,mobile,msg,tempId,tempArgs,new Date(),cost,MsgUserRequest.STATE_FAIL,createTime);
             msgUserRequestService.save(msgRequest);
-            state = -1;
+            resultState = MsgSendOneResult.STATE_FAIL;
         }
         logger.info("发送器："+resultOne.getHandlers()+"|发送类型：单发闪印|手机号码："+mobile+"|模板id："+tempId+"|模板参数："+tempArgs+"|短信内容："+msg+"|发送结果："+resultOne.toString2());
-        return new MsgSendOneResult(key,state);
+        return new MsgSendOneResult(key,resultState);
     }
 
     private MsgSendMassResult sendMass(String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr, String sendType) throws YunhuniApiException {
         App app = appService.findById(appId);
 
-        if(App.STATUS_OFFLINE == app.getStatus()){
+        if(app.getStatus() == null || App.STATUS_ONLINE != app.getStatus()){
             List<String> testNums = testNumBindService.findNumByAppId(app.getId());
             if(!testNums.containsAll(Arrays.asList(mobiles.split(MsgConstant.NumRegexStr)))){
                 throw new AppOffLineException();
@@ -295,13 +295,15 @@ public class MsgSendServiceImpl implements MsgSendService {
         ResultAllMass resultAllMass = new ResultAllMass(list,massMobile.getNo());
         //处理发送结果
         int state = MsgUserRequest.STATE_FAIL;
+        int resultState = MsgSendMassResult.STATE_FAIL;
         if(MsgConstant.SUCCESS.equals(resultAllMass.getResultCode())){
             state = MsgUserRequest.STATE_WAIT;
+            resultState = MsgSendMassResult.STATE_SUCCESS;
         }
         MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,taskName,sendType,null,mobiles,msg,tempId,tempArgs,sendTime,cost,true,
                 resultAllMass.getSumNum(),state,resultAllMass.getPendingNum(),resultAllMass.getInvalidNum(),resultAllMass.getResultDesc(),createTime);
         msgUserRequestService.save(msgRequest);
-        MsgSendMassResult msgSendResult = new MsgSendMassResult(key,state, resultAllMass.getInvalidPhones());
+        MsgSendMassResult msgSendResult = new MsgSendMassResult(key,resultState, resultAllMass.getInvalidPhones());
         return msgSendResult;
     }
 
@@ -319,7 +321,7 @@ public class MsgSendServiceImpl implements MsgSendService {
                 String recordId = UUIDGenerator.uuid();//记录的Id提前生成
                 ResultMass resultMass = massService.sendMass(recordId,tenantId,appId,subaccountId,key,taskName, tempId, tempArgsList, msg, ulMobileList, sendTime,sendType,cost.toString());
                 String mobiles = StringUtils.join(ulMobileList,MsgConstant.NumRegexStr);
-                if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode() )&& !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){
+                if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode() )){
                     //存发送记录 一开始发送总数是所有等待的号码
                     MsgSendRecord msgSendRecord = new MsgSendRecord(recordId,key,tenantId,appId,subaccountId,resultMass.getTaskId(),taskName,mobiles,sendType,resultMass.getHandlers(),oprator,msg,
                             tempId,resultMass.getSupplierTempId(),tempArgs,sendTime,cost,true,resultMass.getPendingNum(),resultMass.getPendingNum(),0L,MsgSendRecord.STATE_WAIT,createTime);
@@ -513,6 +515,11 @@ public class MsgSendServiceImpl implements MsgSendService {
             }
         }
         return false;
+    }
+
+    public static void main(String[] args) {
+        List<String> testTest = Arrays.asList("aaaa","bbbbb");
+
     }
 
 }

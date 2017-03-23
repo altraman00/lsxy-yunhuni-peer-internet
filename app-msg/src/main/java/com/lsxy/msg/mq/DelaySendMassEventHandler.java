@@ -40,6 +40,9 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
 
     @Override
     public void handleMessage(DelaySendMassEvent message) throws JMSException {
+        if(logger.isDebugEnabled()){
+            logger.debug("进入延时发送处理方法:{}",message);
+        }
         ResultMass resultMass = null;
         String[] split = message.getTempArgs().split(MsgConstant.ParamRegexStr);
         List<String> tempArgsList = Arrays.asList(split);
@@ -71,6 +74,9 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
             BigDecimal cost = BigDecimal.ZERO.subtract(new BigDecimal(message.getCost()));
             ProductCode product = ProductCode.valueOf(message.getSendType());
             msgSendService.batchConsumeMsg(endTime,message.getSendType(),cost,product.getRemark(),message.getAppId(),message.getTenantId(),message.getSubaccountId(),ids);
+        }
+        if(logger.isDebugEnabled()){
+            logger.debug("结束延时发送处理方法:{}",message);
         }
     }
 }

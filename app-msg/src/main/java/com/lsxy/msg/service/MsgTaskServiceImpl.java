@@ -14,6 +14,7 @@ import com.lsxy.msg.supplier.paopaoyu.PaoPaoYuMassNofity;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.msg.paopaoyu.PaoPaoYuConstant;
+import com.msg.qixuntong.QiXunTongConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +68,7 @@ public class MsgTaskServiceImpl implements MsgTaskService{
         long succNum = 0; //成功次数
         long failNum = 0; //失败次数
         long pendingNum = 0; //待发送数
-        //泡泡鱼的群发情况
+        //群发情况
         List<MsgSendRecord> records = msgSendRecordService.findByMsgKey(request.getMsgKey());
         int state = MsgUserRequest.STATE_FAIL;
         boolean flag = true;
@@ -92,6 +93,44 @@ public class MsgTaskServiceImpl implements MsgTaskService{
         msgUserRequestService.save(request);
     }
 
+
+    @Override
+    public void massTaskRequestOverdueUpdate(){
+        logger.info("[群发任务过期][检测开始]");
+        List<MsgUserRequest> requests = msgUserRequestService.findAwaitedButOverdueRequets();
+        for(MsgUserRequest request : requests){
+            updateOverdueRequest(request);
+        }
+        logger.info("[群发任务过期][检测结束]");
+    }
+
+    //查看是否执行完成
+    private void updateOverdueRequest(MsgUserRequest request){
+        long succNum = 0; //成功次数
+        long failNum = 0; //失败次数
+        long pendingNum = 0; //待发送数
+        Date endTime = new Date();
+        //群发情况
+        List<MsgSendRecord> records = msgSendRecordService.findByMsgKey(request.getMsgKey());
+        for(MsgSendRecord record : records){
+            Long recordFailNum = msgSendDetailService.finishOverdueRecordId(record.getId(), endTime);
+            record.setFailNum(recordFailNum);
+            record.setPendingNum(0L);
+            record.setSuccNum(record.getSumNum() - recordFailNum);
+            record.setState(MsgSendRecord.STATE_SUCCESS);
+            msgSendRecordService.save(record);
+
+            succNum += record.getSuccNum();
+            failNum += record.getFailNum();
+        }
+        request.setState(MsgUserRequest.STATE_SUCCESS);
+        request.setPendingNum(pendingNum);
+        request.setFailNum(failNum);
+        request.setSuccNum(succNum);
+        msgUserRequestService.save(request);
+
+        mqService.publish(new MsgRequestCompletedEvent(request.getMsgKey()));
+    }
 
     /**
      * 每小时的10分钟，检测截止到当前的一个星期内的检测结果
@@ -204,7 +243,7 @@ public class MsgTaskServiceImpl implements MsgTaskService{
     @Override
     public void qiXunTongMassTaskUpdate(){
         logger.info("[群发任务][检测开始]");
-        List<MsgSendRecord> records = msgSendRecordService.findWaitedSendMassBySupplier(PaoPaoYuConstant.PaopaoyuCode);
+        List<MsgSendRecord> records = msgSendRecordService.findWaitedSendMassBySupplier(QiXunTongConstant.QixuntongCode);
         for(MsgSendRecord record : records){
             checkQiXunTongMassTask(record);
         }
