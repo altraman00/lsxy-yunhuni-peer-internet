@@ -176,7 +176,7 @@ public class MsgSendServiceImpl implements MsgSendService {
         //处理发送结果
         BigDecimal cost = calCostService.calCost(sendType,app.getTenant().getId());
         Date createTime = new Date();
-        boolean state;
+        int state = 0;
         if(MsgConstant.SUCCESS.equals( resultOne.getResultCode() )) {
             // 计算每条费用
             //插入记录
@@ -196,11 +196,10 @@ public class MsgSendServiceImpl implements MsgSendService {
                 ProductCode product = ProductCode.valueOf(sendType);
                 this.batchConsumeMsg(createTime,sendType,cost,product.getRemark(),appId,msgRequest.getTenantId(),subaccountId,ids);
             }
-            state = true;
         }else{
             MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,sendType,mobile,msg,tempId,tempArgs,new Date(),cost,MsgUserRequest.STATE_FAIL,createTime);
             msgUserRequestService.save(msgRequest);
-            state = false;
+            state = -1;
         }
         logger.info("发送器："+resultOne.getHandlers()+"|发送类型：单发闪印|手机号码："+mobile+"|模板id："+tempId+"|模板参数："+tempArgs+"|短信内容："+msg+"|发送结果："+resultOne.toString2());
         return new MsgSendOneResult(key,state);
@@ -296,15 +295,13 @@ public class MsgSendServiceImpl implements MsgSendService {
         ResultAllMass resultAllMass = new ResultAllMass(list,massMobile.getNo());
         //处理发送结果
         int state = MsgUserRequest.STATE_FAIL;
-        boolean returnState = false;
         if(MsgConstant.SUCCESS.equals(resultAllMass.getResultCode())){
             state = MsgUserRequest.STATE_WAIT;
-            returnState = true;
         }
         MsgUserRequest msgRequest = new MsgUserRequest(key,app.getTenant().getId(),appId,subaccountId,taskName,sendType,null,mobiles,msg,tempId,tempArgs,sendTime,cost,true,
                 resultAllMass.getSumNum(),state,resultAllMass.getPendingNum(),resultAllMass.getInvalidNum(),resultAllMass.getResultDesc(),createTime);
         msgUserRequestService.save(msgRequest);
-        MsgSendMassResult msgSendResult = new MsgSendMassResult(key,returnState, resultAllMass.getInvalidPhones());
+        MsgSendMassResult msgSendResult = new MsgSendMassResult(key,state, resultAllMass.getInvalidPhones());
         return msgSendResult;
     }
 

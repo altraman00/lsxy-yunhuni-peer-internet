@@ -8,13 +8,13 @@ import java.util.List;
  */
 public class MsgSendMassResult implements Serializable {
     private String msgKey;
-    private boolean state;
+    private int state;
     private List<String> invalidMobiles;
 
     public MsgSendMassResult() {
     }
 
-    public MsgSendMassResult(String msgKey, boolean state, List<String> invalidMobiles) {
+    public MsgSendMassResult(String msgKey, int state, List<String> invalidMobiles) {
         this.msgKey = msgKey;
         this.state = state;
         this.invalidMobiles = invalidMobiles;
@@ -28,11 +28,11 @@ public class MsgSendMassResult implements Serializable {
         this.msgKey = msgKey;
     }
 
-    public boolean isState() {
+    public Integer getState() {
         return state;
     }
 
-    public void setState(boolean state) {
+    public void setState(Integer state) {
         this.state = state;
     }
 
