@@ -5,6 +5,7 @@ import com.lsxy.framework.api.FrameworkApiConfig;
 import com.lsxy.framework.cache.FrameworkCacheConfig;
 import com.lsxy.framework.dubbo.EnableDubboConfiguration;
 import com.lsxy.framework.monitor.FrameworkMonitorConfig;
+import com.lsxy.framework.mq.FrameworkMQConfig;
 import com.lsxy.framework.web.web.AbstractSpringBootWebStarter;
 import com.lsxy.msg.MsgServiceConfig;
 import com.lsxy.msg.api.MsgApiConfig;
@@ -20,7 +21,7 @@ import org.springframework.context.annotation.Import;
  */
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
 @Import({FrameworkApiConfig.class,FrameworkServiceConfig.class, FrameworkCacheConfig.class, YunhuniApiConfig.class, YunhuniServiceConfig.class,
-        FrameworkMonitorConfig.class,MsgApiConfig.class,MsgServiceConfig.class})
+        FrameworkMonitorConfig.class,MsgApiConfig.class,MsgServiceConfig.class,FrameworkMQConfig.class})
 @EnableDubboConfiguration
 public class MainClass  extends AbstractSpringBootWebStarter {
 
