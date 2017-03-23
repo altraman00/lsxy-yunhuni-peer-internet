@@ -121,6 +121,12 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
     }
 
     @Override
+    public Long finishOverdueRecordId(String recordId,Date endTime){
+        msgSendDetailDao.updateStateFromWaitedToSuccessAndSetEndTimeByRecordId(recordId, MsgSendDetail.STATE_WAIT ,MsgSendDetail.STATE_SUCCESS,endTime);
+        return msgSendDetailDao.countByRecordIdAndState(recordId,MsgSendDetail.STATE_FAIL);
+    }
+
+    @Override
     public Map getStateCountByRecordId(String recordId) {
         String sql = "SELECT d.state,COUNT(1) FROM db_lsxy_bi_yunhuni.tb_bi_msg_send_detail d WHERE d.record_id = ? GROUP BY d.state";
         return jdbcTemplate.queryForMap(sql,recordId);

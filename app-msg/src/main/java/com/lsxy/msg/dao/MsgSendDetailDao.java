@@ -34,4 +34,6 @@ public interface MsgSendDetailDao extends BaseDaoInterface<MsgSendDetail, Serial
     List<MsgSendDetail> findByMsgKey(String msgKey);
 
     List<MsgSendDetail> findByMsgKeyAndState(String msgKey, int stateFail);
+
+    Long countByRecordIdAndState(String recordId, int stateFail);
 }

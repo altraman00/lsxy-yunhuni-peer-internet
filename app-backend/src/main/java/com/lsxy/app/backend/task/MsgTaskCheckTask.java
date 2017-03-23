@@ -19,6 +19,12 @@ public class MsgTaskCheckTask {
         msgTaskService.massTaskRequestUpdate();
     }
 
+
+    @Scheduled(cron="0 30 * * * ?")
+    public void scheduled_massTaskRequestOverdue_yyyyMMddHH(){
+        msgTaskService.massTaskRequestOverdueUpdate();
+    }
+
     @Scheduled(cron="0 0/10 * * * ?")
     public void scheduled_paoPaoYuMassTask_yyyyMMddHHmm(){
         msgTaskService.paoPaoYuMassTaskUpdate();
