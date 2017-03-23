@@ -58,7 +58,7 @@ public class MsgRequestCompletedEventHandler implements MQMessageHandler<MsgRequ
             App app = appService.findById(request.getAppId());
             callbackUrl = app.getUrl();
         }
-        if(StringUtils.isBlank(callbackUrl)){
+        if(StringUtils.isNotBlank(callbackUrl)){
             if(logger.isDebugEnabled()){
                 logger.debug("回调地址{}",callbackUrl);
             }
