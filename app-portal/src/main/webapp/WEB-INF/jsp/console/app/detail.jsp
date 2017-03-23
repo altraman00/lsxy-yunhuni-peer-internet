@@ -365,13 +365,13 @@
                                         <table class="table table-striped cost-table-history tablelist" id="number-table">
                                             <thead>
                                             <tr>
-                                                <th class="text-center">号码</th>
-                                                <th class="text-center">状态</th>
-                                                <th class="text-center">可呼入</th>
-                                                <th class="text-center">可呼出</th>
-                                                <th class="text-center"><span class="text-center-l-fixed">归属地</span></th>
-                                                <th class="text-center">有效期</th>
-                                                <th class="text-center">操作</th>
+                                                <th class="">号码</th>
+                                                <th class="">状态</th>
+                                                <th class="">可呼入</th>
+                                                <th class="">可呼出</th>
+                                                <th class=""><span class="text-center-l-fixed">归属地</span></th>
+                                                <th class="">有效期</th>
+                                                <th class="">操作</th>
                                             </tr>
                                             </thead>
                                             <tbody id="band-table">
@@ -576,12 +576,12 @@
                                         <table class="table table-striped cost-table-history tablelist" id="agent-table">
                                             <thead>
                                             <tr>
-                                                <th class="text-center">坐席名称（ID）</th>
-                                                <th class="text-center">技能组</th>
-                                                <th class="text-center">绑定分机</th>
-                                                <th class="text-center">关联子账号</th>
-                                                <th class="text-center">状态</th>
-                                                <th class="text-center">操作</th>
+                                                <th class="">坐席名称（ID）</th>
+                                                <th class="">技能组</th>
+                                                <th class="">绑定分机</th>
+                                                <th class="">关联子账号</th>
+                                                <th class="">状态</th>
+                                                <th class="">操作</th>
                                             </tr>
                                             </thead>
                                             <tbody id="agent-list">
@@ -613,13 +613,13 @@
                                         <table class="table table-striped cost-table-history tablelist" id="queue-table">
                                             <thead>
                                             <tr>
-                                                <th class="text-center" >条件选择表达式</th>
-                                                <th class="text-center">排序表达式</th>
-                                                <th class="text-center" style="width: 20px">优先级</th>
-                                                <th class="text-center" style="width: 20px">等待超时时间（秒）</th>
-                                                <th class="text-center" style="width: 20px">接听超时时间（秒）</th>
-                                                <th class="text-center">关联子账号</th>
-                                                <th class="text-center">备注</th>
+                                                <th class="" >条件选择表达式</th>
+                                                <th class="">排序表达式</th>
+                                                <th class="" style="width: 20px">优先级</th>
+                                                <th class="" style="width: 20px">等待超时时间（秒）</th>
+                                                <th class="" style="width: 20px">接听超时时间（秒）</th>
+                                                <th class="">关联子账号</th>
+                                                <th class="">备注</th>
                                             </tr>
                                             </thead>
                                             <tbody id="queue-list">
@@ -649,22 +649,22 @@
                                         <table class="table table-striped cost-table-history tablelist" id="subAccount-table">
                                             <thead>
                                             <tr>
-                                                <th class="text-center">鉴权账号</th>
-                                                <th class="text-center">密钥</th>
+                                                <th class="">鉴权账号</th>
+                                                <th class="">密钥</th>
                                                 <c:if test="${app.serviceType == 'voice'}">
-                                                    <th class="text-center">语音用量 /总量（分钟）</th>
+                                                    <th class="">语音用量 /总量（分钟）</th>
                                                 </c:if>
                                                 <c:if test="${app.serviceType == 'call_center'}">
-                                                    <th class="text-center">语音用量 /总量（分钟）</th>
+                                                    <th class="">语音用量 /总量（分钟）</th>
                                                     <%--<th class="text-center">坐席用量 /总量（个）</th>--%>
                                                </c:if>
                                                <c:if test="${app.serviceType == 'msg'}">
-                                                   <th class="text-center">闪印用量 /配额（条）</th>
-                                                   <th class="text-center">短信用量/配额（条）</th>
+                                                   <th class="">闪印用量 /配额（条）</th>
+                                                   <th class="">短信用量/配额（条）</th>
                                                </c:if>
-                                                <th class="text-center">状态</th>
-                                                <th class="text-center">备注</th>
-                                                <th class="text-center">操作</th>
+                                                <th class="">状态</th>
+                                                <th class="">备注</th>
+                                                <th class="">操作</th>
                                             </tr>
                                             </thead>
                                             <tbody >
@@ -798,13 +798,13 @@
                                                 <table class="table table-striped cost-table-history tablelist" id="number-table2">
                                                     <thead>
                                                     <tr>
-                                                        <th class="text-center">号码</th>
-                                                        <th class="text-center">状态</th>
-                                                        <th class="text-center">可呼入</th>
-                                                        <th class="text-center">可呼出</th>
-                                                        <th class="text-center"><span class="text-center-l-fixed">归属地</span></th>
-                                                        <th class="text-center">有效期</th>
-                                                        <th class="text-center">操作</th>
+                                                        <th class="">号码</th>
+                                                        <th class="">状态</th>
+                                                        <th class="">可呼入</th>
+                                                        <th class="">可呼出</th>
+                                                        <th class=""><span class="text-center-l-fixed">归属地</span></th>
+                                                        <th class="">有效期</th>
+                                                        <th class="">操作</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody id="band-table2">
@@ -847,18 +847,18 @@
                         <tr>
                             <th><input type="checkbox" v-model="shopCheck" @click="isCheck" />全选</th>
                             <th>号码</th>
-                            <th class="text-center">可呼入</th>
-                            <th class="text-center">可呼出</th>
-                            <th class="text-center"><span class="text-center-l-fixed">归属地</span></th>
+                            <th class="">可呼入</th>
+                            <th class="">可呼出</th>
+                            <th class="t"><span class="text-center-l-fixed">归属地</span></th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr v-for="item in phonelist">
                             <td scope="row"><input type="checkbox" v-model="shop" value="{{ item.num }}"/></td>
                             <td>{{ item.num }}</td>
-                            <td class="text-center">{{ isCall[item.isCalled] }}</td>
-                            <td class="text-center">{{ isCall[item.isDialing]}}</td>
-                            <td class="text-center"><span class="text-center-l-fixed">{{ item.areaCode}}</span></td>
+                            <td class="">{{ isCall[item.isCalled] }}</td>
+                            <td class="">{{ isCall[item.isDialing]}}</td>
+                            <td class=""><span class="text-center-l-fixed">{{ item.areaCode}}</span></td>
                         </tr>
                         </tbody>
                     </table>
@@ -2441,13 +2441,13 @@
         // $('#playtable').find(".playtr").remove();["✔", "✘"],
         for(var i =0 ; i<data.length; i++){
             html +='<tr id="rent-'+ data[i].rentId +'">' +
-                    '<td class="text-center">'+nulltostr(data[i].num)+'</td>' +
-                    '<td class="text-center">' + (data[i].status == 0 ? '过期': '正常') + '</td>' +
-                    '<td class="text-center">'+ (data[i].isCalled == 0 ? '✘': '✔') +'</td>' +
-                    '<td class="text-center">'+ (data[i].isDialing == 0 ? '✘': '✔') +'</td>' +
-                    '<td class="text-center"><span class="text-center-l-fixed">'+data[i].areaCode+'</span></td>' +
-                    '<td class="text-center"> ' + nulltostr(data[i].expireTime) + ' </td>' +
-                    '<td class="text-center"><a onclick="unband(\''+data[i].rentId+'\')">解除绑定</a></td>' +
+                    '<td class="">'+nulltostr(data[i].num)+'</td>' +
+                    '<td class="">' + (data[i].status == 0 ? '过期': '正常') + '</td>' +
+                    '<td class="">'+ (data[i].isCalled == 0 ? '✘': '✔') +'</td>' +
+                    '<td class="">'+ (data[i].isDialing == 0 ? '✘': '✔') +'</td>' +
+                    '<td class=""><span class="text-center-l-fixed">'+data[i].areaCode+'</span></td>' +
+                    '<td class=""> ' + nulltostr(data[i].expireTime) + ' </td>' +
+                    '<td class=""><a onclick="unband(\''+data[i].rentId+'\')">解除绑定</a></td>' +
                     '</tr>'
         }
         $('#band-table').html(html);
@@ -2499,13 +2499,13 @@
         // $('#playtable').find(".playtr").remove();["✔", "✘"],
         for(var i =0 ; i<data.length; i++){
             html +='<tr id="rent-'+ data[i].rentId +'">' +
-                '<td class="text-center">'+nulltostr(data[i].num)+'</td>' +
-                '<td class="text-center">' + (data[i].status == 0 ? '过期': '正常') + '</td>' +
-                '<td class="text-center">'+ (data[i].isCalled == 0 ? '✘': '✔') +'</td>' +
-                '<td class="text-center">'+ (data[i].isDialing == 0 ? '✘': '✔') +'</td>' +
-                '<td class="text-center"><span class="text-center-l-fixed">'+data[i].areaCode+'</span></td>' +
-                '<td class="text-center"> ' + nulltostr(data[i].expireTime) + ' </td>' +
-                '<td class="text-center"><a onclick="unband2(\''+data[i].rentId+'\')">解除绑定</a></td>' +
+                '<td class="">'+nulltostr(data[i].num)+'</td>' +
+                '<td class="">' + (data[i].status == 0 ? '过期': '正常') + '</td>' +
+                '<td class="">'+ (data[i].isCalled == 0 ? '✘': '✔') +'</td>' +
+                '<td class="">'+ (data[i].isDialing == 0 ? '✘': '✔') +'</td>' +
+                '<td class=""><span class="text-center-l-fixed">'+data[i].areaCode+'</span></td>' +
+                '<td class=""> ' + nulltostr(data[i].expireTime) + ' </td>' +
+                '<td class=""><a onclick="unband2(\''+data[i].rentId+'\')">解除绑定</a></td>' +
                 '</tr>'
         }
         $('#band-table2').html(html);
@@ -2884,24 +2884,24 @@
         },"get");
         for(var i =0 ; i<data.length; i++){
             html +='<tr class="playtr" id="play-'+data[i].id+'">' +
-                '<td class="text-center">'+ nulltostr(data[i].certId) +'</td>' +
-                '<td class="text-center">'+ nulltostr(data[i].secretKey) +'</td>';
+                '<td class="">'+ nulltostr(data[i].certId) +'</td>' +
+                '<td class="">'+ nulltostr(data[i].secretKey) +'</td>';
             if(appServiceType=='msg'){
-                html += '<td class="text-center">' + nulltostr(data[i].ussdNum) + '</td>' ;
-                html += '<td class="text-center">' + nulltostr(data[i].smsNum) + '</td>' ;
+                html += '<td class="">' + nulltostr(data[i].ussdNum) + '</td>' ;
+                html += '<td class="">' + nulltostr(data[i].smsNum) + '</td>' ;
             }else if(appServiceType=='call_center'){
-                html += '<td class="text-center">' + nulltostr(data[i].voiceNum) + '</td>' ;
+                html += '<td class="">' + nulltostr(data[i].voiceNum) + '</td>' ;
 //                html += '<td class="text-center">' + data[i].seatNum + '</td>' ;
             }else if(appServiceType=='voice'){
-                html += '<td class="text-center">' + nulltostr(data[i].voiceNum) + '</td>' ;
+                html += '<td class="">' + nulltostr(data[i].voiceNum) + '</td>' ;
             }
             var state = data[i].enabled == 1?"启用":"禁用";
             var color = data[i].enabled == 1?"text-success":"text-danger";
             var stateEdit = data[i].enabled == 1?"禁用":"启用";
             var remark1 = data[i].remark !=null && data[i].remark.length>18 ? data[i].remark.substring(0,18)+"...": data[i].remark;
-            html+= '<td class="text-center '+color+'" id="enable_'+data[i].id+'" >' + state+ '</td>' +
-                '<td class="text-center">' + remark1 + '</td>' +
-                '<td class="text-center"> <a href="javascript:toSubAccountEnable(\''+data[i].id+'\')" data-state="'+data[i].enabled+'" id="enable_edit_'+data[i].id+'" >'+stateEdit+'</a>&nbsp;<a href="javascript:tosubAccountDatail(\''+data[i].id+'\')" >详情</a>&nbsp;<a href="javascript:delSubAccount(\''+data[i].id+'\')" >删除</a></td>' +
+            html+= '<td class=" '+color+'" id="enable_'+data[i].id+'" >' + state+ '</td>' +
+                '<td >' + remark1 + '</td>' +
+                '<td > <a href="javascript:toSubAccountEnable(\''+data[i].id+'\')" data-state="'+data[i].enabled+'" id="enable_edit_'+data[i].id+'" >'+stateEdit+'</a>&nbsp;<a href="javascript:tosubAccountDatail(\''+data[i].id+'\')" >详情</a>&nbsp;<a href="javascript:delSubAccount(\''+data[i].id+'\')" >删除</a></td>' +
                 '</tr>'
         }
 
@@ -2914,7 +2914,7 @@
         var h;
         var h2;
         var enabled2;
-        var color ="text-center "
+        var color =""
         if(enabled==1){//当前是启用，执行禁用
             state="disable/"+id;
             h="禁用";
@@ -3018,12 +3018,12 @@
             }
 
             html +='<tr id="agent-'+ data[i].name +'">' +
-                    '<td class="text-center">'+ nulltostr(data[i].name) +'</td>' +
-                    '<td class="text-center">'+ nulltostr(skillStr) +'</td>' +
-                    '<td class="text-center">'+ nulltostr(data[i].extension) +'</td>' +
-                     '<td class="text-center">'+ nulltostr(data[i].certId) +'</td>' +
-                    '<td class="text-center">' + nulltostr(data[i].state) + '</td>' +
-                    '<td class="text-center"><a href="javascript:delAgent(\''+data[i].id+'\')" >删除</a></td>' +
+                    '<td >'+ nulltostr(data[i].name) +'</td>' +
+                    '<td >'+ nulltostr(skillStr) +'</td>' +
+                    '<td>'+ nulltostr(data[i].extension) +'</td>' +
+                     '<td >'+ nulltostr(data[i].certId) +'</td>' +
+                    '<td >' + nulltostr(data[i].state) + '</td>' +
+                    '<td ><a href="javascript:delAgent(\''+data[i].id+'\')" >删除</a></td>' +
                     '</tr>'
         }
         $('#agent-list').html(html);
@@ -3050,13 +3050,13 @@
         // $('#playtable').find(".playtr").remove();["✔", "✘"],
         for(var i =0 ; i<data.length; i++){
             html +='<tr id="queue-'+ data[i].id +'">' +
-                '<td class="text-center"><span style="float:left;" >'+ nulltostr(data[i].whereExpression) +'</span></td>' +
-                '<td class="text-center"><span style="float:left;" >'+ nulltostr(data[i].sortExpression) +'</span></td>' +
-                '<td class="text-center">' + nulltostr(data[i].priority) + '</td>' +
-                '<td class="text-center">' + nulltostr(data[i].queueTimeout) + '</td>' +
-                '<td class="text-center">' + nulltostr(data[i].fetchTimeout) + '</td>' +
-                '<td class="text-center">'+ nulltostr(data[i].certId) +'</td>' +
-                '<td class="text-center">' + nulltostr(data[i].remark) + '</td>' +
+                '<td ><span style="float:left;" >'+ nulltostr(data[i].whereExpression) +'</span></td>' +
+                '<td ><span style="float:left;" >'+ nulltostr(data[i].sortExpression) +'</span></td>' +
+                '<td >' + nulltostr(data[i].priority) + '</td>' +
+                '<td >' + nulltostr(data[i].queueTimeout) + '</td>' +
+                '<td >' + nulltostr(data[i].fetchTimeout) + '</td>' +
+                '<td >'+ nulltostr(data[i].certId) +'</td>' +
+                '<td >' + nulltostr(data[i].remark) + '</td>' +
                 '</tr>'
         }
         $('#queue-list').html(html);
