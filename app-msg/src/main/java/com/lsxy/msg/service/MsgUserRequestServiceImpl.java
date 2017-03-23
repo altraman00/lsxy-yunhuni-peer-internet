@@ -83,7 +83,7 @@ public class MsgUserRequestServiceImpl extends AbstractService<MsgUserRequest> i
 
     @Override
     public MsgUserRequest findByMsgKeyAndSendType(String appId, String subaccountId, String msgKey, String sendType) {
-        return msgUserRequestDao.findFirstByAppIdAndSubaccountIdAndMsgKey(appId,subaccountId,msgKey);
+        return msgUserRequestDao.findFirstByAppIdAndSubaccountIdAndMsgKeyAndSendType(appId,subaccountId,msgKey,sendType);
     }
 
     @Override

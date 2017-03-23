@@ -88,7 +88,7 @@ public class SmsController extends AbstractAPIController {
     }
 
     @RequestMapping(value = "/{account_id}/msg/sms/{msgKey}",method = RequestMethod.GET)
-    public ApiGatewayResponse ussdSendMass(HttpServletRequest request, @PathVariable String msgKey, @PathVariable String account_id) throws YunhuniApiException {
+    public ApiGatewayResponse smsSendMass(HttpServletRequest request, @PathVariable String msgKey, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         App app = appService.findById(appId);
         if(!appService.enabledService(app.getTenant().getId(),app.getId(), ServiceType.SMS)){
