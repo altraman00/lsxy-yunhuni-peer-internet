@@ -7,7 +7,7 @@ import static com.lsxy.framework.mq.topic.MQTopicConstants.TOPIC_APP_OC;
 /**
  * Created by liups on 2017/3/23.
  */
-public class TemplatePassedEvent extends AbstractMQEvent {
+public class TemplateCompleteEvent extends AbstractMQEvent {
     private String tempId;
 
     @Override
@@ -15,10 +15,10 @@ public class TemplatePassedEvent extends AbstractMQEvent {
         return TOPIC_APP_OC;
     }
 
-    public TemplatePassedEvent() {
+    public TemplateCompleteEvent() {
     }
 
-    public TemplatePassedEvent(String tempId) {
+    public TemplateCompleteEvent(String tempId) {
         this.tempId = tempId;
     }
 
