@@ -11,6 +11,7 @@ import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.msg.TemplatePassedEvent;
 import com.lsxy.framework.mq.events.oc.VoiceFilePlayAuditCompletedEvent;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.msg.api.model.MsgSupplier;
@@ -58,6 +59,9 @@ public class MsgTemptaleController extends AbstractRestController {
     private AppService appService;
     @Autowired
     AccountMessageService accountMessageService;
+    @Autowired
+    MQService mqService;
+
 
     @ApiOperation(value = "根据id查看详情")
     @RequestMapping(value = "/detail/{id}",method = RequestMethod.GET)
@@ -169,6 +173,7 @@ public class MsgTemptaleController extends AbstractRestController {
                 }
             }
             accountMessageService.sendTenantTempletMessage(null,msgTemplate.getTenantId(), AccountMessage.MESSAGE_MSG_TEMPLATE_SUCCESS );
+            mqService.publish(new TemplatePassedEvent(msgTemplate.getTempId()));
             return RestResponse.success();
         }else{
             return RestResponse.failed("","模板不存在");

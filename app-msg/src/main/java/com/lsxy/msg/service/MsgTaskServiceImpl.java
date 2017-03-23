@@ -1,5 +1,7 @@
 package com.lsxy.msg.service;
 
+import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.msg.MsgRequestCompletedEvent;
 import com.lsxy.msg.api.model.MsgConstant;
 import com.lsxy.msg.api.model.MsgSendDetail;
 import com.lsxy.msg.api.model.MsgSendRecord;
@@ -42,6 +44,8 @@ public class MsgTaskServiceImpl implements MsgTaskService{
     ConsumeService consumeService;
     @Autowired
     MsgSendService msgSendService;
+    @Autowired
+    MQService mqService;
 
 
     /**
@@ -80,6 +84,7 @@ public class MsgTaskServiceImpl implements MsgTaskService{
         }
         if(flag){//任务完成
             request.setState(state);
+            mqService.publish(new MsgRequestCompletedEvent(request.getMsgKey()));
         }
         request.setPendingNum(pendingNum);
         request.setFailNum(failNum);

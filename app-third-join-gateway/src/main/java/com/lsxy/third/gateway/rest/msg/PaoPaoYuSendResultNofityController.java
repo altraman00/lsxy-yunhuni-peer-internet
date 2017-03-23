@@ -2,9 +2,13 @@ package com.lsxy.third.gateway.rest.msg;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.msg.MsgRequestCompletedEvent;
 import com.lsxy.framework.web.utils.WebUtils;
 import com.lsxy.msg.api.model.MsgConstant;
+import com.lsxy.msg.api.model.MsgSendDetail;
 import com.lsxy.msg.api.model.MsgSendRecord;
+import com.lsxy.msg.api.model.MsgUserRequest;
 import com.lsxy.msg.api.service.MsgSendDetailService;
 import com.lsxy.msg.api.service.MsgSendRecordService;
 import com.lsxy.msg.api.service.MsgSendService;
@@ -17,6 +21,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,6 +53,8 @@ public class PaoPaoYuSendResultNofityController extends AbstractAPIController {
     MsgSendDetailService msgSendDetailService;
     @Reference(timeout=3000,check = false,lazy = true)
     MsgSendService msgSendService;
+    @Autowired
+    MQService mqService;
 
     @RequestMapping(value = "",method = RequestMethod.POST,produces = "application/json;charset=UTF-8")
     public String handle(HttpServletRequest request){
@@ -104,24 +111,31 @@ public class PaoPaoYuSendResultNofityController extends AbstractAPIController {
                     isUpdateMain = true;
                 }
                 if(isUpdateMain) {
-                    int state;
+                    int detailState;
+                    int recordState;
+                    int requestState;
                     if(PaoPaoYuConstant.PapPaoyuStateSuccess.equals(status)){
-                        state = MsgSendRecord.STATE_SUCCESS;
+                        detailState = MsgSendDetail.STATE_SUCCESS;
+                        recordState = MsgSendRecord.STATE_SUCCESS;
+                        requestState = MsgUserRequest.STATE_SUCCESS;
                     }else{
-                        state = MsgSendRecord.STATE_FAIL;
+                        detailState = MsgSendDetail.STATE_FAIL;
+                        recordState = MsgSendRecord.STATE_FAIL;
+                        requestState = MsgUserRequest.STATE_FAIL;
                     }
                     //更新泡泡鱼记录
                     if(!msgSendRecord.getIsMass()){
-                        msgUserRequestService.updateNoMassStateByMsgKey(msgSendRecord.getMsgKey(),state);
-                        msgSendRecordService.updateNoMassStateByTaskId(msgSendRecord.getTaskId(),state);
+                        msgUserRequestService.updateNoMassStateByMsgKey(msgSendRecord.getMsgKey(),requestState);
+                        msgSendRecordService.updateNoMassStateByTaskId(msgSendRecord.getTaskId(),recordState);
 
+                        mqService.publish(new MsgRequestCompletedEvent(msgSendRecord.getMsgKey()));
                     }
                     String mobiles = msgSendRecord.getMobiles();
                     List<String> mobileList = Arrays.asList(mobiles.split(MsgConstant.NumRegexStr));
                     Date endTime = new Date();
-                    List<String> detailIds = msgSendDetailService.updateStateAndSetEndTimeByRecordIdAndPhones(msgSendRecord.getId(), mobileList, state,endTime);
+                    List<String> detailIds = msgSendDetailService.updateStateAndSetEndTimeByRecordIdAndPhones(msgSendRecord.getId(), mobileList, detailState,endTime);
                     //查找主记录
-                    if (state == MsgSendRecord.STATE_FAIL) {//发送失败
+                    if (detailIds != null && detailIds.size() > 0) {//发送失败
                         // 返还扣费
                         //插入消费
                         BigDecimal cost = BigDecimal.ZERO.subtract(msgSendRecord.getMsgCost());
