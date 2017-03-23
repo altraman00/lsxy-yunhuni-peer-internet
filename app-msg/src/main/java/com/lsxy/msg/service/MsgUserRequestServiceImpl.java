@@ -92,8 +92,8 @@ public class MsgUserRequestServiceImpl extends AbstractService<MsgUserRequest> i
             String hql = " from MsgUserRequest obj where obj.appId=?1 and obj.subaccountId=?2 and obj.sendType=?3 ";
             return pageList( hql, pageNo, pageSize,appId,subaccountId,sendType);
         }else{
-            String hql = " from MsgUserRequest obj where obj.appId=?1 and obj.subaccountId is null and obj.sendType=?3 ";
-            return pageList( hql, pageNo, pageSize,appId,subaccountId,sendType);
+            String hql = " from MsgUserRequest obj where obj.appId=?1 and obj.subaccountId is null and obj.sendType=?2 ";
+            return pageList( hql, pageNo, pageSize,appId,sendType);
         }
     }
 
