@@ -6,6 +6,8 @@ import java.io.Serializable;
  * Created by liups on 2017/3/23.
  */
 public class MsgSendOneResult implements Serializable {
+    public static final int STATE_SUCCESS = 1;
+    public static final int STATE_FAIL = 0;
     private String msgKey;
     private int state;
 
