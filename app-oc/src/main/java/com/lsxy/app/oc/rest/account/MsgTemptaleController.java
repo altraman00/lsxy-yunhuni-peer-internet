@@ -74,11 +74,20 @@ public class MsgTemptaleController extends AbstractRestController {
         if(msgTemplate!=null){
             App app = appService.findById(msgTemplate.getAppId());
             MsgTemplateDetailVo msgTemplateDetailVo = new MsgTemplateDetailVo(msgTemplate,app.getTenant().getTenantName(),app.getName());
-            MsgSupplierTemplate msgSupplierTemplate = msgSupplierTemplateService.findByTempId(msgTemplate.getTempId());
-            if(msgSupplierTemplate!=null) {
-                MsgSupplier msgSupplier = msgSupplierService.findByCode(msgSupplierTemplate.getSupplierCode());
-                msgTemplateDetailVo.setMsgSupplierId(msgSupplier.getId());
-                msgTemplateDetailVo.setMsgSupplierName(msgSupplier.getSupplierName());
+            List<MsgSupplierTemplate> msgSupplierTemplateList = msgSupplierTemplateService.findByTempId(msgTemplate.getTempId());
+            if(msgSupplierTemplateList!=null) {
+                List<Map> mapList = new ArrayList<>();
+                for (int j = 0; j < msgSupplierTemplateList.size(); j++) {
+                    MsgSupplier msgSupplier = msgSupplierService.findByCode(msgSupplierTemplateList.get(j).getSupplierCode());
+                    if(msgSupplier!=null) {
+                        Map<String, String> map = new HashMap<String, String>() {{
+                            put("msgSupplierId", msgSupplier.getId());
+                            put("msgSupplierName", msgSupplier.getSupplierName());
+                        }};
+                        mapList.add(map);
+                    }
+                }
+                msgTemplateDetailVo.setList(mapList);
             }
             return RestResponse.success(msgTemplateDetailVo);
         }
@@ -142,11 +151,22 @@ public class MsgTemptaleController extends AbstractRestController {
             MsgTemplate msgTemplate = page.getResult().get(i);
             App app = appService.findById(msgTemplate.getAppId());
             MsgTemplateVo templateVo = new MsgTemplateVo( page.getResult().get(i),app.getTenant().getTenantName(),app.getName());
-            MsgSupplierTemplate msgSupplierTemplate = msgSupplierTemplateService.findByTempId(msgTemplate.getTempId());
-            if(msgSupplierTemplate!=null) {
-                MsgSupplier msgSupplier = msgSupplierService.findByCode(msgSupplierTemplate.getSupplierCode());
-                templateVo.setMsgSupplierId(msgSupplier.getId());
-                templateVo.setMsgSupplierName(msgSupplier.getSupplierName());
+            if(msgTemplate.getTempId()!=null) {
+                List<MsgSupplierTemplate> msgSupplierTemplateList = msgSupplierTemplateService.findByTempId(msgTemplate.getTempId());
+                if (msgSupplierTemplateList != null) {
+                    List<Map> mapList = new ArrayList<>();
+                    for (int j = 0; j < msgSupplierTemplateList.size(); j++) {
+                        MsgSupplier msgSupplier = msgSupplierService.findByCode(msgSupplierTemplateList.get(j).getSupplierCode());
+                        if (msgSupplier != null) {
+                            Map<String, String> map = new HashMap<String, String>() {{
+                                put("msgSupplierId", msgSupplier.getId());
+                                put("msgSupplierName", msgSupplier.getSupplierName());
+                            }};
+                            mapList.add(map);
+                        }
+                    }
+                    templateVo.setList(mapList);
+                }
             }
             list.add(templateVo);
         }
@@ -164,6 +184,13 @@ public class MsgTemptaleController extends AbstractRestController {
             msgTemplate.setStatus(MsgTemplate.STATUS_PASS);
             msgTemplateService.save(msgTemplate);
             List<MsgEdit> ids= idsVo.getIds();
+            for (int i = 0; i < ids.size(); i++) {
+                MsgEdit edit = ids.get(i);
+                List list = msgSupplierTemplateService.findBySupplierTempId(edit.getTempId());
+                if(list.size()>0){
+                    return RestResponse.failed("",edit.getTempId()+"上游模板编号已存在");
+                }
+            }
             for (int i = 0; i < ids.size(); i++) {
                 MsgEdit edit = ids.get(i);
                 MsgSupplier msgSupplier = msgSupplierService.findById(edit.getId());
