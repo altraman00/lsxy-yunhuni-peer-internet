@@ -1,7 +1,8 @@
 package com.lsxy.msg.mq;
 
-import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.mq.api.AbstractDelayMQEvent;
+
+import static com.lsxy.framework.mq.topic.MQTopicConstants.TOPIC_APP_OC;
 
 /**
  * Created by zhangxb on 2017/2/10.
@@ -24,7 +25,7 @@ public class DelaySendMassEvent extends AbstractDelayMQEvent {
 
     @Override
     public String getTopicName() {
-        return SystemConfig.getProperty("global.mq.topic.app.ussd.api","test_topic_app_ussd_api");
+        return TOPIC_APP_OC;
     }
 
     public DelaySendMassEvent(Long delay,String tenantId,String appId ,String subaccountId ,String recordId, String key, String taskName, String tempId, String tempArgs, String mobiles, String sendTime, String msg, String sendType, String operator,String cost) {
