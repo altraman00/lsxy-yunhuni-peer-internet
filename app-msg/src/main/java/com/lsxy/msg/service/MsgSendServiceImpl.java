@@ -319,7 +319,7 @@ public class MsgSendServiceImpl implements MsgSendService {
                 String recordId = UUIDGenerator.uuid();//记录的Id提前生成
                 ResultMass resultMass = massService.sendMass(recordId,tenantId,appId,subaccountId,key,taskName, tempId, tempArgsList, msg, ulMobileList, sendTime,sendType,cost.toString());
                 String mobiles = StringUtils.join(ulMobileList,MsgConstant.NumRegexStr);
-                if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode() )&& !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){
+                if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode() )){
                     //存发送记录 一开始发送总数是所有等待的号码
                     MsgSendRecord msgSendRecord = new MsgSendRecord(recordId,key,tenantId,appId,subaccountId,resultMass.getTaskId(),taskName,mobiles,sendType,resultMass.getHandlers(),oprator,msg,
                             tempId,resultMass.getSupplierTempId(),tempArgs,sendTime,cost,true,resultMass.getPendingNum(),resultMass.getPendingNum(),0L,MsgSendRecord.STATE_WAIT,createTime);
