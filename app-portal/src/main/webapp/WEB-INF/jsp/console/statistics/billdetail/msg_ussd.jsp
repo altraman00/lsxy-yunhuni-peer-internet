@@ -197,14 +197,18 @@
                                                             </c:if>
                                                         </td>
                                                         <td><c:if test="${result.succNum == null}">0</c:if>
-                                                            <c:if test="${result.succNum != null}">${result.succNum}</c:if>
+                                                            <c:if test="${result.succNum != null}">${result.succNum}
+                                                                <c:set value="${result.msgCost * result.succNum}" var="msgCost_1"></c:set>
+                                                            </c:if>
                                                             &nbsp;失败数：
                                                             <c:if test="${result.failNum == null}">0</c:if>
                                                             <c:if test="${result.failNum != null}">${result.failNum}</c:if>
                                                             &nbsp;待发数：
                                                             <c:if test="${result.pendingNum == null}">0</c:if>
-                                                            <c:if test="${result.pendingNum != null}">${result.pendingNum}</c:if></td>
-                                                        <td><span style="float:left;width: 80px" ><span style="float:right;" >￥<fmt:formatNumber value="${result.msgCost}" pattern="0.000"></fmt:formatNumber></span></span></td>
+                                                            <c:if test="${result.pendingNum != null}">${result.pendingNum}
+                                                                <c:set value="${result.msgCost * result.pendingNum}" var="msgCost_1"></c:set>
+                                                            </c:if></td>
+                                                        <td><span style="float:left;width: 80px" ><span style="float:right;" >￥<fmt:formatNumber value="${msgCost_1}" pattern="0.000"></fmt:formatNumber></span></span></td>
                                                         <td>
                                                             <a href="#" onclick="toDetail('${result.msgKey}')">详情</a>
                                                             &nbsp;&nbsp;
