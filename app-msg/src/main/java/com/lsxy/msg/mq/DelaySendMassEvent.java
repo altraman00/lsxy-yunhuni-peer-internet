@@ -28,6 +28,8 @@ public class DelaySendMassEvent extends AbstractDelayMQEvent {
         return MQTopicConstants.TOPIC_THIRD_JOIN_GATEWAY;
     }
 
+    public DelaySendMassEvent(){}
+
     public DelaySendMassEvent(Long delay,String tenantId,String appId ,String subaccountId ,String recordId, String key, String taskName, String tempId, String tempArgs, String mobiles, String sendTime, String msg, String sendType, String operator,String cost) {
         super(delay.intValue());
         this.tenantId = tenantId;
