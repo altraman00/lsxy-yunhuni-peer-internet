@@ -82,8 +82,7 @@
                                                 </c:if>
                                                 <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum_cost}" pattern="0.000"></fmt:formatNumber> 元</span></th>
                                             </tr>
-                                            <tr>
-                                                <th>鉴权账号</th>
+                                            <tr><th>鉴权账号</th>
                                                 <th>密钥</th>
                                                 <%--<th>所属应用</th>--%>
                                                 <c:if test="${appServiceTyp=='msg'}">
@@ -112,10 +111,8 @@
                                             <tbody>
                                             <c:forEach items="${pageObj.result}" var="result" varStatus="s">
                                                 <tr>
-                                                    <%--<td><fmt:formatDate value="${result.callStartDt}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>--%>
                                                         <td>${result.certId}</td>
                                                         <td>${result.secretKey}</td>
-                                                    <%--<td><a href="${ctx}/console/app/detail?id=${result.appId}">${result.appName}</a></td>--%>
                                                         <c:if test="${appServiceTyp=='msg'}">
                                                             <td>${result.amongMsg}</td>
                                                         </c:if>
@@ -128,7 +125,7 @@
                                                         <td><span style="float:left;width: 80px" ><span style="float:right;" >￥<fmt:formatNumber value="${result.amongAmount}" pattern="0.000"></fmt:formatNumber></span></span></td>
                                                         <c:if test="${appServiceTyp=='msg'}">
                                                             <td>${result.ussdNum}</td>
-                                                            <<td>${result.smsNum}</td>
+                                                            <td>${result.smsNum}</td>
                                                         </c:if>
                                                         <c:if test="${appServiceTyp=='voice'}">
                                                             <td>${result.voiceNum}</td>
