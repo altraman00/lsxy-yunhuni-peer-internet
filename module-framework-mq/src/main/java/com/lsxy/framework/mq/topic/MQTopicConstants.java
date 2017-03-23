@@ -13,6 +13,7 @@ public class MQTopicConstants {
     public static final String TOPIC_APP_OC = SystemConfig.getProperty("global.mq.topic.app.oc","topic_app_oc");
     public static final String TOPIC_AREA_SERVER = SystemConfig.getProperty("global.mq.topic.area.server","topic.area.server");
     public static final String TOPIC_CALL_CENTER = SystemConfig.getProperty("global.mq.topic.call.center","topic.call.center");
+    public static final String TOPIC_THIRD_JOIN_GATEWAY = SystemConfig.getProperty("global.mq.topic.third.join.gateway","topic.third.join.gateway");
 
     //测试相关topic
     public static final String TOPIC_TEST=SystemConfig.getProperty("global.mq.topic.test","yunhuni_topic_test");
