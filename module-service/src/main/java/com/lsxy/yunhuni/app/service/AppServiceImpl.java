@@ -115,6 +115,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
                 hql += " and obj.tenant.id in ("+tenantIds+") order by obj.applyTime desc";
                 return  this.pageList(hql, pageNo, pageSize, state);
             }else{
+                hql += " order by obj.applyTime desc ";
                 return  this.pageList(hql, pageNo, pageSize, state);
             }
         }
