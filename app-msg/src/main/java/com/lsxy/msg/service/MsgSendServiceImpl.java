@@ -108,7 +108,7 @@ public class MsgSendServiceImpl implements MsgSendService {
     @Transactional
     private MsgSendOneResult sendOne(String appId, String subaccountId, String mobile, String tempId, String tempArgs, String sendType) throws YunhuniApiException {
         App app = appService.findById(appId);
-        if(App.STATUS_OFFLINE == app.getStatus()){
+        if(app.getStatus() == null || App.STATUS_ONLINE != app.getStatus()){
             List<String> testNums = testNumBindService.findNumByAppId(app.getId());
             if(!testNums.contains(mobile)){
                 throw new AppOffLineException();
@@ -208,7 +208,7 @@ public class MsgSendServiceImpl implements MsgSendService {
     private MsgSendMassResult sendMass(String appId, String subaccountId, String taskName, String tempId, String tempArgs, String mobiles, String sendTimeStr, String sendType) throws YunhuniApiException {
         App app = appService.findById(appId);
 
-        if(App.STATUS_OFFLINE == app.getStatus()){
+        if(app.getStatus() == null || App.STATUS_ONLINE != app.getStatus()){
             List<String> testNums = testNumBindService.findNumByAppId(app.getId());
             if(!testNums.containsAll(Arrays.asList(mobiles.split(MsgConstant.NumRegexStr)))){
                 throw new AppOffLineException();
@@ -513,6 +513,11 @@ public class MsgSendServiceImpl implements MsgSendService {
             }
         }
         return false;
+    }
+
+    public static void main(String[] args) {
+        List<String> testTest = Arrays.asList("aaaa","bbbbb");
+
     }
 
 }
