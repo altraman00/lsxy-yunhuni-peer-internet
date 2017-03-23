@@ -17,6 +17,8 @@ import com.lsxy.msg.api.model.MsgTemplate;
 import com.lsxy.msg.api.service.MsgSupplierService;
 import com.lsxy.msg.api.service.MsgSupplierTemplateService;
 import com.lsxy.msg.api.service.MsgTemplateService;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.message.model.AccountMessage;
@@ -57,6 +59,8 @@ public class MsgTemptaleController extends AbstractRestController {
     MQService mqService;
 
 
+    @Autowired
+    private ApiCertificateSubAccountService apiCertificateSubAccountService;
     @ApiOperation(value = "根据id查看详情")
     @RequestMapping(value = "/detail/{id}",method = RequestMethod.GET)
     public RestResponse detail(
@@ -144,7 +148,15 @@ public class MsgTemptaleController extends AbstractRestController {
         for (int i = 0; i < page.getResult().size(); i++) {
             MsgTemplate msgTemplate = page.getResult().get(i);
             App app = appService.findById(msgTemplate.getAppId());
+            String certId = "";
+            if(msgTemplate.getSubaccountId()!=null){
+                ApiCertificateSubAccount apiCertificateSubAccount = apiCertificateSubAccountService.findById(msgTemplate.getSubaccountId());
+                if(apiCertificateSubAccount!=null){
+                    certId = apiCertificateSubAccount.getCertId();
+                }
+            }
             MsgTemplateVo templateVo = new MsgTemplateVo( page.getResult().get(i),app.getTenant().getTenantName(),app.getName());
+            templateVo.setCertId(certId);
             if(msgTemplate.getTempId()!=null) {
                 List<MsgSupplierTemplate> msgSupplierTemplateList = msgSupplierTemplateService.findByTempId(msgTemplate.getTempId());
                 if (msgSupplierTemplateList != null) {
@@ -194,7 +206,6 @@ public class MsgTemptaleController extends AbstractRestController {
                 }
             }
             accountMessageService.sendTenantTempletMessage(null,msgTemplate.getTenantId(), AccountMessage.MESSAGE_MSG_TEMPLATE_SUCCESS );
-            mqService.publish(new TemplateCompleteEvent(msgTemplate.getTempId()));
             return RestResponse.success();
         }else{
             return RestResponse.failed("","模板不存在");
