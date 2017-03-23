@@ -14,6 +14,8 @@ import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.utils.WebUtils;
 import com.lsxy.msg.api.model.MsgUserRequest;
+import com.lsxy.msg.api.result.MsgSendMassResult;
+import com.lsxy.msg.api.result.MsgSendOneResult;
 import com.lsxy.msg.api.service.MsgSendService;
 import com.lsxy.msg.api.service.MsgUserRequestService;
 import com.lsxy.yunhuni.api.app.model.App;
@@ -63,10 +65,8 @@ public class UssdController extends AbstractAPIController {
             }
         }
         String subaccountId = getSubaccountId(request);
-        String msgKey = msgSendService.sendUssd(appId, subaccountId, dto.getMobile(), dto.getTempId(), dto.getTempArgs());
-        Map<String,String> result = new HashMap<>();
-        result.put("msgKey", msgKey);
-        return ApiGatewayResponse.success(result);
+        MsgSendOneResult msgSendOneResult = msgSendService.sendUssd(appId, subaccountId, dto.getMobile(), dto.getTempId(), dto.getTempArgs());
+        return ApiGatewayResponse.success(msgSendOneResult);
     }
 
     @RequestMapping(value = "/{account_id}/msg/ussd/mass/task",method = RequestMethod.POST)
@@ -84,10 +84,8 @@ public class UssdController extends AbstractAPIController {
             }
         }
         String subaccountId = getSubaccountId(request);
-        String msgKey = msgSendService.sendUssdMass(appId, subaccountId, dto.getTaskName(),dto.getTempId(),dto.getTempArgs(),dto.getMobiles(),dto.getSendTime());
-        Map<String,String> result = new HashMap<>();
-        result.put("msgKey", msgKey);
-        return ApiGatewayResponse.success(result);
+        MsgSendMassResult msgSendMassResult = msgSendService.sendUssdMass(appId, subaccountId, dto.getTaskName(), dto.getTempId(), dto.getTempArgs(), dto.getMobiles(), dto.getSendTime());
+        return ApiGatewayResponse.success(msgSendMassResult);
     }
 
     @RequestMapping(value = "/{account_id}/msg/ussd/{msgKey}",method = RequestMethod.GET)
