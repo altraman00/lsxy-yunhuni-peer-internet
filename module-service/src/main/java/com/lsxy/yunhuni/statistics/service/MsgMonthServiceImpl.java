@@ -130,7 +130,7 @@ public class MsgMonthServiceImpl extends AbstractService<MsgMonth> implements Ms
         String hql = " from MsgMonth obj where obj.tenantId=?1 ";
         List<MsgMonth> list = null;
         if(StringUtils.isNotEmpty(appId)){
-            hql += " and obj.appId = ?2 and obj.dt between ?2 and ?3 ";
+            hql += " and obj.appId = ?2 and obj.dt between ?3 and ?4 ";
             list = this.list(hql,tenantId,appId,date1,date2 );
         }else{
             hql+= " and obj.appId = null and obj.dt between ?2 and ?3 ";
