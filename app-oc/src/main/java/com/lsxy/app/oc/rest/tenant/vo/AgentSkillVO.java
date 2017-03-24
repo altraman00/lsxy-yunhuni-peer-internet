@@ -1,11 +1,13 @@
 package com.lsxy.app.oc.rest.tenant.vo;
 
 import com.lsxy.call.center.api.model.AgentSkill;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Created by liups on 2016/11/18.
  */
+@ApiModel
 public class AgentSkillVO {
     @ApiModelProperty(name="name",value = "技能名称")
     private String name;

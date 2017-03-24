@@ -8,6 +8,7 @@ import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * 应用
@@ -19,8 +20,12 @@ import javax.persistence.*;
 public class App extends IdEntity {
     public static int STATUS_ONLINE = 1;//上线
     public static int STATUS_OFFLINE = 2;//没上线
+    public static int STATUS_WAIT = 3;//等待审核
+    public static int STATUS_FAIl = 4;//审核失败
     public static String PRODUCT_VOICE = "voice";//语言产品
     public static String PRODUCT_CALL_CENTER = "call_center";//语言产品
+    public static String PRODUCT_MSG = "msg";//消息类产品
+    private String reason;//失败原因
     private Tenant tenant;//所属租户
     private String name;//应用名字
     private Integer status;//应用状态
@@ -41,6 +46,44 @@ public class App extends IdEntity {
     private Integer isCallCenter;//是否启用呼叫中心服务 是否呼叫中心0否，1是',
     private String serviceType;//服务类型
     private Long callCenterNum; //呼叫中心应用编号
+    private Integer isSms;//短信
+    private Integer isUssd;//闪印
+    private Date applyTime;//申请时间
+    private Date auditTime;//审核时间
+    @Column(name = "apply_time")
+    public Date getApplyTime() {
+        return applyTime;
+    }
+
+    public void setApplyTime(Date applyTime) {
+        this.applyTime = applyTime;
+    }
+    @Column(name = "audit_time")
+    public Date getAuditTime() {
+        return auditTime;
+    }
+
+    public void setAuditTime(Date auditTime) {
+        this.auditTime = auditTime;
+    }
+
+    @Column(name = "is_sms")
+    public Integer getIsSms() {
+        return isSms;
+    }
+
+    public void setIsSms(Integer isSms) {
+        this.isSms = isSms;
+    }
+
+    @Column(name = "is_ussd")
+    public Integer getIsUssd() {
+        return isUssd;
+    }
+
+    public void setIsUssd(Integer isUssd) {
+        this.isUssd = isUssd;
+    }
 
     @Column(name = "is_call_center")
     public Integer getIsCallCenter() {
@@ -210,5 +253,13 @@ public class App extends IdEntity {
 
     public void setCallCenterNum(Long callCenterNum) {
         this.callCenterNum = callCenterNum;
+    }
+    @Column(name = "reason")
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 }

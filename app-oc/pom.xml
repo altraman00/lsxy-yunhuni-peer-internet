@@ -112,6 +112,10 @@
             <artifactId>poi-ooxml</artifactId>
             <version>3.15</version>
         </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-service-msg-api</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

@@ -52,7 +52,16 @@ public enum ApiReturnCodeEnum {
     ConversationNotExist("040501","交谈不存在"),
     OutOfConversationMaxParts("040502","超过最大交谈成员数"),
     AgentNotConversationMember("040503","坐席不是交谈的成员"),
-    QueueTaskNotExist("040601","排队任务不存在")
+    QueueTaskNotExist("040601","排队任务不存在"),
+    MsgIllegalMobile("050101","手机号码不合法"),
+    MsgTemplateError("050102","模板不存在或模板审核不通过"),
+    MsgTaskNameIsEmpty("050103","任务名不能为空"),
+    MsgTemplateArgsError("050104","模板参数不正确"),
+    MsgMobileNumTooLarge("050105","手机号码集合数量大于最大限制"),
+    MsgSendMsgFail("050105","发送消息失败"),
+    MsgOperatorNotAvailable("050106","本平台对号码所属运营商暂时不支持该发送类型"),
+    MsgSendTimeFormatError("050107","发送时间格式错误，格式必须是：yyyyMMddHHmmss"),
+    MsgContentTooLarge("050108","消息长度过长")
     ;
 
     private String code;

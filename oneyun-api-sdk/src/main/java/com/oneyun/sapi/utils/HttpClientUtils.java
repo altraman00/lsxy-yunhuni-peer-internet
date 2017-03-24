@@ -9,7 +9,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-import javax.servlet.http.HttpServletRequest;
+//import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -85,7 +85,7 @@ public class HttpClientUtils {
         }
         return result;
     }
-    public static String doPost(String uri,String secretKey,String certId,String appId , Map param) throws KeyManagementException, NoSuchAlgorithmException, IOException, InvalidKeyException {
+    public static String doPost(String uri,String secretKey,String certId,String appId , Map<String,Object> param) throws KeyManagementException, NoSuchAlgorithmException, IOException, InvalidKeyException {
         String payload = JsonUtils.toJson(param);
         String timestamp = DateUtils.getTimestamp();
 
@@ -113,7 +113,7 @@ public class HttpClientUtils {
         }
         return result;
     }
-    public static String doPut(String uri,String secretKey,String certId,String appId , Map param) throws KeyManagementException, NoSuchAlgorithmException, IOException, InvalidKeyException {
+    public static String doPut(String uri,String secretKey,String certId,String appId , Map<String,Object> param) throws KeyManagementException, NoSuchAlgorithmException, IOException, InvalidKeyException {
         String payload = JsonUtils.toJson(param);
         String timestamp = DateUtils.getTimestamp();
 
@@ -141,42 +141,42 @@ public class HttpClientUtils {
         return result;
     }
 
-    /**
-     * 解析回调参数
-     * @param request
-     * @return
-     */
-    public static Map getRequestParams(HttpServletRequest request){
-        StringBuilder stringBuilder = new StringBuilder();
-        InputStream inputStream = null;
-        try {
-            inputStream = request.getInputStream();
-            if (inputStream != null) {
-                byte[] b = new byte[128];
-                int len = -1;
-                while ((len = inputStream.read(b)) > 0) {
-                    stringBuilder.append(new String(b, 0, len,"utf-8"));
-                }
-            } else {
-                stringBuilder.append("");
-            }
-        } catch (IOException ex) {
-
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException iox) {
-                }
-            }
-        }
-        String str = stringBuilder.toString();
-        Map map = new HashMap<>();
-        if(StringUtils.isNotEmpty(str)) {
-            map = JsonUtils.toMap(str);
-        }
-        return map;
-    }
+//    /**
+//     * 解析回调参数
+//     * @param request
+//     * @return
+//     */
+//    public static Map getRequestParams(HttpServletRequest request){
+//        StringBuilder stringBuilder = new StringBuilder();
+//        InputStream inputStream = null;
+//        try {
+//            inputStream = request.getInputStream();
+//            if (inputStream != null) {
+//                byte[] b = new byte[128];
+//                int len = -1;
+//                while ((len = inputStream.read(b)) > 0) {
+//                    stringBuilder.append(new String(b, 0, len,"utf-8"));
+//                }
+//            } else {
+//                stringBuilder.append("");
+//            }
+//        } catch (IOException ex) {
+//
+//        } finally {
+//            if (inputStream != null) {
+//                try {
+//                    inputStream.close();
+//                } catch (IOException iox) {
+//                }
+//            }
+//        }
+//        String str = stringBuilder.toString();
+//        Map map = new HashMap();
+//        if(StringUtils.isNotEmpty(str)) {
+//            map = JsonUtils.toMap(str);
+//        }
+//        return map;
+//    }
 
     /**get和delete请求时，将参数拼接到uri后面**/
     private static String paramToUri(String uri, Map<String,Object> param) throws IOException {
@@ -207,19 +207,19 @@ public class HttpClientUtils {
         httpRequestBase.addHeader("Signature",signature);
     }
 
-    /**获取请求ip地址*/
-    public static String getRemoteHost(HttpServletRequest request){
-        String ip = request.getHeader("x-forwarded-for");
-        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)){
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)){
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)){
-            ip = request.getRemoteAddr();
-        }
-        return ip.equals("0:0:0:0:0:0:0:1")?"127.0.0.1":ip;
-    }
+//    /**获取请求ip地址*/
+//    public static String getRemoteHost(HttpServletRequest request){
+//        String ip = request.getHeader("x-forwarded-for");
+//        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)){
+//            ip = request.getHeader("Proxy-Client-IP");
+//        }
+//        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)){
+//            ip = request.getHeader("WL-Proxy-Client-IP");
+//        }
+//        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)){
+//            ip = request.getRemoteAddr();
+//        }
+//        return ip.equals("0:0:0:0:0:0:0:1")?"127.0.0.1":ip;
+//    }
 }
 

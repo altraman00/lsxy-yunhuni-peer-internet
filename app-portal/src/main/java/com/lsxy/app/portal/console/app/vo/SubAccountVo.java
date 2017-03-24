@@ -11,6 +11,8 @@ public class SubAccountVo {
     private String remark;//备注
     private String voiceNum; //语音用量 /总量（分钟）
     private String seatNum; //坐席用量 /总量（个）
+    private String ussdNum;
+    private String smsNum;
     private String url;//回调地址
     public String getId() {
         return id;
@@ -74,5 +76,21 @@ public class SubAccountVo {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getUssdNum() {
+        return ussdNum;
+    }
+
+    public void setUssdNum(String ussdNum) {
+        this.ussdNum = ussdNum;
+    }
+
+    public String getSmsNum() {
+        return smsNum;
+    }
+
+    public void setSmsNum(String smsNum) {
+        this.smsNum = smsNum;
     }
 }

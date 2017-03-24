@@ -35,7 +35,7 @@ public class SubAccountController extends AbstractPortalController {
     private Logger logger = LoggerFactory.getLogger(SubAccountController.class);
     @RequestMapping(value = "/new")
     @ResponseBody
-    public RestResponse create(HttpServletRequest request,String appId, String url, int seatNum, int voiceNum, String remark){
+    public RestResponse create(HttpServletRequest request,String appId, String url, int seatNum, int voiceNum, int ussdNum,int smsNum,String remark){
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL+"/rest/sub_account/new";
         Map<String,Object> map = new HashedMap(){{
@@ -43,6 +43,8 @@ public class SubAccountController extends AbstractPortalController {
             put("appId",appId);
             put("seatNum",seatNum);
             put("voiceNum",voiceNum);
+            put("ussdNum",ussdNum);
+            put("smsNum",smsNum);
             put("remark",remark);
         }};
         RestResponse response =  RestRequest.buildSecurityRequest(token).post(uri,map);
@@ -58,13 +60,15 @@ public class SubAccountController extends AbstractPortalController {
     }
     @RequestMapping(value = "/edit")
     @ResponseBody
-    public RestResponse edit(HttpServletRequest request,String id, String url, int seatNum, int voiceNum, String remark){
+    public RestResponse edit(HttpServletRequest request,String id, String url, int seatNum, int voiceNum, int ussdNum,int smsNum,String remark){
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL+"/rest/sub_account/edit/"+id;
         Map<String,Object> map = new HashedMap(){{
             put("url",url);
             put("seatNum",seatNum);
             put("voiceNum",voiceNum);
+            put("ussdNum",ussdNum);
+            put("smsNum",smsNum);
             put("remark",remark);
         }};
         RestResponse response =  RestRequest.buildSecurityRequest(token).post(uri,map);
