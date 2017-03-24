@@ -1,6 +1,7 @@
 package com.lsxy.msg.mq;
 
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.msg.api.model.MsgSendDetail;
 import com.lsxy.msg.api.model.MsgSendRecord;
@@ -40,6 +41,9 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
 
     @Override
     public void handleMessage(DelaySendMassEvent message) throws JMSException {
+        if(logger.isDebugEnabled()){
+            logger.debug("进入延时发送处理方法:{}",message);
+        }
         ResultMass resultMass = null;
         String[] split = message.getTempArgs().split(MsgConstant.ParamRegexStr);
         List<String> tempArgsList = Arrays.asList(split);
@@ -52,13 +56,21 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
         }
         List<String> ids = null;
         Date endTime = new Date();
+        if(logger.isDebugEnabled()){
+            logger.debug("进入延时发送完成{}", JSONUtil2.objectToJson(resultMass));
+        }
         if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode())){
             //成功发送
             //更新发送记录，
             msgSendRecordService.updateStateAndTaskIdById(message.getRecordId(),MsgSendRecord.STATE_WAIT,resultMass.getTaskId());
             msgSendDetailService.updateStateAndTaskIdAndEndTimeByRecordIdAndPhones(message.getRecordId(),resultMass.getPendingPhones(), MsgSendDetail.STATE_WAIT,resultMass.getTaskId(),null);
             ids = msgSendDetailService.updateStateAndTaskIdAndEndTimeByRecordIdAndPhones(message.getRecordId(),resultMass.getBadPhones(), MsgSendDetail.STATE_FAIL,resultMass.getTaskId(),endTime);
-        }else if(resultMass == null || !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){
+        }else if(resultMass == null){
+            //发送失败
+            //更新发送记录，
+            msgSendRecordService.updateStateAndTaskIdById(message.getRecordId(),MsgSendRecord.STATE_FAIL,"");
+            ids = msgSendDetailService.updateStateAndTaskIdAndEndTimeByRecordIdAndPhones(message.getRecordId(),mobiles, MsgSendDetail.STATE_FAIL,"",endTime);
+        } else if( !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){
             //发送失败
             //更新发送记录，
             msgSendRecordService.updateStateAndTaskIdById(message.getRecordId(),MsgSendRecord.STATE_FAIL,resultMass.getTaskId());
@@ -71,6 +83,9 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
             BigDecimal cost = BigDecimal.ZERO.subtract(new BigDecimal(message.getCost()));
             ProductCode product = ProductCode.valueOf(message.getSendType());
             msgSendService.batchConsumeMsg(endTime,message.getSendType(),cost,product.getRemark(),message.getAppId(),message.getTenantId(),message.getSubaccountId(),ids);
+        }
+        if(logger.isDebugEnabled()){
+            logger.debug("结束延时发送处理方法:{}",message);
         }
     }
 }

@@ -58,13 +58,13 @@ public class MsgMonthServiceImpl extends AbstractService<MsgMonth> implements Ms
         if(todayStatistics != null){
             return;
         }
-        String[] selects = {"tenant_id,app_id,subaccount_id,","tenant_id,app_id,","tenant_id,",""};
+        String[] selects = {"tenant_id,app_id,","tenant_id,",""};
 
         for(String select:selects){
             String sql = "SELECT REPLACE(UUID(), '-', '') AS id,"+ select +"TYPE,SUM(total) AS total,SUM(success) AS success,SUM(fail) AS fail, " +
                     "'"+statisticsDateStr+"' AS dt, "+ month +" AS month ," +
                     "'"+currentDateStr + "' AS create_time, '"+ currentDateStr + "' AS last_time," + " 0 AS deleted,0 AS sortno,0 AS version "+
-                    " FROM db_lsxy_bi_yunhuni.tb_bi_msg_day_statistics WHERE tenant_id is not null and app_id is not null and subaccount_id is not null " +
+                    " FROM db_lsxy_bi_yunhuni.tb_bi_msg_day_statistics WHERE tenant_id is not null and app_id is not null " +
                     " AND dt >= '"+statisticsDateStr+"' AND dt < '"+ nextDateStr +"' GROUP BY "+ select +"type";
 
             Query query = getEm().createNativeQuery(sql);
@@ -133,7 +133,7 @@ public class MsgMonthServiceImpl extends AbstractService<MsgMonth> implements Ms
             hql += " and obj.appId = ?2 and obj.dt between ?2 and ?3 ";
             list = this.list(hql,tenantId,appId,date1,date2 );
         }else{
-            hql+= " and obj.dt between ?2 and ?3 ";
+            hql+= " and obj.appId = null and obj.dt between ?2 and ?3 ";
             list = this.list(hql,tenantId,date1,date2 );
         }
         return list;

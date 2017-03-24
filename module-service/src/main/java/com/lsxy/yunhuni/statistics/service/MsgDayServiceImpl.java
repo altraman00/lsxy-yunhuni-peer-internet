@@ -60,7 +60,7 @@ public class MsgDayServiceImpl extends AbstractService<MsgDay> implements MsgDay
         if(todayStatistics != null){
             return;
         }
-        String[] selects = {"tenant_id,app_id,subaccount_id,","tenant_id,app_id,","tenant_id,",""};
+        String[] selects = {"tenant_id,app_id,","tenant_id,",""};
 
         for(String select:selects){
             String sql = "SELECT REPLACE(UUID(), '-', '') AS id,"+ select +"send_type AS TYPE,COUNT(1) AS total," +
@@ -170,7 +170,7 @@ public class MsgDayServiceImpl extends AbstractService<MsgDay> implements MsgDay
             hql += " and obj.appId = ?2 and obj.dt between ?2 and ?3 ";
             list = this.list(hql,tenantId,appId,date1,date2 );
         }else{
-            hql+= " and obj.dt between ?2 and ?3 ";
+            hql+= " and obj.appId = null and obj.dt between ?2 and ?3 ";
             list = this.list(hql,tenantId,date1,date2 );
         }
         return list;

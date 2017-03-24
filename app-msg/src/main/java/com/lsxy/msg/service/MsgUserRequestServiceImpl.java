@@ -75,8 +75,15 @@ public class MsgUserRequestServiceImpl extends AbstractService<MsgUserRequest> i
     }
 
     @Override
+    public List<MsgUserRequest> findAwaitedButOverdueRequets() {
+        Date current = new Date();
+        Date end = new Date(current.getTime() - 3 * 24 * 60 * 60 * 1000);
+        return msgUserRequestDao.findByStateAndSendTimeLessThanEqual(MsgUserRequest.STATE_WAIT,end);
+    }
+
+    @Override
     public MsgUserRequest findByMsgKeyAndSendType(String appId, String subaccountId, String msgKey, String sendType) {
-        return msgUserRequestDao.findFirstByAppIdAndSubaccountIdAndMsgKey(appId,subaccountId,msgKey);
+        return msgUserRequestDao.findFirstByAppIdAndSubaccountIdAndMsgKeyAndSendType(appId,subaccountId,msgKey,sendType);
     }
 
     @Override
@@ -85,9 +92,14 @@ public class MsgUserRequestServiceImpl extends AbstractService<MsgUserRequest> i
             String hql = " from MsgUserRequest obj where obj.appId=?1 and obj.subaccountId=?2 and obj.sendType=?3 ";
             return pageList( hql, pageNo, pageSize,appId,subaccountId,sendType);
         }else{
-            String hql = " from MsgUserRequest obj where obj.appId=?1 and obj.subaccountId is null and obj.sendType=?3 ";
-            return pageList( hql, pageNo, pageSize,appId,subaccountId,sendType);
+            String hql = " from MsgUserRequest obj where obj.appId=?1 and obj.subaccountId is null and obj.sendType=?2 ";
+            return pageList( hql, pageNo, pageSize,appId,sendType);
         }
+    }
+
+    @Override
+    public MsgUserRequest findByMsgKey(String msgKey) {
+        return msgUserRequestDao.findByMsgKey(msgKey);
     }
 
 }

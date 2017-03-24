@@ -2,6 +2,7 @@ package com.lsxy.yunhuni.api.statistics.model;
 
 
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
 
 import java.util.*;
 
@@ -45,11 +46,11 @@ public class MsgStatisticsVo {
             this.total = msgDay.getTotal();
             this.totalFail = msgDay.getFail();
             this.totalSucc = msgDay.getSuccess();
-            if("ussd".equals(msgDay.getType())){
+            if(ProductCode.msg_ussd.name().equals(msgDay.getType())){
                 this.ussd = msgDay.getTotal();
                 this.ussdFail = msgDay.getFail();
                 this.ussdSucc = msgDay.getSuccess();
-            }else if("sms".equals(msgDay.getType())){
+            }else if(ProductCode.msg_sms.name().equals(msgDay.getType())){
                 this.sms = msgDay.getTotal();
                 this.smsFail = msgDay.getFail();
                 this.smsSucc = msgDay.getSuccess();
@@ -61,11 +62,11 @@ public class MsgStatisticsVo {
             this.total = msgMonth.getTotal();
             this.totalFail = msgMonth.getFail();
             this.totalSucc = msgMonth.getSuccess();
-            if("ussd".equals(msgMonth.getType())){
+            if(ProductCode.msg_ussd.name().equals(msgMonth.getType())){
                 this.ussd = msgMonth.getTotal();
                 this.ussdFail = msgMonth.getFail();
                 this.ussdSucc = msgMonth.getSuccess();
-            }else if("sms".equals(msgMonth.getType())){
+            }else if(ProductCode.msg_sms.name().equals(msgMonth.getType())){
                 this.sms = msgMonth.getTotal();
                 this.smsFail = msgMonth.getFail();
                 this.smsSucc = msgMonth.getSuccess();
@@ -209,11 +210,11 @@ public class MsgStatisticsVo {
             this.total = this.total + msgDay.getTotal();
             this.totalFail = this.totalFail + msgDay.getFail();
             this.totalSucc = this.totalSucc + msgDay.getSuccess();
-            if("ussd".equals(msgDay.getType())){
+            if(ProductCode.msg_ussd.name().equals(msgDay.getType())){
                 this.ussd = msgDay.getTotal();
                 this.ussdFail = msgDay.getFail();
                 this.ussdSucc = msgDay.getSuccess();
-            }else if("sms".equals(msgDay.getType())){
+            }else if(ProductCode.msg_sms.name().equals(msgDay.getType())){
                 this.sms = msgDay.getTotal();
                 this.smsFail = msgDay.getFail();
                 this.smsSucc = msgDay.getSuccess();
@@ -223,11 +224,11 @@ public class MsgStatisticsVo {
             this.total = this.total + msgMonth.getTotal();
             this.totalFail = this.totalFail + msgMonth.getFail();
             this.totalSucc = this.totalSucc + msgMonth.getSuccess();
-            if("ussd".equals(msgMonth.getType())){
+            if(ProductCode.msg_ussd.name().equals(msgMonth.getType())){
                 this.ussd = msgMonth.getTotal();
                 this.ussdFail = msgMonth.getFail();
                 this.ussdSucc = msgMonth.getSuccess();
-            }else if("sms".equals(msgMonth.getType())){
+            }else if(ProductCode.msg_sms.name().equals(msgMonth.getType())){
                 this.sms = msgMonth.getTotal();
                 this.smsFail = msgMonth.getFail();
                 this.smsSucc = msgMonth.getSuccess();

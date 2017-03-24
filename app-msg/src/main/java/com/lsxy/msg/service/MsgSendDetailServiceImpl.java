@@ -5,6 +5,7 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.msg.api.model.MsgConstant;
 import com.lsxy.msg.api.model.MsgSendDetail;
 import com.lsxy.msg.api.model.MsgSendRecord;
 import com.lsxy.msg.api.service.MsgSendDetailService;
@@ -14,10 +15,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by liups on 2017/3/1.
@@ -50,7 +48,7 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
                 valuesMark += "?,";
             }
         }
-        String insertSql = " insert into db_lsxy_bi_yunhuni.tb_bi_voice_cdr_month("+ values + ") values ("+valuesMark+")";
+        String insertSql = " insert into db_lsxy_bi_yunhuni.tb_bi_msg_send_detail("+ values + ") values ("+valuesMark+")";
         List resultList = new ArrayList();
         List<String> ids = new ArrayList<>();
         if(phones != null && phones.size() > 0){
@@ -78,9 +76,21 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
 
     @Override
     public List<String> updateStateAndTaskIdAndEndTimeByRecordIdAndPhones(String recordId, List<String> phones, int state, String taskId,Date endTime) {
+        if(StringUtils.isBlank(recordId) || phones == null || phones.size() == 0){
+            return null;
+        }
         msgSendDetailDao.updateDetailStateAndTaskIdByRecordId(recordId, phones, state,taskId,endTime);
         if(MsgSendDetail.STATE_FAIL == state){
-             return msgSendDetailDao.findIdByRecordIdAndMobileIn(recordId,phones);
+            List<MsgSendDetail> details = msgSendDetailDao.findByRecordIdAndMobileIn(recordId, phones);
+            if(details != null && details.size()>0){
+                List<String> ids = new ArrayList<>();
+                for(MsgSendDetail detail : details){
+                    ids.add(detail.getId());
+                }
+                return ids;
+            }else{
+                return null;
+            }
         }else{
             return null;
         }
@@ -88,9 +98,21 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
 
     @Override
     public List<String> updateStateAndSetEndTimeByRecordIdAndPhones(String recordId, List<String> phones, int state,Date endTime) {
+        if(StringUtils.isBlank(recordId) || phones == null || phones.size() == 0  || endTime == null){
+            return null;
+        }
         msgSendDetailDao.updateStateByRecordId(recordId, phones, state,endTime);
         if(MsgSendDetail.STATE_FAIL == state){
-            return msgSendDetailDao.findIdByRecordIdAndMobileIn(recordId,phones);
+            List<MsgSendDetail> details = msgSendDetailDao.findByRecordIdAndMobileIn(recordId, phones);
+            if(details != null && details.size()>0){
+                List<String> ids = new ArrayList<>();
+                for(MsgSendDetail detail : details){
+                    ids.add(detail.getId());
+                }
+                return ids;
+            }else{
+                return null;
+            }
         }else{
             return null;
         }
@@ -102,9 +124,22 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
     }
 
     @Override
+    public Long finishOverdueRecordId(String recordId,Date endTime){
+        msgSendDetailDao.updateStateFromWaitedToSuccessAndSetEndTimeByRecordId(recordId, MsgSendDetail.STATE_WAIT ,MsgSendDetail.STATE_SUCCESS,endTime);
+        return msgSendDetailDao.countByRecordIdAndState(recordId,MsgSendDetail.STATE_FAIL);
+    }
+
+    @Override
     public Map getStateCountByRecordId(String recordId) {
-        String sql = "SELECT d.state,COUNT(1) FROM db_lsxy_bi_yunhuni.tb_bi_msg_send_detail d WHERE d.record_id = ? GROUP BY d.state";
-        return jdbcTemplate.queryForMap(sql,recordId);
+        String sql = "SELECT d.state AS state,COUNT(1) AS count FROM db_lsxy_bi_yunhuni.tb_bi_msg_send_detail d WHERE d.record_id = ? GROUP BY d.state";
+        Map<Integer,Long> result = new HashMap<>();
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(sql,recordId);
+        if(list != null && list.size() >0){
+            for(Map map : list){
+                result.put((Integer)map.get("state"),(Long)map.get("count"));
+            }
+        }
+        return result;
     }
 
 
@@ -123,6 +158,20 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
     @Override
     public List<MsgSendDetail> findByMsgKey(String msgKey) {
         return msgSendDetailDao.findByMsgKey(msgKey);
+    }
+
+    @Override
+    public String findFailMobilesByMsgKey(String msgKey) {
+        String result = null;
+        List<MsgSendDetail> failMobiles = msgSendDetailDao.findByMsgKeyAndState(msgKey,MsgSendDetail.STATE_WAIT);
+        if(failMobiles != null && failMobiles.size() > 0){
+            List<String> strings = new ArrayList<>();
+            for(MsgSendDetail detail : failMobiles){
+                strings.add(detail.getMobile());
+            }
+            result = StringUtils.join(strings,MsgConstant.NumRegexStr);
+        }
+        return result;
     }
 
 }

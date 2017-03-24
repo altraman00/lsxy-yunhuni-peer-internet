@@ -23,8 +23,11 @@ public interface MsgSendDetailService extends BaseService<MsgSendDetail> {
 
     void updateStateAndSetEndTimeFromWaitedToSuccessByRecordId(String recordId,Date endTime);
 
+    Long finishOverdueRecordId(String recordId, Date endTime);
+
     Map getStateCountByRecordId(String recordId);
     Page<MsgSendDetail> getPageByContiton(Integer pageNo, Integer pageSize, String msgKey, String mobile, String state);
     List<MsgSendDetail> findByMsgKey(String msgKey);
 
+    String findFailMobilesByMsgKey(String msgKey);
 }

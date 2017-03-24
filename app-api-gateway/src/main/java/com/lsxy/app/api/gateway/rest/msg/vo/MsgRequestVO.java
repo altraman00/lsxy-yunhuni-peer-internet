@@ -19,6 +19,7 @@ public class MsgRequestVO {
     private Long succNum;
     private Long failNum;
     private Long pendingNum;
+    private String mobile;
 
     public MsgRequestVO() {
     }
@@ -36,6 +37,7 @@ public class MsgRequestVO {
         this.succNum = request.getSuccNum();
         this.failNum = request.getFailNum();
         this.pendingNum = request.getPendingNum();
+        this.mobile = request.getMobile();
     }
 
     public String getMsgKey() {
@@ -132,5 +134,13 @@ public class MsgRequestVO {
 
     public void setPendingNum(Long pendingNum) {
         this.pendingNum = pendingNum;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 }

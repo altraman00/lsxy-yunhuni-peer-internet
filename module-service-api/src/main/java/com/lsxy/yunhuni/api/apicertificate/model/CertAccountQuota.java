@@ -186,7 +186,7 @@ public class CertAccountQuota extends IdEntity {
         if(value < 0){
             return true;
         }else{
-            return (value - (this.currentUsed == null ? (this.used == null ? 0L : this.used) : currentUsed)) - (need == null?0L:need) > 0;
+            return (value - (this.currentUsed == null ? (this.used == null ? 0L : this.used) : currentUsed)) - (need == null?0L:need) >= 0;
         }
     }
 

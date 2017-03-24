@@ -15,7 +15,6 @@ public class UssdSendMassDTO extends CommonDTO {
     private String tempArgs;
     @NotNull
     private String mobiles;
-    @NotNull
     private String sendTime;
 
     public String getTaskName() {
