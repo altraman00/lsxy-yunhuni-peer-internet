@@ -61,7 +61,12 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
             msgSendRecordService.updateStateAndTaskIdById(message.getRecordId(),MsgSendRecord.STATE_WAIT,resultMass.getTaskId());
             msgSendDetailService.updateStateAndTaskIdAndEndTimeByRecordIdAndPhones(message.getRecordId(),resultMass.getPendingPhones(), MsgSendDetail.STATE_WAIT,resultMass.getTaskId(),null);
             ids = msgSendDetailService.updateStateAndTaskIdAndEndTimeByRecordIdAndPhones(message.getRecordId(),resultMass.getBadPhones(), MsgSendDetail.STATE_FAIL,resultMass.getTaskId(),endTime);
-        }else if(resultMass == null || !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){
+        }else if(resultMass == null){
+            //发送失败
+            //更新发送记录，
+            msgSendRecordService.updateStateAndTaskIdById(message.getRecordId(),MsgSendRecord.STATE_FAIL,"");
+            ids = msgSendDetailService.updateStateAndTaskIdAndEndTimeByRecordIdAndPhones(message.getRecordId(),mobiles, MsgSendDetail.STATE_FAIL,"",endTime);
+        } else if( !MsgConstant.AwaitingTaskId.equals(resultMass.getTaskId())){
             //发送失败
             //更新发送记录，
             msgSendRecordService.updateStateAndTaskIdById(message.getRecordId(),MsgSendRecord.STATE_FAIL,resultMass.getTaskId());

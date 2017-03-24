@@ -70,7 +70,7 @@ public class QiXunTongServiceImpl extends AbstractSupplierSendServiceImpl {
                 String  sendTimeStr = DateUtils.getDate(sendTime,MsgConstant.TimePartten);
                 String tempArgsStr = StringUtils.join(tempArgs, MsgConstant.ParamRegexStr);
                 //发布定时任务
-                mqService.publish( new DelaySendMassEvent( delay, tenantId,appId,subaccountId,recordId, msgKey,taskName,tempId,  tempArgsStr, mobilesStr, sendTimeStr, msg,  MsgConstant.MSG_USSD, MsgConstant.ChinaUnicom,cost));
+                mqService.publish( new DelaySendMassEvent( delay, tenantId,appId,subaccountId,recordId, msgKey,taskName,tempId,  tempArgsStr, mobilesStr, sendTimeStr, msg,  MsgConstant.MSG_SMS, MsgConstant.ChinaUnicom,cost));
                 //先按发送成功的计算
                 ResultMass resultMass = new QiXunTongResultMass("{\"resultcode\":0,\"resultmsg\":\"成功\",\"taskid\":\"" + MsgConstant.AwaitingTaskId + "\"}",mobilesStr);
                 return resultMass;

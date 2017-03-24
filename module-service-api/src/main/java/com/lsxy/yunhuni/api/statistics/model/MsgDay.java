@@ -17,7 +17,6 @@ import java.util.Date;
 public class MsgDay extends IdEntity {
     private String tenantId;
     private String appId;
-    private String subaccountId;
     private String type;
     private Long total;
     private Long success;
@@ -41,15 +40,6 @@ public class MsgDay extends IdEntity {
 
     public void setAppId(String appId) {
         this.appId = appId;
-    }
-
-    @Column(name = "subaccount_id")
-    public String getSubaccountId() {
-        return subaccountId;
-    }
-
-    public void setSubaccountId(String subaccountId) {
-        this.subaccountId = subaccountId;
     }
 
     @Column(name = "type")

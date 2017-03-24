@@ -47,18 +47,19 @@ public class MsgUserRequest extends IdEntity {
     public MsgUserRequest() {
     }
 
-
+    //单发
     public MsgUserRequest(String msgKey, String tenantId, String appId, String subaccountId, String sendType,String mobile, String msg, String tempId,
                           String tempArgs, Date sendTime,BigDecimal msgCost,Integer state,Date createTime) {
-        this(msgKey, tenantId, appId, subaccountId,null, sendType, mobile,null, msg, tempId, tempArgs, sendTime, msgCost,false,1L,state,null,null,null,createTime);
+        this(msgKey, tenantId, appId, subaccountId,null, sendType, mobile,null, msg, tempId, tempArgs, sendTime, msgCost,false,1L,state,0L,0L,null,createTime);
         if(STATE_WAIT == state){
             this.pendingNum = 1L;
         }
         if(STATE_FAIL == state){
-            this.failNum = 1L;
+            this.invalidNum = 1L;
         }
     }
 
+    //群发
     public MsgUserRequest(String msgKey, String tenantId, String appId, String subaccountId, String taskName, String sendType, String mobile, String mobiles, String msg, String tempId,
                           String tempArgs, Date sendTime, BigDecimal msgCost, Boolean isMass, Long sumNum, Integer state, Long pendingNum, Long invalidNum, String reason,Date createTime) {
         this.msgKey = msgKey;
@@ -75,10 +76,12 @@ public class MsgUserRequest extends IdEntity {
         this.sendTime = sendTime;
         this.msgCost = msgCost;
         this.isMass = isMass;
-        this.sumNum = sumNum;
+        this.sumNum = sumNum==null?0:sumNum;
+        this.failNum = 0L;
+        this.succNum = 0L;
         this.state = state;
-        this.pendingNum = pendingNum;
-        this.invalidNum = invalidNum;
+        this.pendingNum = pendingNum==null?0:pendingNum;
+        this.invalidNum = invalidNum==null?0:invalidNum;
         this.reason = reason;
         this.createTime = createTime;
     }

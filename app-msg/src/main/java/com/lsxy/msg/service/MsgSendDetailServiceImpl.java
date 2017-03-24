@@ -15,10 +15,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by liups on 2017/3/1.
@@ -79,6 +76,9 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
 
     @Override
     public List<String> updateStateAndTaskIdAndEndTimeByRecordIdAndPhones(String recordId, List<String> phones, int state, String taskId,Date endTime) {
+        if(StringUtils.isBlank(recordId) || phones == null || phones.size() == 0 || StringUtils.isBlank(taskId ) || endTime == null){
+            return null;
+        }
         msgSendDetailDao.updateDetailStateAndTaskIdByRecordId(recordId, phones, state,taskId,endTime);
         if(MsgSendDetail.STATE_FAIL == state){
             List<MsgSendDetail> details = msgSendDetailDao.findByRecordIdAndMobileIn(recordId, phones);
@@ -98,6 +98,9 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
 
     @Override
     public List<String> updateStateAndSetEndTimeByRecordIdAndPhones(String recordId, List<String> phones, int state,Date endTime) {
+        if(StringUtils.isBlank(recordId) || phones == null || phones.size() == 0  || endTime == null){
+            return null;
+        }
         msgSendDetailDao.updateStateByRecordId(recordId, phones, state,endTime);
         if(MsgSendDetail.STATE_FAIL == state){
             List<MsgSendDetail> details = msgSendDetailDao.findByRecordIdAndMobileIn(recordId, phones);
@@ -128,8 +131,15 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
 
     @Override
     public Map getStateCountByRecordId(String recordId) {
-        String sql = "SELECT d.state,COUNT(1) FROM db_lsxy_bi_yunhuni.tb_bi_msg_send_detail d WHERE d.record_id = ? GROUP BY d.state";
-        return jdbcTemplate.queryForMap(sql,recordId);
+        String sql = "SELECT d.state AS state,COUNT(1) AS count FROM db_lsxy_bi_yunhuni.tb_bi_msg_send_detail d WHERE d.record_id = ? GROUP BY d.state";
+        Map<Integer,Long> result = new HashMap<>();
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(sql,recordId);
+        if(list != null && list.size() >0){
+            for(Map map : list){
+                result.put((Integer)map.get("state"),(Long)map.get("count"));
+            }
+        }
+        return result;
     }
 
 
