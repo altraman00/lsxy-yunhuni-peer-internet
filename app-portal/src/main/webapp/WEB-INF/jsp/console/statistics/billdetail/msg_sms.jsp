@@ -177,7 +177,6 @@
                                                     <th>手机号码</th>
                                                     <th>发送内容</th>
                                                     <th>发送结果</th>
-                                                    <th>备注</th>
                                                     <th><span style="float:left;width: 80px" ><span style="float:right;" >消费金额</span></span></th>
                                                 </tr>
                                             </c:if>
@@ -191,9 +190,8 @@
                                                         <td>${result.msgKey}</td>
                                                         <td>${result.taskName}</td>
                                                         <td>
-                                                            <c:if test="${result.state==1}">任务完成</c:if>
+                                                            <c:if test="${result.state==1||result.state==-1}">任务完成</c:if>
                                                             <c:if test="${result.state==0}">待处理</c:if>
-                                                            <c:if test="${result.state==-1}">任务失败</c:if>
                                                         </td>
                                                         <td><fmt:formatDate value="${result.sendTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
                                                         <td>
@@ -201,22 +199,24 @@
                                                                 <fmt:formatDate value="${result.lastTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate>
                                                             </c:if>
                                                         </td>
-                                                        <td>成功数：
+                                                        <td>
+                                                            总数：
+                                                            <c:set var="sumNum" value="${result.sumNum != null?(result.sumNum + (result.invalidNum != null?result.invalidNum :0)):(result.invalidNum != null?result.invalidNum :0) }"></c:set>
+                                                           ${sumNum}
+                                                            &nbsp;成功数：
                                                             <c:if test="${result.succNum == null}">0</c:if>
-                                                            <c:if test="${result.succNum != null}">${result.succNum}
-                                                            <c:set value="${result.msgCost * result.succNum}" var="msgCost_1"></c:set>
-                                                            </c:if>
+                                                            <c:if test="${result.succNum != null}">${result.succNum}</c:if>
                                                             &nbsp;失败数：
                                                             <c:if test="${result.failNum == null}">0</c:if>
                                                             <c:if test="${result.failNum != null}">${result.failNum}</c:if>
                                                             &nbsp;待发数：
                                                             <c:if test="${result.pendingNum == null}">0</c:if>
-                                                            <c:if test="${result.pendingNum != null}">${result.pendingNum}
-                                                                <c:set value="${result.msgCost * result.pendingNum}" var="msgCost_1"></c:set>
-                                                            </c:if>
+                                                            <c:if test="${result.pendingNum != null}">${result.pendingNum}</c:if>
+                                                            &nbsp;无效号码数：
+                                                            <c:if test="${result.invalidNum == null}">0</c:if>
+                                                            <c:if test="${result.invalidNum != null}">${result.invalidNum}</c:if>
                                                         </td>
-
-                                                        <td><span style="float:left;width: 80px" ><span style="float:right;" >￥<fmt:formatNumber value="${msgCost_1}" pattern="0.000"></fmt:formatNumber></span></span></td>
+                                                        <td><span style="float:left;width: 80px" ><span style="float:right;" >￥<fmt:formatNumber value="${result.sumNum == null?0:(result.msgCost*result.sumNum)}" pattern="0.000"></fmt:formatNumber></span></span></td>
                                                         <td>
                                                             <a href="#" onclick="toDetail('${result.msgKey}')">详情</a>
                                                             &nbsp;&nbsp;
@@ -237,7 +237,6 @@
                                                             <c:if test="${result.state=='0'}">待处理</c:if>
                                                             <c:if test="${result.state=='-1'}">发送失败</c:if>
                                                         </td>
-                                                        <td>${result.reason}</td>
                                                         <td><span style="float:left;width: 80px" ><span style="float:right;" >￥<fmt:formatNumber value="${result.msgCost}" pattern="0.000"></fmt:formatNumber></span></span></td>
                                                     </tr>
                                                 </c:forEach>

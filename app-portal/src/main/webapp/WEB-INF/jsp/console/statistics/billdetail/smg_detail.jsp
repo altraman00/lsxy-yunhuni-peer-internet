@@ -2,20 +2,26 @@
 <%@include file="/inc/import.jsp" %>
 <div id="myTabContent2" hidden class="tab-content" >
         <div>
-            <small style="font-size:30px;">消息群发详情</small>
-        </div>
-        <div>
-            <small style="font-size:20px;">任务名称：${detail_1.taskName}&nbsp;&nbsp;&nbsp;&nbsp;
+            <small style="font-size:14px;">任务名称：${detail_1.taskName}&nbsp;&nbsp;&nbsp;&nbsp;
                 任务状态：
-                <c:if test="${detail_1.state==1}">任务完成</c:if>
+                <c:if test="${detail_1.state==1||detail_1.state==-1}">任务完成</c:if>
                 <c:if test="${detail_1.state==0}">待处理</c:if>
                 <c:if test="${detail_1.state==-1}">任务失败</c:if>&nbsp;&nbsp;&nbsp;&nbsp;
-                成功数：<c:if test="${detail_1.succNum == null}">0</c:if>
-                <c:if test="${detail_1.succNum != null}">${detail_1.succNum}</c:if>&nbsp;失败数：
+                总数：
+                <c:set var="sumNum1" value="${detail_1.sumNum != null?(detail_1.sumNum + (detail_1.invalidNum != null?detail_1.invalidNum :0)):(detail_1.invalidNum != null?detail_1.invalidNum :0) }"></c:set>
+                ${sumNum1}
+                &nbsp;成功数：
+                <c:if test="${detail_1.succNum == null}">0</c:if>
+                <c:if test="${detail_1.succNum != null}">${detail_1.succNum}</c:if>
+                &nbsp;失败数：
                 <c:if test="${detail_1.failNum == null}">0</c:if>
-                <c:if test="${detail_1.failNum != null}">${detail_1.failNum}</c:if>&nbsp;待发数：
+                <c:if test="${detail_1.failNum != null}">${detail_1.failNum}</c:if>
+                &nbsp;待发数：
                 <c:if test="${detail_1.pendingNum == null}">0</c:if>
                 <c:if test="${detail_1.pendingNum != null}">${detail_1.pendingNum}</c:if>
+                &nbsp;无效号码数：
+                <c:if test="${detail_1.invalidNum == null}">0</c:if>
+                <c:if test="${detail_1.invalidNum != null}">${detail_1.invalidNum}</c:if>
             </small>
         </div>
         <div class="row statistics_row" >
