@@ -220,7 +220,7 @@
                                                         <td>
                                                             <a href="#" onclick="toDetail('${result.msgKey}')">详情</a>
                                                             &nbsp;&nbsp;
-                                                            <a href="javascript:download('${result.id}')"  >下载</a>
+                                                            <c:if test="${result.state==1||result.state==-1}"><a href="javascript:download('${result.id}')"  >下载</a></c:if>
                                                         </td>
                                                     </tr>
                                                 </c:forEach>
@@ -288,7 +288,7 @@
     function download(id){
         $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/download/msg/"+id);
         $('#mainForm').submit();
-        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/ussd");
+        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/sms");
     }
     $(function () {
         var msgKey = '${msgKey}';

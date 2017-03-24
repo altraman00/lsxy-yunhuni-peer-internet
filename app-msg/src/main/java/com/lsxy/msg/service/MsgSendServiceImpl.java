@@ -349,7 +349,7 @@ public class MsgSendServiceImpl implements MsgSendService {
         }
     }
 
-    public String getMsg(String temp,String arg){
+    public String getMsg(String temp,String arg) throws YunhuniApiException {
         //判断有几个参数替换符
         int count = countStr(temp,MsgConstant.REPLACE_SYMBOL);
         int argsLength = 0;
@@ -359,7 +359,8 @@ public class MsgSendServiceImpl implements MsgSendService {
             argsLength = args.length;
         }
         if(count != argsLength){
-            return null;
+            //抛异常
+            throw new MsgTemplateArgsErrorException();
         }else{
             return repStr(temp,MsgConstant.REPLACE_SYMBOL,args);
         }
