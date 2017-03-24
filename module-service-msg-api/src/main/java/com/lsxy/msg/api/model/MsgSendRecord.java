@@ -79,11 +79,11 @@ public class MsgSendRecord extends IdEntity {
         this.sendTime = sendTime;
         this.msgCost = msgCost;
         this.isMass = isMass;
-        this.sumNum = sumNum;
+        this.sumNum = sumNum==null?0:sumNum;
         this.succNum = 0L;
         this.failNum = 0L;
-        this.pendingNum = pendingNum;
-        this.failNum = failNum;
+        this.pendingNum = pendingNum==null?0:pendingNum;
+        this.failNum = failNum==null?0:failNum;
         this.state = state;
         this.createTime = createTime;
     }
