@@ -38,6 +38,7 @@ import java.util.regex.Pattern;
  */
 @Service
 @com.alibaba.dubbo.config.annotation.Service
+@Transactional
 public class MsgSendServiceImpl implements MsgSendService {
     private static final Logger logger = LoggerFactory.getLogger(MsgSendServiceImpl.class);
     @Autowired
@@ -108,7 +109,7 @@ public class MsgSendServiceImpl implements MsgSendService {
         }
     }
 
-    @Transactional
+
     private MsgSendOneResult sendOne(String appId, String subaccountId, String mobile, String tempId, String tempArgs, String sendType) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app.getStatus() == null || App.STATUS_ONLINE != app.getStatus()){
@@ -225,7 +226,7 @@ public class MsgSendServiceImpl implements MsgSendService {
         taskName = taskName.trim();
         Date sendTime;
         //校验群发时间
-        if(StringUtils.isNotEmpty(sendTimeStr)){
+        if(StringUtils.isNotBlank(sendTimeStr)){
             try{
                 sendTime = DateUtils.parseDate(sendTimeStr, MsgConstant.TimePartten);
             }catch (Exception e){
