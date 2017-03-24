@@ -7,6 +7,7 @@ import com.lsxy.msg.api.model.MsgSendRecord;
 import com.lsxy.msg.api.model.MsgUserRequest;
 import com.lsxy.msg.api.service.MsgSendRecordService;
 import com.lsxy.msg.dao.MsgSendRecordDao;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +54,9 @@ public class MsgSendRecordServiceImpl extends AbstractService<MsgSendRecord> imp
 
     @Override
     public void updateStateAndTaskIdById(String id, int state, String taskId) {
+        if(StringUtils.isBlank(id) || StringUtils.isBlank(taskId)){
+            return;
+        }
         msgSendRecordDao.updateStateAndTaskIdById(id,state,taskId);
     }
 

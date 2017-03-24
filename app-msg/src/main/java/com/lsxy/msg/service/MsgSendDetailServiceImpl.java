@@ -76,6 +76,9 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
 
     @Override
     public List<String> updateStateAndTaskIdAndEndTimeByRecordIdAndPhones(String recordId, List<String> phones, int state, String taskId,Date endTime) {
+        if(StringUtils.isBlank(recordId) || phones == null || phones.size() == 0 || StringUtils.isBlank(taskId ) || endTime == null){
+            return null;
+        }
         msgSendDetailDao.updateDetailStateAndTaskIdByRecordId(recordId, phones, state,taskId,endTime);
         if(MsgSendDetail.STATE_FAIL == state){
             List<MsgSendDetail> details = msgSendDetailDao.findByRecordIdAndMobileIn(recordId, phones);
@@ -95,6 +98,9 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
 
     @Override
     public List<String> updateStateAndSetEndTimeByRecordIdAndPhones(String recordId, List<String> phones, int state,Date endTime) {
+        if(StringUtils.isBlank(recordId) || phones == null || phones.size() == 0  || endTime == null){
+            return null;
+        }
         msgSendDetailDao.updateStateByRecordId(recordId, phones, state,endTime);
         if(MsgSendDetail.STATE_FAIL == state){
             List<MsgSendDetail> details = msgSendDetailDao.findByRecordIdAndMobileIn(recordId, phones);
