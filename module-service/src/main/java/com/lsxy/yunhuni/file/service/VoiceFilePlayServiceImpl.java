@@ -231,9 +231,9 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
         jdbcTemplate.update(sql, 0, appId);
     }
     @Override
-    public List<Map> getOssListByDeleted() {
+    public List<Map<String,Object>> getOssListByDeleted() {
         String sql = " SELECT id as id ,file_key as ossUrl FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_play WHERE deleted=1 and status=1 and file_key is not null and file_key<>'' and (oss_deleted is null or oss_deleted<>1)";
-        List<Map> list = jdbcTemplate.queryForList(sql,Map.class);
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
         return list;
     }
 }

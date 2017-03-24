@@ -45,10 +45,12 @@ public class ApiCertificateSubAccountController extends AbstractRestController {
     @Autowired
     private AppService appService;
     @RequestMapping(value = "/new")
-    public RestResponse create(HttpServletRequest request,String appId, String url, long seatNum, long voiceNum, String remark){
+    public RestResponse create(HttpServletRequest request,String appId, String url, long seatNum, long voiceNum, long ussdNum,long smsNum,String remark){
         List<CertAccountQuota> quotas = new ArrayList<>();
         quotas.add( new CertAccountQuota(CertAccountQuotaType.CallQuota.name(),voiceNum*60) );
         quotas.add( new CertAccountQuota(CertAccountQuotaType.AgentQuota.name(),seatNum*60) );
+        quotas.add( new CertAccountQuota(CertAccountQuotaType.SmsQuota.name(),smsNum) );
+        quotas.add( new CertAccountQuota(CertAccountQuotaType.UssdQuota.name(),ussdNum) );
         apiCertificateSubAccountService.createSubAccount(new ApiCertificateSubAccount( appId,  url,  remark,  quotas));
         return RestResponse.success("成功");
     }
@@ -123,7 +125,7 @@ public class ApiCertificateSubAccountController extends AbstractRestController {
         }
     }
     @RequestMapping(value = "/edit/{subId}")
-    public RestResponse detail(HttpServletRequest request,@PathVariable String subId, String url, long seatNum, long voiceNum, String remark){
+    public RestResponse detail(HttpServletRequest request,@PathVariable String subId, String url, long seatNum, long voiceNum,long smsNum,long ussdNum, String remark){
         ApiCertificateSubAccount apiCertificateSubAccount = apiCertificateSubAccountService.findByIdWithQuota(subId);
         if(apiCertificateSubAccount != null){
             apiCertificateSubAccount.setCallbackUrl(url);
@@ -131,6 +133,8 @@ public class ApiCertificateSubAccountController extends AbstractRestController {
             List<CertAccountQuota> quotas = new ArrayList<>();
             quotas.add( new CertAccountQuota(CertAccountQuotaType.CallQuota.name(),voiceNum*60) );
             quotas.add( new CertAccountQuota(CertAccountQuotaType.AgentQuota.name(),seatNum*60) );
+            quotas.add( new CertAccountQuota(CertAccountQuotaType.UssdQuota.name(),ussdNum) );
+            quotas.add( new CertAccountQuota(CertAccountQuotaType.SmsQuota.name(),smsNum) );
             apiCertificateSubAccount.setQuotas(quotas);
             apiCertificateSubAccountService.updateSubAccount(apiCertificateSubAccount);
             return RestResponse.success("修改成功");

@@ -91,6 +91,41 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     }
 
     @Override
+    public Page<App> pageList(String[] tenantId, Date date1, Date date2, int state, Integer pageNo, Integer pageSize) {
+        String hql = "from App obj where obj.status = ?1 ";
+        if(date1!=null&&date2!=null){
+            if(tenantId!=null&&tenantId.length>0) {
+                String tenantIds = "";
+                for(int i=0;i<tenantId.length;i++){
+                    tenantIds += " '"+tenantId[i]+"' ";
+                    if(i!=(tenantId.length-1)){
+                        tenantIds+=",";
+                    }
+                }
+                hql += " and obj.tenant.id in (?2) and obj.lastTime between ?3 and ?4 order by obj.applyTime desc";
+                return  this.pageList(hql, pageNo, pageSize, state,tenantIds,date1,date2);
+            }else{
+                hql += " and obj.lastTime between ?2 and ?3 order by obj.applyTime desc";
+                return  this.pageList(hql, pageNo, pageSize, state,date1,date2);
+            }
+        }else{
+            if(tenantId!=null&&tenantId.length>0) {
+                String tenantIds = "";
+                for(int i=0;i<tenantId.length;i++){
+                    tenantIds += " '"+tenantId[i]+"' ";
+                    if(i!=(tenantId.length-1)){
+                        tenantIds+=",";
+                    }
+                }
+                hql += " and obj.tenant.id in (?2) order by obj.applyTime desc";
+                return  this.pageList(hql, pageNo, pageSize, state,tenantIds);
+            }else{
+                return  this.pageList(hql, pageNo, pageSize, state);
+            }
+        }
+    }
+
+    @Override
     public boolean isAppBelongToUser(String userName, String appId) {
         Tenant tenant = tenantService.findTenantByUserName(userName);
         App app = appDao.findOne(appId);

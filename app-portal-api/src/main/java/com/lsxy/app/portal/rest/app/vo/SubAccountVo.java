@@ -17,6 +17,8 @@ public class SubAccountVo {
     private String remark;//备注
     private String voiceNum; //语音用量 /总量（分钟）
     private String seatNum; //坐席用量 /总量（个）
+    private String smsNum;//短信用量/配额（条）
+    private String ussdNum;//闪印用量 /配额（条）
     private String url;//回调地址
 
     public SubAccountVo(ApiCertificateSubAccount apiCertificateSubAccount) {
@@ -33,6 +35,10 @@ public class SubAccountVo {
                     this.seatNum = ( null == certAccountQuota.getCurrentUsed() ? "0": (certAccountQuota.getCurrentUsed()/60) ) +"/" + ( 0 > certAccountQuota.getValue() ? "∞": (certAccountQuota.getValue()/60) );
                 }else if(CertAccountQuotaType.CallQuota.name().equals( certAccountQuota.getType())){
                     this.voiceNum = ( null == certAccountQuota.getCurrentUsed() ? "0": (certAccountQuota.getCurrentUsed()/60) )+"/" + ( 0 > certAccountQuota.getValue() ? "∞": (certAccountQuota.getValue()/60) );
+                }else if(CertAccountQuotaType.UssdQuota.name().equals( certAccountQuota.getType())){
+                    this.ussdNum = ( null == certAccountQuota.getCurrentUsed() ? "0": (certAccountQuota.getCurrentUsed()) )+"/" + ( 0 > certAccountQuota.getValue() ? "∞": (certAccountQuota.getValue()) );
+                }else if(CertAccountQuotaType.SmsQuota.name().equals( certAccountQuota.getType())){
+                    this.smsNum = ( null == certAccountQuota.getCurrentUsed() ? "0": (certAccountQuota.getCurrentUsed()) )+"/" + ( 0 > certAccountQuota.getValue() ? "∞": (certAccountQuota.getValue()) );
                 }
             }
         }
@@ -52,9 +58,29 @@ public class SubAccountVo {
                     this.seatNum = ( certAccountQuota.getValue()/60 )+"" ;
                 }else if(CertAccountQuotaType.CallQuota.name().equals( certAccountQuota.getType())){
                     this.voiceNum = ( certAccountQuota.getValue()/60 ) +"";
+                }else if(CertAccountQuotaType.UssdQuota.name().equals( certAccountQuota.getType())){
+                    this.ussdNum = ( certAccountQuota.getValue() ) +"";
+                }else if(CertAccountQuotaType.SmsQuota.name().equals( certAccountQuota.getType())){
+                    this.smsNum = ( certAccountQuota.getValue() ) +"";
                 }
             }
         }
+    }
+
+    public String getSmsNum() {
+        return smsNum;
+    }
+
+    public void setSmsNum(String smsNum) {
+        this.smsNum = smsNum;
+    }
+
+    public String getUssdNum() {
+        return ussdNum;
+    }
+
+    public void setUssdNum(String ussdNum) {
+        this.ussdNum = ussdNum;
     }
 
     public String getUrl() {

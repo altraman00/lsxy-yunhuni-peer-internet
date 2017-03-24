@@ -1,11 +1,13 @@
 package com.lsxy.call.center.api.states.statics;
 
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.utils.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 /**
@@ -45,5 +47,12 @@ public class ACs {
     public Set<String> getAll(String agentId){
         return redisCacheService.zRange(getKey(agentId), 0L, -1L);
     }
-
+    public Page getPage(String agentId, Integer pageNo, Integer pageSize){
+        Integer score1 = 0;
+        Integer score2 = Integer.MAX_VALUE;
+        Long count = redisCacheService.zCount(getKey(agentId),score1.doubleValue(),score2.doubleValue());
+        Integer start = (pageNo-1)*pageSize;
+        Set<String> set = redisCacheService.zRange(getKey(agentId),start.longValue(),pageSize.longValue());
+        return new Page( start,count.intValue(),pageSize,new ArrayList(set));
+    }
 }

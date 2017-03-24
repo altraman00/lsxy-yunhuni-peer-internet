@@ -61,7 +61,10 @@ public class SubaccountMonthServiceImpl extends AbstractService<SubaccountMonth>
                 "obj.among_amount as among_amount," +
                 "ROUND(obj.among_duration/60,0) as among_duration," +
                 "concat( (CASE WHEN obj.voice_used IS NULL THEN '0'ELSE ROUND(obj.voice_used/60,0) END) ,'/', (CASE WHEN obj.voice_quota_value IS NULL THEN '0' WHEN obj.voice_quota_value<0 THEN '∞' ELSE ROUND(obj.voice_quota_value/60,0) END) ) as voice_num," +
-                "concat( (CASE WHEN obj.msg_used IS NULL THEN '0'ELSE obj.msg_used END)  ,'/', (CASE WHEN obj.msg_quota_value IS NULL THEN '0' WHEN obj.msg_quota_value<0 THEN '∞' ELSE obj.msg_quota_value END)) as seat_num "+sql;
+                "concat( (CASE WHEN obj.msg_used IS NULL THEN '0'ELSE obj.msg_used END)  ,'/', (CASE WHEN obj.msg_quota_value IS NULL THEN '0' WHEN obj.msg_quota_value<0 THEN '∞' ELSE obj.msg_quota_value END)) as seat_num ," +
+                "concat( (CASE WHEN obj.ussd_used IS NULL THEN '0'ELSE obj.ussd_used END)  ,'/', (CASE WHEN obj.ussd_quota_value IS NULL THEN '0' WHEN obj.ussd_quota_value<0 THEN '∞' ELSE obj.ussd_quota_value END)) as ussd_num ," +
+                "concat( (CASE WHEN obj.sms_used IS NULL THEN '0'ELSE obj.sms_used END)  ,'/', (CASE WHEN obj.sms_quota_value IS NULL THEN '0' WHEN obj.sms_quota_value<0 THEN '∞' ELSE obj.sms_quota_value END)) as sms_num ," +
+                "(CASE WHEN obj.among_sms IS NULL THEN '0'ELSE obj.among_sms END) + (CASE WHEN obj.among_ussd IS NULL THEN '0'ELSE obj.among_ussd END)  as among_msg "+sql;
         Query countQuery = em.createNativeQuery(countSql);
         pageSql +=" group by obj.dt desc";
         Query pageQuery = em.createNativeQuery(pageSql,SubaccountStatisticalVO.class);
@@ -129,25 +132,48 @@ public class SubaccountMonthServiceImpl extends AbstractService<SubaccountMonth>
         Date staticsDate = DateUtils.parseDate(monthStr, "yyyy-MM");
         String statisticsDateStr = DateUtils.formatDate(staticsDate);
         Date preDate = DateUtils.getPrevMonth(staticsDate);
-        String preDateStr = DateUtils.formatDate(preDate);
         String nextDateStr = DateUtils.getNextMonth(statisticsDateStr, "yyyy-MM-dd HH:mm:ss");
-        String currentDateStr = DateUtils.formatDate(new Date());
+        Date nextDate = DateUtils.parseDate(nextDateStr,"yyyy-MM-dd HH:mm:ss");
+        Date currentDate = new Date();
 
-        String sql = "SELECT REPLACE(UUID(), '-', '') AS id,a.app_id,a.tenant_id,a.id AS subaccount_id ,'"+statisticsDateStr+"' AS dt, "+ month +" AS month , IFNULL(b.among_amount,0) AS among_amount, IFNULL(b.among_duration,0) AS among_duration," +
-                "IFNULL((SELECT d.voice_used FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_month d WHERE d.subaccount_id = a.id AND d.dt = '" + preDateStr + "'),0) + IFNULL(b.among_duration,0) AS voice_used, 0 AS msg_used ," +
-                "IFNULL((SELECT qu.value FROM db_lsxy_bi_yunhuni.tb_bi_cert_account_quota qu WHERE qu.type='CallQuota' AND qu.cert_account_id = a.id LIMIT 1),0) AS voice_quota_value, -1 AS msg_quota_value ," +
-                "'"+currentDateStr + "' AS create_time, '"+ currentDateStr + "' AS last_time," + " 0 AS deleted,0 AS sortno,0 AS version "+
+        String sql = "SELECT REPLACE(UUID(), '-', '') AS id,a.app_id,a.tenant_id,a.id AS subaccount_id ,? AS dt, ? AS month , IFNULL(b.among_amount,0) AS among_amount, IFNULL(b.among_duration,0) AS among_duration," +
+                "IFNULL(b.among_sms,0) AS among_sms, IFNULL(b.among_ussd,0) AS among_ussd," +
+                "IFNULL((SELECT mo.voice_used FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_month mo WHERE mo.subaccount_id = a.id AND mo.dt = ?),0) + IFNULL(b.among_duration,0) AS voice_used," +
+                "IFNULL((SELECT mo.sms_used FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_month mo WHERE mo.subaccount_id = a.id AND mo.dt = ?),0) + IFNULL(b.among_sms,0) AS sms_used," +
+                "IFNULL((SELECT mo.ussd_used FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_month mo WHERE mo.subaccount_id = a.id AND mo.dt = ?),0) + IFNULL(b.among_ussd,0) AS ussd_used," +
+                "IFNULL((SELECT qu.value FROM db_lsxy_bi_yunhuni.tb_bi_cert_account_quota qu WHERE qu.type='CallQuota' AND qu.cert_account_id = a.id LIMIT 1),0) AS voice_quota_value, " +
+                "IFNULL((SELECT qu.value FROM db_lsxy_bi_yunhuni.tb_bi_cert_account_quota qu WHERE qu.type='SmsQuota' AND qu.cert_account_id = a.id LIMIT 1),0) AS sms_quota_value, " +
+                "IFNULL((SELECT qu.value FROM db_lsxy_bi_yunhuni.tb_bi_cert_account_quota qu WHERE qu.type='UssdQuota' AND qu.cert_account_id = a.id LIMIT 1),0) AS ussd_quota_value, " +
+                "? AS create_time, ? AS last_time, 0 AS deleted,0 AS sortno,0 AS version "+
                 "FROM (SELECT p.tenant_id ,s.app_id ,p.id FROM db_lsxy_bi_yunhuni.tb_bi_api_cert p INNER JOIN db_lsxy_bi_yunhuni.tb_bi_api_cert_subaccount s ON p.id = s.id WHERE p.deleted = 0) a " +
                 "LEFT JOIN " +
-                "(SELECT tenant_id,app_id,subaccount_id,SUM(among_duration) AS among_duration,SUM(among_amount) AS among_amount  " +
-                "FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day WHERE dt >= '" + statisticsDateStr + "'  AND dt < '" + nextDateStr + "' GROUP BY tenant_id,app_id,subaccount_id) b " +
+                "(SELECT tenant_id,app_id,subaccount_id,SUM(among_duration) AS among_duration,SUM(among_amount) AS among_amount,SUM(among_sms) AS among_sms,SUM(among_ussd) AS among_ussd  " +
+                "FROM db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_day WHERE dt >= ?  AND dt < ? GROUP BY tenant_id,app_id,subaccount_id) b " +
                 "ON a.id = b.subaccount_id";
         Query query = getEm().createNativeQuery(sql);
+
+        Object[] obj = new Object[]{
+                staticsDate,month,preDate,preDate,preDate,currentDate,currentDate,staticsDate,nextDate
+        };
+        for(int i=0;i<obj.length;i++){
+            query.setParameter(i+1,obj[i]);
+        }
+
+
         List result = query.getResultList();
         if(result != null && result.size() >0){
-            String insertSql = "INSERT INTO db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_month (id,app_id,tenant_id,subaccount_id,dt,month,among_amount,among_duration,voice_used," +
-                    "msg_used,voice_quota_value,msg_quota_value,create_time,last_time,deleted,sortno,version) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
+            String values = "id,app_id,tenant_id,subaccount_id,dt,month,among_amount,among_duration,among_sms,among_ussd,voice_used,sms_used,ussd_used,voice_quota_value,sms_quota_value,ussd_quota_value,create_time,last_time,deleted,sortno,version";
+            String valuesMark = "";
+            int length = values.split(",").length;
+            for(int i = 0;i<length;i++){
+                if(i == length -1){
+                    valuesMark += "?";
+                }else{
+                    valuesMark += "?,";
+                }
+            }
+            String insertSql = "INSERT INTO db_lsxy_bi_yunhuni.tb_bi_cert_subaccount_month ("+values+") values ("+valuesMark+")";
             jdbcTemplate.batchUpdate(insertSql,result);
         }
     }

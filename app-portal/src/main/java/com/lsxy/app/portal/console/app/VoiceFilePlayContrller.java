@@ -203,6 +203,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                 //遍历并保存文件
                 for (int i=0;i< multipartfiles.length;i++) {
                     MultipartFile file  = multipartfiles[i];
+
                     String name = file.getOriginalFilename();//文件名
                     boolean flagName = name.matches("^.+(.wav)$");
                     if(!flagName){
@@ -234,6 +235,10 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                         flag = true;
                     } catch (Exception e) {
                         logger.error("上传放音文件-保存文件过程出错,{}", e);
+                    }
+                    boolean isVerify = WavVerify.verify(newFile);
+                    if(!isVerify){
+                        return RestResponse.failed("0000", "上传失败,上传格式不正确");
                     }
 //                    int re = downFile(file,filePlayPath +"/"+fileKey);
                     if (flag) {

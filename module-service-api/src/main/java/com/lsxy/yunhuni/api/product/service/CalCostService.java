@@ -40,5 +40,7 @@ public interface CalCostService {
      */
     boolean isCallTimeRemainOrBalanceEnough(String subaccountId,String apiCmd, String tenantId) throws BalanceNotEnoughException, QuotaNotEnoughException;
 
+    boolean isMsgRemainOrBalanceEnough(String subaccountId, String code, String tenantId, Long num) throws BalanceNotEnoughException, QuotaNotEnoughException;
+
     void recordConsumeCal(VoiceFileRecord record);
 }
