@@ -60,7 +60,7 @@ public class MsgDayServiceImpl extends AbstractService<MsgDay> implements MsgDay
         if(todayStatistics != null){
             return;
         }
-        String[] selects = {"tenant_id,app_id,subaccount_id,","tenant_id,app_id,","tenant_id,",""};
+        String[] selects = {"tenant_id,app_id,","tenant_id,",""};
 
         for(String select:selects){
             String sql = "SELECT REPLACE(UUID(), '-', '') AS id,"+ select +"send_type AS TYPE,COUNT(1) AS total," +
