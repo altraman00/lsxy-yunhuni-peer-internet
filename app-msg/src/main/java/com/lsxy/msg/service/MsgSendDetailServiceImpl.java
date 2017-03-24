@@ -76,7 +76,7 @@ public class MsgSendDetailServiceImpl extends AbstractService<MsgSendDetail> imp
 
     @Override
     public List<String> updateStateAndTaskIdAndEndTimeByRecordIdAndPhones(String recordId, List<String> phones, int state, String taskId,Date endTime) {
-        if(StringUtils.isBlank(recordId) || phones == null || phones.size() == 0 || StringUtils.isBlank(taskId ) || endTime == null){
+        if(StringUtils.isBlank(recordId) || phones == null || phones.size() == 0){
             return null;
         }
         msgSendDetailDao.updateDetailStateAndTaskIdByRecordId(recordId, phones, state,taskId,endTime);
