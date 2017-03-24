@@ -105,11 +105,15 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
     @Override
     public MsgTemplate findByTempId(String appId, String subaccountId, String tempId, boolean isGW) throws YunhuniApiException {
         if(StringUtils.isNotBlank(subaccountId) || isGW){
-            MsgTemplate msgTemplate = msgTemplateDao.findByAppIdAndSubaccountIdAndTempId(appId,subaccountId,tempId);
-            if(isGW && msgTemplate == null){
-                throw new MsgTemplateErrorException();
+            if("1001".equals(tempId)){
+                return msgTemplateDao.findByTempId(tempId);
+            }else{
+                MsgTemplate msgTemplate = msgTemplateDao.findByAppIdAndSubaccountIdAndTempId(appId,subaccountId,tempId);
+                if(isGW && msgTemplate == null){
+                    throw new MsgTemplateErrorException();
+                }
+                return msgTemplate;
             }
-            return msgTemplate;
         }else{
            return msgTemplateDao.findByAppIdAndTempId(appId,tempId);
         }
