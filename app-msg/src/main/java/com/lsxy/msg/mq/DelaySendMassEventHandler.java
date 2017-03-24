@@ -1,6 +1,7 @@
 package com.lsxy.msg.mq;
 
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.msg.api.model.MsgSendDetail;
 import com.lsxy.msg.api.model.MsgSendRecord;
@@ -55,6 +56,9 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
         }
         List<String> ids = null;
         Date endTime = new Date();
+        if(logger.isDebugEnabled()){
+            logger.debug("进入延时发送完成{}", JSONUtil2.objectToJson(resultMass));
+        }
         if(resultMass != null && MsgConstant.SUCCESS.equals( resultMass.getResultCode())){
             //成功发送
             //更新发送记录，
