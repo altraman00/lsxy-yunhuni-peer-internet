@@ -106,9 +106,9 @@ public class MsgStatisticsVo {
                 msgVo.setDate( calendar.getTime() );
             }
             if(type==1){
-                calendar.add(Calendar.MONTH,1);
-            }else{
                 calendar.add(Calendar.DAY_OF_MONTH,1);
+            }else{
+                calendar.add(Calendar.MONTH,1);
             }
             list.add(msgVo);
         }
