@@ -85,6 +85,9 @@ public class MsgSendServiceImpl implements MsgSendService {
 
     @Override
     public void batchConsumeMsg(Date dt, String type, BigDecimal cost, String remark, String appId, String tenantId, String subaccountId, List<String> detailIds) {
+        if(dt == null || StringUtils.isBlank(type) || cost == null || StringUtils.isBlank(appId) || StringUtils.isBlank(tenantId) || detailIds == null || detailIds.size() ==0){
+            return;
+        }
         consumeService.batchConsume(dt, type, cost, remark, appId, tenantId, subaccountId, detailIds);
         if(StringUtils.isNotBlank(subaccountId)){
             Long d = 1L;

@@ -26,9 +26,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by liups on 2017/2/14.
@@ -68,17 +66,13 @@ public class MsgTest {
     MsgSendDetailService msgSendDetailService;
     @Test
     public void testDe(){
-        Map result = msgSendDetailService.getStateCountByRecordId("8a2bc5445af0311d015af0362a590001");
-        long succNum = 0;//成功次数
-        long failNum = 0;//失败次数
-        long pendingNum = 0;//待发送数
-        if(result != null){
-            succNum = result.get(MsgSendDetail.STATE_SUCCESS) == null? 0L : (Long)result.get(MsgSendDetail.STATE_SUCCESS);
-            failNum = result.get(MsgSendDetail.STATE_FAIL) == null? 0L : (Long)result.get(MsgSendDetail.STATE_FAIL);
-            pendingNum = result.get(MsgSendDetail.STATE_WAIT) == null? 0L : (Long)result.get(MsgSendDetail.STATE_WAIT);
-        }
-        System.out.println(succNum + "," + failNum + "," + pendingNum);
+//        msgSendRecordService.updateStateAndTaskIdById("ec1a1c062f021d415f3e77e9dd8552e5",MsgSendRecord.STATE_WAIT,"C757585745569844");
+//        msgSendDetailService.updateStateAndTaskIdAndEndTimeByRecordIdAndPhones("ec1a1c062f021d415f3e77e9dd8552e5", Arrays.asList("18620591870","17620010850"),0,"C757585745569844",new Date());
+        msgSendDetailService.updateStateAndTaskIdAndEndTimeByRecordIdAndPhones("ec1a1c062f021d415f3e77e9dd8552e5",new ArrayList<>(), MsgSendDetail.STATE_FAIL,"C757585745569844",new Date());
+
     }
+
+
 
 
 }
