@@ -117,6 +117,9 @@ public class TemplateController extends AbstractAPIController {
             }
         }
         String subaccountId = getSubaccountId(request);
+        if("1001".equals(tempId)){
+            return ApiGatewayResponse.success();
+        }
         MsgTemplate temp = msgTemplateService.findByTempId(appId, subaccountId, tempId, true);
         return ApiGatewayResponse.success(new TemplateVO(temp));
     }
