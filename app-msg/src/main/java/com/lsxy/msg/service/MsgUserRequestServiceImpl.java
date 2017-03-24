@@ -29,9 +29,12 @@ public class MsgUserRequestServiceImpl extends AbstractService<MsgUserRequest> i
     }
 
     @Override
-    public Page<MsgUserRequest> getPageByCondition(Integer pageNo, Integer pageSize, String sendType,String appId,Date start, Date end, int isMass, String taskName, String mobile) {
+    public Page<MsgUserRequest> getPageByCondition(Integer pageNo, Integer pageSize, String sendType,String appId,Date start, Date end, int isMass, String taskName, String mobile,String tenantId) {
         boolean flag = isMass==1?true:false;
         String hql = " from MsgUserRequest obj where obj.sendType=?1 and obj.isMass=?2 ";
+        if(StringUtils.isNotEmpty(tenantId)){
+            hql += " and obj.tenantId = '"+tenantId+"' ";
+        }
         if(StringUtils.isNotEmpty(appId)){
             hql += " and obj.appId = '"+appId+"' ";
         }

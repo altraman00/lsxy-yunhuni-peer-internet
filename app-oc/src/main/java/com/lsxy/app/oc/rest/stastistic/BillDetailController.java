@@ -342,7 +342,7 @@ public class BillDetailController extends AbstractRestController {
         }catch (Exception e){
             return RestResponse.failed("0000","日期格式错误");
         }
-        Page page = msgUserRequestService.getPageByCondition( pageNo,  pageSize,type, appId, start,  end,  isMass,  taskName,  mobile );
+        Page page = msgUserRequestService.getPageByCondition( pageNo,  pageSize,type, appId, start,  end,  isMass,  taskName,  mobile,uid );
         return RestResponse.success(page);
     }
     @RequestMapping(value = "/{uid}/session/msg/detail/{msgKey}" ,method = RequestMethod.GET)
