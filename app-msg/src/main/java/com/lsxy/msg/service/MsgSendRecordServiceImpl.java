@@ -7,6 +7,7 @@ import com.lsxy.msg.api.model.MsgSendRecord;
 import com.lsxy.msg.api.model.MsgUserRequest;
 import com.lsxy.msg.api.service.MsgSendRecordService;
 import com.lsxy.msg.dao.MsgSendRecordDao;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,13 +54,16 @@ public class MsgSendRecordServiceImpl extends AbstractService<MsgSendRecord> imp
 
     @Override
     public void updateStateAndTaskIdById(String id, int state, String taskId) {
+        if(StringUtils.isBlank(id) || StringUtils.isBlank(taskId)){
+            return;
+        }
         msgSendRecordDao.updateStateAndTaskIdById(id,state,taskId);
     }
 
     @Override
     public List<MsgSendRecord> findUssdSendOneFailAndSendNotOver() {
         Date date = new Date(System.currentTimeMillis() - 1000 * 120);
-        String hql = "from MsgSendRecord obj where obj.isMass = false obj.state = ?1 and obj.sendType = ?2 and obj.sendFailTime <= ?3 and obj.lastTime >= ?4 ";
+        String hql = "from MsgSendRecord obj where obj.isMass = false and obj.state = ?1 and obj.sendType = ?2 and obj.sendFailNum <= ?3 and obj.lastTime >= ?4 ";
         return this.list(hql,MsgSendRecord.STATE_FAIL, MsgConstant.MSG_USSD,3,date);
     }
 

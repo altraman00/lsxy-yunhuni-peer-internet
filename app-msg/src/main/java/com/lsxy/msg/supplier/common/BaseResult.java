@@ -21,10 +21,7 @@ public class BaseResult implements Serializable {
 
     public BaseResult() {
     }
-    public BaseResult(ResultCode result) {
-        this.resultCode = result.getResultCode();
-        this.resultDesc = result.getResultDesc();
-    }
+
     public String getResultCode() {
         return resultCode;
     }

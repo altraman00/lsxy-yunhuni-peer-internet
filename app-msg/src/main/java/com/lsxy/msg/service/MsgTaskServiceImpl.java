@@ -1,5 +1,7 @@
 package com.lsxy.msg.service;
 
+import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.msg.MsgRequestCompletedEvent;
 import com.lsxy.msg.api.model.MsgConstant;
 import com.lsxy.msg.api.model.MsgSendDetail;
 import com.lsxy.msg.api.model.MsgSendRecord;
@@ -12,6 +14,7 @@ import com.lsxy.msg.supplier.paopaoyu.PaoPaoYuMassNofity;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.msg.paopaoyu.PaoPaoYuConstant;
+import com.msg.qixuntong.QiXunTongConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +45,8 @@ public class MsgTaskServiceImpl implements MsgTaskService{
     ConsumeService consumeService;
     @Autowired
     MsgSendService msgSendService;
+    @Autowired
+    MQService mqService;
 
 
     /**
@@ -60,10 +65,11 @@ public class MsgTaskServiceImpl implements MsgTaskService{
 
     //查看是否执行完成
     private void updateRequest(MsgUserRequest request){
+        long sumNum = 0;
         long succNum = 0; //成功次数
         long failNum = 0; //失败次数
         long pendingNum = 0; //待发送数
-        //泡泡鱼的群发情况
+        //群发情况
         List<MsgSendRecord> records = msgSendRecordService.findByMsgKey(request.getMsgKey());
         int state = MsgUserRequest.STATE_FAIL;
         boolean flag = true;
@@ -74,19 +80,62 @@ public class MsgTaskServiceImpl implements MsgTaskService{
             if(MsgSendRecord.STATE_SUCCESS == record.getState()){
                 state = MsgUserRequest.STATE_SUCCESS; //只要有一条成功，就算成功
             }
+            sumNum += record.getSumNum();
             succNum += record.getSuccNum();
             failNum += record.getFailNum();
             pendingNum += record.getPendingNum();
         }
         if(flag){//任务完成
             request.setState(state);
+            mqService.publish(new MsgRequestCompletedEvent(request.getMsgKey()));
         }
+        if(flag || request.getSuccNum() != succNum || request.getFailNum() != failNum || request.getPendingNum() != pendingNum || request.getSumNum() != sumNum){
+            request.setSumNum(sumNum);
+            request.setPendingNum(pendingNum);
+            request.setFailNum(failNum);
+            request.setSuccNum(succNum);
+            msgUserRequestService.save(request);
+        }
+    }
+
+
+    @Override
+    public void massTaskRequestOverdueUpdate(){
+        logger.info("[群发任务过期][检测开始]");
+        List<MsgUserRequest> requests = msgUserRequestService.findAwaitedButOverdueRequets();
+        for(MsgUserRequest request : requests){
+            updateOverdueRequest(request);
+        }
+        logger.info("[群发任务过期][检测结束]");
+    }
+
+    //查看是否执行完成
+    private void updateOverdueRequest(MsgUserRequest request){
+        long succNum = 0; //成功次数
+        long failNum = 0; //失败次数
+        long pendingNum = 0; //待发送数
+        Date endTime = new Date();
+        //群发情况
+        List<MsgSendRecord> records = msgSendRecordService.findByMsgKey(request.getMsgKey());
+        for(MsgSendRecord record : records){
+            Long recordFailNum = msgSendDetailService.finishOverdueRecordId(record.getId(), endTime);
+            record.setFailNum(recordFailNum);
+            record.setPendingNum(0L);
+            record.setSuccNum(record.getSumNum() - recordFailNum);
+            record.setState(MsgSendRecord.STATE_SUCCESS);
+            msgSendRecordService.save(record);
+
+            succNum += record.getSuccNum();
+            failNum += record.getFailNum();
+        }
+        request.setState(MsgUserRequest.STATE_SUCCESS);
         request.setPendingNum(pendingNum);
         request.setFailNum(failNum);
         request.setSuccNum(succNum);
         msgUserRequestService.save(request);
-    }
 
+        mqService.publish(new MsgRequestCompletedEvent(request.getMsgKey()));
+    }
 
     /**
      * 每小时的10分钟，检测截止到当前的一个星期内的检测结果
@@ -199,7 +248,7 @@ public class MsgTaskServiceImpl implements MsgTaskService{
     @Override
     public void qiXunTongMassTaskUpdate(){
         logger.info("[群发任务][检测开始]");
-        List<MsgSendRecord> records = msgSendRecordService.findWaitedSendMassBySupplier(PaoPaoYuConstant.PaopaoyuCode);
+        List<MsgSendRecord> records = msgSendRecordService.findWaitedSendMassBySupplier(QiXunTongConstant.QixuntongCode);
         for(MsgSendRecord record : records){
             checkQiXunTongMassTask(record);
         }
@@ -210,6 +259,7 @@ public class MsgTaskServiceImpl implements MsgTaskService{
     private void checkQiXunTongMassTask(MsgSendRecord record){
         logger.info("[群发任务][检测开启][taskId：" + record.getTaskId() + "]");
         Map result = msgSendDetailService.getStateCountByRecordId(record.getId());
+        long sumNum = 0;
         long succNum = 0;//成功次数
         long failNum = 0;//失败次数
         long pendingNum = 0;//待发送数
@@ -217,32 +267,28 @@ public class MsgTaskServiceImpl implements MsgTaskService{
             succNum = result.get(MsgSendDetail.STATE_SUCCESS) == null? 0L : (Long)result.get(MsgSendDetail.STATE_SUCCESS);
             failNum = result.get(MsgSendDetail.STATE_FAIL) == null? 0L : (Long)result.get(MsgSendDetail.STATE_FAIL);
             pendingNum = result.get(MsgSendDetail.STATE_WAIT) == null? 0L : (Long)result.get(MsgSendDetail.STATE_WAIT);
+            sumNum = succNum + pendingNum + failNum;
         }
         if(pendingNum == 0){//没有等待的号码，即任务完成
             //检验号码数是否正确
-            if( (record.getSuccNum() +record.getFailNum() +record.getPendingNum()) == (succNum + pendingNum + failNum)) {
-                record.setPendingNum(pendingNum);
-                record.setFailNum(failNum);
-                record.setSuccNum(succNum);
-                record.setState(MsgSendRecord.STATE_SUCCESS);
-                msgSendRecordService.save(record);
-            }else{
-                logger.error("[企讯通群发任务][任务id]["+record.getTaskId()+"]参数检验失败：[新数据][succNum="+succNum+" ;pendingNum="+pendingNum+" ;failNum="+failNum+"][旧数据][" +
-                        "succNum="+record.getSuccNum() +" ;pendingNum="+record.getPendingNum()+" ;failNum="+record.getFailNum()+"]");
-            }
+            record.setSumNum(sumNum);
+            record.setPendingNum(pendingNum);
+            record.setFailNum(failNum);
+            record.setSuccNum(succNum);
+            record.setState(MsgSendRecord.STATE_SUCCESS);
+            msgSendRecordService.save(record);
         }else{
-            if( (record.getSuccNum() +record.getFailNum() +record.getPendingNum()) == (succNum + pendingNum + failNum)) {
-                if(succNum > 0){//有号码成功即是开始处理
+            if(succNum > 0){//有号码成功即是开始处理
+                if(record.getSuccNum() != succNum || record.getFailNum() != failNum || record.getPendingNum() != pendingNum || record.getSumNum() != sumNum){
+                    record.setSumNum(sumNum);
                     record.setPendingNum(pendingNum);
                     record.setFailNum(failNum);
                     record.setSuccNum(succNum);
                     msgSendRecordService.save(record);
                 }
-            }else{
-                logger.error("[企讯通群发任务][任务id]["+record.getTaskId()+"]参数检验失败：[新数据][succNum="+succNum+" ;pendingNum="+pendingNum+" ;failNum="+failNum+"][旧数据][" +
-                        "succNum="+record.getSuccNum() +" ;pendingNum="+record.getPendingNum()+" ;failNum="+record.getFailNum()+"]");
             }
         }
+
     }
 
 }

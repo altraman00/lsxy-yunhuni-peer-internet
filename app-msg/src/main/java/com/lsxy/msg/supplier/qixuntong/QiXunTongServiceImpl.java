@@ -45,7 +45,7 @@ public class QiXunTongServiceImpl extends AbstractSupplierSendServiceImpl {
     @Override
     public ResultOne sendOne(String tempId, List<String> tempArgs, String msg, String mobile,String sendType) {
         if(MsgConstant.MSG_SMS.equals(sendType)){
-            String result = getQiXinTongClient().sendTempleMSM("",tempId, msg ,  mobile);
+            String result = getQiXinTongClient().sendMSM("", msg ,  mobile);
             logger.info("调用[企信通][单发][模板短信]结果:"+ result);
             return new QiXunTongResultOne(result);
         }else{
@@ -60,9 +60,9 @@ public class QiXunTongServiceImpl extends AbstractSupplierSendServiceImpl {
                 //TODO 抛异常
             }
             long delay = sendTime.getTime() - new Date().getTime();
-            if(delay < 0){
+            if(delay <= 0){
                 String mobilesStr = StringUtils.join(mobiles, QiXunTongConstant.QiXunTongNumRegexStr);
-                String result = getQiXinTongClient().sendTempleMSM(taskName,tempId, msg ,  mobilesStr);
+                String result = getQiXinTongClient().sendMSM(taskName, msg ,  mobilesStr);
                 logger.info("调用[企信通][群发][模板短信]结果:"+ result);
                 return new QiXunTongResultMass(result,mobilesStr);
             }else{
@@ -70,7 +70,7 @@ public class QiXunTongServiceImpl extends AbstractSupplierSendServiceImpl {
                 String  sendTimeStr = DateUtils.getDate(sendTime,MsgConstant.TimePartten);
                 String tempArgsStr = StringUtils.join(tempArgs, MsgConstant.ParamRegexStr);
                 //发布定时任务
-                mqService.publish( new DelaySendMassEvent( delay, tenantId,appId,subaccountId,recordId, msgKey,taskName,tempId,  tempArgsStr, mobilesStr, sendTimeStr, msg,  MsgConstant.MSG_USSD, MsgConstant.ChinaUnicom,cost));
+                mqService.publish( new DelaySendMassEvent( delay, tenantId,appId,subaccountId,recordId, msgKey,taskName,tempId,  tempArgsStr, mobilesStr, sendTimeStr, msg,  MsgConstant.MSG_SMS, MsgConstant.ChinaUnicom,cost));
                 //先按发送成功的计算
                 ResultMass resultMass = new QiXunTongResultMass("{\"resultcode\":0,\"resultmsg\":\"成功\",\"taskid\":\"" + MsgConstant.AwaitingTaskId + "\"}",mobilesStr);
                 return resultMass;

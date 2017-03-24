@@ -2,13 +2,18 @@ package com.lsxy.app.api.gateway.rest.msg.dto;
 
 import com.lsxy.app.api.gateway.dto.CommonDTO;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * Created by liups on 2017/3/9.
  */
 public class SmsSendMassDTO extends CommonDTO {
+    @NotNull
     private String taskName;
+    @NotNull
     private String tempId;
     private String tempArgs;
+    @NotNull
     private String mobiles;
     private String sendTime;
 

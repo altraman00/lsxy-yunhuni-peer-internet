@@ -53,7 +53,10 @@ public class StatisticsTest {
 
     @Test
     public void msgTest(){
-        msgDayService.dayStatistics(new Date());
+        Date date=new Date();
+        //执行语句
+        Date preDate = DateUtils.getPreDate(date);
+//        msgDayService.dayStatistics(preDate);
         ssgMonthService.monthStatistics(new Date());
     }
 

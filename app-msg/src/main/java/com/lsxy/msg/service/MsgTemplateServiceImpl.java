@@ -3,6 +3,7 @@ package com.lsxy.msg.service;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.exceptions.api.msg.MsgTemplateErrorException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.exceptions.api.RequestIllegalArgumentException;
@@ -102,11 +103,19 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
     }
 
     @Override
-    public MsgTemplate findByTempId(String appId, String subaccountId, String tempId, boolean isGW){
+    public MsgTemplate findByTempId(String appId, String subaccountId, String tempId, boolean isGW) throws YunhuniApiException {
         if(StringUtils.isNotBlank(subaccountId) || isGW){
-            return msgTemplateDao.findByAppIdAndSubaccountIdAndTempId(appId,subaccountId,tempId);
+            if("1001".equals(tempId)){
+                return msgTemplateDao.findByTempId(tempId);
+            }else{
+                MsgTemplate msgTemplate = msgTemplateDao.findByAppIdAndSubaccountIdAndTempId(appId,subaccountId,tempId);
+                if(isGW && msgTemplate == null){
+                    throw new MsgTemplateErrorException();
+                }
+                return msgTemplate;
+            }
         }else{
-            return msgTemplateDao.findByAppIdAndTempId(appId,tempId);
+           return msgTemplateDao.findByAppIdAndTempId(appId,tempId);
         }
     }
 
@@ -144,21 +153,26 @@ public class MsgTemplateServiceImpl extends AbstractService<MsgTemplate> impleme
         }
         if(StringUtils.isNotBlank(msgTemplate.getType())){
             flag = true;
-            oldTemplate.setName(msgTemplate.getType());
+            oldTemplate.setType(msgTemplate.getType());
         }
         if(StringUtils.isNotBlank(msgTemplate.getContent())){
             flag = true;
-            oldTemplate.setName(msgTemplate.getContent());
+            oldTemplate.setContent(msgTemplate.getContent());
         }
         if(StringUtils.isNotBlank(msgTemplate.getRemark())){
             flag = true;
-            oldTemplate.setName(msgTemplate.getReason());
+            oldTemplate.setRemark(msgTemplate.getRemark());
         }
         if(flag){
             oldTemplate.setStatus(MsgTemplate.STATUS_WAIT);
             this.save(oldTemplate);
         }
         return oldTemplate;
+    }
+
+    @Override
+    public MsgTemplate findByTempId(String tempId) {
+        return msgTemplateDao.findByTempId(tempId);
     }
 
     @Override

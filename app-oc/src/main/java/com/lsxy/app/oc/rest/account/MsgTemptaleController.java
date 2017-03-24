@@ -3,15 +3,13 @@ package com.lsxy.app.oc.rest.account;
 import com.alibaba.dubbo.common.utils.StringUtils;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.oc.base.AbstractRestController;
-import com.lsxy.app.oc.rest.config.vo.IdsVo;
-import com.lsxy.app.oc.rest.file.VoiceFilePlayVo;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mq.api.MQService;
-import com.lsxy.framework.mq.events.oc.VoiceFilePlayAuditCompletedEvent;
+import com.lsxy.framework.mq.events.msg.TemplateCompleteEvent;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.msg.api.model.MsgSupplier;
 import com.lsxy.msg.api.model.MsgSupplierTemplate;
@@ -23,8 +21,6 @@ import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
-import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
 import com.lsxy.yunhuni.api.message.model.AccountMessage;
 import com.lsxy.yunhuni.api.message.service.AccountMessageService;
 import io.swagger.annotations.Api;
@@ -35,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Field;
 import java.util.*;
 
 
@@ -60,6 +55,10 @@ public class MsgTemptaleController extends AbstractRestController {
     private AppService appService;
     @Autowired
     AccountMessageService accountMessageService;
+    @Autowired
+    MQService mqService;
+
+
     @Autowired
     private ApiCertificateSubAccountService apiCertificateSubAccountService;
     @ApiOperation(value = "根据id查看详情")
@@ -207,6 +206,7 @@ public class MsgTemptaleController extends AbstractRestController {
                 }
             }
             accountMessageService.sendTenantTempletMessage(null,msgTemplate.getTenantId(), AccountMessage.MESSAGE_MSG_TEMPLATE_SUCCESS );
+            mqService.publish(new TemplateCompleteEvent(msgTemplate.getTempId()));
             return RestResponse.success();
         }else{
             return RestResponse.failed("","模板不存在");
@@ -226,6 +226,7 @@ public class MsgTemptaleController extends AbstractRestController {
             msgTemplate.setReason((String)map.get("reason"));
             msgTemplateService.save(msgTemplate);
             accountMessageService.sendTenantTempletMessage(null,msgTemplate.getTenantId(), AccountMessage.MESSAGE_MSG_TEMPLATE_FAIL );
+            mqService.publish(new TemplateCompleteEvent(msgTemplate.getTempId()));
             return RestResponse.success();
         }else{
             return RestResponse.failed("","模板不存在");
