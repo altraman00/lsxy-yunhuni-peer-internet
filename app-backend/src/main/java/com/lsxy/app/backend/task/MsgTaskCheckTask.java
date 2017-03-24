@@ -32,7 +32,7 @@ public class MsgTaskCheckTask {
         msgTaskService.paoPaoYuMassTaskUpdate();
     }
 
-    @Scheduled(cron="0 0/1 * * * ?")
+//    @Scheduled(cron="0 0/1 * * * ?")
     public void scheduled_paoPaoYuUssdReSend_yyyyMMddHHmm(){
         msgTaskService.paoPaoYuUssdReSendTask();
     }
