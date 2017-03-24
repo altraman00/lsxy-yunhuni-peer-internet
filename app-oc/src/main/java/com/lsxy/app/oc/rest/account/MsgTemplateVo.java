@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
+import java.util.*;
 
 /**
  * Created by zhangxb on 2017/3/17.
@@ -24,6 +24,7 @@ public class MsgTemplateVo {
     private String tenantName;
     private String appName;
     private String subaccountId;
+    private String certId;
     private String name;
     private String type;
     private String content;
@@ -31,8 +32,7 @@ public class MsgTemplateVo {
     private String reason;
     private String remark;
     private String lastUserName;
-    private String msgSupplierId;
-    private String msgSupplierName;
+    private List<Map> list = new ArrayList<>();
     public MsgTemplateVo(MsgTemplate msgTemplate,String tenantName,String appName){
         try {
             BeanUtils.copyProperties(this,msgTemplate);
@@ -181,19 +181,19 @@ public class MsgTemplateVo {
         this.lastUserName = lastUserName;
     }
 
-    public String getMsgSupplierId() {
-        return msgSupplierId;
+    public List<Map> getList() {
+        return list;
     }
 
-    public void setMsgSupplierId(String msgSupplierId) {
-        this.msgSupplierId = msgSupplierId;
+    public void setList(List<Map> list) {
+        this.list = list;
     }
 
-    public String getMsgSupplierName() {
-        return msgSupplierName;
+    public String getCertId() {
+        return certId;
     }
 
-    public void setMsgSupplierName(String msgSupplierName) {
-        this.msgSupplierName = msgSupplierName;
+    public void setCertId(String certId) {
+        this.certId = certId;
     }
 }

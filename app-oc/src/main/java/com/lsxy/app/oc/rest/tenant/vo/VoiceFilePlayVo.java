@@ -131,4 +131,12 @@ public class VoiceFilePlayVo {
     public void setCertId(String certId) {
         this.certId = certId;
     }
+
+    public Date getCheckTime() {
+        return checkTime;
+    }
+
+    public void setCheckTime(Date checkTime) {
+        this.checkTime = checkTime;
+    }
 }
