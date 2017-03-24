@@ -133,7 +133,7 @@ public class MsgMonthServiceImpl extends AbstractService<MsgMonth> implements Ms
             hql += " and obj.appId = ?2 and obj.dt between ?2 and ?3 ";
             list = this.list(hql,tenantId,appId,date1,date2 );
         }else{
-            hql+= " and obj.dt between ?2 and ?3 ";
+            hql+= " and obj.appId = null and obj.dt between ?2 and ?3 ";
             list = this.list(hql,tenantId,date1,date2 );
         }
         return list;
