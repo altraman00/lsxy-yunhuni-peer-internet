@@ -21,6 +21,9 @@ public class TenantServiceSwitch extends IdEntity {
     private Integer isRecording;//是否录音服务0否，1是
     private Integer isVoiceValidate;//是否语音验证码0否，1是
     private Integer isIvrService;//是否IVR定制服务0否，1是
+    private Integer isCallCenter;
+    private Integer isSms;//短信
+    private Integer isUssd;//闪印
 
     @ManyToOne
     @JoinColumn(name = "tenant_id")
@@ -80,5 +83,33 @@ public class TenantServiceSwitch extends IdEntity {
 
     public void setIsIvrService(Integer isIvrService) {
         this.isIvrService = isIvrService;
+    }
+
+    @Column(name = "is_call_center")
+    public Integer getIsCallCenter() {
+        return isCallCenter;
+    }
+
+    public void setIsCallCenter(Integer isCallCenter) {
+        this.isCallCenter = isCallCenter;
+    }
+
+    @Column(name = "is_sms")
+    public Integer getIsSms() {
+        return isSms;
+    }
+
+    public void setIsSms(Integer isSms) {
+        this.isSms = isSms;
+    }
+
+
+    @Column(name = "is_ussd")
+    public Integer getIsUssd() {
+        return isUssd;
+    }
+
+    public void setIsUssd(Integer isUssd) {
+        this.isUssd = isUssd;
     }
 }

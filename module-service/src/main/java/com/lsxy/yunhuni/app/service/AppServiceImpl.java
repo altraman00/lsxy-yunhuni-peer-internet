@@ -13,11 +13,14 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.app.service.ServiceType;
+import com.lsxy.yunhuni.api.product.model.Product;
+import com.lsxy.yunhuni.api.product.service.ProductService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.app.dao.AppDao;
+import com.lsxy.yunhuni.product.dao.ProductDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -50,6 +53,9 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
 
     @Autowired
     private TenantServiceSwitchService tenantServiceSwitchService;
+
+    @Autowired
+    private ProductDao productDao;
 
     @Override
     public BaseDaoInterface<App, Serializable> getDao() {
@@ -175,7 +181,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     }
 
     @Override
-    @Cacheable(value = "entity", key = "'entity_' + #tenantId + #appId + #service.code")
+    @Cacheable(value = "entity", key = "'entity_' + #tenantId + #appId + #service.product + #service.code")
     public boolean enabledService(String tenantId, String appId, ServiceType service) {
         if(tenantId == null){
             return false;
@@ -186,9 +192,19 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         if(service == null){
             return false;
         }
+        if(service.getCode() == null && service.getProduct() == null){
+            return false;
+        }
+        String productCode = service.getProduct();
         String field = service.getCode();
         try {
-            if(service != ServiceType.CallCenter){//租户功能开关 暂时没有呼叫中心功能
+            if(productCode!=null){//如果产品不null 判断产品是否可用
+                Product product = productDao.findByCode(productCode);
+                if(product == null || product.getStatus() ==null || product.getStatus().intValue() != 1){
+                    return false;
+                }
+            }
+            if(field != null){//判断租户是否开启该功能
                 TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
                 if(serviceSwitch != null){
                     Integer enabled =  (Integer) BeanUtils.getProperty2(serviceSwitch,field);
@@ -196,14 +212,15 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
                         return false;
                     }
                 }
-            }
-            App app = this.findById(appId);
-            if(app == null){
-                return false;
-            }
-            Integer enabled =  (Integer) BeanUtils.getProperty2(app,field);
-            if(enabled == null || enabled != 1){
-                return false;
+                //判断应用是否开启该功能
+                App app = this.findById(appId);
+                if(app == null){
+                    return false;
+                }
+                Integer enabled =  (Integer) BeanUtils.getProperty2(app,field);
+                if(enabled == null || enabled != 1){
+                    return false;
+                }
             }
         } catch (Throwable e) {
             return false;
