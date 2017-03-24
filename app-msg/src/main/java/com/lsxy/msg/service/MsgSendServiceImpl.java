@@ -225,7 +225,7 @@ public class MsgSendServiceImpl implements MsgSendService {
         taskName = taskName.trim();
         Date sendTime;
         //校验群发时间
-        if(StringUtils.isNotEmpty(sendTimeStr)){
+        if(StringUtils.isNotBlank(sendTimeStr)){
             try{
                 sendTime = DateUtils.parseDate(sendTimeStr, MsgConstant.TimePartten);
             }catch (Exception e){
