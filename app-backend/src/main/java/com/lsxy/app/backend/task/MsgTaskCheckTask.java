@@ -16,7 +16,7 @@ public class MsgTaskCheckTask {
     @Reference(timeout=3000,check = false,lazy = true)
     MsgTaskService msgTaskService;
 
-    @Scheduled(cron="0 0/3 * * * ?")
+    @Scheduled(cron="0 0/4 * * * ?")
     public void scheduled_massTaskRequest_yyyyMMddHHmm(){
         msgTaskService.massTaskRequestUpdate();
     }
@@ -27,7 +27,7 @@ public class MsgTaskCheckTask {
         msgTaskService.massTaskRequestOverdueUpdate();
     }
 
-    @Scheduled(cron="0 0/10 * * * ?")
+//    @Scheduled(cron="0 0/10 * * * ?")
     public void scheduled_paoPaoYuMassTask_yyyyMMddHHmm(){
         msgTaskService.paoPaoYuMassTaskUpdate();
     }
