@@ -42,8 +42,10 @@ public class SubAccountStatisticsController extends AbstractPortalController {
         mav.addObject("appList",getAppList(request).getData());
         List<App> appList = (List<App>) getAppList(request).getData();
         if(StringUtils.isEmpty(appId)){
-            appId = appList.get(0).getId();
-            mav.addObject("appServiceTyp",appList.get(0).getServiceType());
+            if(appList!=null&& appList.size()>0 ) {
+                appId = appList.get(0).getId();
+                mav.addObject("appServiceTyp",appList.get(0).getServiceType());
+            }
         }else{
             App app = (App)getAppById(request,appId).getData();
             mav.addObject("appServiceTyp",app.getServiceType());
