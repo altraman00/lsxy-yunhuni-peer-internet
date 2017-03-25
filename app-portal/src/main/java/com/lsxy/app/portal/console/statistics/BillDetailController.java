@@ -113,7 +113,7 @@ public class BillDetailController extends AbstractPortalController {
                 MsgUserRequest msgUserRequest = result.getData();
                 if(msgUserRequest != null){
                     String title = "msg".equals(msgUserRequest.getSendType())?"短信":"闪印" ;
-                    String one = "任务名字："+msgUserRequest.getTaskName()+"  任务状态："+( msgUserRequest.getState()==MsgUserRequest.STATE_FAIL ? "任务失败":(msgUserRequest.getState()==MsgUserRequest.STATE_SUCCESS?"任务结束":"待处理"))+"  成功数："+(msgUserRequest.getSuccNum()!=null?msgUserRequest.getSuccNum():0)+" 失败数："+(msgUserRequest.getFailNum()!=null?msgUserRequest.getFailNum():0)+" 待发数："+(msgUserRequest.getPendingNum()!=null?msgUserRequest.getPendingNum():0);
+                    String one = "任务名字："+msgUserRequest.getTaskName()+"  任务状态："+( msgUserRequest.getState()==MsgUserRequest.STATE_FAIL ? "任务完成":(msgUserRequest.getState()==MsgUserRequest.STATE_SUCCESS?"任务完成":"待处理"))+"  成功数："+(msgUserRequest.getSuccNum()!=null?msgUserRequest.getSuccNum():0)+" 失败数："+(msgUserRequest.getFailNum()!=null?msgUserRequest.getFailNum():0)+" 待发数："+(msgUserRequest.getPendingNum()!=null?msgUserRequest.getPendingNum():0);
                     String[] headers =  new String[]{"手机号码","发送结果","原因"};
                     String[] values = new String[]{"mobile","state:-1=发送失败;0=未发送;1=发送成功"};
                     String uri1 =  PortalConstants.REST_PREFIX_URL  + "/rest/msg_user_detail/list?msgKey={1}";
