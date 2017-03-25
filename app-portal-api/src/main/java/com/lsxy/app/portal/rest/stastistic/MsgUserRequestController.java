@@ -33,7 +33,8 @@ public class MsgUserRequestController extends AbstractRestController {
             startTime = DateUtils.parseDate(start, "yyyy-MM-dd");
             endTime = DateUtils.parseDate(end + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
         }catch (Exception e){}
-        Page page = msgUserRequestService.getPageByCondition( pageNo,  pageSize,sendType, appId, startTime,  endTime,  isMass,  taskName,  mobile );
+
+        Page page = msgUserRequestService.getPageByCondition( pageNo,  pageSize,sendType, appId, startTime,  endTime,  isMass,  taskName,  mobile ,getCurrentAccount().getTenant().getId());
         return RestResponse.success(page);
     }
     @RequestMapping("/get/{id}")
