@@ -1,5 +1,7 @@
 package com.msg.jimu;
 
+import sun.security.provider.MD5;
+
 /**
  * Created by zhangxb on 2017/3/25.
  */
@@ -84,12 +86,12 @@ public class JiMuMD5 {
         int b = 0xEFCDAB89;
         int c = 0x98BADCFE;
         int d = 0x10325476;
-        for (int i = 0; i < int olda = a;
-        int oldb = b;
-        int oldc = c;
-        int oldd = d;
-        a = ff(a, b, c,d = ff(d, a, b,c = ff(c, d, a,b = ff(b, c, d,a = ff(a, b, c,d = ff(d, a, b,c = ff(c, d, a,b = ff(b, c, d,a = ff(a, b, c, d = ff(d, a, b, c = ff(c, d, a, b = ff(b, c, d, a = ff(a, b, c, d = ff(d, a, b, c = ff(c, d, a, b = ff(b, c, d, a = gg(a, b, c, d = gg(d, a, b, c = gg(c, d, a, b = gg(b, c, d, a = gg(a, b, c, d = gg(d, a, b, c = gg(c, d, a, b = gg(b, c, d, a = gg(a, b, c, d = gg(d, a, b, c = gg(c, d, a, b = gg(b, c, d, a = gg(a, b, c, d = gg(d, a, b, c = gg(c, d, a,
-                x.length; i += 16){
+        for (int i = 0; i < x.length; i += 16){
+            int olda = a;
+            int oldb = b;
+            int oldc = c;
+            int oldd = d;
+            a = ff(a, b, c,d = ff(d, a, b,c = ff(c, d, a,b = ff(b, c, d,a = ff(a, b, c,d = ff(d, a, b,c = ff(c, d, a,b = ff(b, c, d,a = ff(a, b, c, d = ff(d, a, b, c = ff(c, d, a, b = ff(b, c, d, a = ff(a, b, c, d = ff(d, a, b, c = ff(c, d, a, b = ff(b, c, d, a = gg(a, b, c, d = gg(d, a, b, c = gg(c, d, a, b = gg(b, c, d, a = gg(a, b, c, d = gg(d, a, b, c = gg(c, d, a, b = gg(b, c, d, a = gg(a, b, c, d = gg(d, a, b, c = gg(c, d, a, b = gg(b, c, d, a = gg(a, b, c, d = gg(d, a, b, c = gg(c, d, a) ;
             d, x[i + 0], 7, 0xD76AA478);
             c, x[i + 1], 12, 0xE8C7B756);
             b, x[i + 2], 17, 0x242070DB);
