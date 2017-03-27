@@ -577,7 +577,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             }
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
             if(StringUtils.isNotBlank(error)){
-                logger.warn("呼叫坐席失败{}",error);
+                logger.warn("callid={},呼叫坐席失败{},",call_id,error);
             }else{
                 String agentId = businessData.get(CallCenterUtil.AGENT_ID_FIELD);
                 if(agentId != null){
