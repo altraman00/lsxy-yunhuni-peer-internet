@@ -251,7 +251,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
     }
 
     @Override
-    public boolean callOut(String subaccountId,String ip, String appId, String name,
+    public String callOut(String subaccountId,String ip, String appId, String name,
                            String from, String to, Integer maxDialSeconds, Integer maxAnswerSeconds,String userData) throws YunhuniApiException {
         if(StringUtil.isBlank(to)){
             throw new RequestIllegalArgumentException(
@@ -407,7 +407,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             //FINALLY 坐席解锁
             try {
                 if(!CallCenterAgent.STATE_IDLE.equals(agentState.getState(agent))){
-                    throw new SystemBusyException(
+                    throw new AgentIsBusyException(
                             new ExceptionContext().put("subaccountId",subaccountId)
                                     .put("appId",appId)
                                     .put("agentName",name)
@@ -448,11 +448,11 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                 agentLock.unlock();
             }
         }
-        return true;
+        return callId;
     }
 
     @Override
-    public boolean callAgent(String subaccountId,String ip, String appId, String name, String from, String enqueueXml, Integer maxDialSeconds, Integer maxAnswerSeconds) throws YunhuniApiException {
+    public String callAgent(String subaccountId,String ip, String appId, String name, String from, String enqueueXml, Integer maxDialSeconds, Integer maxAnswerSeconds) throws YunhuniApiException {
         if(StringUtil.isBlank(enqueueXml)){
             throw new RequestIllegalArgumentException(
                     new ExceptionContext().put("subaccountId",subaccountId)
@@ -627,7 +627,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             //FINALLY 坐席解锁
             try {
                 if(!CallCenterAgent.STATE_IDLE.equals(agentState.getState(agent))){
-                    throw new SystemBusyException(
+                    throw new AgentIsBusyException(
                             new ExceptionContext().put("subaccountId",subaccountId)
                                     .put("appId",appId)
                                     .put("agentName",name)
@@ -668,7 +668,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                 agentLock.unlock();
             }
         }
-        return true;
+        return callId;
     }
 
 
@@ -958,7 +958,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             //FINALLY 坐席解锁
             try {
                 if(!CallCenterAgent.STATE_IDLE.equals(agentState.getState(agent))){
-                    throw new SystemBusyException(
+                    throw new AgentIsBusyException(
                             new ExceptionContext().put("subaccountId",subaccountId)
                                     .put("appId",appId)
                                     .put("conversation_id",conversationId)
