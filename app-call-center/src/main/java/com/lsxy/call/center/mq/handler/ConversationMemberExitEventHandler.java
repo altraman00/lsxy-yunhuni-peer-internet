@@ -17,6 +17,9 @@ public class ConversationMemberExitEventHandler implements MQMessageHandler<Conv
 
     private static final Logger logger = LoggerFactory.getLogger(ConversationMemberExitEventHandler.class);
 
+    /**超过半个小时的消息直接丢弃**/
+    private static final long expired = 1000 * 60 * 30;
+
     @Autowired
     private CallCenterConversationMemberService callCenterConversationMemberService;
 
@@ -25,10 +28,13 @@ public class ConversationMemberExitEventHandler implements MQMessageHandler<Conv
         if(logger.isDebugEnabled()){
             logger.debug("处理CallCenter.ConversationMemberExitEvent{}",message.toJson());
         }
-        CallCenterConversationMember member = callCenterConversationMemberService.findOne(message.getConversationId(),message.getCallId());
-        CallCenterConversationMember update = new CallCenterConversationMember();
-        update.setEndTime(new Date(message.getTimestamp()));
-        //member为null，消息消费失败，会重新消费
-        callCenterConversationMemberService.update(member.getId(),update);
+        if(System.currentTimeMillis() - message.getTimestamp() <= expired){
+            CallCenterConversationMember member = callCenterConversationMemberService.findOne(message.getConversationId(),message.getCallId());
+            CallCenterConversationMember update = new CallCenterConversationMember();
+            update.setEndTime(new Date(message.getTimestamp()));
+            //member为null，消息消费失败，会重新消费
+            callCenterConversationMemberService.update(member.getId(),update);
+        }
+
     }
 }
