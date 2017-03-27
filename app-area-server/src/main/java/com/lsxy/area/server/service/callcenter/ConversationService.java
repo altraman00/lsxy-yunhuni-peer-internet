@@ -912,8 +912,8 @@ public class ConversationService {
             logger.info("(conversation_state == null || conversation_state.getResId() == null)conversationId={},callId={}",conversationId,callId);
             return;
         }
-
-        if(sismember(conversationId,callId)){
+        boolean ismember = this.sismember(conversationId, callId);
+        if(ismember){
             try{
                 mqService.publish(new ConversationMemberExitEvent(conversationId,callId));
             }catch (Throwable t){
@@ -921,6 +921,7 @@ public class ConversationService {
             }
             //交谈成员递减
             this.decrPart(conversationId,callId);
+
             //成员大于1且，活动成员只剩一个了
             if(this.size(conversationId) > 1){
                 long activeTotal = avtiveTotal(conversationId);//需要获取活动成员
@@ -951,7 +952,8 @@ public class ConversationService {
                     }
                 }
             }
-            //呼叫所在的交谈
+
+            //退出呼叫所在的交谈
             callConversationService.decrConversation(callId,conversationId);
 
             if(call_state.getType().equals(BusinessState.TYPE_CC_INVITE_AGENT_CALL) ||
