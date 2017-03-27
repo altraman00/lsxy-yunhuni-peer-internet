@@ -52,6 +52,7 @@ public enum ApiReturnCodeEnum {
     ConversationNotExist("040501","交谈不存在"),
     OutOfConversationMaxParts("040502","超过最大交谈成员数"),
     AgentNotConversationMember("040503","坐席不是交谈的成员"),
+    ConversationMemberNotExist("040504","交谈成员不存在"),
     QueueTaskNotExist("040601","排队任务不存在"),
     MsgIllegalMobile("050101","手机号码不合法"),
     MsgTemplateError("050102","模板不存在或模板审核不通过"),
