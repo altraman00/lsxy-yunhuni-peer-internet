@@ -138,4 +138,8 @@ public class SapiConstants {
     public static final String CALLCENTER_AGENT_CONVERSATION_CHANGED = "callcenter.agent.conversation_changed";
     //分机状态
     public static final String EXTENSION_STATE = "/callcenter/extensionlisttest";
+
+    //坐席外呼
+    public static final String CALLCENTER_AGENT_CALLOUT = "/callcenter/agent/{agent_name}/call_out";
+
 }
