@@ -433,7 +433,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                             }
                         }
                     }
-                    businessStateService.deleteInnerField(CallCenterUtil.DIRECT_HOT_FIELD,CallCenterUtil.DIRECT_EXTENSIONPREFIX_FIELD);
+                    businessStateService.deleteInnerField(callId,CallCenterUtil.DIRECT_HOT_FIELD,CallCenterUtil.DIRECT_EXTENSIONPREFIX_FIELD);
                 }finally {
                     lock.unlock();
                 }
