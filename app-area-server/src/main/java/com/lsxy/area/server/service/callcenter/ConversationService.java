@@ -900,53 +900,57 @@ public class ConversationService {
             logger.info("(conversation_state == null || conversation_state.getResId() == null)conversationId={},callId={}",conversationId,callId);
             return;
         }
-        try{
-            mqService.publish(new ConversationMemberExitEvent(conversationId,callId));
-        }catch (Throwable t){
-            logger.error(String.format("设置交谈成员的结束时间失败,conversationId=%s,callid=%s",conversationId,callId),t);
-        }
-        //交谈成员递减
-        this.decrPart(conversationId,callId);
+        boolean ismember = this.sismember(conversationId, callId);
+        if(ismember){
+            try{
+                mqService.publish(new ConversationMemberExitEvent(conversationId,callId));
+            }catch (Throwable t){
+                logger.error(String.format("设置交谈成员的结束时间失败,conversationId=%s,callid=%s",conversationId,callId),t);
+            }
+            //交谈成员递减
+            this.decrPart(conversationId,callId);
 
-        //成员大于1且，活动成员只剩一个了
-        if(this.size(conversationId) > 1){
-            long activeTotal = avtiveTotal(conversationId);//需要获取活动成员
-            if(activeTotal == 1){
-                //TODO 播放holdvoice,是否需要默认的,(什么时候停止播放holdvoice)
-                if(conversation_state.getBusinessData().get(CallCenterUtil.HOLD_VOICE_FIELD) != null){
-                    String holdvoice = conversation_state.getBusinessData().get(CallCenterUtil.HOLD_VOICE_FIELD);
-                    try {
-                        holdvoice = playFileUtil.convert(conversation_state.getTenantId(),conversation_state.getAppId(),holdvoice);
-                    } catch (YunhuniApiException e) {
-                        logger.error("调用失败",e);
-                    }
-                    if(StringUtil.isNotBlank(holdvoice)){
-                        Map<String, Object> _params = new MapBuilder<String,Object>()
-                                .putIfNotEmpty("res_id",conversation_state.getResId())
-                                .putIfNotEmpty("content", JSONUtil2.objectToJson(new Object[][]{new Object[]{holdvoice,0,""}}))
-                                .putIfNotEmpty("user_data",conversationId)
-                                .putIfNotEmpty("is_loop",true)
-                                .put("areaId",conversation_state.getAreaId())
-                                .build();
-                        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, _params);
+            //成员大于1且，活动成员只剩一个了
+            if(this.size(conversationId) > 1){
+                long activeTotal = avtiveTotal(conversationId);//需要获取活动成员
+                if(activeTotal == 1){
+                    //TODO 播放holdvoice,是否需要默认的,(什么时候停止播放holdvoice)
+                    if(conversation_state.getBusinessData().get(CallCenterUtil.HOLD_VOICE_FIELD) != null){
+                        String holdvoice = conversation_state.getBusinessData().get(CallCenterUtil.HOLD_VOICE_FIELD);
                         try {
-                            rpcCaller.invoke(sessionContext, rpcrequest,true);
-                        } catch (Throwable t) {
-                            logger.error(String.format("调用交谈放音失败,conversationId=%s",conversationId),t);
+                            holdvoice = playFileUtil.convert(conversation_state.getTenantId(),conversation_state.getAppId(),holdvoice);
+                        } catch (YunhuniApiException e) {
+                            logger.error("调用失败",e);
+                        }
+                        if(StringUtil.isNotBlank(holdvoice)){
+                            Map<String, Object> _params = new MapBuilder<String,Object>()
+                                    .putIfNotEmpty("res_id",conversation_state.getResId())
+                                    .putIfNotEmpty("content", JSONUtil2.objectToJson(new Object[][]{new Object[]{holdvoice,0,""}}))
+                                    .putIfNotEmpty("user_data",conversationId)
+                                    .putIfNotEmpty("is_loop",true)
+                                    .put("areaId",conversation_state.getAreaId())
+                                    .build();
+                            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, _params);
+                            try {
+                                rpcCaller.invoke(sessionContext, rpcrequest,true);
+                            } catch (Throwable t) {
+                                logger.error(String.format("调用交谈放音失败,conversationId=%s",conversationId),t);
+                            }
                         }
                     }
                 }
             }
-        }
-        //退出呼叫所在的交谈
-        callConversationService.decrConversation(callId,conversationId);
 
-        if(call_state.getType().equals(BusinessState.TYPE_CC_INVITE_AGENT_CALL) ||
-                call_state.getType().equals(BusinessState.TYPE_CC_AGENT_CALL)){
-            callCenterUtil.agentExitConversationEvent(call_state.getSubaccountId(),call_state.getCallBackUrl(),
-                    call_state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD),
-                    call_state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),
-                    conversationId,call_state.getUserdata());
+            //退出呼叫所在的交谈
+            callConversationService.decrConversation(callId,conversationId);
+
+            if(call_state.getType().equals(BusinessState.TYPE_CC_INVITE_AGENT_CALL) ||
+                    call_state.getType().equals(BusinessState.TYPE_CC_AGENT_CALL)){
+                callCenterUtil.agentExitConversationEvent(call_state.getSubaccountId(),call_state.getCallBackUrl(),
+                        call_state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD),
+                        call_state.getBusinessData().get(CallCenterUtil.AGENT_NAME_FIELD),
+                        conversationId,call_state.getUserdata());
+            }
         }
 
         if(callConversationService.size(callId) > 0){
