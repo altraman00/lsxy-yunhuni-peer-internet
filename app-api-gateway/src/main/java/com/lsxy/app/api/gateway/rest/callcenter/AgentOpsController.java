@@ -45,7 +45,10 @@ public class AgentOpsController extends AbstractAPIController {
             logger.debug("AGENT CALLOUT API参数,accountId={},appId={},name={},dto={}",accountId,appId,name,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        agentOps.callOut(getSubaccountId(request),ip,appId,name,dto.getFrom(),dto.getTo(),dto.getMaxDialSeconds(),dto.getMaxAnswerSeconds(),dto.getUserData());
+        String callId = agentOps.callOut(getSubaccountId(request),ip,appId,name,dto.getFrom(),dto.getTo(),dto.getMaxDialSeconds(),dto.getMaxAnswerSeconds(),dto.getUserData());
+        if(logger.isDebugEnabled()){
+            logger.debug("AGENT CALLOUT API参数,accountId={},appId={},name={},dto={},callid={}",accountId,appId,name,dto,callId);
+        }
         return ApiGatewayResponse.success(true);
     }
 
@@ -57,7 +60,10 @@ public class AgentOpsController extends AbstractAPIController {
             logger.debug("AGENT CALLAGENT API参数,accountId={},appId={},name={},dto={}",accountId,appId,name,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        agentOps.callAgent(getSubaccountId(request),ip,appId,name,null,dto.getEnqueue(),null,null);
+        String callId = agentOps.callAgent(getSubaccountId(request),ip,appId,name,null,dto.getEnqueue(),null,null);
+        if(logger.isDebugEnabled()){
+            logger.debug("AGENT CALLAGENT API参数,accountId={},appId={},name={},dto={},callid={}",accountId,appId,name,dto,callId);
+        }
         return ApiGatewayResponse.success(true);
     }
 
