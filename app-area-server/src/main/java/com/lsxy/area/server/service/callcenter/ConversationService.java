@@ -983,7 +983,7 @@ public class ConversationService {
                     try {
                         this.dismiss(conversation_state.getAppId(),conversationId);
                     } catch (Throwable e) {
-                        logger.error("解散交谈",e);
+                        logger.warn("解散交谈",e);
                     }
                 }
             }
