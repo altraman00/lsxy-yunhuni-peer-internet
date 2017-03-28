@@ -14,5 +14,6 @@ public interface MsgSupplierTemplateService extends BaseService<MsgSupplierTempl
 
     String findSupplierTempIdByTempIdAndSupplierCode(String tempId, String supplierCode);
     List<MsgSupplierTemplate> findByTempId(String tempId);
-    List<MsgSupplierTemplate> findBySupplierTempId(String supplierCode);
+    List<MsgSupplierTemplate> findByTempIdAndStatus(String tempId,Integer status);
+    List<MsgSupplierTemplate> findBySupplierTempId(String supplierTempId);
 }

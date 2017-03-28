@@ -13,4 +13,6 @@ public interface MsgTaskService {
     void paoPaoYuUssdReSendTask();
 
     void qiXunTongMassTaskUpdate();
+
+    void jiMuTaskUpdate();
 }
