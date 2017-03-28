@@ -1,5 +1,15 @@
 package com.lsxy.framework.web.utils;
 
+import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.security.SecurityUser;
+import com.lsxy.framework.core.utils.BeanUtils;
+import com.lsxy.framework.core.utils.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
@@ -8,20 +18,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.core.security.SecurityUser;
-import com.lsxy.framework.core.utils.BeanUtils;
-import com.lsxy.framework.core.utils.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -208,9 +204,14 @@ public class WebUtils {
 	 * @return
 	 */
 	public static String getRemoteAddress(HttpServletRequest request) {
-		String ip = request.getHeader("x-forwarded-for");
+		String ip = request.getHeader("X-real-ip");
 		if (ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown")) {
-			ip = request.getRemoteAddr();
+			ip = request.getHeader("x-forwarded-for");
+			if (ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown")) {
+				{
+					ip = request.getRemoteAddr();
+				}
+			}
 		}
 		return ip;
 	}
