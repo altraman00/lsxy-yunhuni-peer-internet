@@ -41,6 +41,9 @@ public class MsgTaskCheckTask {
     public void scheduled_qiXunTongMassTask_yyyyMMddHHmm(){
         msgTaskService.qiXunTongMassTaskUpdate();
     }
-
+    @Scheduled(cron="0 0/2 * * * ?")
+    public void scheduled_jiMuTaskUpdate_yyyyMMddHHmm(){
+        msgTaskService.jiMuTaskUpdate();
+    }
 
 }

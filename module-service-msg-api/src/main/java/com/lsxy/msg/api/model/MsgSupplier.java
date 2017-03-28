@@ -17,16 +17,48 @@ import java.math.BigDecimal;
 public class MsgSupplier extends IdEntity {
     public static final String QixuntongCode = "QiXunTong";
     public static final String PaopaoyuCode = "PaoPaoYu";
+    public static final String JiMuCode = "JiMu";
+    public static final int IS_MASS = 2;
+    public static final int IS_SINGLE = 1;
+    public static final int IS_HYBRID = 3;
+    public static final int IS_DISABLE = 0;
     private String supplierName;
     private String code;
     private BigDecimal unitPrice;
-    private Boolean isUssd;
-    private Boolean isTemplate;
-    private Boolean isSms;
-    private String operator;
+    private Boolean isUssd;//是否支持闪印
+    private Integer ussdSendType;
+    private Boolean isTemplate;//是否支持模板
+    private Integer templateSendType;
+    private Boolean isSms;//是否支持短信
+    private Integer smsSendType;//
+    private String operator;//供应商的名称
     private String param;
     private Boolean enabled;
     private String remark;
+    @Column(name = "ussd_send_type")
+    public Integer getUssdSendType() {
+        return ussdSendType;
+    }
+
+    public void setUssdSendType(Integer ussdSendType) {
+        this.ussdSendType = ussdSendType;
+    }
+    @Column(name = "template_send_type")
+    public Integer getTemplateSendType() {
+        return templateSendType;
+    }
+
+    public void setTemplateSendType(Integer templateSendType) {
+        this.templateSendType = templateSendType;
+    }
+    @Column(name = "sms_send_type")
+    public Integer getSmsSendType() {
+        return smsSendType;
+    }
+
+    public void setSmsSendType(Integer smsSendType) {
+        this.smsSendType = smsSendType;
+    }
 
     @Column(name = "supplier_name")
     public String getSupplierName() {

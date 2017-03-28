@@ -21,6 +21,7 @@ import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
+import com.sun.org.apache.xml.internal.serializer.utils.MsgKey;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +64,8 @@ public class MsgSendServiceImpl implements MsgSendService {
     CertAccountQuotaService certAccountQuotaService;
     @Autowired
     TestNumBindService testNumBindService;
+    @Autowired
+    MsgSupplierService msgSupplierService;
 
     @Override
     public MsgSendOneResult sendUssd(String appId, String subaccountId, String mobile, String tempId, String tempArgs) throws YunhuniApiException{
@@ -111,6 +114,8 @@ public class MsgSendServiceImpl implements MsgSendService {
 
 
     private MsgSendOneResult sendOne(String appId, String subaccountId, String mobile, String tempId, String tempArgs, String sendType) throws YunhuniApiException {
+        //1、先检验手机号码
+        //应用未上线，只能发测试号码
         App app = appService.findById(appId);
         if(app.getStatus() == null || App.STATUS_ONLINE != app.getStatus()){
             List<String> testNums = testNumBindService.findNumByAppId(app.getId());
@@ -118,61 +123,54 @@ public class MsgSendServiceImpl implements MsgSendService {
                 throw new AppOffLineException();
             }
         }
-
         //TODO 判断红黑名单
-        tempId = tempId.trim();
-        if(StringUtils.isNotBlank(tempArgs)){
-            tempArgs = tempArgs.trim();
-        }
-        MsgTemplate temp = msgTemplateService.findByTempId(appId, subaccountId, tempId, true);
-        String tempContent = temp.getContent();
-
-        if(temp == null|| MsgTemplate.STATUS_PASS != temp.getStatus()){
-            // 抛异常
-            throw new MsgTemplateErrorException();
-        }
-
-        //检查参数格式是否合法
-        if(!checkTempArgs(tempArgs)){
-            //抛异常
-            throw new MsgTemplateArgsErrorException();
-        }
-        String msg = getMsg(tempContent, tempArgs);
-        if(!checkMsgLength(msg,sendType)){
-            // 抛异常
-            throw new MsgContentTooLargeException();
-        }
-
         //检验号码的合法性
         mobile = mobile.trim();
         if(!checkMobile(mobile)){
-            //抛异常
             throw new MsgIllegalMobileException();
         }
         //判断号码运营商
         String operator = telnumLocationService.getOperator(mobile);
-        //判断是否支持发送
-        if(!isSend( operator , sendType )){
-            //抛异常
-            throw new MsgOperatorNotAvailableException();
+
+        //2、再验证模板
+        tempId = tempId.trim();
+        if(StringUtils.isNotBlank(tempArgs)){
+            tempArgs = tempArgs.trim();
         }
-        //判断余额是否可以发送
+        //获取模板
+        MsgTemplate temp = msgTemplateService.findByTempId(appId, subaccountId, tempId, true);
+        if(temp == null|| MsgTemplate.STATUS_PASS != temp.getStatus()){
+            throw new MsgTemplateErrorException();
+        }
+        //检查参数格式是否合法
+        if(!checkTempArgs(tempArgs)){
+            throw new MsgTemplateArgsErrorException();
+        }
+        String tempContent = temp.getContent();
+        String msg = getMsg(tempContent, tempArgs);
+        //检验消息长度
+        if(!checkMsgLength(msg,sendType)){
+            throw new MsgContentTooLargeException();
+        }
+
+        //3、判断余额是否可以发送
         calCostService.isMsgRemainOrBalanceEnough(subaccountId,sendType,app.getTenant().getId(),1L);
 
-        //生成任务标识，发送
-        ResultOne resultOne = null;
-        String key = UUIDGenerator.uuid();
-        SupplierSendService smsSendOneService = supplierSelector.getSendOneService(operator,sendType);
+
+        //4、获取可用的供应商
+        SupplierSendService smsSendOneService = supplierSelector.getSendOneService(operator,sendType,tempId);
         if(smsSendOneService == null){
             //抛异常 找不到短信服务商
             throw new MsgOperatorNotAvailableException();
         }
+
+        //生成任务标识，发送
+        ResultOne resultOne = null;
+        String key = UUIDGenerator.uuid();
         String[] split = tempArgs.split(MsgConstant.ParamRegexStr);
         List<String> tempArgsList = Arrays.asList(split);
-        resultOne = smsSendOneService.sendOne(tempId, tempArgsList, msg, mobile,sendType);
-
-        if(resultOne == null){
-            // 抛异常
+        resultOne = smsSendOneService.sendOne(tempId, tempArgsList, msg, mobile,sendType, key);
+        if(resultOne == null){//发送失败
             throw new MsgSendMsgFailException();
         }
 
@@ -313,7 +311,7 @@ public class MsgSendServiceImpl implements MsgSendService {
 
     private void sendMassByOperator(String tenantId,String appId,String subaccountId,String taskName, String tempId, String tempArgs, String sendType, Date sendTime, String msg, String key,
                                     List<ResultMass> list, List<String> mobileList, String oprator,BigDecimal cost,Date createTime) {
-        SupplierSendService massService = supplierSelector.getSendMassService( oprator,sendType);
+        SupplierSendService massService = supplierSelector.getSendMassService( oprator,sendType,tempId);
         if(massService != null){
             List<String> detailIds = new ArrayList<>();
             int uMax = massService.getMaxSendNum();
@@ -437,6 +435,12 @@ public class MsgSendServiceImpl implements MsgSendService {
                 flag = false;
             }
         }else if(MsgConstant.ChinaUnicom.equals(operator )){//联通号码
+            if(MsgConstant.MSG_USSD.equals(sendType)){//闪印
+                return false;
+            }else if(MsgConstant.MSG_SMS.equals(sendType)){//短信
+                flag = true;//
+            }
+        }else if(MsgConstant.ChinaTelecom.equals(operator )){//电信号码
             if(MsgConstant.MSG_USSD.equals(sendType)){//闪印
                 return false;
             }else if(MsgConstant.MSG_SMS.equals(sendType)){//短信

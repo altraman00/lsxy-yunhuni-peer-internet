@@ -4,7 +4,6 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.msg.api.model.MsgConstant;
 import com.lsxy.msg.api.model.MsgSendRecord;
-import com.lsxy.msg.api.model.MsgUserRequest;
 import com.lsxy.msg.api.service.MsgSendRecordService;
 import com.lsxy.msg.dao.MsgSendRecordDao;
 import org.apache.commons.lang.StringUtils;
@@ -70,6 +69,11 @@ public class MsgSendRecordServiceImpl extends AbstractService<MsgSendRecord> imp
     @Override
     public List<MsgSendRecord> findWaitedSendMassBySupplier(String supplierCode){
         return msgSendRecordDao.findBySupplierCodeAndStateAndIsMass(supplierCode,MsgSendRecord.STATE_WAIT,true);
+    }
+
+    @Override
+    public List<MsgSendRecord> findWaitedSendBySupplier(String supplierCode) {
+        return msgSendRecordDao.findBySupplierCodeAndStateAndIsMass(supplierCode,MsgSendRecord.STATE_WAIT,false);
     }
 
     @Override

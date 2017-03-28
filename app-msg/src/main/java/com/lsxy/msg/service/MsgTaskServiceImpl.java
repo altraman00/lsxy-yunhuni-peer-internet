@@ -2,17 +2,16 @@ package com.lsxy.msg.service;
 
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.msg.MsgRequestCompletedEvent;
-import com.lsxy.msg.api.model.MsgConstant;
-import com.lsxy.msg.api.model.MsgSendDetail;
-import com.lsxy.msg.api.model.MsgSendRecord;
-import com.lsxy.msg.api.model.MsgUserRequest;
+import com.lsxy.msg.api.model.*;
 import com.lsxy.msg.api.service.*;
 import com.lsxy.msg.supplier.SupplierSelector;
 import com.lsxy.msg.supplier.SupplierSendService;
 import com.lsxy.msg.supplier.common.ResultOne;
+import com.lsxy.msg.supplier.jimu.JiMuResultOne;
 import com.lsxy.msg.supplier.paopaoyu.PaoPaoYuMassNofity;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
+import com.msg.jimu.JiMuClient;
 import com.msg.paopaoyu.PaoPaoYuConstant;
 import com.msg.qixuntong.QiXunTongConstant;
 import org.slf4j.Logger;
@@ -21,10 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by liups on 2017/3/16.
@@ -153,7 +149,7 @@ public class MsgTaskServiceImpl implements MsgTaskService{
     //更新单任务的执行情况
     private void paoPaoYuMassTaskRecordUpdate(MsgSendRecord record){
         try {
-            SupplierSendService sendMassService = supplierSelector.getSendMassService(record.getOperator(), record.getSupplierCode());
+            SupplierSendService sendMassService = supplierSelector.getSendMassService(record.getOperator(), record.getSupplierCode(),record.getTempId());
             PaoPaoYuMassNofity nofity = (PaoPaoYuMassNofity) sendMassService.getTask(record.getTaskId());
             //调用查询结果成功，并且任务状态是完成。
             if( PaoPaoYuMassNofity.sueccess.equals( nofity.getResultCode() ) ){
@@ -210,11 +206,11 @@ public class MsgTaskServiceImpl implements MsgTaskService{
         logger.info("启动闪印失败重发机制");
         List<MsgSendRecord> sendOneFails = msgSendRecordService.findUssdSendOneFailAndSendNotOver();
         for(MsgSendRecord record : sendOneFails){
-            SupplierSendService sendOneService = supplierSelector.getSendOneService(MsgConstant.ChinaMobile, MsgConstant.MSG_USSD);
+            SupplierSendService sendOneService = supplierSelector.getSendOneService(MsgConstant.ChinaMobile, MsgConstant.MSG_USSD,record.getTempId());
             String tempArgs = record.getTempArgs();
             String[] split = tempArgs.split(MsgConstant.ParamRegexStr);
             List<String> tempArgsList = Arrays.asList(split);
-            ResultOne resultOne = sendOneService.sendOne(record.getTempId(), tempArgsList, record.getMsg(), record.getMobiles(), record.getSendType());
+            ResultOne resultOne = sendOneService.sendOne(record.getTempId(), tempArgsList, record.getMsg(), record.getMobiles(), record.getSendType(),record.getMsgKey());
             if(MsgConstant.SUCCESS.equals( resultOne.getResultCode() )) {//重发成功，更新记录
                 MsgSendDetail detail = msgSendDetailService.findByTaskIdAndMobile(record.getTaskId(), record.getMobiles());
                 detail.setTaskId(resultOne.getTaskId());
@@ -253,6 +249,47 @@ public class MsgTaskServiceImpl implements MsgTaskService{
             checkQiXunTongMassTask(record);
         }
         logger.info("[群发任务][检测结束]");
+    }
+
+    @Override
+    public void jiMuTaskUpdate() {
+        logger.info("[积木][单发任务][检测开始]");
+        List<MsgSendRecord> records = msgSendRecordService.findWaitedSendBySupplier(MsgSupplier.JiMuCode);
+        SupplierSendService sendOneService = supplierSelector.getSupplierSendService(MsgSupplier.JiMuCode);
+        for(MsgSendRecord record : records){
+            int state = Integer.valueOf(sendOneService.getTask(record.getTaskId(),record.getMsgKey()) +"");
+            Date end = new Date();
+            if(1 == state || -1 == state) {
+                updateSendLog(record,state,end);
+            }
+        }
+        logger.info("[积木][单发任务][检测结束]");
+    }
+
+    private void updateSendLog(MsgSendRecord record,int state,Date end){
+        record.setState( state );
+        record = msgSendRecordService.save(record);
+        MsgUserRequest msgUserRequest = msgUserRequestService.findByMsgKey(record.getMsgKey());
+        if(msgUserRequest != null){
+            msgUserRequest.setState( state );
+            msgUserRequestService.save( msgUserRequest );
+        }
+        List<MsgSendDetail> msgSendDetails = msgSendDetailService.findByMsgKey(record.getMsgKey());
+        if(msgSendDetails!=null && msgSendDetails.size() >0 ) {
+            List<String> result = new ArrayList<String>();
+            for (int i = 0; i < msgSendDetails.size(); i++) {
+                MsgSendDetail msgSendDetail = msgSendDetails.get(i);
+                msgSendDetail.setState( state );
+                msgSendDetail.setEndTime( end );
+                msgSendDetail = msgSendDetailService.save( msgSendDetail );
+                if(-1 == state) {//失败时
+                    result.add(msgSendDetail.getId());
+                }
+            }
+            if(-1 == state && result.size() > 0) {//失败时,补扣费
+                msgSendService.batchConsumeMsg(end,ProductCode.msg_sms.name(),record.getMsgCost(),"补扣费",record.getAppId(),record.getTenantId(),record.getSubaccountId(),result);
+            }
+        }
     }
 
     //检查群发任务下的全部子任务是否成功
