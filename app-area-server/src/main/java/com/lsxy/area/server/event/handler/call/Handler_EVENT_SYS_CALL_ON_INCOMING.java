@@ -279,11 +279,11 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 from_extensionnum = from_extensionnum.replace(extension_prefix,"");
 
                 if(SipUrlUtil.isHotNum(to_uri)){//被叫是热线号码
-                    //流程，应答成功后调用收码，收码完成事件中创建会议，会议创建成功后将call加入会议，加入会议成功事件 呼叫被叫，振铃事件将被叫加入会议
                     String to = SipUrlUtil.extractTelnum(to_uri);
                     if(logger.isDebugEnabled()){
                         logger.info("直拨热线，to={}",to);
                     }
+                    //流程，应答成功后调用收码，收码完成事件中创建会议，会议创建成功后将call加入会议，加入会议成功事件 呼叫被叫，振铃事件将被叫加入会议
                     answer(res_id,call_id,areaAndTelNumSelector.getAreaId(app));
                     businessStateService.updateInnerField(
                             call_id,
