@@ -61,11 +61,9 @@
             <version>3.1</version>
         </dependency>
         <dependency>
-            <groupId>call.jimu.com</groupId>  <!--自定义-->
-            <artifactId>jimu</artifactId>    <!--自定义-->
-            <version>1.0</version> <!--自定义-->
-            <scope>system</scope> <!--system，类似provided，需要显式提供依赖的jar以后，Maven就不会在Repository中查找它-->
-            <systemPath>${basedir}/src/main/resources/lib/jimu-sdk-1.0.jar</systemPath> <!--项目根目录下的lib文件夹下-->
+            <groupId>com.jimu</groupId>
+            <artifactId>com.jimu.jimu-sdk</artifactId>
+            <version>1.0</version>
         </dependency>
     </dependencies>
 
