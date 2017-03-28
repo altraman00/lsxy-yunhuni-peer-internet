@@ -8,6 +8,7 @@ import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +68,13 @@ public class RestAuthenticationProvider implements AuthenticationProvider {
         App app = appService.findById(restToken.getAppId());
         if(app == null || !app.getTenant().getId().equals(tenantId)){
             throw new BadCredentialsException("无效的appid");
+        }
+
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList)){
+            if(!whiteList.contains(restToken.getIp())){
+                throw new BadCredentialsException("IP不在白名单内");
+            }
         }
 
         if(logger.isDebugEnabled()){

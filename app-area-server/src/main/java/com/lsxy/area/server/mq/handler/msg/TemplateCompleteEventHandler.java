@@ -67,7 +67,6 @@ public class TemplateCompleteEventHandler implements MQMessageHandler<TemplateCo
                         .putIfNotEmpty("tempId",tempId)
                         .putIfNotEmpty("state",MsgTemplate.STATUS_PASS == template.getStatus()?1:0)
                         .putIfNotEmpty("reason",template.getReason())
-                        .putIfNotEmpty("url",callbackUrl)
                         .build();
                 // 发送通知
                 notifyCallbackUtil.postNotify(callbackUrl,notify_data,null,3);
