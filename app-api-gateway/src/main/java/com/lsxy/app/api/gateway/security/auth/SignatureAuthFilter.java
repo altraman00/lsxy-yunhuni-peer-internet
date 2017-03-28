@@ -3,6 +3,7 @@ package com.lsxy.app.api.gateway.security.auth;
 import com.lsxy.app.api.gateway.util.Constants;
 import com.lsxy.app.api.gateway.util.SpringContextHolder;
 import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.framework.web.utils.WebUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,9 +132,9 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
 
             Date date = DateUtils.parseDate(timestamp, "yyyyMMddHHmmss");
 
-
+            String ip = WebUtils.getRemoteAddress(request);
             // Create an authentication token
-            Authentication authentication = new RestToken(certID, restCredential, date,appid);
+            Authentication authentication = new RestToken(certID, restCredential, date,appid,ip);
 
             Authentication successfulAuthentication = authenticationManager.authenticate(authentication);
 
