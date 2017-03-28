@@ -194,4 +194,21 @@ public class TestIvrCall extends BaseTest{
         send( appId, from, to, maxDialDuration, maxCallDuration, userDate);
         logger.info("[结束][max_call_duration设置5.5s]");
     }
+
+    @Test
+    public void test16(){
+        Map<String,Object> params = new HashMap<String,Object>();
+        params.put("from",null);
+        params.put("to","13316232666");
+        params.put("max_dial_duration",60);
+        params.put("max_call_duration",600);
+        params.put("user_data",null);
+        logger.info("[IVR呼叫]参数："+params);
+        try {
+            String result =  HttpClientUtils.doPost(sapiSdk.getUrl(SapiConstants.CALLCENTER_AGENT_CALLOUT,"user001"),sapiSdk.getSecretKey(),sapiSdk.getCertId(),appId,params);
+            logger.info("[调用结果]"+result);
+        } catch (Exception e) {
+            logger.info(e.getMessage());
+        }
+    }
 }

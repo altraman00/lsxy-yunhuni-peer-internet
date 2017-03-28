@@ -88,11 +88,11 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
             /**开始判断振铃前是否客户挂断了呼叫，挂断了要同时挂断被叫的坐席**/
             Map<String,String> businessData = state.getBusinessData();
             String conversation = businessData.get(CallCenterUtil.CONVERSATION_FIELD);
-            BusinessState conversationState = businessStateService.get(conversation);
+            boolean conversation_closed = businessStateService.closed(conversation);
             if(logger.isDebugEnabled()){
-                logger.info("[{}][{}]开始判断振铃前是否客户挂断了呼叫:{}",state.getTenantId(),state.getAppId(),conversationState);
+                logger.info("[{}][{}]开始判断振铃前是否客户挂断了呼叫:{}",state.getTenantId(),state.getAppId(),conversation_closed);
             }
-            if(conversationState == null || (conversationState.getClosed() != null && conversationState.getClosed())){
+            if(conversation_closed){
                 conversationService.logicExit(conversation,state.getId());
                 return res;
             }
@@ -100,7 +100,7 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
             if(initiator != null){
                 BusinessState initiatorState = businessStateService.get(initiator);
                 if(logger.isDebugEnabled()){
-                    logger.info("[{}][{}]开始判断振铃前是否客户挂断了呼叫:{}",state.getTenantId(),state.getAppId(),initiatorState);
+                    logger.info("[{}][{}]开始判断振铃前是否客户挂断了呼叫:callid={},{}",state.getTenantId(),state.getAppId(),initiator,initiatorState);
                 }
                 if(initiatorState!=null && initiatorState.getClosed() != null && initiatorState.getClosed()){
                     callCenterUtil.sendQueueFailEvent(initiatorState.getSubaccountId(),initiatorState.getCallBackUrl(),
@@ -124,18 +124,18 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
         }else if(BusinessState.TYPE_CC_INVITE_OUT_CALL.equals(state.getType())){
             Map<String,String> businessData = state.getBusinessData();
             String conversationId = businessData.get(CallCenterUtil.CONVERSATION_FIELD);
-            BusinessState conversationState = businessStateService.get(conversationId);
-            if(conversationState == null || (conversationState.getClosed() != null && conversationState.getClosed())){
+            boolean conversation_closed = businessStateService.closed(conversationId);
+            if(conversation_closed){
                 conversationService.logicExit(conversationId,state.getId());
                 return res;
             }
             String initiator = state.getBusinessData().get(CallCenterUtil.INITIATOR_FIELD);
             if(initiator != null){
-                BusinessState initiatorState = businessStateService.get(initiator);
+                boolean initiator_closed = businessStateService.closed(initiator);
                 if(logger.isDebugEnabled()){
-                    logger.info("[{}][{}]开始判断振铃前是否客户挂断了呼叫:{}",state.getTenantId(),state.getAppId(),initiatorState);
+                    logger.info("[{}][{}]开始判断振铃前是否客户挂断了呼叫:callid={},{}",state.getTenantId(),state.getAppId(),initiator,initiator_closed);
                 }
-                if(initiatorState!=null && initiatorState.getClosed() != null && initiatorState.getClosed()){
+                if(initiator_closed){
                     conversationService.logicExit(conversationId,state.getId());
                     return res;
                 }

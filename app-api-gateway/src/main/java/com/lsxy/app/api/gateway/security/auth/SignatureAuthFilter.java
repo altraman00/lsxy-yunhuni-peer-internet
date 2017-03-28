@@ -1,8 +1,12 @@
 package com.lsxy.app.api.gateway.security.auth;
 
+import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.app.api.gateway.util.Constants;
 import com.lsxy.app.api.gateway.util.SpringContextHolder;
+import com.lsxy.framework.core.exceptions.api.ApiReturnCodeEnum;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.framework.web.utils.WebUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +25,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Set;
@@ -131,9 +136,9 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
 
             Date date = DateUtils.parseDate(timestamp, "yyyyMMddHHmmss");
 
-
+            String ip = WebUtils.getRemoteAddress(request);
             // Create an authentication token
-            Authentication authentication = new RestToken(certID, restCredential, date,appid);
+            Authentication authentication = new RestToken(certID, restCredential, date,appid,ip);
 
             Authentication successfulAuthentication = authenticationManager.authenticate(authentication);
 
@@ -163,7 +168,13 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
                 logger.debug("执行体执行完毕,花费:{}ms",(System.currentTimeMillis() - start));
             }
 
-        } catch (AuthenticationException authenticationException) {
+        }catch (IpWhiteListException e){
+            //Ip白名单异常
+            SecurityContextHolder.clearContext();
+            ApiGatewayResponse fail = ApiGatewayResponse.failed(ApiReturnCodeEnum.IPNotInWhiteList.getCode(), ApiReturnCodeEnum.IPNotInWhiteList.getMsg());
+            PrintWriter writer = response.getWriter();
+            writer.println(JSONUtil.objectToJson(fail));
+        }catch (AuthenticationException authenticationException) {
             SecurityContextHolder.clearContext();
             restAuthenticationEntryPoint.commence(request, response, authenticationException);
         } catch (ParseException e) {

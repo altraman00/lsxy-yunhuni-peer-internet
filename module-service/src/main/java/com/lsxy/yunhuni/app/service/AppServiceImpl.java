@@ -10,6 +10,7 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.app.service.ServiceType;
@@ -174,6 +175,12 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         if(App.PRODUCT_CALL_CENTER.equals(app.getServiceType())){
             app.setCallCenterNum(getExtensionPrefixNum());
         }
+
+        String version = this.getClass().getPackage().getImplementationVersion();
+        if(StringUtil.isEmpty(version)){
+            version = "1.2.1";
+        }
+        app.setProjectVersion(version);
 
         String areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
         //TODO 应用新建 时落到测试区域，并指定一个sip接入点
