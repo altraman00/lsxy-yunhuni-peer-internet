@@ -3,7 +3,6 @@ package com.lsxy.msg.service;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.msg.api.model.MsgSupplierTemplate;
-import com.lsxy.msg.api.model.MsgTemplate;
 import com.lsxy.msg.api.service.MsgSupplierTemplateService;
 import com.lsxy.msg.dao.MsgSupplierTemplateDao;
 import org.apache.commons.lang.StringUtils;
@@ -60,9 +59,16 @@ public class MsgSupplierTemplateServiceImpl extends AbstractService<MsgSupplierT
     }
 
     @Override
-    public List<MsgSupplierTemplate> findBySupplierTempId(String supplierCode) {
-        List<MsgSupplierTemplate> obj =  msgSupplierTemplateDao.findBySupplierTempId(supplierCode);
+    public List<MsgSupplierTemplate> findByTempIdAndStatus(String tempId, Integer status) {
+        List<MsgSupplierTemplate> obj =  msgSupplierTemplateDao.findByTempIdAndStatus(tempId,status);
         return obj;
     }
+
+    @Override
+    public List<MsgSupplierTemplate> findBySupplierTempId(String supplierTempId) {
+        List<MsgSupplierTemplate> obj =  msgSupplierTemplateDao.findBySupplierTempId(supplierTempId);
+        return obj;
+    }
+
 
 }

@@ -20,5 +20,7 @@ public interface MsgSendRecordService extends BaseService<MsgSendRecord> {
 
     List<MsgSendRecord> findWaitedSendMassBySupplier(String supplierCode);
 
+    List<MsgSendRecord> findWaitedSendBySupplier(String supplierCode);
+
     List<MsgSendRecord> findByMsgKey(String msgKey);
 }

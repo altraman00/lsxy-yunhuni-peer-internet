@@ -35,7 +35,7 @@ public class PaoPaoYuServiceImpl extends AbstractSupplierSendServiceImpl {
     }
 
     @Override
-    public Object getTask(String taskId) {
+    public Object getTask(String taskId,Object ...params) {
         String result = getPaoPaoYuClient().getTask(taskId);
         logger.info("调用[泡泡鱼][查询群发]结果:"+ result);
         return new PaoPaoYuMassNofity(result);
@@ -47,7 +47,7 @@ public class PaoPaoYuServiceImpl extends AbstractSupplierSendServiceImpl {
     }
 
     @Override
-    public ResultOne sendOne(String tempId, List<String> tempArgs, String msg, String mobile,String sendType) {
+    public ResultOne sendOne(String tempId, List<String> tempArgs, String msg, String mobile,String sendType,String msgKey) {
         if(MsgConstant.MSG_USSD.equals(sendType)){
             String supplierTempId = getSupplierTempId(tempId, PaoPaoYuConstant.PaopaoyuCode);
             String tempArgsStr = StringUtils.join(tempArgs, PaoPaoYuConstant.PaoPaoYuParamRegexStr);

@@ -1230,4 +1230,17 @@ public class StringUtil extends StringUtils{
 		}
 		return "";
 	}
+	public static String sqlIn(List<String> list){
+		String result = "";
+		for (int i = 0; i < list.size(); i++) {
+			result += " '"+list.get(i)+"' ";
+			if(i != list.size()-1){
+				result += " , ";
+			}
+		}
+		return result;
+	}
+	public static String sqlLike(String str){
+		return " '%"+str+"%' ";
+	}
 }

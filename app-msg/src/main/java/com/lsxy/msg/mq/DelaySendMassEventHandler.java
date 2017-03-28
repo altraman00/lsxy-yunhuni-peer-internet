@@ -49,7 +49,7 @@ public class DelaySendMassEventHandler implements MQMessageHandler<DelaySendMass
         List<String> tempArgsList = Arrays.asList(split);
         List<String> mobiles = Arrays.asList(message.getMobiles().split(MsgConstant.NumRegexStr));
         Date sendTime = DateUtils.parseDate(message.getSendTime(), MsgConstant.TimePartten);
-        SupplierSendService supplierSendService = supplierSelector.getSendMassService(message.getOperator(),message.getSendType());
+        SupplierSendService supplierSendService = supplierSelector.getSendMassService(message.getOperator(),message.getSendType(),message.getTempId());
         if(supplierSendService != null){
             resultMass = supplierSendService.sendMass(message.getTenantId(),message.getAppId(),message.getSubaccountId(),message.getRecordId(),message.getKey(),message.getTaskName(),
                     message.getTempId(),tempArgsList,message.getMsg(),mobiles,sendTime,message.getSendType(),message.getCost());
