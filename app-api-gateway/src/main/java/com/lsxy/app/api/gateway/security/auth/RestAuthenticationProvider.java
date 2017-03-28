@@ -73,6 +73,9 @@ public class RestAuthenticationProvider implements AuthenticationProvider {
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(restToken.getIp())){
+                if(logger.isDebugEnabled()){
+                    logger.debug("ip白名单：{}，访问IP：{}",app.getWhiteList(),restToken.getIp());
+                }
                 throw new BadCredentialsException("IP不在白名单内");
             }
         }
