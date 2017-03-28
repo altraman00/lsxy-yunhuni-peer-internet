@@ -130,6 +130,10 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
         }
 
         if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
+            if(businessStateService.closed(call_id)){
+                logger.info("收码完成事件触发时，呼叫已被释放callid={}",call_id);
+                return res;
+            }
             //热线收码结束标记
             businessStateService.deleteInnerField(call_id,CallCenterUtil.DIRECT_RECEIVE_ING_FIELD);
             //分机短号

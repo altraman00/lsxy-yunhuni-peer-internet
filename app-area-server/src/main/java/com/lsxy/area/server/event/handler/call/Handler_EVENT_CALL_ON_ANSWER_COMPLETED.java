@@ -117,6 +117,12 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
         }catch (Throwable t){
             logger.error(String.format("incrIntoRedis失败,appId=%s",state.getAppId()),t);
         }
+
+        if(businessStateService.closed(call_id)){
+            logger.info("应答事件触发时，呼叫已被释放callid={}",call_id);
+            return res;
+        }
+
         if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
             //分机直拨
             String conversationId = state.getBusinessData().get(CallCenterUtil.CONVERSATION_FIELD);
