@@ -177,6 +177,9 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         if(conversationState == null || (conversationState.getClosed() !=null && conversationState.getClosed())){
             return;
         }
+        if(businessStateService.closed(call_id)){
+            return;
+        }
         conversationService.join(conversation_id,call_id);
         if(conversationState.getBusinessData().get(CallCenterUtil.INVITETO_FIELD) != null){//邀请外线
             try{
@@ -274,6 +277,9 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
                         );
                     }
                     try{
+                        if(businessStateService.closed(call_id)){
+                            throw new CallNotExistsException(new ExceptionContext().put("分机直拨坐席","主叫分机已挂断").put("callid",call_id));
+                        }
                         conversationService.inviteAgent(state.getSubaccountId(),state.getAppId(),conversationState.getBusinessData().get(BusinessState.REF_RES_ID),call_id,
                                         conversation_id,agent.getId(),
                                         agent.getName(),agent.getExtension(),null,from_extension,extension.getTelnum(),
@@ -289,7 +295,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
                     agentLock.unlock();
                 }
             }catch (Throwable t){
-                logger.info("",t);
+                logger.info("直拨坐席失败",t);
                 conversationService.exit(conversation_id,call_id);
             }
         }else if(state.getBusinessData().get(CallCenterUtil.DIRECT_OUT_FIELD) != null){//直拨外线
