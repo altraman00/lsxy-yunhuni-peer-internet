@@ -130,8 +130,12 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
         }
 
         if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
+            if(businessStateService.closed(call_id)){
+                logger.info("收码完成事件触发时，呼叫已被释放callid={}",call_id);
+                return res;
+            }
             //热线收码结束标记
-            businessStateService.deleteInnerField(CallCenterUtil.DIRECT_RECEIVE_ING_FIELD);
+            businessStateService.deleteInnerField(call_id,CallCenterUtil.DIRECT_RECEIVE_ING_FIELD);
             //分机短号
             String from_extensionnum = state.getBusinessData().get(CallCenterUtil.DIRECT_HOT_FIELD);
             //分机前缀
@@ -147,7 +151,7 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
                 return res;
             }
             try{
-                businessStateService.deleteInnerField(CallCenterUtil.DIRECT_HOT_FIELD,CallCenterUtil.DIRECT_EXTENSIONPREFIX_FIELD);
+                businessStateService.deleteInnerField(call_id,CallCenterUtil.DIRECT_HOT_FIELD,CallCenterUtil.DIRECT_EXTENSIONPREFIX_FIELD);
                 if(StringUtil.isNotBlank(error) || StringUtils.isBlank(to)){
                     throw new IllegalArgumentException(String.format("收码失败callid=%s,error=%s,keys=%s",call_id,error,keys));
                 }
