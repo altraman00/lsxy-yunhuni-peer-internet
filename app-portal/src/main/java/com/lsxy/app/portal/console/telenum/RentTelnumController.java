@@ -6,6 +6,7 @@ import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificateSubAccount;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelenumOrder;
@@ -163,6 +164,7 @@ public class RentTelnumController extends AbstractPortalController {
         List<ResourcesRent> result = page.getResult();
         if(result != null && result.size() > 0){
             List<AppNumVO> appNumVOs = new ArrayList<>();
+            Map<String,ApiCertificateSubAccount> subMap = getMapSubAccountList(request,appId);
             for(ResourcesRent rent : result){
                 AppNumVO vo = new AppNumVO();
                 vo.setRentId(rent.getId());
@@ -176,6 +178,16 @@ public class RentTelnumController extends AbstractPortalController {
                 }
                 vo.setAreaCode(rent.getResourceTelenum().getAreaCode());
                 vo.setExpireTime(rent.getRentExpire() == null ? "" : DateUtils.formatDate(rent.getRentExpire(),"yyyy-MM-dd "));
+                String subId = "";
+                String certId = "";
+                if( rent.getResourceTelenum() != null){
+                    ApiCertificateSubAccount sub = subMap.get(rent.getResourceTelenum().getSubaccountId());
+                    if(sub != null){
+                        certId = sub.getCertId();
+                    }
+                }
+                vo.setCertId(certId);
+                vo.setSubId(subId);
                 appNumVOs.add(vo);
             }
             page.setResult(appNumVOs);

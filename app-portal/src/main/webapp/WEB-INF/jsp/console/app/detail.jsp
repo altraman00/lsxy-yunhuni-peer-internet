@@ -371,6 +371,7 @@
                                                 <th class="">可呼出</th>
                                                 <th class=""><span class="text-center-l-fixed">归属地</span></th>
                                                 <th class="">有效期</th>
+                                                <th class="">关联子账号</th>
                                                 <th class="">操作</th>
                                             </tr>
                                             </thead>
@@ -2446,6 +2447,7 @@
                     '<td class="">'+ (data[i].isDialing == 0 ? '✘': '✔') +'</td>' +
                     '<td class=""><span class="text-center-l-fixed">'+data[i].areaCode+'</span></td>' +
                     '<td class=""> ' + nulltostr(data[i].expireTime) + ' </td>' +
+                    '<td class=""> ' + data[i].certId + ' </td>' +
                     '<td class=""><a onclick="unband(\''+data[i].rentId+'\')">解除绑定</a></td>' +
                     '</tr>'
         }
