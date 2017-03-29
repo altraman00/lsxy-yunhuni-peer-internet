@@ -40,7 +40,16 @@ public class SubAccountStatisticsController extends AbstractPortalController {
     public ModelAndView index(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String monthTime, String dayTime, String appId,String stime,String subId){
         ModelAndView mav = new ModelAndView();
         mav.addObject("appList",getAppList(request).getData());
-
+        List<App> appList = (List<App>) getAppList(request).getData();
+        if(StringUtils.isEmpty(appId)){
+            if(appList!=null&& appList.size()>0 ) {
+                appId = appList.get(0).getId();
+                mav.addObject("appServiceTyp",appList.get(0).getServiceType());
+            }
+        }else{
+            App app = (App)getAppById(request,appId).getData();
+            mav.addObject("appServiceTyp",app.getServiceType());
+        }
         if(StringUtils.isEmpty(monthTime)){
             monthTime = DateUtils.formatDate(new Date(),"yyyy-MM");
         }

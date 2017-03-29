@@ -1,6 +1,8 @@
 package com.lsxy.app.oc.rest.message;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.oc.base.AbstractRestController;
+import com.lsxy.msg.api.service.MsgTemplateService;
 import com.lsxy.yunhuni.api.message.model.AccountMessage;
 import com.lsxy.framework.api.message.model.Message;
 import com.lsxy.yunhuni.api.message.service.AccountMessageService;
@@ -40,7 +42,8 @@ public class MessageController extends AbstractRestController {
     AccountService accountService;
     @Autowired
     AccountMessageService accountMessageService;
-
+    @Reference(timeout=3000,check = false,lazy = true)
+    private MsgTemplateService msgTemplateService;
     /**
      *  根据日期和类型查询消息列表信息
      * @param type 0用户消息 1活动消息
@@ -185,6 +188,12 @@ public class MessageController extends AbstractRestController {
     public RestResponse getAwaitNum(){
         Map map = new HashMap();
         map.putAll(accountMessageService.getAwaitNum());
+        Long awaitDemand = (Long)map.get("awaitDemand");
+        Long msgTemplat = msgTemplateService.findByWait();
+        map.put("awaitDemand",awaitDemand+msgTemplat);
+        Map map1 = (HashMap)map.get("son");
+        map1.put("msgTemplat",msgTemplat);
+        map.put("son",map1);
         return RestResponse.success(map);
     }
 

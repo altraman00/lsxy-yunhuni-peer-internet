@@ -24,11 +24,16 @@ public class SubaccountMonth extends IdEntity {
     private Integer month;
     private BigDecimal amongAmount;
     private Long amongDuration;
+    private Long amongSms;
+    private Long amongUssd;
     private Long voiceUsed;
     private Long msgUsed;
+    private Long ussdUsed;
+    private Long smsUser;
     private Long voiceQuotaValue;
     private Long msgQuotaValue;
-
+    private Long smsQuotaValue;
+    private Long ussdQuotaValue;
 
     @Column(name = "app_id")
     public String getAppId() {
@@ -93,6 +98,25 @@ public class SubaccountMonth extends IdEntity {
         this.amongDuration = amongDuration;
     }
 
+
+    @Column(name = "among_sms")
+    public Long getAmongSms() {
+        return amongSms;
+    }
+
+    public void setAmongSms(Long amongSms) {
+        this.amongSms = amongSms;
+    }
+
+    @Column(name = "among_ussd")
+    public Long getAmongUssd() {
+        return amongUssd;
+    }
+
+    public void setAmongUssd(Long amongUssd) {
+        this.amongUssd = amongUssd;
+    }
+
     @Column(name = "voice_used")
     public Long getVoiceUsed() {
         return voiceUsed;
@@ -101,7 +125,22 @@ public class SubaccountMonth extends IdEntity {
     public void setVoiceUsed(Long voiceUsed) {
         this.voiceUsed = voiceUsed;
     }
+    @Column(name = "ussd_used")
+    public Long getUssdUsed() {
+        return ussdUsed;
+    }
 
+    public void setUssdUsed(Long ussdUsed) {
+        this.ussdUsed = ussdUsed;
+    }
+    @Column(name = "sms_used")
+    public Long getSmsUser() {
+        return smsUser;
+    }
+
+    public void setSmsUser(Long smsUser) {
+        this.smsUser = smsUser;
+    }
     @Column(name = "msg_used")
     public Long getMsgUsed() {
         return msgUsed;
@@ -127,5 +166,21 @@ public class SubaccountMonth extends IdEntity {
 
     public void setMsgQuotaValue(Long msgQuotaValue) {
         this.msgQuotaValue = msgQuotaValue;
+    }
+    @Column(name = "sms_quota_value")
+    public Long getSmsQuotaValue() {
+        return smsQuotaValue;
+    }
+
+    public void setSmsQuotaValue(Long smsQuotaValue) {
+        this.smsQuotaValue = smsQuotaValue;
+    }
+    @Column(name = "ussd_quota_value")
+    public Long getUssdQuotaValue() {
+        return ussdQuotaValue;
+    }
+
+    public void setUssdQuotaValue(Long ussdQuotaValue) {
+        this.ussdQuotaValue = ussdQuotaValue;
     }
 }

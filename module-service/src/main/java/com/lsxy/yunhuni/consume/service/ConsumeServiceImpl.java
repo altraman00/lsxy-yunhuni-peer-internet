@@ -8,6 +8,8 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.UUIDGenerator;
+import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuotaType;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.consume.dao.ConsumeDao;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -145,6 +148,40 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
         String sql = "SELECT IFNULL(SUM(c.amount),0) as consume FROM db_lsxy_bi_yunhuni.tb_bi_consume c WHERE c.app_id=? AND c.dt >= ? AND c.dt < ? and c.deleted=0";
         Map<String, Object> map = jdbcTemplate.queryForMap(sql, appId,startDate,endDate);
         return (BigDecimal) map.get("consume");
+    }
+
+    @Override
+    public void batchConsume(Date dt, String type, BigDecimal cost, String remark, String appId, String tenantId, String subaccountId, List<String> detailIds) {
+        String values = "id,dt,type,amount,remark,app_id,tenant_id,relevance_id,subaccount_id,create_time,last_time,deleted,sortno,version";
+        String valuesMark = "";
+        int length = values.split(",").length;
+        for(int i = 0;i<length;i++){
+            if(i == length -1){
+                valuesMark += "?";
+            }else{
+                valuesMark += "?,";
+            }
+        }
+        String insertSql =  " insert into db_lsxy_bi_yunhuni.tb_bi_consume("+ values + ") values ("+valuesMark+")";
+        Date date = new Date();
+        BigDecimal allCost = null;
+        List resultList = new ArrayList();
+        if(detailIds != null && detailIds.size() > 0){
+            for(String detailId:detailIds){
+                String uuid = UUIDGenerator.uuid();
+                Object[] obj = new Object[]{uuid,dt,type,cost,remark,appId,tenantId,detailId,subaccountId,date,date,0,0,0};
+                resultList.add(obj);
+            }
+            allCost = cost.multiply(new BigDecimal(detailIds.size()));
+        }
+
+        if(allCost != null && allCost.compareTo(BigDecimal.ZERO) != 0){
+            if(resultList != null && resultList.size() > 0){
+                jdbcTemplate.batchUpdate(insertSql,resultList);
+            }
+            //Redis中消费增加
+            calBillingService.incConsume(tenantId,dt,allCost);
+        }
     }
 
 }

@@ -122,6 +122,8 @@
                                                                 <c:if test="${app.isVoiceValidate=='1'}">语音验证码&nbsp;</c:if>
                                                                 <c:if test="${app.isIvrService=='1'}">自定义IVR&nbsp;</c:if>
                                                                 <c:if test="${app.isCallCenter==1}">呼叫中心&nbsp;</c:if>
+                                                                <c:if test="${app.isSms=='1'}">短信&nbsp;</c:if>
+                                                                <c:if test="${app.isUssd==1}">闪印&nbsp;</c:if>
                                                             </p>
                                                         </div>
                                                     </div>
@@ -236,35 +238,41 @@
                                 <!--新的应用详情结束-->
                             <section class="panel panel-default pos-rlt clearfix application-tab">
                                 <ul id="myTab" class="nav nav-tabs">
-                                    <c:if test="${app.serviceType=='call_center'}">
+                                    <c:if test="${app.serviceType == 'voice'}"><%--语音--%>
+                                        <li class="active" data-id="play"><a href="#play" data-toggle="tab">放音媒体库</a></li>
+                                        <li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>
+                                        <li data-id="number"><a href="#number" data-toggle="tab">号码绑定</a></li>
+                                        <li data-id="subAccount"><a href="#subAccount" data-toggle="tab">子账号</a></li>
+                                    </c:if>
+                                    <c:if test="${app.serviceType == 'msg'}"><%--消息--%>
+                                        <li data-id="template" class="active"><a href="#template" data-toggle="tab">模板列表</a></li>
+                                        <li data-id="subAccount" ><a href="#subAccount" data-toggle="tab">子账号</a></li>
+                                    </c:if>
+                                    <c:if test="${app.serviceType == 'call_center'}"><%--呼叫中心--%>
                                         <li data-id="extension" class="active"><a href="#extension" data-toggle="tab">分机列表</a></li>
                                         <li data-id="agent"><a href="#agent" data-toggle="tab">坐席列表</a></li>
                                         <li data-id="queue"><a href="#queue" data-toggle="tab">排队条件</a></li>
+                                        <li data-id="play"><a href="#play" data-toggle="tab">放音媒体库</a></li>
+                                        <li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>
+                                        <li data-id="number"><a href="#number" data-toggle="tab">号码绑定</a></li>
+                                        <li data-id="subAccount"><a href="#subAccount" data-toggle="tab">子账号</a></li>
                                     </c:if>
-                                    <li <c:if test="${app.serviceType!='call_center'}">class="active" </c:if> data-id="play">
-                                        <a href="#play" data-toggle="tab">
-                                            放音媒体库
-                                        </a>
-                                    </li>
-                                    <li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>
-                                    <!--号码绑定-->
-                                    <li data-id="number"><a href="#number" data-toggle="tab">号码绑定</a></li>
-                                    <li data-id="subAccount"><a href="#subAccount" data-toggle="tab">子账号</a></li>
-                                    <li class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
+
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
-                                    <div class="tab-pane fade<c:if test="${app.serviceType!='call_center'}"> in active</c:if>" id="play">
+                                    <!-- 放音文件-->
+                                    <div class="tab-pane fade<c:if test="${app.serviceType=='voice'}"> in active</c:if>" id="play">
                                         <p class="application_info">
-                                            当您的应用需要开通语音通知、自定义IVR或者云呼叫中心时，请上传语音文件至放音媒体库，语音文件均需要审核
+                                            1.当您的应用需要开通语音通知、自定义IVR或者呼叫中心时，请上传语音文件至放音媒体库，语音文件均需要审核。<br/>
+                                            2.只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、8位）后再上传,单条语音最大支持 5M。详情请查看<a href="#" onclick="window.open('${globalWebsite}/develop/book/platform?page=playvoicefile')">放音文件上传说明</a>
                                         </p>
                                         <div class="form-group">
                                             <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="文件名" id="name"/></div>
                                             <div class="col-md-3 remove-padding" style="padding-left:15px;">
                                                 <input type="text" class="form-control" placeholder="关联子账号" id="voice_file_subId"/>
-                                                <%--<select id="voice_file_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号" >--%>
-                                                <%--</select>--%>
-                                                <%--<input type="text" class="form-control " placeholder="子账号鉴权账号" id="subId"/>--%></div>
-                                            <div class="col-md-1"><button class="btn btn-primary" type="button" onclick="upplay()">查询</button></div>
+                                            </div>
+                                            <div class="col-md-1 voice-find-btn"><button class="btn btn-primary" type="button" onclick="upplay()">查询</button></div>
+                                            <div class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></div>
                                             <div class="col-md-8 sizebox  remove-padding " id="voiceFilePlay">
                                             </div>
                                         </div>
@@ -288,6 +296,7 @@
                                         </section>
 
                                     </div>
+                                    <!-- 录音文件-->
                                     <div class="tab-pane fade" id="voice">
                                         <p class="application_info">
                                             1.每个账号默认允许免费存储7天内的录音文件，超过指定配置周期的录音文件系统将自动删除。<br/>
@@ -356,13 +365,13 @@
                                         <table class="table table-striped cost-table-history tablelist" id="number-table">
                                             <thead>
                                             <tr>
-                                                <th class="text-center">号码</th>
-                                                <th class="text-center">状态</th>
-                                                <th class="text-center">可呼入</th>
-                                                <th class="text-center">可呼出</th>
-                                                <th class="text-center"><span class="text-center-l-fixed">归属地</span></th>
-                                                <th class="text-center">有效期</th>
-                                                <th class="text-center">操作</th>
+                                                <th class="">号码</th>
+                                                <th class="">状态</th>
+                                                <th class="">可呼入</th>
+                                                <th class="">可呼出</th>
+                                                <th class=""><span class="text-center-l-fixed">归属地</span></th>
+                                                <th class="">有效期</th>
+                                                <th class="">操作</th>
                                             </tr>
                                             </thead>
                                             <tbody id="band-table">
@@ -374,7 +383,6 @@
                                         </section>
                                     </div>
                                     <!--号码绑定end-->
-
                                     <!--分机列表-->
                                     <div class="tab-pane fade<c:if test="${app.serviceType=='call_center'}"> in active</c:if>" id="extension">
                                         <div class="form-group">
@@ -382,7 +390,7 @@
                                             <div class="col-md-3 remove-padding" style="padding-left:15px;">
                                                 <%--<select id="extension_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号"  >--%>
                                                 <%--</select>--%>
-                                                    <input type="text" class="form-control" placeholder="关联子账号" id="extension_subId" /></div>
+                                                <input type="text" class="form-control" placeholder="关联子账号" id="extension_subId" /></div>
                                             <div class="col-md-2">
                                                 <button class="btn btn-primary" type="button" onclick="extensionList()">查询</button>
                                                 <button href="#"  class="btn btn-primary defind modalShow" data-id="six" >创建分机</button>
@@ -409,6 +417,148 @@
                                         </section>
                                     </div>
                                     <!--分机列表end-->
+                                    <!--模板列表-->
+                                    <div class="tab-pane fade<c:if test="${app.serviceType=='msg'}"> in active</c:if>" id="template">
+                                        <p class="application_info">
+                                            1.提交模板申请前，请仔细阅读文档：<a href="#" onclick="window.open('${globalWebsite}/develop/book/platform?page=template')">模板使用说明</a></br>
+                                            2.短信模板只能在所属应用下使用，不允许跨应用使用</br>
+                                            3.会员需进行公司认证，并审核通过后才能新增模板</br>
+                                            4.会员在进行闪印和短信的测试时，可以使用平台提供测试模板
+                                        </p>
+                                        <div id="template_home">
+                                            <div class="form-group">
+                                                <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="模板名称" id="template_num" /></div>
+                                                <div class="col-md-3 remove-padding" style="padding-left:15px;">
+                                                    <%--<select id="extension_subId" class="form-control show-tick sublist"  data-live-search="true" title="关联子账号"  >--%>
+                                                    <%--</select>--%>
+                                                    <input type="text" class="form-control" placeholder="关联子账号" id="template_subId" /></div>
+                                                <div class="col-md-2">
+                                                    <button class="btn btn-primary" type="button" onclick="templateList()">查询</button>
+                                                    <div hidden>
+                                                    <button href="#"  class="btn btn-primary defind modalShow" data-id="seven" >新增模板</button></div>
+                                                    <button href="#"  class="btn btn-primary " onclick="isnewTemplate()" >新增模板</button>
+                                                </div>
+                                            </div>
+                                            <table class="table table-striped cost-table-history tablelist" id="template-table">
+                                                <thead>
+                                                <tr>
+                                                    <th class="">模板编号</th>
+                                                    <th class="">模板类型</th>
+                                                    <th class="">模板名称</th>
+                                                    <th>内容</th>
+                                                    <th>关联子账号</th>
+                                                    <th class="">状态</th>
+                                                    <th class="">操作</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody id="template-list">
+
+                                                </tbody>
+                                            </table>
+                                            <section class="panel panel-default yunhuni-personal">
+                                                <div id="template-page"></div>
+                                            </section>
+                                        </div>
+                                        <div id="template_detail" hidden>
+                                            <div class="panel-body devbox remove-padding-left">
+                                                <h4 class="margin-bottom-20">模板详情</h4>
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev">
+                                                        模板编号：
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p>
+                                                            <input type="text" class="form-control"  disabled value="{{tempId}}">
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev">
+                                                        模板类型：
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <p>
+                                                            <input type="radio" id="ussd2" disabled value="msg_ussd" v-model="type" name="type">
+                                                            <label for="ussd2">闪印</label>
+                                                            <input type="radio" id="sms2" disabled value="msg_sms" v-model="type" name="type">
+                                                            <label for="sms2">短信</label>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev line-height-32">
+                                                        模板名称：
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p>
+                                                            <input v-if="isShow(1,0)" type="text" class="form-control" disabled value="{{name}}" placeholder=""/>
+                                                            <input v-if="isShow(-1)" type="text" class="form-control" v-model="name" value="{{name}}" placeholder=""/>
+                                                        </p>
+                                                        <span>仅供识别</span>
+                                                    </div>
+                                                </div>
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev line-height-32">
+                                                        模板内容：
+                                                    </div>
+                                                    <div class="col-md-6" v-if="isShow(-1)">
+                                                        <div style="height: 70px;position:relative;margin:0;padding:0;width:620px">
+                                                        <textarea class="form-control" v-model="content" placeholder="" style="height:70px;position:absolute;margin:0;padding:2px "
+                                                                  id="template_content2" onkeydown="checkMaxInput(this,60)" onkeyup="checkMaxInput(this,60)" onfocus="checkMaxInput(this,60)" onblur="checkMaxInput(this,60);"
+                                                        >{{content}}</textarea>
+                                                            <div id="template_content2msg" class="note" style="position:absolute;line-height:117px;padding:3px 555px;height: 0px"><font color="#777">{{contentlength}}/60</font></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6" v-if="isShow(1,0)" >
+                                                        <textarea  type="text"  class="form-control"  readonly placeholder="">{{content}}</textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev line-height-32">
+                                                        备注：
+                                                    </div>
+                                                    <div class="col-md-6" v-if="isShow(-1)">
+                                                        <div style="height: 70px;position:relative;margin:0;padding:0;width:620px">
+                                                        <textarea class="form-control" v-model="remark" placeholder="" style="height:70px;position:absolute;margin:0;padding:2px "
+                                                                  id="template_remark2" onkeydown="checkMaxInput(this,100)" onkeyup="checkMaxInput(this,100)" onfocus="checkMaxInput(this,100)" onblur="checkMaxInput(this,100);"
+                                                        >{{remark}}</textarea>
+                                                            <div id="template_remark2msg" class="note" style="position:absolute;line-height:117px;padding:3px 555px;height: 0px"><font color="#777">{{remarklength}}/100</font></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6" v-if="isShow(1,0)" style="width:620px">
+                                                        <textarea  type="text"  class="form-control"  readonly placeholder="" >{{remark}}</textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="row margin-bottom-10">
+                                                    <div class="col-md-1 dev">
+                                                        状态：
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p v-if="isShow(1)">审核已通过</p>
+                                                        <p v-if="isShow(-1)">审核不通过！</p>
+                                                        <p v-if="isShow(0)">待审核</p>
+                                                    </div>
+                                                </div>
+                                                <div class="row margin-bottom-10" v-if="isShow(-1)">
+                                                    <div class="col-md-1 dev line-height-32">
+                                                        原因：
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div style="height: 70px;position:relative;margin:0;padding:0;width:620px">
+                                                        <textarea type="text"  class="form-control" readonly placeholder="">{{reason}}</textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row margin-bottom-20">
+                                                <div class="col-md-6">
+                                                    <button v-if="state==-1" class="btn btn-primary" type="button" onclick="editSevenPost()">重新提交</button>
+                                                    <button class="btn btn-primary" type="button" onclick="totemplateHome()">返回</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--分机列表end-->
                                     <!--坐席列表-->
                                     <div class="tab-pane fade" id="agent">
                                         <div class="form-group">
@@ -426,12 +576,12 @@
                                         <table class="table table-striped cost-table-history tablelist" id="agent-table">
                                             <thead>
                                             <tr>
-                                                <th class="text-center">坐席名称（ID）</th>
-                                                <th class="text-center">技能组</th>
-                                                <th class="text-center">绑定分机</th>
-                                                <th class="text-center">关联子账号</th>
-                                                <th class="text-center">状态</th>
-                                                <th class="text-center">操作</th>
+                                                <th class="">坐席名称（ID）</th>
+                                                <th class="">技能组</th>
+                                                <th class="">绑定分机</th>
+                                                <th class="">关联子账号</th>
+                                                <th class="">状态</th>
+                                                <th class="">操作</th>
                                             </tr>
                                             </thead>
                                             <tbody id="agent-list">
@@ -463,13 +613,13 @@
                                         <table class="table table-striped cost-table-history tablelist" id="queue-table">
                                             <thead>
                                             <tr>
-                                                <th class="text-center" >条件选择表达式</th>
-                                                <th class="text-center">排序表达式</th>
-                                                <th class="text-center" style="width: 20px">优先级</th>
-                                                <th class="text-center" style="width: 20px">等待超时时间（秒）</th>
-                                                <th class="text-center" style="width: 20px">接听超时时间（秒）</th>
-                                                <th class="text-center">关联子账号</th>
-                                                <th class="text-center">备注</th>
+                                                <th class="" >条件选择表达式</th>
+                                                <th class="">排序表达式</th>
+                                                <th class="" style="width: 20px">优先级</th>
+                                                <th class="" style="width: 20px">等待超时时间（秒）</th>
+                                                <th class="" style="width: 20px">接听超时时间（秒）</th>
+                                                <th class="">关联子账号</th>
+                                                <th class="">备注</th>
                                             </tr>
                                             </thead>
                                             <tbody id="queue-list">
@@ -496,20 +646,25 @@
                                                 <button href="#"  class="btn btn-primary defind modalShow" data-id="five" >创建子账号</button>
                                             </div>
                                         </div>
-
-
                                         <table class="table table-striped cost-table-history tablelist" id="subAccount-table">
                                             <thead>
                                             <tr>
-                                                <th class="text-center">鉴权账号</th>
-                                                <th class="text-center">密钥</th>
-                                                <th class="text-center">语音用量 /总量（分钟）</th>
-<%--<c:if test="${app.serviceType == 'call_center'}">--%>
-                                                <%--<th class="text-center">坐席用量 /总量（个）</th>--%>
-<%--</c:if>--%>
-                                                <th class="text-center">状态</th>
-                                                <th class="text-center">备注</th>
-                                                <th class="text-center">操作</th>
+                                                <th class="">鉴权账号</th>
+                                                <th class="">密钥</th>
+                                                <c:if test="${app.serviceType == 'voice'}">
+                                                    <th class="">语音用量 /总量（分钟）</th>
+                                                </c:if>
+                                                <c:if test="${app.serviceType == 'call_center'}">
+                                                    <th class="">语音用量 /总量（分钟）</th>
+                                                    <%--<th class="text-center">坐席用量 /总量（个）</th>--%>
+                                               </c:if>
+                                               <c:if test="${app.serviceType == 'msg'}">
+                                                   <th class="">闪印用量 /配额（条）</th>
+                                                   <th class="">短信用量/配额（条）</th>
+                                               </c:if>
+                                                <th class="">状态</th>
+                                                <th class="">备注</th>
+                                                <th class="">操作</th>
                                             </tr>
                                             </thead>
                                             <tbody >
@@ -562,26 +717,57 @@
                                                         <p>（负数为额度不作限制，0则表示额度为0，正数为具体的使用额度限制）</p>
                                                     </div>
                                                 </div>
-                                                <div class="row margin-bottom-10">
-                                                    <div class="col-md-1 dev line-height-32">语音(分钟)：</div>
-                                                    <div class="col-md-6">
-                                                        <p>
-                                                            <input type="text"  class="form-control"  v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
-                                                        </p>
+                                                <c:if test="${app.serviceType == 'voice'}">
+                                                    <div class="row margin-bottom-10">
+                                                        <div class="col-md-1 dev line-height-32">语音(分钟)：</div>
+                                                        <div class="col-md-6">
+                                                            <p>
+                                                                <input type="text"  class="form-control"  v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
+                                                            </p>
+                                                        </div>
+                                                        <span class="col-md-1 line-height-32 text-left text-danger">*</span>
                                                     </div>
-                                                    <span class="col-md-1 line-height-32 text-left text-danger">*</span>
-                                                </div>
-                                                <%--<c:if test="${app.serviceType == 'call_center'}">--%>
-                                                <%--<div class="row margin-bottom-10">--%>
-                                                    <%--<div class="col-md-1 dev">--%>
-                                                        <%--坐席（个）：--%>
+                                                </c:if>
+                                                <c:if test="${app.serviceType == 'call_center'}">
+                                                    <div class="row margin-bottom-10">
+                                                        <div class="col-md-1 dev line-height-32">语音(分钟)：</div>
+                                                        <div class="col-md-6">
+                                                            <p>
+                                                                <input type="text"  class="form-control"  v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
+                                                            </p>
+                                                        </div>
+                                                        <span class="col-md-1 line-height-32 text-left text-danger">*</span>
+                                                    </div>
+                                                    <%--<div class="row margin-bottom-10">--%>
+                                                        <%--<div class="col-md-1 dev line-height-32">坐席（个）：</div>--%>
+                                                        <%--<div class="col-md-6">--%>
+                                                            <%--<p>--%>
+                                                                <%--<input type="text"  class="form-control"  v-model="seatNum" value="{{seatNum}}" placeholder=""/>--%>
+                                                            <%--</p>--%>
+                                                        <%--</div>--%>
+                                                        <%--<span class="col-md-1 line-height-32 text-left text-danger">*</span>--%>
                                                     <%--</div>--%>
-                                                    <%--<div class="col-md-6">--%>
-                                                        <%--<input type="text"  class="form-control"  v-model="seatNum" value="{{seatNum}}" placeholder=""/>--%>
-                                                    <%--</div>--%>
-                                                    <%--<span class="col-md-1 line-height-32 text-left text-danger">*</span>--%>
-                                                <%--</div>--%>
-                                                <%--</c:if>--%>
+                                                </c:if>
+                                                <c:if test="${app.serviceType == 'msg'}">
+                                                    <div class="row margin-bottom-10">
+                                                        <div class="col-md-1 dev line-height-32">闪印（条）：</div>
+                                                        <div class="col-md-6">
+                                                            <p>
+                                                                <input type="text"  class="form-control"  v-model="ussdNum" value="{{ussdNum}}" placeholder=""/>
+                                                            </p>
+                                                        </div>
+                                                        <span class="col-md-1 line-height-32 text-left text-danger">*</span>
+                                                    </div>
+                                                    <div class="row margin-bottom-10">
+                                                        <div class="col-md-1 dev line-height-32">短信（条）：</div>
+                                                        <div class="col-md-6">
+                                                            <p>
+                                                                <input type="text"  class="form-control"  v-model="smsNum" value="{{smsNum}}" placeholder=""/>
+                                                            </p>
+                                                        </div>
+                                                        <span class="col-md-1 line-height-32 text-left text-danger">*</span>
+                                                    </div>
+                                                </c:if>
                                                 <div class="row margin-bottom-10">
                                                     <div class="col-md-1 dev line-height-32">
                                                         备注：
@@ -597,36 +783,38 @@
                                                     <button class="btn btn-primary" type="button" onclick="tosubAccountHome1()">返回</button>
                                                 </div>
                                             </div>
-                                            <p class="noticeInfo hr text-success"></p>
-                                            <p class="margin-bottom-20"></p>
-                                            <div class="row margin-bottom-20">
-                                                <div class="col-md-12">
-                                                    <a class="btn btn-primary" onclick="unallband2()" >全部解除绑定</a>
-                                                    <c:if test="${app.status==1}">
-                                                        <a class="btn btn-primary" id="call-number2" data-num-bind="">绑定号码</a>
-                                                    </c:if>
+                                            <c:if test="${app.serviceType == 'voice' ||app.serviceType == 'call_center' }">
+                                                <p class="noticeInfo hr text-success"></p>
+                                                <p class="margin-bottom-20"></p>
+                                                <div class="row margin-bottom-20">
+                                                    <div class="col-md-12">
+                                                        <a class="btn btn-primary" onclick="unallband2()" >全部解除绑定</a>
+                                                        <c:if test="${app.status==1}">
+                                                            <a class="btn btn-primary" id="call-number2" data-num-bind="">绑定号码</a>
+                                                        </c:if>
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <table class="table table-striped cost-table-history tablelist" id="number-table2">
-                                                <thead>
-                                                <tr>
-                                                    <th class="text-center">号码</th>
-                                                    <th class="text-center">状态</th>
-                                                    <th class="text-center">可呼入</th>
-                                                    <th class="text-center">可呼出</th>
-                                                    <th class="text-center"><span class="text-center-l-fixed">归属地</span></th>
-                                                    <th class="text-center">有效期</th>
-                                                    <th class="text-center">操作</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody id="band-table2">
+                                                <table class="table table-striped cost-table-history tablelist" id="number-table2">
+                                                    <thead>
+                                                    <tr>
+                                                        <th class="">号码</th>
+                                                        <th class="">状态</th>
+                                                        <th class="">可呼入</th>
+                                                        <th class="">可呼出</th>
+                                                        <th class=""><span class="text-center-l-fixed">归属地</span></th>
+                                                        <th class="">有效期</th>
+                                                        <th class="">操作</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody id="band-table2">
 
-                                                </tbody>
-                                            </table>
-                                            <section class="panel panel-default yunhuni-personal">
-                                                <div id="bandpage2"></div>
-                                            </section>
+                                                    </tbody>
+                                                </table>
+                                                <section class="panel panel-default yunhuni-personal">
+                                                    <div id="bandpage2"></div>
+                                                </section>
+                                            </c:if>
                                         </div>
                                     </div>
                                     <!--子账号end-->
@@ -659,18 +847,18 @@
                         <tr>
                             <th><input type="checkbox" v-model="shopCheck" @click="isCheck" />全选</th>
                             <th>号码</th>
-                            <th class="text-center">可呼入</th>
-                            <th class="text-center">可呼出</th>
-                            <th class="text-center"><span class="text-center-l-fixed">归属地</span></th>
+                            <th class="">可呼入</th>
+                            <th class="">可呼出</th>
+                            <th class="t"><span class="text-center-l-fixed">归属地</span></th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr v-for="item in phonelist">
                             <td scope="row"><input type="checkbox" v-model="shop" value="{{ item.num }}"/></td>
                             <td>{{ item.num }}</td>
-                            <td class="text-center">{{ isCall[item.isCalled] }}</td>
-                            <td class="text-center">{{ isCall[item.isDialing]}}</td>
-                            <td class="text-center"><span class="text-center-l-fixed">{{ item.areaCode}}</span></td>
+                            <td class="">{{ isCall[item.isCalled] }}</td>
+                            <td class="">{{ isCall[item.isDialing]}}</td>
+                            <td class=""><span class="text-center-l-fixed">{{ item.areaCode}}</span></td>
                         </tr>
                         </tbody>
                     </table>
@@ -790,22 +978,47 @@
                         （负数为额度不作限制，0则表示额度为0，正数为具体的使用额度限制）
                     </div>
                 </div>
-                <div class="row margin-bottom-10">
-                    <lable class="col-md-3 text-right line-height-32">语音（分钟）：</lable>
-                    <div class="col-md-8 remove-padding-right">
-                        <input type="text" class="form-control" v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
+                <c:if test="${app.serviceType == 'voice'}">
+                    <div class="row margin-bottom-10">
+                        <lable class="col-md-3 text-right line-height-32">语音（分钟）：</lable>
+                        <div class="col-md-8 remove-padding-right">
+                            <input type="text" class="form-control" v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
+                        </div>
+                        <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
                     </div>
-                    <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
-                </div>
-                <%--<c:if test="${app.serviceType == 'call_center'}">--%>
-                <%--<div class="row margin-bottom-10">--%>
-                    <%--<lable class="col-md-3 text-right line-height-32">坐席（个）：</lable>--%>
-                    <%--<div class="col-md-8 remove-padding-right">--%>
-                        <%--<input type="text" class="form-control" v-model="seatNum"  value="{{seatNum}}" placeholder="" />--%>
+                </c:if>
+                <c:if test="${app.serviceType == 'call_center'}">
+                    <div class="row margin-bottom-10">
+                        <lable class="col-md-3 text-right line-height-32">语音（分钟）：</lable>
+                        <div class="col-md-8 remove-padding-right">
+                            <input type="text" class="form-control" v-model="voiceNum" value="{{voiceNum}}" placeholder=""/>
+                        </div>
+                        <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
+                    </div>
+                    <%--<div class="row margin-bottom-10">--%>
+                        <%--<lable class="col-md-3 text-right line-height-32">坐席（个）：</lable>--%>
+                        <%--<div class="col-md-8 remove-padding-right">--%>
+                            <%--<input type="text" class="form-control" v-model="seatNum" value="{{seatNum}}" placeholder=""/>--%>
+                        <%--</div>--%>
+                        <%--<span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>--%>
                     <%--</div>--%>
-                    <%--<span class="col-md-1 line-height-32 text-left text-danger padding-left-5">*</span>--%>
-                <%--</div>--%>
-                <%--</c:if>--%>
+                </c:if>
+                <c:if test="${app.serviceType == 'msg'}">
+                    <div class="row margin-bottom-10">
+                        <lable class="col-md-3 text-right line-height-32">闪印（条）：</lable>
+                        <div class="col-md-8 remove-padding-right">
+                            <input type="text" class="form-control" v-model="ussdNum" value="{{ussdNum}}" placeholder=""/>
+                        </div>
+                        <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
+                    </div>
+                    <div class="row margin-bottom-10">
+                        <lable class="col-md-3 text-right line-height-32">短信（条）：</lable>
+                        <div class="col-md-8 remove-padding-right">
+                            <input type="text" class="form-control" v-model="smsNum" value="{{smsNum}}" placeholder=""/>
+                        </div>
+                        <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
+                    </div>
+                </c:if>
                 <div class="row">
                     <lable class="col-md-3 text-right line-height-32">备注：</lable>
                     <div class="col-md-8 remove-padding-right">
@@ -816,6 +1029,64 @@
             <div class="footer">
                 <a class="cancel modalCancel cancelfive" data-id="five">返回</a>
                 <a class="sure modalSureFive" data-id="five">创建</a>
+            </div>
+        </div>
+        <!---创建模板--->
+        <div class="modal-box application-detail-box" id="modalseven" style="display:none;">
+            <div class="title">创建模板<a class="close_a modalCancel cancelseven" data-id="seven"></a></div>
+            <div class="content" id="createSeven" >
+                <br>
+                <div class="row margin-bottom-10">
+                    <lable class="col-md-3 text-right line-height-32">模板类型：</lable>
+                    <div class="col-md-8 remove-padding-right">
+                        <input type="radio" id="ussd" checked value="msg_ussd" v-model="type" name="type">
+                        <label for="ussd">闪印</label>
+                        <input type="radio" id="sms" value="msg_sms" v-model="type" name="type">
+                        <label for="sms">短信</label>
+                        <br>
+                    </div>
+                    <%--<span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>--%>
+                </div>
+                <div class="row margin-bottom-10">
+                    <lable class="col-md-3 text-right line-height-32">模板名称：</lable>
+                    <div class="col-md-8 remove-padding-right">
+                        <input type="text" class="form-control" v-model="name" value="{{name}}" placeholder=""/>
+                        <span>仅供识别</span>
+                    </div>
+                    <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
+                </div>
+                <div class="row margin-bottom-10">
+                    <lable class="col-md-3 text-right line-height-32">模板内容：</lable>
+                    <div  class="col-md-8 remove-padding-right" style="height:115px;">
+                        <div style="position:relative;margin:0;padding:0;">
+                        <textarea class="form-control" v-model="content"  placeholder="" style="height:86px;position:absolute;margin:0;padding:2px "
+                        id="template_content" onkeydown="checkMaxInput(this,62)" onkeyup="checkMaxInput(this,62)" onfocus="checkMaxInput(this,62)" onblur="checkMaxInput(this,62);"
+                        >{{content}}</textarea>
+                            <div id="template_contentmsg" class="note" style="position:absolute;line-height:147px;padding:3px 250px;height: 0px"><font color="#777">0/62</font></div>
+                        </div>
+                        <span style="position:absolute;line-height:184px;padding:3px 3px;height: 0px">
+                            例：【壹耘】您的验证码是#*#,请在#*#分钟内完成输</span>
+                        <span style="position:absolute;line-height:215px;padding:3px 3px;height: 0px">
+                            入内容不允许超过62个字符（包括变量）</span>
+                    </div>
+                    <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
+                </div>
+                <div class="row margin-bottom-10">
+                    <lable class="col-md-3 text-right line-height-32">使用场景说明：</lable>
+                    <div class="col-md-8 remove-padding-right" style="height:130px;">
+                        <div style="position:relative;margin:0;padding:0">
+                        <textarea class="form-control" v-model="remark" placeholder="" style="height:130px;position:absolute;margin:0;padding:2px "
+                                  id="template_remark" onkeydown="checkMaxInput(this,100)" onkeyup="checkMaxInput(this,100)" onfocus="checkMaxInput(this,100)" onblur="checkMaxInput(this,100);"
+                        >{{remark}}</textarea>
+                        </div>
+                        <div id="template_remarkmsg" class="note" style="position:absolute;line-height:235px;padding:3px 235px;height: 0px"><font color="#777">0/100</font></div>
+                    </div>
+                    <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
+                </div>
+            </div>
+            <div class="footer">
+                <a class="cancel modalCancel cancelseven" data-id="seven">返回</a>
+                <a class="sure modalSureSeven" data-id="seven">创建</a>
             </div>
         </div>
         <!---创建分机--->
@@ -878,7 +1149,7 @@
     <div class="modal-loadding loadding"></div>
     <div class="title">文件上传<a class="close_a modalCancel-app-up" data-id="four" ></a></div>
     <div class="content">
-        <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、16位）后再上传,单条语音最大支持 5M。</p>
+        <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、8位）后再上传,单条语音最大支持 5M。</p>
         <form:form action="${ctx}/console/app/file/play/upload" method="post" id="uploadMianForm" enctype="multipart/form-data" target="hidden_frame">
             <div class="input-box ">
                 <div class="row margin-bottom-10">
@@ -947,15 +1218,62 @@
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.fileupload-process.js"></script>
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.iframe-transport.js"></script>
 <script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.fileupload-validate.js"></script>
-        <link rel="stylesheet" href="${resPrefixUrl }/js/dist/css/bootstrap-select.css">
-        <script src="${resPrefixUrl }/js/dist/js/bootstrap-select.js"></script>
+<link rel="stylesheet" href="${resPrefixUrl }/js/dist/css/bootstrap-select.css">
+<script src="${resPrefixUrl }/js/dist/js/bootstrap-select.js"></script>
+        <script type="text/javascript">
+            function isnewTemplate(){
+                var state = '${authState}';
+                if(state==2){
+                    $('button[data-id=seven]').click();
+                }else{
+                    showtoast("你还没进行公司认证，快去认证吧！");
+                }
+            }
+            //多行文本输入框剩余字数计算
+            function checkMaxInput(obj, maxLen) {
+                if (obj == null || obj == undefined || obj == "") {
+                    return;
+                }
+                if (maxLen == null || maxLen == undefined || maxLen == "") {
+                    maxLen = 100;
+                }
 
+                var strResult;
+                var $obj = $(obj);
+                var newid = $obj.attr("id") + 'msg';
+
+                if (obj.value.length > maxLen) { //如果输入的字数超过了限制
+                    obj.value = obj.value.substring(0, maxLen); //就去掉多余的字
+                    $('#'+newid).html(( obj.value.length)+"/"+maxLen );//maxLen
+//                    strResult = '<span id="' + newid + '" class=\'Max_msg\' ><br/>剩(' + (maxLen - obj.value.length) + ')字</span>'; //计算并显示剩余字数
+                } else {
+                    $('#'+newid).html(( obj.value.length)+"/"+maxLen );
+//                    strResult = '<span id="' + newid + '" class=\'Max_msg\' ><br/>剩(' + (maxLen - obj.value.length) + ')字</span>'; //计算并显示剩余字数
+                }
+
+//                var $msg = $("#" + newid);
+//                if ($msg.length == 0) {
+//                    $obj.after(strResult);
+//                }
+//                else {
+//                    $msg.html(strResult);
+//                }
+            }
+
+            //清空剩除字数提醒信息
+            function resetMaxmsg() {
+//                $("span.Max_msg").remove();
+            }
+        </script>
         <script>
             $('.cancelfive').click(function(){
                 createSubAccountFive.init();
             });
             $('.cancelsix').click(function(){
                 createSix.init();
+            });
+            $('.cancelseven').click(function(){
+                createSeven.init();
             });
             var appServiceType = '${app.serviceType}';
             $(function () {
@@ -967,6 +1285,9 @@
                 $('#modalplayvoice2').css("padding","10px").css("margin-top","0px").css("height","36px")
                     .css("font-size:","14px").css("line-height","normal").css("text-align","left").css("background-color","#0099cc").css("font-size","14px");
 
+                $('#modalseven').css("height","510px");
+//                $('#modalseven textarea.form-control').css("height","75px");
+                $('#template_detail div.col-md-6').css("width","650px");
             })
         </script>
 
@@ -1011,13 +1332,6 @@
                         showtoast("非常抱歉，本站的上传文件功能，暂时不支持IE9及以下的浏览器版本，请更换或者升级浏览器");
                     })
                 }
-//                var appStatus = $("#appStatus").val();
-//                if(appStatus == 2){
-//                    $('#uploadButtonA').unbind("click").bind("click",function(){
-//                        showtoast("请先上线应用");
-//                    })
-//                }
-//                getSubAccountByAppId();
             }
             // 上传多个文件
             var cancelCancel=false;
@@ -1148,6 +1462,7 @@
             $('#progress').hide();
             $('#fileupload').removeAttr('disabled');
 //        }
+        $('#uploadButton').show();
     });
     /**
      *绑定测试电话号码
@@ -1180,9 +1495,6 @@
         },"post");
 
     });
-    function subAccountDatial(){
-        console.info("进入页面")
-    }
     /**修改子账号**/
     var editSubAccountFive = new Vue({
         el:'#subAccount_datail',
@@ -1193,7 +1505,10 @@
             url:'',
             remark:'',
             voiceNum:'',
-            seatNum:''
+            seatNum:'',
+            ussdNum:'',
+            smsNum:'',
+            ussdNum:''
         },methods:{
             initObj:function(obj){
                 this.id=obj.id;
@@ -1203,16 +1518,21 @@
                 this.remark=obj.remark;
                 this.voiceNum= obj.voiceNum;
                 this.seatNum=obj.seatNum;
+                this.smsNum = obj.smsNum;
+                this.ussdNum = obj.ussdNum;
             },
             initObj2:function(obj){
                 this.id=this.certId=this.secretKey = this.url= this.remark='';
-                this.voiceNum= this.seatNum=-1;
+                this.voiceNum= this.seatNum=this.ussdNum=this.smsNum=-1;
             }
         }
     });
     function editSubAccount(){
-        if(isNaN(editSubAccountFive.voiceNum) || isNaN(editSubAccountFive.seatNum) ||
-            editSubAccountFive.voiceNum=='' || editSubAccountFive.seatNum==''){
+        if(isNaN(editSubAccountFive.voiceNum) ||editSubAccountFive.voiceNum==''||
+            isNaN(editSubAccountFive.seatNum) ||editSubAccountFive.seatNum==''||
+            isNaN(editSubAccountFive.ussdNum) ||editSubAccountFive.ussdNum==''||
+            isNaN(editSubAccountFive.smsNum) ||editSubAccountFive.smsNum==''
+        ){
             showtoast("配额参数必须为数字");
             return;
         }
@@ -1230,6 +1550,8 @@
             'url':editSubAccountFive.url,
             'voiceNum':new Number(editSubAccountFive.voiceNum),
             'seatNum':new Number(editSubAccountFive.seatNum),
+            'ussdNum':new Number(editSubAccountFive.ussdNum),
+            'smsNum':new Number(editSubAccountFive.smsNum),
             'remark':editSubAccountFive.remark,
             csrfParameterName:csrfToken
         }
@@ -1241,6 +1563,124 @@
             }
         },"post");
     };
+    /*新增模板*/
+    var createSeven = new Vue({
+        el:'#createSeven',
+        data:{
+            type:'msg_ussd',
+            name:'',
+            content:'',
+            remark:''
+        },
+        methods:{
+            init:function(){
+                this.type='msg_ussd';
+                this.name=this.content=this.remark='';
+            }
+        }
+    });
+    /*修改模板*/
+    var editSeven = new Vue({
+        el:'#template_detail',
+        data:{
+            id:'',
+            tempId:'',
+            type:'',
+            name:'',
+            content:'',
+            contentlength:'',
+            remark:'',
+            remarklength:'',
+            state:'',
+            reason:''
+        },
+        methods:{
+            isShow:function(state1,state2){
+                var flag ;
+                if(state2 != undefined ){
+                    flag = this.state == state1 ||this.state == state2 ?true:false;
+                }else{
+                    flag = this.state == state1 ?true:false;
+                }
+                return flag;
+            },
+            init:function(){
+                this.id=this.tempId=this.type=this.name=this.content=this.remark=this.reason='';
+                this.state=-1;
+                this.remarklength=0;
+                this.contentlength=0;
+            },initObj:function(obj){
+                this.id=obj.id;
+                this.tempId=obj.tempId;
+                this.type=obj.type;
+                this.name=obj.name;
+                this.content=obj.content;
+                this.remark=obj.remark;
+                this.state = obj.status;
+                this.reason = obj.reason;
+                this.remarklength=obj.remark!=null?( new Number(obj.remark.length)):100;
+                this.contentlength=obj.content!=null?( new Number(obj.content.length)):60;
+            }
+        }
+    });
+    function editSevenPost(){
+        if(editSeven.content ==''||editSeven.content.length <=0 || editSeven.content.length>62){
+            showtoast('模板内容格式错误' );
+            return;
+        }
+        if(editSeven.remark =='' ||  editSeven.remark.length <= 0 || editSeven.remark.length>100){
+            showtoast("使用场景说明格式错误");
+            return;
+        }
+        var params = {
+            appId:appId,
+            name:editSeven.name,
+            content:editSeven.content,
+            remark:editSeven.remark,
+            csrfParameterName:csrfToken
+        }
+        ajaxsync(ctx + "/console/msg_template/edit/"+editSeven.id,params,function(response){
+            if(response.success){
+                showtoast("修改模板成功");
+                editSeven.state=0;
+            }else{
+                var error = response.errorMsg;
+                showtoast(error);
+            }
+        },"post");
+    };
+    $('.modalSureSeven').click(function(){
+        var id = $(this).attr('data-id');
+        if(createSeven.content ==''||createSeven.content.length <=0 || createSeven.content.length>62){
+            showtoast('模板内容格式错误' );
+            return;
+        }
+        if(createSeven.remark =='' ||  createSeven.remark.length <= 0 || createSeven.remark.length>100){
+            showtoast("使用场景说明格式错误");
+            return;
+        }
+        var subId = $('#create_six_subId') .val();//$('#create_six_subId option:selected') .val();
+        var params = {
+            appId:appId,
+            type:createSeven.type,
+            name:createSeven.name,
+            content:createSeven.content,
+            remark:createSeven.remark,
+            csrfParameterName:csrfToken
+        }
+        ajaxsync(ctx + "/console/msg_template/new",params,function(response){
+            console.info(response);
+            if(response.success){
+                showtoast("新增模板成功");
+                createSeven.init();
+                hideModal(id);
+                templateList();
+            }else{
+                var error = response.errorMsg;
+                showtoast(error);
+            }
+        },"post");
+    });
     /*新增分机*/
     var createSix = new Vue({
         el:'#createSix',
@@ -1306,19 +1746,24 @@
             url:'',
             voiceNum:-1,
             seatNum:-1,
+            ussdNum:-1,
+            smsNum:-1,
             remark:''
         },
         methods:{
             init:function(){
                 this.url=this.remark='';
-                this.voiceNum=this.seatNum=-1;
+                this.voiceNum=this.seatNum=this.smsNum=this.ussdNum=-1;
             }
         }
     });
     $('.modalSureFive').click(function(){
         var id = $(this).attr('data-id');
-        if(isNaN(createSubAccountFive.voiceNum) || isNaN(createSubAccountFive.seatNum) ||
-            createSubAccountFive.voiceNum=='' || createSubAccountFive.seatNum==''){
+        if(isNaN(createSubAccountFive.voiceNum) || createSubAccountFive.voiceNum==''||
+            isNaN(createSubAccountFive.seatNum) ||createSubAccountFive.seatNum=='' ||
+            isNaN(createSubAccountFive.smsNum) ||createSubAccountFive.smsNum=='' ||
+            isNaN(createSubAccountFive.ussdNum) ||createSubAccountFive.ussdNum==''
+        ){
             showtoast("配额参数必须为数字");
             return;
         }
@@ -1336,6 +1781,8 @@
             'url':createSubAccountFive.url,
             'voiceNum':createSubAccountFive.voiceNum,
             'seatNum':createSubAccountFive.seatNum,
+            'smsNum':createSubAccountFive.smsNum,
+            'ussdNum':createSubAccountFive.ussdNum,
             'remark':createSubAccountFive.remark,
             csrfParameterName:csrfToken
         }
@@ -1503,6 +1950,35 @@
             }
         });
     }
+    function delTemplate(id){
+        bootbox.setLocale("zh_CN");
+        bootbox.confirm("确认删除模板", function(result) {
+            if(result){
+                ajaxsync(ctx + "/console/msg_template/delete/"+id,{csrfParameterName:csrfToken},function(response){
+                    if(response.success){
+                        showtoast("删除成功");
+                        if(templatePage){
+                            var currentPage;
+                            if(((templatePage.nowPage - 1) * templatePage.listRow +1) <= --templatePage.count){
+                                currentPage = templatePage.nowPage;
+                            }else {
+                                currentPage = templatePage.nowPage - 1;
+                            }
+                            if(currentPage>0){
+                                $('#page' + currentPage + templatePage.obj).click();
+                            }else{
+                                $('#template-'+id).remove();
+                                $('#page0'+templatePage.obj).hide();
+                            }
+                        }
+                    }else{
+                        showtoast("删除失败");
+                    }
+                },"post");
+
+            }
+        });
+    }
     function delExtension(id){
         bootbox.setLocale("zh_CN");
         bootbox.confirm("确认删除分机", function(result) {
@@ -1521,7 +1997,7 @@
                                 $('#page' + currentPage + extensionPage.obj).click();
                             }else{
                                 $('#extension-'+id).remove();
-                                $('#page0'+subAccountPage.obj).hide();
+                                $('#page0'+extensionPage.obj).hide();
                             }
                         }
                     }else{
@@ -1566,29 +2042,17 @@
         });
     }
 
-
-    //默认加载放音文件分页
-    $(function () {
-        if('${app.serviceType}'=='call_center') {
-            extensionList();
-        }else{
-            upplay();
-        }
-    });
     /**
      *触发放音文件分页
      */
     var pagePlay ;
-    function voiceRecordTab(){
-        $('#uploadButton').hide();
-    }
+
     function upplay(){
         $('#uploadButton').show();
         //获取数据总数
         var count = 0;
         var name = $('#name').val();
         var subId = $('#voice_file_subId') .val();//$('#voice_file_subId option:selected') .val();
-        console.info(subId);
         ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':1,'pageSize':20,'subId':subId,csrfParameterName:csrfToken},function(response){
             if(response.success){
                 count=response.data.totalCount;
@@ -1638,7 +2102,6 @@
                 var data =[];
                 for(var j=0;j<response.data.result.length;j++){
                     var tempFile = response.data.result[j];
-                    console.info(tempFile)
                     var temp = [
                         tempFile.id,
                         tempFile.name,
@@ -1657,7 +2120,7 @@
                 for(var i = 0 ; i<data.length; i++){
                     html +='<tr class="playtr" id="play-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
                     if(data[i][2]==-1){
-                        html+='<td  title="审核不通过原因：'+data[i][5]+'"><span class="nosuccess">审核不通过</span><i class="fa fa-exclamation-triangle"></i></td>';
+                        html+='<td ><span class="nosuccess" title="审核不通过原因：'+data[i][5]+'">审核不通过<i class="iconfont icon-uc_no_pass"></i></span></td>';
                     }else if(data[i][2]==1&&data[i][6]==1){
                         html+='<td ><span class="success">已审核</span></td>';
                     }else{
@@ -1691,37 +2154,47 @@
             }
         }
     });
+    //默认加载放音文件分页
+    $(function () {
+        var type = $('#myTab li[class=active]').attr('data-id');
+        updateList(type);
+    });
     $('#myTab li').click(function(){
         var type = $(this).attr('data-id');
-        if(type=='voice'){
-            voiceRecordTab();
-        }
+        updateList(type);
+    });
+    function updateList(type){
         if(type=='play'){
             upplay();
-        }
-        if(type=='number'){
-            upnumber();
-        }
-        if(type=='extension'){
-            extensionList();
-        }
-        if(type=='agent'){
-            agentList();
-        }
-        if(type=='subAccount' ){
-            tosubAccountHome();
-            subAccountList();
+            $('#uploadButton').show();
+        }else{
+            if(type=='voice'){
+                //录音文件暂时没文件
+            }
+            if(type=='number'){
+                upnumber();
+            }
+            if(type=='extension'){
+                extensionList();
+            }
+            if(type=='agent'){
+                agentList();
+            }
+            if(type=='subAccount' ){
+                tosubAccountHome();
+                subAccountList();
+            }
+            if(type=='queue'){
+                queueList();
+            }
+            if(type=='template'){
+                totemplateHome();
+                templateList();
+            }
+            //除了放音文件标签外，其他都不显示上传放音文件按钮
             $('#uploadButton').hide();
         }
-        if(type=='queue'){
-            queueList();
-        }
-//        getSubAccountByAppId();
-    });
-
-//    fileTotalSoze();
-
-
+    }
     // 号码绑定
     var vue = new Vue({
         el: '#vue-application',
@@ -1928,7 +2401,6 @@
      *绑定号码分页
      */
     function upnumber(){
-        $('#uploadButton').hide();
         //获取数据总数
         var count = 0;
         var params = {"pageNo":1,"pageSize":10};
@@ -1969,13 +2441,13 @@
         // $('#playtable').find(".playtr").remove();["✔", "✘"],
         for(var i =0 ; i<data.length; i++){
             html +='<tr id="rent-'+ data[i].rentId +'">' +
-                    '<td class="text-center">'+data[i].num+'</td>' +
-                    '<td class="text-center">' + (data[i].status == 0 ? '过期': '正常') + '</td>' +
-                    '<td class="text-center">'+ (data[i].isCalled == 0 ? '✘': '✔') +'</td>' +
-                    '<td class="text-center">'+ (data[i].isDialing == 0 ? '✘': '✔') +'</td>' +
-                    '<td class="text-center"><span class="text-center-l-fixed">'+data[i].areaCode+'</span></td>' +
-                    '<td class="text-center"> ' + data[i].expireTime + ' </td>' +
-                    '<td class="text-center"><a onclick="unband(\''+data[i].rentId+'\')">解除绑定</a></td>' +
+                    '<td class="">'+nulltostr(data[i].num)+'</td>' +
+                    '<td class="">' + (data[i].status == 0 ? '过期': '正常') + '</td>' +
+                    '<td class="">'+ (data[i].isCalled == 0 ? '✘': '✔') +'</td>' +
+                    '<td class="">'+ (data[i].isDialing == 0 ? '✘': '✔') +'</td>' +
+                    '<td class=""><span class="text-center-l-fixed">'+data[i].areaCode+'</span></td>' +
+                    '<td class=""> ' + nulltostr(data[i].expireTime) + ' </td>' +
+                    '<td class=""><a onclick="unband(\''+data[i].rentId+'\')">解除绑定</a></td>' +
                     '</tr>'
         }
         $('#band-table').html(html);
@@ -2027,13 +2499,13 @@
         // $('#playtable').find(".playtr").remove();["✔", "✘"],
         for(var i =0 ; i<data.length; i++){
             html +='<tr id="rent-'+ data[i].rentId +'">' +
-                '<td class="text-center">'+data[i].num+'</td>' +
-                '<td class="text-center">' + (data[i].status == 0 ? '过期': '正常') + '</td>' +
-                '<td class="text-center">'+ (data[i].isCalled == 0 ? '✘': '✔') +'</td>' +
-                '<td class="text-center">'+ (data[i].isDialing == 0 ? '✘': '✔') +'</td>' +
-                '<td class="text-center"><span class="text-center-l-fixed">'+data[i].areaCode+'</span></td>' +
-                '<td class="text-center"> ' + data[i].expireTime + ' </td>' +
-                '<td class="text-center"><a onclick="unband2(\''+data[i].rentId+'\')">解除绑定</a></td>' +
+                '<td class="">'+nulltostr(data[i].num)+'</td>' +
+                '<td class="">' + (data[i].status == 0 ? '过期': '正常') + '</td>' +
+                '<td class="">'+ (data[i].isCalled == 0 ? '✘': '✔') +'</td>' +
+                '<td class="">'+ (data[i].isDialing == 0 ? '✘': '✔') +'</td>' +
+                '<td class=""><span class="text-center-l-fixed">'+data[i].areaCode+'</span></td>' +
+                '<td class=""> ' + nulltostr(data[i].expireTime) + ' </td>' +
+                '<td class=""><a onclick="unband2(\''+data[i].rentId+'\')">解除绑定</a></td>' +
                 '</tr>'
         }
         $('#band-table2').html(html);
@@ -2199,13 +2671,73 @@
             }
         );
     }
+    /**
+     * 模板分页
+     */
+    var templatePage;
+    function templateList(){
 
+        //获取数据总数
+        var count = 0;
+        var templateNum = $('#template_num').val();
+        var subId = $('#tempate_subId') .val();//$('#extension_subId option:selected') .val();
+        var params = {"pageNo":1,"pageSize":10,"name":templateNum,'subId':subId,'appId':appId};
+        ajaxsync(ctx + "/console/msg_template/plist" ,params,function(response) {
+            if(response.success){
+                count = response.data.totalCount;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+            }
+        },"get");
+        //每页显示数量
+        var listRow = 10;
+        //显示多少个分页按钮
+        var showPageCount = 5;
+        //指定id，创建分页标签
+        var pageId = 'template-page';
+        //searchTable 为方法名
+        templatePage = new Page(count,listRow,showPageCount,pageId,templateTable);
+        templatePage.show();
+    }
+    var templateTable = function(nowPage,listRows){
+        var html = '';
+        var data = [];
+        var templateNum = $('#template_num').val();
+        var subId = $('#template_subId') .val();//$('#extension_subId option:selected') .val();
+        var params = {"pageNo":nowPage,"pageSize":listRows,"name":templateNum,'subId':subId,'appId':appId};
+        ajaxsync(ctx + "/console/msg_template/plist" ,params,function(response){
+            if(response.success){
+                data = response.data.result;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
+            }
+        },"get");
+        for(var i =0 ; i<data.length; i++){
+            html +='<tr id="template-'+ data[i].id +'">' +
+                '<td class="">' + data[i].tempId + '</td>' +
+                '<td class="">'+ (data[i].type == 'msg_sms'?'短信':( data[i].type=='msg_ussd'?'闪印':'未知')) +'</td>' +
+                '<td class="">'+ data[i].name +'</td>' +
+                '<td class="">'+ (data[i].content) +'</td>' +
+                '<td class="">'+ (data[i].certId) +'</td>';
+            var state = data[i].state=='1'?'审核已通过':(data[i].state=='0'?'待审核':(data[i].state=='-1'?'审核不通过':'未知')) ;
+            var color = data[i].state == 1?"text-success":"text-danger";
+            var reason = data[i].reason==null?'':data[i].reason;
+            if(data[i].state=='-1'){
+                html+= '<td class="'+color+'" id="enable_'+data[i].id+'" title="审核不通过原因:'+reason+'">' + state+ '<i class="iconfont icon-uc_no_pass"></i></td>' ;
+            }else{
+                html+= '<td class="'+color+'" id="enable_'+data[i].id+'" >' + state+ '</td>' ;
+            }
+               html+= '<td class=""><a href="javascript:totemplateDetail(\''+data[i].id+'\')" >详情</a>&nbsp;<a href="javascript:delTemplate(\''+data[i].id+'\')" >删除</a></td>' +
+                '</tr>'
+        }
+        $('#template-list').html(html);
+    }
     /**
      * 分机分页
      */
     var extensionPage;
     function extensionList(){
-        $('#uploadButton').hide();
+
         //获取数据总数
         var count = 0;
         var extensionNum = $('#extension_num').val();
@@ -2251,10 +2783,10 @@
         // $('#playtable').find(".playtr").remove();["✔", "✘"],
         for(var i =0 ; i<data.length; i++){
             html +='<tr id="extension-'+ data[i].id +'">' +
-                    '<td class="">'+ data[i].id +'</td>' +
-                    '<td class="">' + data[i].user + '</td>' +
-                    '<td class="">'+ data[i].password +'</td>' +
-                    '<td class="">'+ (data[i].certId == undefined ||data[i].certId== null ?'': data[i].certId) +'</td>' +
+                    '<td class="">'+ nulltostr(data[i].id) +'</td>' +
+                    '<td class="">' + nulltostr(data[i].user) + '</td>' +
+                    '<td class="">'+ nulltostr(data[i].password) +'</td>' +
+                    '<td class="">'+ nulltostr(data[i].certId ) +'</td>' +
                     '<td class="">'+ (data[i].enable?'可用':'不可用') +'</td>' +
                     '<td class="">'+ (data[i].type==1?'SIP 终端':(data[i].type==2?'SIP 网关':(data[i].type==3?'普通电话':'未知类型'))) +'</td>' +
                     '<td class=""><a href="javascript:delExtension(\''+data[i].id+'\')" >删除</a></td>' +
@@ -2290,7 +2822,6 @@
      */
     var agentPage;
     function agentList(){
-        $('#uploadButton').hide();
         //获取数据总数
         var count = 0;
         var agentNum = $('#agent_num').val();
@@ -2318,7 +2849,6 @@
      */
     var queuePage;
     function queueList(){
-        $('#uploadButton').hide();
         //获取数据总数
         var count = 0;
         var queueNum = $('#queue_num').val();
@@ -2354,19 +2884,24 @@
         },"get");
         for(var i =0 ; i<data.length; i++){
             html +='<tr class="playtr" id="play-'+data[i].id+'">' +
-                '<td class="text-center">'+ data[i].certId +'</td>' +
-                '<td class="text-center">'+ data[i].secretKey +'</td>'+
-                '<td class="text-center">' + data[i].voiceNum + '</td>' ;
-//            if(appServiceType == 'call_center'){
+                '<td class="">'+ nulltostr(data[i].certId) +'</td>' +
+                '<td class="">'+ nulltostr(data[i].secretKey) +'</td>';
+            if(appServiceType=='msg'){
+                html += '<td class="">' + nulltostr(data[i].ussdNum) + '</td>' ;
+                html += '<td class="">' + nulltostr(data[i].smsNum) + '</td>' ;
+            }else if(appServiceType=='call_center'){
+                html += '<td class="">' + nulltostr(data[i].voiceNum) + '</td>' ;
 //                html += '<td class="text-center">' + data[i].seatNum + '</td>' ;
-//            }
+            }else if(appServiceType=='voice'){
+                html += '<td class="">' + nulltostr(data[i].voiceNum) + '</td>' ;
+            }
             var state = data[i].enabled == 1?"启用":"禁用";
             var color = data[i].enabled == 1?"text-success":"text-danger";
             var stateEdit = data[i].enabled == 1?"禁用":"启用";
             var remark1 = data[i].remark !=null && data[i].remark.length>18 ? data[i].remark.substring(0,18)+"...": data[i].remark;
-            html+= '<td class="text-center '+color+'" id="enable_'+data[i].id+'" >' + state+ '</td>' +
-                '<td class="text-center">' + remark1 + '</td>' +
-                '<td class="text-center"> <a href="javascript:toSubAccountEnable(\''+data[i].id+'\')" data-state="'+data[i].enabled+'" id="enable_edit_'+data[i].id+'" >'+stateEdit+'</a>&nbsp;<a href="javascript:tosubAccountDatail(\''+data[i].id+'\')" >详情</a>&nbsp;<a href="javascript:delSubAccount(\''+data[i].id+'\')" >删除</a></td>' +
+            html+= '<td class=" '+color+'" id="enable_'+data[i].id+'" >' + state+ '</td>' +
+                '<td >' + remark1 + '</td>' +
+                '<td > <a href="javascript:toSubAccountEnable(\''+data[i].id+'\')" data-state="'+data[i].enabled+'" id="enable_edit_'+data[i].id+'" >'+stateEdit+'</a>&nbsp;<a href="javascript:tosubAccountDatail(\''+data[i].id+'\')" >详情</a>&nbsp;<a href="javascript:delSubAccount(\''+data[i].id+'\')" >删除</a></td>' +
                 '</tr>'
         }
 
@@ -2379,7 +2914,7 @@
         var h;
         var h2;
         var enabled2;
-        var color ="text-center "
+        var color =""
         if(enabled==1){//当前是启用，执行禁用
             state="disable/"+id;
             h="禁用";
@@ -2405,18 +2940,39 @@
             }
         },"post");
     }
+
+    function totemplateDetail(id){
+        ajaxsync(ctx + "/console/msg_template/get/"+id ,{},function(response){
+            if(response.success){
+                editSeven.initObj(response.data);
+                $('#template_home').hide();
+                $('#template_detail').show();
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
+            }
+        },"get");
+    }
     function tosubAccountDatail(id){
         ajaxsync(ctx + "/console/sub_account/get/"+id ,{},function(response){
             if(response.success){
                 editSubAccountFive.initObj(response.data);
                 $('#subAccount_home').hide();
                 $('#subAccount_datail').show();
-                $('#call-number2').attr("data-num-bind",response.data.id);
-                upnumber2();
+                if(appServiceType == 'msg'|| '${app.status}'!=1){
+                }else{
+                    $('#call-number2').attr("data-num-bind",response.data.id);
+                    upnumber2();
+                }
             }else{
                 showtoast(response.errorMsg?response.errorMsg:'数据异常');
             }
         },"get");
+    }
+    function totemplateHome(){
+        $('#template_detail').hide();
+        $('#template_home').show();
+        editSeven.init();
+        templateList();
     }
     function tosubAccountHome(){
         $('#subAccount_datail').hide();
@@ -2462,12 +3018,12 @@
             }
 
             html +='<tr id="agent-'+ data[i].name +'">' +
-                    '<td class="text-center">'+ data[i].name +'</td>' +
-                    '<td class="text-center">'+ skillStr +'</td>' +
-                    '<td class="text-center">'+ (data[i].extension!=null?data[i].extension:'') +'</td>' +
-                     '<td class="text-center">'+ data[i].certId +'</td>' +
-                    '<td class="text-center">' + data[i].state + '</td>' +
-                    '<td class="text-center"><a href="javascript:delAgent(\''+data[i].id+'\')" >删除</a></td>' +
+                    '<td >'+ nulltostr(data[i].name) +'</td>' +
+                    '<td >'+ nulltostr(skillStr) +'</td>' +
+                    '<td>'+ nulltostr(data[i].extension) +'</td>' +
+                     '<td >'+ nulltostr(data[i].certId) +'</td>' +
+                    '<td >' + nulltostr(data[i].state) + '</td>' +
+                    '<td ><a href="javascript:delAgent(\''+data[i].id+'\')" >删除</a></td>' +
                     '</tr>'
         }
         $('#agent-list').html(html);
@@ -2494,13 +3050,13 @@
         // $('#playtable').find(".playtr").remove();["✔", "✘"],
         for(var i =0 ; i<data.length; i++){
             html +='<tr id="queue-'+ data[i].id +'">' +
-                '<td class="text-center"><span style="float:left;" >'+ data[i].whereExpression +'</span></td>' +
-                '<td class="text-center"><span style="float:left;" >'+ data[i].sortExpression +'</span></td>' +
-                '<td class="text-center">' + data[i].priority + '</td>' +
-                '<td class="text-center">' + data[i].queueTimeout + '</td>' +
-                '<td class="text-center">' + data[i].fetchTimeout + '</td>' +
-                '<td class="text-center">'+ data[i].certId +'</td>' +
-                '<td class="text-center">' + data[i].remark + '</td>' +
+                '<td ><span style="float:left;" >'+ nulltostr(data[i].whereExpression) +'</span></td>' +
+                '<td ><span style="float:left;" >'+ nulltostr(data[i].sortExpression) +'</span></td>' +
+                '<td >' + nulltostr(data[i].priority) + '</td>' +
+                '<td >' + nulltostr(data[i].queueTimeout) + '</td>' +
+                '<td >' + nulltostr(data[i].fetchTimeout) + '</td>' +
+                '<td >'+ nulltostr(data[i].certId) +'</td>' +
+                '<td >' + nulltostr(data[i].remark) + '</td>' +
                 '</tr>'
         }
         $('#queue-list').html(html);
@@ -2545,6 +3101,9 @@
                 }
             });
         }
+    }
+    function nulltostr(val){
+        return val==null||val==undefined ? '':val;
     }
 </script>
 

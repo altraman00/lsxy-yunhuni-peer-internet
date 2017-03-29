@@ -33,7 +33,7 @@ public class JsonUtils {
             mapJson = JSONObject.fromObject(jsonObject);
         }catch (Exception e){
             String[] temp1 = result.replace("{","").replace("}","").split(",");
-            mapJson = new HashMap<>();
+            mapJson = new HashMap<String,Object>();
             for(int i=0;i<temp1.length;i++){
                 String[] temp2 = temp1[i].trim().split("=");
                 mapJson.put(temp2[0].trim(),temp2[1].trim());

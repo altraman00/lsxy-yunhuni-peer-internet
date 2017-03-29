@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 
@@ -96,7 +97,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             action = actionList.get(0);
         }
         //应用上线--选号
-        if( app.getStatus() == App.STATUS_OFFLINE ){
+        if( app.getStatus() == App.STATUS_OFFLINE ||app.getStatus() == App.STATUS_FAIl){
             if(action == null){
                 AppOnlineAction newAction = new AppOnlineAction(app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_SELECT_NUM,AppOnlineAction.STATUS_AVTIVE);
                 this.save(newAction);
@@ -156,8 +157,10 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                         app,areaId,null,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_ONLINE,AppOnlineAction.STATUS_AVTIVE);
                 this.save(newAction);
 
-                //应用状态改为上线
-                app.setStatus(App.STATUS_ONLINE);
+                //应用状态改为上线//改为待审核edit zhangxb by2017-03-15
+                app.setStatus(App.STATUS_WAIT);
+                app.setApplyTime(new Date());
+                app.setAuditTime(null);
                 appService.save(app);
 
                 return newAction;
@@ -178,7 +181,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
     @Override
     public App offline(String appId) {
         App app = appService.findById(appId);
-        if(app!= null && app.getStatus() == App.STATUS_ONLINE){
+        if(app!= null && (app.getStatus() == App.STATUS_ONLINE ||app.getStatus() == App.STATUS_WAIT) ){
             List<AppOnlineAction> actionList = appOnlineActionDao.findByAppIdAndStatusOrderByCreateTimeDesc(appId, AppOnlineAction.STATUS_AVTIVE);
             if(actionList != null && actionList.size() > 0){
                 //将上一步设为已完成
@@ -191,8 +194,12 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             //生成新的动作
             AppOnlineAction newAction = new AppOnlineAction(app,AppOnlineAction.TYPE_OFFLINE,AppOnlineAction.ACTION_OFFLINE,AppOnlineAction.STATUS_AVTIVE);
             this.save(newAction);
-            //应用状态改为下线
-            app.setStatus(App.STATUS_OFFLINE);
+            //应用状态更改 上线-->下线  待审核-->失败
+            if(app.getStatus() == App.STATUS_ONLINE) {
+                app.setStatus(App.STATUS_OFFLINE);
+            }else if(app.getStatus() == App.STATUS_WAIT){
+                app.setStatus(App.STATUS_FAIl);
+            }
             String areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
             if(!areaId.equals(app.getAreaId())){
                 // 当区域和测试区域不一样时，进行区域迁移（重新同步放音文件）

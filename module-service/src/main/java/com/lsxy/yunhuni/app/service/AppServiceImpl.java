@@ -13,11 +13,14 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.app.service.ServiceType;
+import com.lsxy.yunhuni.api.product.model.Product;
+import com.lsxy.yunhuni.api.product.service.ProductService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.app.dao.AppDao;
+import com.lsxy.yunhuni.product.dao.ProductDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -51,6 +54,9 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     @Autowired
     private TenantServiceSwitchService tenantServiceSwitchService;
 
+    @Autowired
+    private ProductDao productDao;
+
     @Override
     public BaseDaoInterface<App, Serializable> getDao() {
         return this.appDao;
@@ -82,6 +88,43 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         String hql = "from App obj where obj.tenant.id=?1 ";
         Page<App> page =  this.pageList(hql,pageNo,pageSize,tenantId);
         return page;
+    }
+
+    @Override
+    public Page<App> pageList(String[] tenantId, Date date1, Date date2, int state, Integer pageNo, Integer pageSize) {
+        String hql = "from App obj where obj.status = ?1 ";
+
+        if(date1!=null&&date2!=null){
+            if(tenantId!=null&&tenantId.length>0) {
+                String tenantIds = "";
+                for(int i=0;i<tenantId.length;i++){
+                    tenantIds += " '"+tenantId[i]+"' ";
+                    if(i!=(tenantId.length-1)){
+                        tenantIds+=",";
+                    }
+                }
+                hql += " and obj.tenant.id in ("+tenantIds+") and obj.lastTime between ?2 and ?3 order by obj.applyTime desc";
+                return  this.pageList(hql, pageNo, pageSize, state,date1,date2);
+            }else{
+                hql += " and obj.lastTime between ?2 and ?3 order by obj.applyTime desc";
+                return  this.pageList(hql, pageNo, pageSize, state,date1,date2);
+            }
+        }else{
+            if(tenantId!=null&&tenantId.length>0) {
+                String tenantIds = "";
+                for(int i=0;i<tenantId.length;i++){
+                    tenantIds += " '"+tenantId[i]+"' ";
+                    if(i!=(tenantId.length-1)){
+                        tenantIds+=",";
+                    }
+                }
+                hql += " and obj.tenant.id in ("+tenantIds+") order by obj.applyTime desc";
+                return  this.pageList(hql, pageNo, pageSize, state);
+            }else{
+                hql += " order by obj.applyTime desc ";
+                return  this.pageList(hql, pageNo, pageSize, state);
+            }
+        }
     }
 
     @Override
@@ -144,7 +187,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         //5位编号
         Long incr5 = redisCacheService.getHashOps(APP_CC_NUM_KEY).increment(APP_CC_NUM_FIELD5, 1L);
         //初始始值是10001,因为redis的incr是从1开始的，所以都加上10000
-        long num5 = incr5 + 10000;
+        long num5 = incr5 + 20000;//新的规则是改为2开始，以免和普通手机号有冲突
         //5位编号到59999为止
         if(num5 <= 59999){
             return num5;
@@ -159,12 +202,23 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         if(num7 <= 7999999){
             return num7;
         }
-        //TODO 8位9位
+
+        long num8 = num7 - 7999999 + 80000000;
+        //        8位编号到89999999为止
+        if(num8 <= 89999999){
+            return num8;
+        }
+
+        long num9 = num8 - 89999999 + 9000000000L;
+        //        9开头到9999999999为止
+        if(num9 <= 9999999999L){
+            return num9;
+        }
         throw new RuntimeException("编号已满，请联系管理员");
     }
 
     @Override
-    @Cacheable(value = "entity", key = "'entity_' + #tenantId + #appId + #service.code")
+    @Cacheable(value = "entity", key = "'entity_' + #tenantId + #appId + #service.product + #service.code")
     public boolean enabledService(String tenantId, String appId, ServiceType service) {
         if(tenantId == null){
             return false;
@@ -175,9 +229,19 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         if(service == null){
             return false;
         }
+        if(service.getCode() == null && service.getProduct() == null){
+            return false;
+        }
+        String productCode = service.getProduct();
         String field = service.getCode();
         try {
-            if(service != ServiceType.CallCenter){//租户功能开关 暂时没有呼叫中心功能
+            if(productCode!=null){//如果产品不null 判断产品是否可用
+                Product product = productDao.findByCode(productCode);
+                if(product == null || product.getStatus() ==null || product.getStatus().intValue() != 1){
+                    return false;
+                }
+            }
+            if(field != null){//判断租户是否开启该功能
                 TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
                 if(serviceSwitch != null){
                     Integer enabled =  (Integer) BeanUtils.getProperty2(serviceSwitch,field);
@@ -185,14 +249,15 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
                         return false;
                     }
                 }
-            }
-            App app = this.findById(appId);
-            if(app == null){
-                return false;
-            }
-            Integer enabled =  (Integer) BeanUtils.getProperty2(app,field);
-            if(enabled == null || enabled != 1){
-                return false;
+                //判断应用是否开启该功能
+                App app = this.findById(appId);
+                if(app == null){
+                    return false;
+                }
+                Integer enabled =  (Integer) BeanUtils.getProperty2(app,field);
+                if(enabled == null || enabled != 1){
+                    return false;
+                }
             }
         } catch (Throwable e) {
             return false;
