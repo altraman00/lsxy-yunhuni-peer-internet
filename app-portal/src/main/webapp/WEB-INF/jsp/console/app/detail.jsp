@@ -1039,7 +1039,7 @@
                 <div class="row margin-bottom-10">
                     <lable class="col-md-3 text-right line-height-32">模板类型：</lable>
                     <div class="col-md-8 remove-padding-right">
-                        <input type="radio" id="ussd" checked value="msg_ussd" v-model="type" name="type">
+                        <input type="radio" id="ussd" value="msg_ussd" v-model="type" name="type">
                         <label for="ussd">闪印</label>
                         <input type="radio" id="sms" value="msg_sms" v-model="type" name="type">
                         <label for="sms">短信</label>
@@ -1053,7 +1053,6 @@
                         <input type="text" class="form-control" v-model="name" value="{{name}}" placeholder=""/>
                         <span>仅供识别</span>
                     </div>
-                    <span class="col-md-1 line-height-32 text-left text-danger padding-left-5" >*</span>
                 </div>
                 <div class="row margin-bottom-10">
                     <lable class="col-md-3 text-right line-height-32">模板内容：</lable>
@@ -1567,7 +1566,7 @@
     var createSeven = new Vue({
         el:'#createSeven',
         data:{
-            type:'msg_ussd',
+            type:'msg_sms',
             name:'',
             content:'',
             remark:''
