@@ -88,12 +88,12 @@ public class MsgRequestVO {
         this.sendType = sendType;
     }
 
-    public Boolean getMass() {
+    public Boolean getIsMass() {
         return isMass;
     }
 
-    public void setMass(Boolean mass) {
-        isMass = mass;
+    public void setIsMass(Boolean isMass) {
+        this.isMass = isMass;
     }
 
     public Long getSumNum() {
