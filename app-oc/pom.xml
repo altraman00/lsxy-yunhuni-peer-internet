@@ -5,7 +5,7 @@
     <parent>
         <artifactId>yunhuni</artifactId>
         <groupId>com.lsxy</groupId>
-        <version>1.2.5-RC2</version>
+        <version>1.2.6-RC1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -111,6 +111,10 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>3.15</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-service-msg-api</artifactId>
         </dependency>
     </dependencies>
 

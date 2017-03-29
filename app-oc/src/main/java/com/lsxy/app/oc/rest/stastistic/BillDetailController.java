@@ -7,13 +7,15 @@ import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.core.utils.OssTempUriUtils;
-import com.lsxy.framework.core.utils.Page;
-import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.framework.core.utils.*;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.portal.VoiceFileRecordSyncEvent;
+import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.msg.api.model.MsgSendDetail;
+import com.lsxy.msg.api.model.MsgUserRequest;
+import com.lsxy.msg.api.service.MsgSendDetailService;
+import com.lsxy.msg.api.service.MsgUserRequestService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
@@ -28,16 +30,19 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.WebAsyncTask;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
 import java.net.URL;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.Callable;
 
 import static com.lsxy.yunhuni.api.product.enums.ProductCode.call_center;
 
@@ -64,6 +69,10 @@ public class BillDetailController extends AbstractRestController {
     TenantService tenantService;
     @Autowired
     AppService appService;
+    @Reference(timeout=3000,check = false,lazy = true)
+    private MsgSendDetailService msgSendDetailService;
+    @Reference(timeout=3000,check = false,lazy = true)
+    private MsgUserRequestService msgUserRequestService;
     /**
      * 会话详单查询
      * @param pageNo 第几页
@@ -289,5 +298,107 @@ public class BillDetailController extends AbstractRestController {
         }
         return list;
     }
-
+    protected String getOssTempUri(String resource){
+        String host = SystemConfig.getProperty("global.oss.aliyun.endpoint.internet","http://oss-cn-beijing.aliyuncs.com");
+        String accessId = SystemConfig.getProperty("global.aliyun.key","nfgEUCKyOdVMVbqQ");
+        String accessKey = SystemConfig.getProperty("global.aliyun.secret","HhmxAMZ2jCrE0fTa2kh9CLXF9JPcOW");
+        String resource1 = SystemConfig.getProperty("global.oss.aliyun.bucket");
+        try {
+            URL url = new URL(host);
+            host = url.getHost();
+        }catch (Exception e){}
+        resource = "/"+resource1+"/"+resource;
+        String result = OssTempUriUtils.getOssTempUri( accessId, accessKey, host, "GET",resource ,60);
+        return result;
+    }
+    @RequestMapping(value = "/{uid}/session/msg/{type}" ,method = RequestMethod.GET)
+    @ResponseBody
+    @ApiOperation(value = "会话详单之消息类型查询")
+    public RestResponse msg(
+            @ApiParam(name = "uid",value = "用户id")
+            @PathVariable String uid,
+            @ApiParam(name = "type",value = "短信msg_sms,闪印msg_ussd")
+            @RequestParam(required = false) String type,
+            @ApiParam(name = "isMass",value = "0单发1群发")
+            @RequestParam(required = false) int isMass,
+            @ApiParam(name = "taskName",value = "任务名")
+            @RequestParam(required = false) String taskName,
+            @ApiParam(name = "mobile",value = "手机号码")
+            @RequestParam(required = false) String mobile,
+            @ApiParam(name = "time",value = "yyyy-MM-dd")
+            @RequestParam(required=false) String time,
+            @ApiParam(name = "time2",value = "yyyy-MM-dd")
+            @RequestParam(required=false) String time2,
+            @ApiParam(name = "appId",value = "应用id,当应用id为空时，表示全部")
+            @RequestParam(required=false)String appId,
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "20") Integer pageSize
+    ){
+        Date start = null;
+        Date end = null;
+        try{
+            start = DateUtils.parseDate(time+" 00:00:00","yyyy-MM-dd HH:mm:ss");
+            end = DateUtils.parseDate(time2+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+        }catch (Exception e){
+            return RestResponse.failed("0000","日期格式错误");
+        }
+        Page page = msgUserRequestService.getPageByCondition( pageNo,  pageSize,type, appId, start,  end,  isMass,  taskName,  mobile,uid );
+        return RestResponse.success(page);
+    }
+    @RequestMapping(value = "/{uid}/session/msg/detail/{msgKey}" ,method = RequestMethod.GET)
+    @ResponseBody
+    @ApiOperation(value = "会话详单之消息之群发详单查询")
+    public RestResponse msg(
+            @ApiParam(name = "uid",value = "用户id")
+            @PathVariable String uid,
+            @ApiParam(name = "msgKey",value = "记录标识")
+            @RequestParam(required = false) String msgKey,
+            @ApiParam(name = "state",value = "发送状态-1失败0等待1成功")
+            @RequestParam(required = false) int state,
+            @ApiParam(name = "mobile",value = "手机号码")
+            @RequestParam(required = false) String mobile,
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "20") Integer pageSize
+    ){
+        Page page = msgSendDetailService.getPageByContiton( pageNo,  pageSize,msgKey,  mobile,state+"" );
+        return RestResponse.success(page);
+    }
+    @RequestMapping(value = "/{uid}/session/msg/download/{id}" ,method = RequestMethod.GET)
+    @ResponseBody
+    @ApiOperation(value = "会话详单之消息之群发详单下载")
+    public String downloadMsg(
+            HttpServletRequest request, HttpServletResponse response,
+            @ApiParam(name = "uid",value = "用户id") @PathVariable String uid,
+            @ApiParam(name = "id",value = "记录ID") @RequestParam(required = false) String id
+    ){
+        MsgUserRequest msgUserRequest = msgUserRequestService.findById(id);
+        if(msgUserRequest != null){
+            String title = "msg".equals(msgUserRequest.getSendType())?"短信":"闪印" ;
+            String one = "任务名字："+msgUserRequest.getTaskName()+"  任务状态："+( msgUserRequest.getState()==MsgUserRequest.STATE_FAIL ? "任务失败":(msgUserRequest.getState()==MsgUserRequest.STATE_SUCCESS?"任务结束":"待处理"))+"  成功数："+msgUserRequest.getSuccNum()+" 失败数："+msgUserRequest.getFailNum()+" 待发数："+msgUserRequest.getPendingNum();
+            String[] headers =  new String[]{"手机号码","发送结果","原因"};
+            String[] values = new String[]{"mobile","state:-1=发送失败;0=未发送;1=发送失败"};
+            List list = msgSendDetailService.findByMsgKey(msgUserRequest.getMsgKey());
+            downloadExcel(title,one,headers,values,list,null,"cost",response);
+        }
+        return "";
+    }
+    /**
+     * 导出文件
+     * @param response
+     */
+    public <T>  void downloadExcel(String title, String one, String[] headers, String[] values, Collection<T> dataset, String pattern, String money, HttpServletResponse response) {
+        try {
+            Date d = new Date();
+            String name = org.apache.http.client.utils.DateUtils.formatDate(d,"yyyyMMdd")+ d.getTime();
+            HSSFWorkbook wb = ExportExcel.exportExcel(title,one,headers,values,dataset,pattern,money);
+            response.setContentType("application/vnd.ms-excel");
+            response.setHeader("Content-disposition", "attachment;filename="+name+".xls");
+            OutputStream ouputStream = response.getOutputStream();
+            wb.write(ouputStream);
+            ouputStream.flush();
+            ouputStream.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 }

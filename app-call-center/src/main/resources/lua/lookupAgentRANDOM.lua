@@ -24,32 +24,32 @@ local array_to_map = function(_array)
 	return _map;
 end
 
---指定坐席ID查找
+--指定坐席ID查找，先获取坐席lock，然后判断坐席分机状态，解锁
 if(target_agent_id and string.len(target_agent_id) > 0)
 then
 	redis.log(redis.LOG_WARNING,'target_agent_id='..target_agent_id)
 	local agent_id = target_agent_id
-	local agent = array_to_map(redis.call('HGETALL',agent_state_key_prefix..agent_id))
-	redis.log(redis.LOG_WARNING,agent['state'])
-	redis.log(redis.LOG_WARNING,agent['extension'])
-	redis.log(redis.LOG_WARNING,agent['lastRegTime'])
-	if(agent and agent['state'] == idle
-			and agent['extension'] and agent['lastRegTime']
-			and (agent['lastRegTime'] + agent_reg_expire) >= cur_time)
-	then
-		local extension = array_to_map(redis.call('HGETALL',extension_state_key_prefix..agent['extension']))
-		redis.log(redis.LOG_WARNING,extension['enable'])
-		if(extension and extension['enable'] and extension['enable'] == extension_enable)
+	local ok = redis.call('setnx',agent_lock_key_prefix..agent_id, lock_info)
+	redis.log(redis.LOG_WARNING,ok)
+	if ok == 1 then
+		local agent = array_to_map(redis.call('HGETALL',agent_state_key_prefix..agent_id))
+		redis.log(redis.LOG_WARNING,agent['state'])
+		redis.log(redis.LOG_WARNING,agent['extension'])
+		redis.log(redis.LOG_WARNING,agent['lastRegTime'])
+		if(agent and agent['state'] == idle
+				and agent['extension'] and agent['lastRegTime']
+				and (agent['lastRegTime'] + agent_reg_expire) >= cur_time)
 		then
-			local ok = redis.call('setnx',agent_lock_key_prefix..agent_id, lock_info)
-			redis.log(redis.LOG_WARNING,ok)
-			if ok == 1 then
+			local extension = array_to_map(redis.call('HGETALL',extension_state_key_prefix..agent['extension']))
+			redis.log(redis.LOG_WARNING,extension['enable'])
+			if(extension and extension['enable'] and extension['enable'] == extension_enable)
+			then
 				redis.call('HSET',agent_state_key_prefix..agent_id,'lastTime',cur_time)
 				redis.call('HSET',agent_state_key_prefix..agent_id,'state',fetching)
-				redis.call('DEL', agent_lock_key_prefix..agent_id)
 				result = agent_id
 			end
 		end
+		redis.call('DEL', agent_lock_key_prefix..agent_id)
 	end
 	return result;
 end
@@ -67,6 +67,7 @@ redis.log(redis.LOG_WARNING,'cas_size'..cas_size)
 
 local idleAgents = {}
 
+--获取空闲的状态的坐席列表
 for i=1,cas_size,2 do
 	local agent_id = cas[i]
     local agent = array_to_map(redis.call('HGETALL',agent_state_key_prefix..agent_id))
@@ -90,16 +91,32 @@ math.randomseed(tostring(cur_time):reverse():sub(1, 7))
 local adleAgentTotal = #idleAgents
 redis.log(redis.LOG_WARNING,'adleAgentTotal='..adleAgentTotal)
 for i=1,adleAgentTotal do
-	local id = idleAgents[math.random(1,adleAgentTotal)]
-	redis.log(redis.LOG_WARNING,'randomid='..id)
-	local ok = redis.call('setnx',agent_lock_key_prefix..id, lock_info)
+	local agent_id = idleAgents[math.random(1,adleAgentTotal)]
+	redis.log(redis.LOG_WARNING,'randomid='..agent_id)
+	local ok = redis.call('setnx',agent_lock_key_prefix..agent_id, lock_info)
 	redis.log(redis.LOG_WARNING,ok)
 	if ok == 1 then
-		redis.call('HSET',agent_state_key_prefix..id,'lastTime',cur_time)
-		redis.call('HSET',agent_state_key_prefix..id,'state',fetching)
-		redis.call('DEL', agent_lock_key_prefix..id)
-		result = id
-		return result
+		local agent = array_to_map(redis.call('HGETALL',agent_state_key_prefix..agent_id))
+		redis.log(redis.LOG_WARNING,agent['state'])
+		redis.log(redis.LOG_WARNING,agent['extension'])
+		redis.log(redis.LOG_WARNING,agent['lastRegTime'])
+		if(agent and agent['state'] == idle
+				and agent['extension'] and agent['lastRegTime']
+				and (agent['lastRegTime'] + agent_reg_expire) >= cur_time)
+		then
+			local extension = array_to_map(redis.call('HGETALL',extension_state_key_prefix..agent['extension']))
+			redis.log(redis.LOG_WARNING,extension['enable'])
+			if(extension and extension['enable'] and extension['enable'] == extension_enable)
+			then
+				redis.call('HSET',agent_state_key_prefix..agent_id,'lastTime',cur_time)
+				redis.call('HSET',agent_state_key_prefix..agent_id,'state',fetching)
+				result = agent_id
+			end
+		end
+		redis.call('DEL', agent_lock_key_prefix..agent_id)
+		if(result and string.len(result) > 0) then
+			return result
+		end
 	end
 end
 

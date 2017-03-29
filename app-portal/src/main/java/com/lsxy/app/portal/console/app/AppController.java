@@ -9,9 +9,11 @@ import com.lsxy.app.portal.console.app.vo.ExtensionVO;
 import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.model.Condition;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
@@ -26,6 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -105,6 +108,11 @@ public class AppController extends AbstractPortalController {
 //        }
         mav.addObject("sipRegistrar", SystemConfig.getProperty("app.cc.opensips.domain"));
         mav.setViewName("/console/app/detail");
+        String uri2 = PortalConstants.REST_PREFIX_URL  + "/rest/account/auth/find_auth_status";
+        RestResponse<HashMap> authState =  RestRequest.buildSecurityRequest(token).get(uri2,HashMap.class);
+        HashMap hs = authState.getData();
+        int authStatus  = Integer.valueOf((hs.get("status")+""));
+        mav.addObject("authState",authStatus);
         return mav;
     }
     /**
@@ -134,7 +142,7 @@ public class AppController extends AbstractPortalController {
     @ResponseBody
     public RestResponse delete(HttpServletRequest request,String id){
         App app = (App)findById(request,id).getData();
-        if(App.STATUS_OFFLINE==app.getStatus()) {
+        if(App.STATUS_OFFLINE==app.getStatus()||App.STATUS_WAIT==app.getStatus()||App.STATUS_FAIl==app.getStatus()) {
             //Rest删除应用
             String token = getSecurityToken(request);
             String uri = PortalConstants.REST_PREFIX_URL  + "/rest/app/delete?id={1}";

@@ -81,5 +81,5 @@ public interface VoiceFilePlayService extends BaseService<VoiceFilePlay> {
      */
     void renewSyncByAppId(String appId);
     /** 获取已删除记录但没有删除oss文件的记录*/
-    List<Map> getOssListByDeleted();
+    List<Map<String,Object>> getOssListByDeleted();
 }

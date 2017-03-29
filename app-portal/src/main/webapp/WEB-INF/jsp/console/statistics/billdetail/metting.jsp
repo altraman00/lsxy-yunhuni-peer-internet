@@ -56,6 +56,16 @@
                                         </li>
                                         <li>
                                             <div class="aside-li-a">
+                                                <a href="${ctx}/console/statistics/billdetail/ussd">闪印</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="aside-li-a">
+                                                <a href="${ctx}/console/statistics/billdetail/sms">短信</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="aside-li-a">
                                                 <a href="${ctx}/console/statistics/billdetail/callcenter">呼叫中心</a>
                                             </div>
                                         </li>

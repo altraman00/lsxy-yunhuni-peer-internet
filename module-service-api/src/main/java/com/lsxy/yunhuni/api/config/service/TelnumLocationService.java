@@ -46,4 +46,5 @@ public interface TelnumLocationService extends BaseService<TelnumLocation> {
      */
     List<Map<String,Object>> getCityAndAreaCodeByTelenum( );
 
+    String getOperator(String mobile);
 }

@@ -3,7 +3,9 @@ package com.lsxy.yunhuni.product.service;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.exceptions.api.BalanceNotEnoughException;
+import com.lsxy.framework.core.exceptions.api.ExceptionContext;
 import com.lsxy.framework.core.exceptions.api.QuotaNotEnoughException;
+import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuotaType;
 import com.lsxy.yunhuni.api.apicertificate.service.CertAccountQuotaService;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.model.VoiceTimeUse;
@@ -212,10 +214,14 @@ public class CalCostServiceImpl implements CalCostService{
 //                    return true;
 //                }else{
                     if(!isBalanceEnough(tenantId)){
-                        throw new BalanceNotEnoughException();
+                        throw new BalanceNotEnoughException(new ExceptionContext().put("tenantId",tenantId));
                     }
                     if(!certAccountQuotaService.isCallQuotaEnough(subaccountId)){
-                        throw new QuotaNotEnoughException();
+                        throw new QuotaNotEnoughException(new ExceptionContext()
+                                .put("tenantId",tenantId)
+                                .put("subaccountId",subaccountId)
+                                .put("apiCmd",apiCmd)
+                        );
                     }
                     return true;
 //                }
@@ -226,10 +232,14 @@ public class CalCostServiceImpl implements CalCostService{
 //                    return true;
 //                }else{
                     if(!isBalanceEnough(tenantId)){
-                        throw new BalanceNotEnoughException();
+                        throw new BalanceNotEnoughException(new ExceptionContext().put("tenantId",tenantId));
                     }
                     if(!certAccountQuotaService.isCallQuotaEnough(subaccountId)){
-                        throw new QuotaNotEnoughException();
+                        throw new QuotaNotEnoughException(new ExceptionContext()
+                                .put("tenantId",tenantId)
+                                .put("subaccountId",subaccountId)
+                                .put("apiCmd",apiCmd)
+                        );
                     }
                     return true;
 //                }
@@ -240,10 +250,14 @@ public class CalCostServiceImpl implements CalCostService{
 //                    return true;
 //                }else{
                     if(!isBalanceEnough(tenantId)){
-                        throw new BalanceNotEnoughException();
+                        throw new BalanceNotEnoughException(new ExceptionContext().put("tenantId",tenantId));
                     }
                     if(!certAccountQuotaService.isCallQuotaEnough(subaccountId)){
-                        throw new QuotaNotEnoughException();
+                        throw new QuotaNotEnoughException(new ExceptionContext()
+                                .put("tenantId",tenantId)
+                                .put("subaccountId",subaccountId)
+                                .put("apiCmd",apiCmd)
+                        );
                     }
                     return true;
 //                }
@@ -251,15 +265,58 @@ public class CalCostServiceImpl implements CalCostService{
         }
     }
 
+
+    @Override
+    public boolean isMsgRemainOrBalanceEnough(String subaccountId,String code, String tenantId,Long num) throws BalanceNotEnoughException, QuotaNotEnoughException {
+        //TODO 当需要时再加上余量判断（把注释打开）
+        ProductCode productCode = ProductCode.valueOf(code);
+        BigDecimal needCost = calCost(productCode.name(), tenantId).multiply(new BigDecimal(num));
+        switch(productCode){
+            case msg_sms:{
+                if(!isBalanceEnough(tenantId,needCost)){
+                    throw new BalanceNotEnoughException(new ExceptionContext().put("tenantId",tenantId));
+                }
+                if(!certAccountQuotaService.isQuotaEnough(subaccountId, CertAccountQuotaType.SmsQuota.name(),num)){
+                    throw new QuotaNotEnoughException(new ExceptionContext()
+                            .put("tenantId",tenantId)
+                            .put("subaccountId",subaccountId)
+                            .put("code",code)
+                    );
+                }
+                return true;
+            }
+            case msg_ussd:{
+                if(!isBalanceEnough(tenantId,needCost)){
+                    throw new BalanceNotEnoughException(new ExceptionContext().put("tenantId",tenantId));
+                }
+                if(!certAccountQuotaService.isQuotaEnough(subaccountId, CertAccountQuotaType.UssdQuota.name(),num)){
+                    throw new QuotaNotEnoughException(new ExceptionContext()
+                            .put("tenantId",tenantId)
+                            .put("subaccountId",subaccountId)
+                            .put("code",code)
+                    );
+                }
+                return true;
+            }default:{
+                return false;
+            }
+        }
+    }
+
+
     /**
      * 余额是否大于标准线
      * @param tenantId
      * @return
      */
     private boolean isBalanceEnough(String tenantId) {
-        BigDecimal balance = calBillingService.getBalance(tenantId);
         //TODO 余额是否充足标准线
-        if(balance.compareTo(new BigDecimal(0)) == 1){
+       return this.isBalanceEnough(tenantId,BigDecimal.ZERO);
+    }
+
+    private boolean isBalanceEnough(String tenantId,BigDecimal decimal) {
+        BigDecimal balance = calBillingService.getBalance(tenantId);
+        if(balance.compareTo(decimal == null ? BigDecimal.ZERO:decimal) == 1){
             return true;
         }else{
             return false;
