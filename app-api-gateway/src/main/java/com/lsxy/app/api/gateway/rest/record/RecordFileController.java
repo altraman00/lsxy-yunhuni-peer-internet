@@ -97,7 +97,7 @@ public class RecordFileController extends AbstractAPIController {
             if(logger.isDebugEnabled()) {
                 logger.debug("生成ossUri地址：[{}]", ossUri);
             }
-            return ApiGatewayResponse.success(ossUri);
+            return ApiGatewayResponse.success(new DownloadUrlVo(DownloadUrlVo.STATE_DONE,ossUri));
         }
 
         List<VoiceFileRecord> list = voiceFileRecordService.getListBySessionId(voiceFileRecord.getSessionId());
