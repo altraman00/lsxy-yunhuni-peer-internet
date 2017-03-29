@@ -61,4 +61,6 @@ public interface CertAccountQuotaService extends BaseService<CertAccountQuota> {
      * @return
      */
     boolean isCallQuotaEnough(String certAccountId);
+
+    boolean isQuotaEnough(String certAccountId, String quotaType, Long need);
 }

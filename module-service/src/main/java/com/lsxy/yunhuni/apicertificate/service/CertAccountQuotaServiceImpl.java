@@ -11,7 +11,9 @@ import com.lsxy.yunhuni.api.apicertificate.model.CertAccountQuotaType;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateSubAccountService;
 import com.lsxy.yunhuni.api.apicertificate.service.CertAccountQuotaService;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.session.service.VoiceCdrService;
+import com.lsxy.yunhuni.api.statistics.service.MsgDayService;
 import com.lsxy.yunhuni.apicertificate.dao.CertAccountQuotaDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,8 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
     VoiceCdrService voiceCdrService;
     @Autowired
     ApiCertificateService apiCertificateService;
+    @Autowired
+    MsgDayService msgDayService;
     @Override
     public BaseDaoInterface<CertAccountQuota, Serializable> getDao() {
         return certAccountQuotaDao;
@@ -97,14 +101,14 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
     public CertAccountQuota getCurrentQuota(CertAccountQuota quota) {
         CertAccountQuotaType type = CertAccountQuotaType.valueOf(quota.getType());
         switch (type){
-            case CallQuota:{
-                Long currentUsed = this.getQuotaUsed(quota);
-                quota.setCurrentUsed(currentUsed);
-                break;
-            }
             case AgentQuota:{
                 //TODO 座席配额待定
                 quota.setCurrentUsed(quota.getUsed() == null ? 0L : quota.getUsed());
+                break;
+            }
+            default:{
+                Long currentUsed = this.getQuotaUsed(quota);
+                quota.setCurrentUsed(currentUsed);
                 break;
             }
         }
@@ -201,6 +205,17 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
                     BigDecimal costTimeLong = (BigDecimal) staticCdr.get("costTimeLong");
                     Long oleUsed = quota.getUsed() == null ? 0L : quota.getUsed();
                     quota.setUsed(oleUsed + costTimeLong.longValue());
+                    break;
+                }case SmsQuota:{
+                    Long used = msgDayService.getUsed(null, null, subaccount.getId(), ProductCode.msg_sms.name(), startDate, endDate);
+                    Long oleUsed = quota.getUsed() == null ? 0L : quota.getUsed();
+                    quota.setUsed(oleUsed + used);
+                    break;
+                }case UssdQuota:{
+                    Long used = msgDayService.getUsed(null, null, subaccount.getId(), ProductCode.msg_ussd.name(), startDate, endDate);
+                    Long oleUsed = quota.getUsed() == null ? 0L : quota.getUsed();
+                    quota.setUsed(oleUsed + used);
+                    break;
                 }
             }
             quota.setBalanceDt(staticsDate);
@@ -210,13 +225,18 @@ public class CertAccountQuotaServiceImpl extends AbstractService<CertAccountQuot
 
     @Override
     public boolean isCallQuotaEnough(String certAccountId){
+        return this.isQuotaEnough(certAccountId,CertAccountQuotaType.CallQuota.name(),0L);
+    }
+
+    @Override
+    public boolean isQuotaEnough(String certAccountId,String quotaType,Long need){
         if(StringUtils.isBlank(certAccountId)){
             return true;
         }
         ApiCertificate cert = apiCertificateService.findById(certAccountId);
         if(cert instanceof  ApiCertificateSubAccount){
-            CertAccountQuota quota = this.getCurrentQuota(certAccountId,CertAccountQuotaType.CallQuota.name());
-            return quota.getHasRemain();
+            CertAccountQuota quota = this.getCurrentQuota(certAccountId,quotaType);
+            return quota.getHasRemain(need);
         }else{
             return true;
         }

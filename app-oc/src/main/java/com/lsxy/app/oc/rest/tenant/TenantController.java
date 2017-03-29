@@ -3,10 +3,11 @@ package com.lsxy.app.oc.rest.tenant;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.oc.base.AbstractRestController;
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
-import com.lsxy.app.oc.rest.tenant.vo.*;
-import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.app.oc.rest.tenant.vo.ConsumesVO;
+import com.lsxy.app.oc.rest.tenant.vo.RechargeInput;
+import com.lsxy.app.oc.rest.tenant.vo.TenantIndicantVO;
+import com.lsxy.app.oc.rest.tenant.vo.TenantInfoVO;
 import com.lsxy.call.center.api.model.CallCenter;
-import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.api.billing.model.Billing;
 import com.lsxy.framework.api.billing.service.CalBillingService;
@@ -14,41 +15,37 @@ import com.lsxy.framework.api.tenant.model.*;
 import com.lsxy.framework.api.tenant.service.*;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
-import com.lsxy.framework.core.utils.BeanUtils;
-import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.*;
 import com.lsxy.framework.mail.MailConfigNotEnabledException;
 import com.lsxy.framework.mail.MailContentNullException;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.portal.ResetPwdVerifySuccessEvent;
+import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.config.service.TenantConfigService;
 import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
-import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
-import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
-import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
-import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
 import com.lsxy.yunhuni.api.recharge.service.RechargeService;
-import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
-import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
 import com.lsxy.yunhuni.api.statistics.model.*;
 import com.lsxy.yunhuni.api.statistics.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -56,7 +53,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 
 /**
@@ -110,7 +106,10 @@ public class TenantController extends AbstractRestController {
     private ApiCallMonthService apiCallMonthService;
     @Reference(timeout = 10000,check = false,lazy = true)
     CallCenterService callCenterService;
-
+    @Autowired
+    private MsgDayService msgDayService;
+    @Autowired
+    private MsgMonthService msgMonthService;
 
     @RequestMapping(value = "/list",method = RequestMethod.GET)
     @ApiOperation(value = "获取全部数据")
@@ -121,19 +120,19 @@ public class TenantController extends AbstractRestController {
     @ApiOperation(value = "租户列表")
     @RequestMapping(value = "/tenants",method = RequestMethod.GET)
     public RestResponse tenants(
-    @RequestParam(required = false) String name,
-    @ApiParam(name = "begin",value = "格式:yyyy-MM-dd")
-    @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date begin,
-    @ApiParam(name = "end",value = "格式:yyyy-MM-dd")
-    @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date end,
-    @ApiParam(name = "authStatus",value = "认证状态，1已认证，0未认证")
-    @RequestParam(required = false) Integer authStatus,
-    @ApiParam(name = "accStatus",value = "账号状态，2正常/启用，1被锁定/禁用")
-    @RequestParam(required = false) Integer accStatus,
-    @ApiParam(name = "isCost",value = "消费状态，1已消费，0未消费")
-    @RequestParam(required = false,defaultValue = "0") int isCost,
-    @RequestParam(required = false,defaultValue = "1") Integer pageNo,
-    @RequestParam(required = false,defaultValue = "10") Integer pageSize){
+            @RequestParam(required = false) String name,
+            @ApiParam(name = "begin",value = "格式:yyyy-MM-dd")
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date begin,
+            @ApiParam(name = "end",value = "格式:yyyy-MM-dd")
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date end,
+            @ApiParam(name = "authStatus",value = "认证状态，1已认证，0未认证")
+            @RequestParam(required = false) Integer authStatus,
+            @ApiParam(name = "accStatus",value = "账号状态，2正常/启用，1被锁定/禁用")
+            @RequestParam(required = false) Integer accStatus,
+            @ApiParam(name = "isCost",value = "消费状态，1已消费，0未消费")
+            @RequestParam(required = false,defaultValue = "0") int isCost,
+            @RequestParam(required = false,defaultValue = "1") Integer pageNo,
+            @RequestParam(required = false,defaultValue = "10") Integer pageSize){
         if(begin!=null){
             begin = DateUtils.getFirstTimeOfDate(begin);
         }
@@ -715,9 +714,9 @@ public class TenantController extends AbstractRestController {
     @ApiOperation(value = "租户的月结账单")
     @RequestMapping(value="/tenants/{tenant}/consume_month",method = RequestMethod.GET)
     public RestResponse get(@PathVariable String tenant,
-        @RequestParam(required = false) String appId,
-        @ApiParam(name = "month",value = "格式:yyyy-MM")
-        @RequestParam(required = false) String month){
+                            @RequestParam(required = false) String appId,
+                            @ApiParam(name = "month",value = "格式:yyyy-MM")
+                            @RequestParam(required = false) String month){
         if(StringUtils.isBlank(month)){
             String curMonth = DateUtils.getDate("yyyy-MM");
             month = DateUtils.getPrevMonth(curMonth,"yyyy-MM");
@@ -1040,5 +1039,263 @@ public class TenantController extends AbstractRestController {
             }
         }
         return list1;
+    }
+    public static final String TYPE_MONTH = "month";//月统计类型 按年查找输出 返回按年
+    public static final String TYPE_DAY = "day";//日统计类型 按月查找输出 返回按月
+    @ApiOperation(value = "租户(某月所有天/某年所有月)的消息统计数据(succ成功fail失败)")
+    @RequestMapping(value = "/tenants/{tenant}/msg/statistic",method = RequestMethod.GET)
+    public RestResponse msgStatisticList(
+            @PathVariable String tenant,
+            @RequestParam(value = "year") Integer year,
+            @ApiParam(name = "month",value="不传month就是某年所有月的统计")
+            @RequestParam(value = "month",required = false) Integer month,
+            @RequestParam(required = false) String appId
+    ){
+        String type = null;
+        String startTime = null;
+        if(month!=null){
+            type = TYPE_MONTH;
+            startTime = year+"-"+month;
+        }else{
+            type = TYPE_DAY;
+            startTime = year+"";
+        }
+        Date date1 = getStartDate(startTime,type);
+        Date date2 = getLastDate(startTime,type);
+        List list = null;//getList( tenantId, appId,date1,date2,type);
+        if(TYPE_MONTH.equals(type)){
+            list = msgMonthService.getStatisticsList(tenant,appId,date1,date2);
+        }else{
+            list = msgDayService.getStatisticsList(tenant,appId,date1,date2);
+        }
+        return RestResponse.success(list);
+    }
+    @ApiOperation(value = "租户(某月所有天/某年所有月)的消息统计数据分页")
+    @RequestMapping(value = "/tenants/{tenant}/msg/statistic/plist",method = RequestMethod.GET)
+    public RestResponse msgStatistic(
+            @PathVariable String tenant,
+            @RequestParam(value = "year") Integer year,
+            @ApiParam(name = "month",value="不传month就是某年所有月的统计")
+            @RequestParam(value = "month",required = false) Integer month,
+            @RequestParam(required = false) String appId,
+            @RequestParam(required = false,defaultValue = "1") Integer pageNo,
+            @RequestParam(required = false,defaultValue = "70") Integer pageSize
+    ){
+        String type = null;
+        String startTime = null;
+        if(month!=null){
+            type = TYPE_MONTH;
+            startTime = year+"-"+month;
+        }else{
+            type = TYPE_DAY;
+            startTime = year+"";
+        }
+        Date date1 = getStartDate(startTime,type);
+        Date date2 = getLastDate(startTime,type);
+        Page page = null;//getPage(tenantId, appId , type, date1, date2, pageNo, pageSize);
+        if(TYPE_MONTH.equals(type)){
+            page = msgMonthService.getStatisticsPage(tenant,appId,date1,date2,pageNo,pageSize);
+        }else{
+            page = msgDayService.getStatisticsPage(tenant,appId,date1,date2,pageNo,pageSize);
+        }
+        return RestResponse.success(page);
+    }
+    /**
+     * 获取列表数据
+     * @param list 待处理的list
+     * @return
+     */
+    private Map getMsgArrays(List list,Object date) {
+        int leng = getLong(date);
+        Long[] succ = new Long[leng];
+        Long[] fail = new Long[leng];
+        for(int j=0;j<leng;j++){
+            succ[j] = 0L;
+            fail[j] = 0L;
+        }
+        for(int i=0;i<list.size();i++){
+            Object obj = list.get(i);
+            if(obj instanceof MsgStatisticsVo){
+                MsgStatisticsVo temp = (MsgStatisticsVo)obj;
+                int index = temp.getNum()-1;
+                succ[index] = temp.getTotalSucc();
+                fail[index] = temp.getTotalFail();
+            }
+        }
+        return new HashMap<String,Long[]>(){{
+            put("succ",succ);
+            put("fail",fail);
+        }};
+    }
+    private Page<MsgStatisticsVo> getPage(String tenantId,String appId ,String type,Date date1,Date date2,int pageNo,int pageSize){
+        List<MsgStatisticsVo> list = getList(tenantId,appId,date1,date2,type);
+        Page page = new Page( (pageNo-1)*pageSize ,  list.size(),  pageSize, list);
+        return page;
+    }
+    private List<MsgStatisticsVo> getList(String tenantId, String appId, Date date1,Date date2,String type){
+        int len = 0;
+        if(TYPE_MONTH.equals(type)){
+            len = getLong(12);
+        }else{
+            len = getLong(date1);
+        }
+        List<MsgStatisticsVo> list = new ArrayList<>();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date1);
+        for (int i = 0; i < len; i++) {
+            list.add( MsgStatisticsVo.initMsgStatisticsVo(calendar.getTime(),(i+1)) );
+            if(TYPE_MONTH.equals(type)){
+                calendar.add(Calendar.MONTH,1);
+            }else{
+                calendar.add(Calendar.DAY_OF_MONTH,1);
+            }
+        }
+        return list;
+    }
+    private Date getStartDate(String startTime,String type){
+        Date date = null;
+        if(TYPE_MONTH.equals(type)){
+            date = DateUtils.parseDate(startTime,"yyyy");
+        }else{
+            date = DateUtils.parseDate(startTime,"yyyy-MM");
+        }
+        return date;
+    }
+    private Date getLastDate(String endTime,String type){
+        Date date2 = null;
+        if(TYPE_MONTH.equals(type)){
+            date2  = DateUtils.parseDate(DateUtils.getLastYearByDate(endTime)+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+        }else{
+            date2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(endTime,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
+        }
+        return date2;
+    }
+    @Autowired
+    private SubaccountMonthService subaccountMonthService;
+    @Autowired
+    private SubaccountDayService subaccountDayService;
+    @ApiOperation(value = "租户(某月所有天/某年所有月)的子账户统计数据分页")
+    @RequestMapping(value = "/tenants/{tenant}/sub/statistic/{type}/plist",method = RequestMethod.GET)
+    public RestResponse msgStatistic(
+            @PathVariable String tenant,
+            @ApiParam(name = "type",value="day日统计格式（yyyy-MM-dd）month月统计(yyyy-MM)")
+            @PathVariable String type,
+            @ApiParam(name = "endTime",value="开始时间")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime",value="结束时间")
+            @RequestParam(value = "endTime",required = false) String endTime,
+            @RequestParam(required = false) String appId,
+            @RequestParam(required = false) String subId,
+            @RequestParam(required = false,defaultValue = "1") Integer pageNo,
+            @RequestParam(required = false,defaultValue = "70") Integer pageSize
+    ){
+        if("month".equals(type)){
+            Date date1 = DateUtils.parseDate(startTime,"yyyy-MM");
+            if(StringUtils.isEmpty(endTime)){
+                endTime = startTime;
+            }
+            Date date2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(endTime,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
+            Page page = subaccountMonthService.getPageByConditions(pageNo,pageSize,date1,date2,tenant,appId,subId);
+            Map map = subaccountMonthService.sum(date1,date2,tenant,appId,subId);
+            map.put("page",page);
+            return RestResponse.success(map);
+        }else if("day".equals(type)){
+            Date date1 = DateUtils.parseDate(startTime+" 00:00:00","yyyy-MM-dd HH:mm:ss");
+            if(StringUtils.isEmpty(endTime)){
+                endTime = startTime;
+            }
+            Date date2 =  DateUtils.parseDate(endTime+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+            Page page = subaccountDayService.getPageByConditions(pageNo,pageSize,date1,date2,tenant,appId,subId);
+            Map map = subaccountDayService.sum(date1,date2,tenant,appId,subId);
+            map.put("page",page);
+            return RestResponse.success(map);
+        }else{
+            return RestResponse.failed("","类型错误");
+        }
+    }
+    @ApiOperation(value = "租户(某月所有天/某年所有月)的子账户统计数据下载")
+    @RequestMapping(value = "/tenants/{tenant}/sub/statistic/{type}/download",method = RequestMethod.GET)
+    public void msgStatistic(
+            HttpServletResponse response,
+            @PathVariable String tenant,
+            @ApiParam(name = "type",value="day日统计格式（yyyy-MM-dd）month月统计(yyyy-MM)")
+            @PathVariable String type,
+            @ApiParam(name = "endTime",value="开始时间")
+            @RequestParam(value = "startTime") String startTime,
+            @ApiParam(name = "endTime",value="结束时间")
+            @RequestParam(value = "endTime",required = false) String endTime,
+            @RequestParam(required = false) String appId,
+            @RequestParam(required = false) String subId,
+            @RequestParam(required = false,defaultValue = "1") Integer pageNo,
+            @RequestParam(required = false,defaultValue = "70") Integer pageSize
+    ){
+        String appId1 = appId;
+        //初始化数据
+        if(StringUtil.isEmpty(appId)){
+            appId = "all";
+        }
+        if("all".equals(appId)){
+            appId1 = "";
+        }
+        String title = "子账号综合统计";
+        String one = "";
+        String[] headers = null;
+        String[] values = null;
+        Map result2;
+        List list ;
+        if("month".equals(type)){
+            Date date1 = DateUtils.parseDate(startTime,"yyyy-MM");
+            if(StringUtils.isEmpty(endTime)){
+                endTime = startTime;
+            }
+            Date date2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(endTime,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
+            one +=" 类型：月统计 时间："+startTime+"-"+endTime;
+            result2 = subaccountMonthService.sum(date1,date2,tenant,appId1,subId);
+            list = subaccountMonthService.getListByConditions(date1,date2,tenant,appId,subId);
+        }else if("day".equals(type)){
+            Date date1 = DateUtils.parseDate(startTime+" 00:00:00","yyyy-MM-dd HH:mm:ss");
+            if(StringUtils.isEmpty(endTime)){
+                endTime = startTime;
+            }
+            Date date2 =  DateUtils.parseDate(endTime+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+            one +=" 类型：日统计 时间："+startTime+"-"+endTime;
+            result2 = subaccountDayService.sum(date1,date2,tenant,appId1,subId);
+            list = subaccountDayService.getListByConditions(date1,date2,tenant,appId,subId);
+        }else{
+            return ;
+        }
+        if("all".equals(appId)){
+            one += " 选中应用：全部应用 ";
+            headers = new String[]{"鉴权账号", "密钥", "所属应用", "话务量（分钟）", "消费金额（元）","语音总用量 /配额（分钟）","坐席数/配额（个）"};
+            values = new String[]{"certId", "secretKey", "appName", "amongDuration", "amongAmount","voiceNum","seatNum"};
+        }else{
+            App app = appService.findById(appId);
+            one += " 选中应用："+app.getName();
+            headers = new String[]{"鉴权账号", "密钥", "话务量（分钟）", "消费金额（元）","语音总用量 /配额（分钟）","坐席数/配额（个）"};
+            values = new String[]{"certId", "secretKey", "amongDuration", "cost", "amongAmount","voiceNum","seatNum"};
+        }
+
+        String amongAmount = result2.get("amongAmount")==null? "": result2.get("amongAmount").toString();
+        if(StringUtils.isNotEmpty(amongAmount)){
+            one += " 总消费："+amongAmount+"元";
+        }else{
+            one += " 总消费：0元";
+        }
+        downloadExcel(title, one, headers, values, list, null, "amongAmount", response);
+    }
+    public <T>  void downloadExcel(String title,String one, String[] headers, String[] values, Collection<T> dataset, String pattern, String money,HttpServletResponse response) {
+        try {
+            Date d = new Date();
+            String name = org.apache.http.client.utils.DateUtils.formatDate(d,"yyyyMMdd")+ d.getTime();
+            HSSFWorkbook wb = ExportExcel.exportExcel(title,one,headers,values,dataset,pattern,money);
+            response.setContentType("application/vnd.ms-excel");
+            response.setHeader("Content-disposition", "attachment;filename="+name+".xls");
+            OutputStream ouputStream = response.getOutputStream();
+            wb.write(ouputStream);
+            ouputStream.flush();
+            ouputStream.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }

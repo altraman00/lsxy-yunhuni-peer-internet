@@ -104,12 +104,22 @@ public class ApiCertificateSubAccountServiceImpl extends AbstractService<ApiCert
             }
         }
         Set<String> keys = map.keySet();
-        if(!keys.contains(CertAccountQuotaType.CallQuota.name())){
-            map.put(CertAccountQuotaType.CallQuota.name(),new CertAccountQuota(CertAccountQuotaType.CallQuota.name()));
-        }
-        if(app.getType().equals(App.PRODUCT_CALL_CENTER)){
-            if(!keys.contains(CertAccountQuotaType.AgentQuota.name())){
-                map.put(CertAccountQuotaType.AgentQuota.name(),new CertAccountQuota(CertAccountQuotaType.AgentQuota.name()));
+        if(app.PRODUCT_MSG.equals(app.getType())){
+            //消息类配额
+            if(!keys.contains(CertAccountQuotaType.SmsQuota)){
+                map.put(CertAccountQuotaType.SmsQuota.name(),new CertAccountQuota(CertAccountQuotaType.SmsQuota.name()));
+            }
+            if(!keys.contains(CertAccountQuotaType.UssdQuota)){
+                map.put(CertAccountQuotaType.UssdQuota.name(),new CertAccountQuota(CertAccountQuotaType.UssdQuota.name()));
+            }
+        }else{
+            if(!keys.contains(CertAccountQuotaType.CallQuota.name())){
+                map.put(CertAccountQuotaType.CallQuota.name(),new CertAccountQuota(CertAccountQuotaType.CallQuota.name()));
+            }
+            if(app.getType().equals(App.PRODUCT_CALL_CENTER)){
+                if(!keys.contains(CertAccountQuotaType.AgentQuota.name())){
+                    map.put(CertAccountQuotaType.AgentQuota.name(),new CertAccountQuota(CertAccountQuotaType.AgentQuota.name()));
+                }
             }
         }
         return map.values();

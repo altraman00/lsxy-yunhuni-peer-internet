@@ -9,18 +9,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Set;
-import java.util.TreeSet;
-
 /**
  * Created by zhangxb on 2016/8/29.
  */
 public class EncryptUtil {
-
-    private static final Set<String> METHOD_HAS_CONTENT = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER) {
-        private static final long serialVersionUID = 1L;
-        { add("PUT"); add("POST"); }
-    };
 
     /**
      * 获取签名数据
@@ -33,8 +25,8 @@ public class EncryptUtil {
      * @return 返回签名内容
      */
     public static String getSign(String method,String payload,String contentType,String timestamp,String appId,String uri){
-        // 是否有post 或者 put  body
-        boolean hasContent = METHOD_HAS_CONTENT.contains(method);
+        // 是否有post 或者 put
+        boolean hasContent = "PUT".equals(method)||"POST".equals(method)?true:false;
         //j8bm4n329cHi4lSMdMJG482wfaF0POq4PmzQn7lK8XM
         String contentMd5 = hasContent ? (new Md5PasswordEncoder()).encodePassword(payload, null) : "";
         String contentType1 = hasContent ? contentType : "";

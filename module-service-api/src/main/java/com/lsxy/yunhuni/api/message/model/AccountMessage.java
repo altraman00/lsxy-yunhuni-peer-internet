@@ -25,6 +25,10 @@ public class AccountMessage extends IdEntity {
     public static final String MESSAGE_TYPE_INVOCE_APPLY_FAIL = "message-templates/08_message_type_invoce_apply_fail.vm";
     public static final String MESSAGE_TYPE_ARREARS= "message-templates/09_message_type_arrears.vm";
     public static final String MESSAGE_TYPE_FEEDBACK= "message-templates/10_message_type_feedback.vm";
+    public static final String MESSAGE_TYPE_APP_FAIL= "message-templates/11_message_type_app_fail.vm";
+    public static final String MESSAGE_TYPE_APP_SUCCESS= "message-templates/12_message_type_app_success.vm";
+    public static final String MESSAGE_MSG_TEMPLATE_FAIL= "message-templates/13_message_type_msg_template_fail.vm";
+    public static final String MESSAGE_MSG_TEMPLATE_SUCCESS= "message-templates/14_message_type_msg_template_success.vm";
     public  static final int READ = 1;
     public static final int DELETE = -1;
     public static final int NOT = 0;
