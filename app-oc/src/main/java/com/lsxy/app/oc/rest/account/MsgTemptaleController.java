@@ -147,15 +147,23 @@ public class MsgTemptaleController extends AbstractRestController {
         List<MsgTemplateVo> list = new ArrayList<>();
         for (int i = 0; i < page.getResult().size(); i++) {
             MsgTemplate msgTemplate = page.getResult().get(i);
-            App app = appService.findById(msgTemplate.getAppId());
             String certId = "";
-            if(msgTemplate.getSubaccountId()!=null){
-                ApiCertificateSubAccount apiCertificateSubAccount = apiCertificateSubAccountService.findById(msgTemplate.getSubaccountId());
-                if(apiCertificateSubAccount!=null){
-                    certId = apiCertificateSubAccount.getCertId();
+            String tenantName = "";
+            String appName = "";
+            if(StringUtils.isNotEmpty(msgTemplate.getAppId())) {
+                App app = appService.findById(msgTemplate.getAppId());
+                if(app != null){
+                    tenantName = app.getTenant().getTenantName();
+                    appName = app.getName();
+                }
+                if (msgTemplate.getSubaccountId() != null) {
+                    ApiCertificateSubAccount apiCertificateSubAccount = apiCertificateSubAccountService.findById(msgTemplate.getSubaccountId());
+                    if (apiCertificateSubAccount != null) {
+                        certId = apiCertificateSubAccount.getCertId();
+                    }
                 }
             }
-            MsgTemplateVo templateVo = new MsgTemplateVo( page.getResult().get(i),app.getTenant().getTenantName(),app.getName());
+            MsgTemplateVo templateVo = new MsgTemplateVo( page.getResult().get(i),tenantName,appName);
             templateVo.setCertId(certId);
             if(msgTemplate.getTempId()!=null) {
                 List<MsgSupplierTemplate> msgSupplierTemplateList = msgSupplierTemplateService.findByTempId(msgTemplate.getTempId());
