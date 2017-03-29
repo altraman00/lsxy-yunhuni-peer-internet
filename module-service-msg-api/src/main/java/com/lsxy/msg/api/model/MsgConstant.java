@@ -28,4 +28,5 @@ public class MsgConstant {
     public static String AwaitingTaskId = "mqAwaiting"; //当taskId为这个时，表示在延迟队列里待发送
 
     public static final int SEND_FIAL_MAX_NUM = 3;
+
 }
