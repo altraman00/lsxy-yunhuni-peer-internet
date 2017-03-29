@@ -32,6 +32,7 @@ public enum ApiReturnCodeEnum {
     IPNotInWhiteList("010004","IP不在白名单内"),
     PlayFileNotExists("010005","放音文件不存在或未审核"),
     QuotaNotEnough("010006","配额不足"),
+    RecordFileNotExists("010007","录音文件不存在"),
     CallNotExists("020000","呼叫不存在"),
     NumberNotAllowToCall("020001","号码不允许呼叫"),
     NotAvailableLine("020002","没有可用线路"),

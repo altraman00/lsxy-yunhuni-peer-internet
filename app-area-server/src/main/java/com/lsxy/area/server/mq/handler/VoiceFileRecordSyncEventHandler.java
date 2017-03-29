@@ -94,11 +94,18 @@ public class VoiceFileRecordSyncEventHandler implements MQMessageHandler<VoiceFi
         }
         //从文件出发，等到的session应该对应一个oss文件；从cdr出发，得到的文件，也只有对应一个oss文件
         List<String> files = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
         for(int i=0;i<list.size();i++){
             VoiceFileRecord voiceFileRecord = list.get(i);
 //            if(1!=voiceFileRecord.getStatus()){
                 files.add(voiceFileRecord.getUrl());
 //            }
+            ids.add(voiceFileRecord.getId());
+        }
+        //TODO 更新正在上传的文件
+        Integer count = voiceFileRecordService.setWaitedUpload(ids);
+        if(count == 0){
+            return;
         }
         //设置需要串过去的参数
         Map<String, Object> map = new HashMap();
