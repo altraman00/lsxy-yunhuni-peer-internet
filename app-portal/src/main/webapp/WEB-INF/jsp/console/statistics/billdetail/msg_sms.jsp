@@ -107,8 +107,10 @@
                                 <div id="myTabContent" class="tab-content" >
                                     <form:form action="${ctx}/console/statistics/billdetail/sms" method="post" id="mainForm">
                                         <div class="row margin-bottom-20">
-                                            <div class="col-md-9">
+                                            <div class="col-md-2 remove-padding-right" style="width: 91px">
                                                 <input type="radio" name="isMass" value="0" class="selectdata isMassChange" <c:if test="${isMass == '0'}">checked </c:if>>单发消息
+                                            </div>
+                                            <div class="col-md-2 remove-padding" style="width: 91px">
                                                 <input type="radio" name="isMass" value="1" class="isMassChange" <c:if test="${isMass == '1'}">checked </c:if> class="selectdata ml-15">群发消息
                                             </div>
                                         </div>
@@ -117,34 +119,34 @@
                                             <input type="hidden" id="state" name="state" value="${state}">
                                             <input type="hidden" id="mobile1" name="mobile1" value="${mobile1}">
                                             <input type="hidden" id="appId" name="appId" value="${appId}">
-                                            <div class="col-md-1">
+                                            <div class="col-md-1 remove-padding-right">
                                                 日期
                                             </div>
-                                            <div class="col-md-2">
+                                            <div class="col-md-2 remove-padding" style="width: 180px">
                                                 <input type="text" name="start" class="form-control currentDay "  value="${start}"  />
                                             </div>
-                                            <div class="col-md-1">
+                                            <div class="col-md-1 remove-padding-right" style="width: 47px">
                                                 到
                                             </div>
-                                            <div class="col-md-2">
+                                            <div class="col-md-2 remove-padding" style="width: 180px">
                                                 <input type="text" name="end" class="form-control currentDay "  value="${end}"  />
                                             </div>
 
                                                 <div id="isMass0" <c:if test="${isMass == '1'}">hidden</c:if>>
-                                                <div class="col-md-2 mywidth">
+                                                <div class="col-md-2 remove-padding-right" style="width: 90px">
                                                     手机号码
                                                 </div>
-                                                <div class="col-md-2">
+                                                <div class="col-md-2 remove-padding" style="width: 200px">
                                                     <input type="text" name="mobile" class="form-control"  value="${mobile}"  />
                                                 </div>
                                                 </div>
 
 
                                             <div id="isMass1" <c:if test="${isMass == '0'}">hidden </c:if>>
-                                                <div class="col-md-2 mywidth">
+                                                <div class="col-md-2 remove-padding-right" style="width: 90px">
                                                     任务名称
                                                 </div>
-                                                <div class="col-md-2">
+                                                <div class="col-md-2 remove-padding" style="width: 200px">
                                                     <input type="text" name="taskName" class="form-control"  value="${taskName}"  />
                                                 </div>
                                             </div>
@@ -263,9 +265,11 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <!--must-->
 <script type="text/javascript" src='${resPrefixUrl }/js/statistics/find.js'> </script>
+        <link rel="stylesheet" href="${resPrefixUrl }/js/dist/css/bootstrap-select.css">
+        <script src="${resPrefixUrl }/js/dist/js/bootstrap-select.js"></script>
 <script type="text/javascript" >
     $(function(){
-        $('.mywidth').css("width","90px");
+//        $('.mywidth').css("width","90px");
         $('.isMassChange').click(function(){
             $('#mainForm').submit();
 //            var type = $(this).val();
