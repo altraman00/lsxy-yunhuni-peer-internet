@@ -514,7 +514,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         logger.warn("更新CallCenter失败",t);
                     }
                 }
-                conversationService.logicExit(conversationState.getAppId(),conversationId);
+                conversationService.logicExit(conversationId,call_id);
             }else{
                 //交谈开始
                 if(conversationState.getBusinessData().get(CallCenterUtil.CONVERSATION_STARTED_FIELD) == null){
@@ -572,7 +572,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             }
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
             if(StringUtils.isNotBlank(error)){
-                logger.warn("呼叫坐席失败{}",error);
+                logger.warn("callid={},呼叫坐席失败{},",call_id,error);
             }else{
                 String agentId = businessData.get(CallCenterUtil.AGENT_ID_FIELD);
                 if(agentId != null){

@@ -50,6 +50,8 @@ public class App extends IdEntity {
     private Integer isUssd;//闪印
     private Date applyTime;//申请时间
     private Date auditTime;//审核时间
+    private String projectVersion;
+
     @Column(name = "apply_time")
     public Date getApplyTime() {
         return applyTime;
@@ -261,5 +263,13 @@ public class App extends IdEntity {
 
     public void setReason(String reason) {
         this.reason = reason;
+    }
+    @Column(name = "project_version")
+    public String getProjectVersion() {
+        return projectVersion;
+    }
+
+    public void setProjectVersion(String projectVersion) {
+        this.projectVersion = projectVersion;
     }
 }
