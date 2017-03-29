@@ -108,16 +108,16 @@
                                     <form:form action="${ctx}/console/statistics/billdetail/metting" method="post" id="mainForm">
                                         <div class="row statistics_row" >
                                             <input type="hidden" id="appId" name="appId" value="${appId}">
-                                            <div class="col-md-1">
+                                            <div class="col-md-1 remove-padding-right">
                                                 日期
                                             </div>
-                                            <div class="col-md-2">
+                                            <div class="col-md-2 remove-padding" style="width: 180px">
                                                 <input type="text" name="start" class="form-control currentDay "  value="${start}"  />
                                             </div>
-                                            <div class="col-md-1">
+                                            <div class="col-md-1 remove-padding-right" style="width: 47px">
                                                 到
                                             </div>
-                                            <div class="col-md-2">
+                                            <div class="col-md-2 remove-padding" style="width: 180px">
                                                 <input type="text" name="end" class="form-control currentDay "  value="${end}"  />
                                             </div>
                                             <div class="col-md-2">
