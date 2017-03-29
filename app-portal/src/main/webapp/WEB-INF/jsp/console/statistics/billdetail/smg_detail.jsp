@@ -6,8 +6,7 @@
                 <small style="font-size:14px;">任务名称：${detail_1.taskName}&nbsp;&nbsp;&nbsp;&nbsp;
                     任务状态：
                     <c:if test="${detail_1.state==1||detail_1.state==-1}">任务完成</c:if>
-                    <c:if test="${detail_1.state==0}">待处理</c:if>
-                    <c:if test="${detail_1.state==-1}">任务失败</c:if>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <c:if test="${detail_1.state==0}">待处理</c:if>&nbsp;&nbsp;&nbsp;&nbsp;
                     总数：
                     <c:set var="sumNum1" value="${detail_1.sumNum != null?(detail_1.sumNum + (detail_1.invalidNum != null?detail_1.invalidNum :0)):(detail_1.invalidNum != null?detail_1.invalidNum :0) }"></c:set>
                     ${sumNum1}
