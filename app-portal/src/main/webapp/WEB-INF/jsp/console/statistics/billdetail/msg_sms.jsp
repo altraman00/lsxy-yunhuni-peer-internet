@@ -108,10 +108,10 @@
                                     <form:form action="${ctx}/console/statistics/billdetail/sms" method="post" id="mainForm">
                                         <div class="row margin-bottom-20">
                                             <div class="col-md-2 remove-padding-right" style="width: 91px">
-                                                <input type="radio" name="isMass" value="0" class="selectdata isMassChange" <c:if test="${isMass == '0'}">checked </c:if>>单发消息
+                                                <input type="radio" name="isMass" value="0" class="selectdata isMassChange" <c:if test="${isMass == '0'}">checked </c:if>>消息单发
                                             </div>
                                             <div class="col-md-2 remove-padding" style="width: 91px">
-                                                <input type="radio" name="isMass" value="1" class="isMassChange" <c:if test="${isMass == '1'}">checked </c:if> class="selectdata ml-15">群发消息
+                                                <input type="radio" name="isMass" value="1" class="isMassChange" <c:if test="${isMass == '1'}">checked </c:if> class="selectdata ml-15">消息群发
                                             </div>
                                         </div>
                                         <div class="row statistics_row" >
