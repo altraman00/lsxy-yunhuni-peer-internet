@@ -106,7 +106,7 @@ public class OssTempUriUtils {
             host = url.getHost();
         }catch (Exception e){}
         resource = "/"+resource1+"/"+resource;
-        String result = OssTempUriUtils.getOssTempUri( accessId, accessKey, host, "GET",resource ,60);
+        String result = OssTempUriUtils.getOssTempUri( accessId, accessKey, host, "GET",resource ,10*60);
         return result;
     }
 
