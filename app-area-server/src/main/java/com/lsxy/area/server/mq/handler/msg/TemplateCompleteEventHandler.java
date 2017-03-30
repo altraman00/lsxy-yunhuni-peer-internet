@@ -2,6 +2,7 @@ package com.lsxy.area.server.mq.handler.msg;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.mq.events.msg.TemplateCompleteEvent;
@@ -65,7 +66,8 @@ public class TemplateCompleteEventHandler implements MQMessageHandler<TemplateCo
                 Map<String,Object> notify_data = new MapBuilder<String,Object>()
                         .putIfNotEmpty("event","msg.template_complete")
                         .putIfNotEmpty("tempId",tempId)
-                        .putIfNotEmpty("state",MsgTemplate.STATUS_PASS == template.getStatus()?1:0)
+                        .putIfNotEmpty("status",template.getStatus())
+                        .putIfNotEmpty("checkTime", DateUtils.getTime(template.getLastTime(),"yyyy-MM-dd HH:mm:ss"))
                         .putIfNotEmpty("reason",template.getReason())
                         .build();
                 // 发送通知
