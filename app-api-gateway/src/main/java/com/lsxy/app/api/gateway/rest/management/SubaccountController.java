@@ -88,7 +88,7 @@ public class SubaccountController extends AbstractAPIController {
         return ApiGatewayResponse.success(createOutput(subAccount));
     }
 
-    @RequestMapping(value = "/{accountId}/management/subaccount/{id}",method = RequestMethod.PUT)
+    @RequestMapping(value = "/{accountId}/management/subaccount/{id}",method = {RequestMethod.PUT,RequestMethod.POST})
     public ApiGatewayResponse update(HttpServletRequest request,
                                          @PathVariable String accountId,
                                          @RequestHeader(value = "AppID") String appId,
@@ -134,7 +134,7 @@ public class SubaccountController extends AbstractAPIController {
         return ApiGatewayResponse.success(true);
     }
 
-    @RequestMapping(value = "/{accountId}/management/subaccount/{id}/quotas",method = RequestMethod.PUT)
+    @RequestMapping(value = "/{accountId}/management/subaccount/{id}/quotas",method = {RequestMethod.PUT,RequestMethod.POST})
     public ApiGatewayResponse setQuota(HttpServletRequest request,
                                        @PathVariable String accountId,
                                        @RequestHeader(value = "AppID") String appId,
