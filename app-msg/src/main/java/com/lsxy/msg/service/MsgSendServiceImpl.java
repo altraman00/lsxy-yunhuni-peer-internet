@@ -166,8 +166,11 @@ public class MsgSendServiceImpl implements MsgSendService {
         //生成任务标识，发送
         ResultOne resultOne = null;
         String key = UUIDGenerator.uuid();
-        String[] split = tempArgs.split(MsgConstant.ParamRegexStr);
-        List<String> tempArgsList = Arrays.asList(split);
+        List<String> tempArgsList = new ArrayList<>();
+        if(StringUtils.isNotBlank(tempArgs)){
+            String[] split = tempArgs.split(MsgConstant.ParamRegexStr);
+            tempArgsList = Arrays.asList(split);
+        }
         resultOne = smsSendOneService.sendOne(tempId, tempArgsList, msg, mobile,sendType, key);
         if(resultOne == null){//发送失败
             throw new MsgSendMsgFailException();
@@ -317,8 +320,11 @@ public class MsgSendServiceImpl implements MsgSendService {
             int ulength = mobileList.size() / uMax + ( mobileList.size() % uMax == 0 ? 0 :1 );
             for(int ul = 0;ul <ulength ;ul ++ ) {
                 List<String> ulMobileList = mobileList.subList(ul * uMax, ((ul + 1) * uMax) > mobileList.size() ? mobileList.size() : ((ul + 1) * uMax));
-                String[] split = tempArgs.split(MsgConstant.ParamRegexStr);
-                List<String> tempArgsList = Arrays.asList(split);
+                List<String> tempArgsList = new ArrayList<>();
+                if(StringUtils.isNotBlank(tempArgs)){
+                    String[] split = tempArgs.split(MsgConstant.ParamRegexStr);
+                    tempArgsList = Arrays.asList(split);
+                }
                 String recordId = UUIDGenerator.uuid();//记录的Id提前生成
                 ResultMass resultMass = massService.sendMass(recordId,tenantId,appId,subaccountId,key,taskName, tempId, tempArgsList, msg, ulMobileList, sendTime,sendType,cost.toString());
                 String mobiles = StringUtils.join(ulMobileList,MsgConstant.NumRegexStr);
