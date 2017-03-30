@@ -2,6 +2,7 @@ package com.lsxy.app.api.gateway.rest.record;
 
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.app.api.gateway.rest.AbstractAPIController;
+import com.lsxy.app.api.gateway.rest.record.vo.DownloadUrlVo;
 import com.lsxy.app.api.gateway.rest.record.vo.RecordFileVo;
 import com.lsxy.framework.core.exceptions.api.RecordFileNotExistException;
 import com.lsxy.framework.core.exceptions.api.RequestIllegalArgumentException;
@@ -96,7 +97,7 @@ public class RecordFileController extends AbstractAPIController {
             if(logger.isDebugEnabled()) {
                 logger.debug("生成ossUri地址：[{}]", ossUri);
             }
-            return ApiGatewayResponse.success(ossUri);
+            return ApiGatewayResponse.success(new DownloadUrlVo(DownloadUrlVo.STATE_DONE,ossUri));
         }
 
         List<VoiceFileRecord> list = voiceFileRecordService.getListBySessionId(voiceFileRecord.getSessionId());
@@ -119,10 +120,10 @@ public class RecordFileController extends AbstractAPIController {
             mqService.publish(new VoiceFileRecordSyncEvent(app.getTenant().getId(), voiceFileRecord.getAppId(), voiceFileRecord.getId(), VoiceFileRecordSyncEvent.TYPE_FILE));
             //TODO 延时处理录音同步查询时间
             mqService.publish(new RecordFileDownloadNotificationEvent(appId,subaccountId,voiceFileRecord.getId(),1));
-            return ApiGatewayResponse.success();
+            return ApiGatewayResponse.success(new DownloadUrlVo(DownloadUrlVo.STATE_WAIT,null));
         }else {
             String ossUri = OssTempUriUtils.getOssTempUri(list.get(0).getOssUrl());
-            return ApiGatewayResponse.success(ossUri);
+            return ApiGatewayResponse.success(new DownloadUrlVo(DownloadUrlVo.STATE_DONE,ossUri));
         }
     }
 

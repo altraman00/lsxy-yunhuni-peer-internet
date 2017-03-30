@@ -305,7 +305,7 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
             String hql = "from VoiceFileRecord obj where obj.appId=?1 and obj.subaccountId=?2 and obj.createTime between ?3 and ?4 ";
             return this.pageList(hql,pageNo,pageSize,appId,subaccountId,start,end);
         }else{
-            String hql = "from VoiceFileRecord obj where obj.appId=?1 and obj.subaccountId is null and obj.createTime between ?3 and ?4 ";
+            String hql = "from VoiceFileRecord obj where obj.appId=?1 and obj.subaccountId is null and obj.createTime between ?2 and ?3 ";
             return this.pageList(hql,pageNo,pageSize,appId,start,end);
         }
     }
