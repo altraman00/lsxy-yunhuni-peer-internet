@@ -56,8 +56,8 @@ public class StatisticsTest {
         Date date=new Date();
         //执行语句
         Date preDate = DateUtils.getPreDate(date);
-//        msgDayService.dayStatistics(preDate);
-        ssgMonthService.monthStatistics(new Date());
+        msgDayService.dayStatistics(preDate);
+//        ssgMonthService.monthStatistics(new Date());
     }
 
 }
