@@ -287,7 +287,7 @@ public class MsgTaskServiceImpl implements MsgTaskService{
                 }
             }
             if(-1 == state && result.size() > 0) {//失败时,补扣费
-                msgSendService.batchConsumeMsg(end,ProductCode.msg_sms.name(),record.getMsgCost(),"补扣费",record.getAppId(),record.getTenantId(),record.getSubaccountId(),result);
+                msgSendService.batchConsumeMsg(end,ProductCode.msg_sms.name(),record.getMsgCost().multiply(new BigDecimal( -1)),"补扣费",record.getAppId(),record.getTenantId(),record.getSubaccountId(),result);
             }
         }
     }
