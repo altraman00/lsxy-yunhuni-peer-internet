@@ -73,7 +73,7 @@ public class RecordFileController extends AbstractAPIController {
         return date;
     }
 
-    @RequestMapping(value = "/{accountId}/recording/url",method = RequestMethod.GET)
+    @RequestMapping(value = "/{accountId}/recording/url/generate",method = RequestMethod.GET)
     public ApiGatewayResponse getRecordFileDownloadUrl(HttpServletRequest request,
                                                 @PathVariable String accountId,
                                                 @RequestHeader(value = "AppID") String appId,
