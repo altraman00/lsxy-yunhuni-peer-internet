@@ -78,7 +78,7 @@ public class RecordFileDownloadNotificationHandler implements MQMessageHandler<R
                 return;
             }
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                    .putIfNotEmpty("event","recording.download_preparing")
+                    .putIfNotEmpty("event","recording.url_generate")
                     .putIfNotEmpty("id",message.getRecordFileId())
                     .putIfNotEmpty("subaccount_id",message.getSubaccountId())
                     .putIfNotEmpty("url",ossUri)
