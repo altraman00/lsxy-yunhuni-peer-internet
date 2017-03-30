@@ -1,41 +1,42 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
 <%@include file="/inc/import.jsp" %>
 <div id="myTabContent2" hidden class="tab-content" >
-        <div>
-            <small style="font-size:14px;">任务名称：${detail_1.taskName}&nbsp;&nbsp;&nbsp;&nbsp;
-                任务状态：
-                <c:if test="${detail_1.state==1||detail_1.state==-1}">任务完成</c:if>
-                <c:if test="${detail_1.state==0}">待处理</c:if>
-                <c:if test="${detail_1.state==-1}">任务失败</c:if>&nbsp;&nbsp;&nbsp;&nbsp;
-                总数：
-                <c:set var="sumNum1" value="${detail_1.sumNum != null?(detail_1.sumNum + (detail_1.invalidNum != null?detail_1.invalidNum :0)):(detail_1.invalidNum != null?detail_1.invalidNum :0) }"></c:set>
-                ${sumNum1}
-                &nbsp;成功数：
-                <c:if test="${detail_1.succNum == null}">0</c:if>
-                <c:if test="${detail_1.succNum != null}">${detail_1.succNum}</c:if>
-                &nbsp;失败数：
-                <c:if test="${detail_1.failNum == null}">0</c:if>
-                <c:if test="${detail_1.failNum != null}">${detail_1.failNum}</c:if>
-                &nbsp;待发数：
-                <c:if test="${detail_1.pendingNum == null}">0</c:if>
-                <c:if test="${detail_1.pendingNum != null}">${detail_1.pendingNum}</c:if>
-                &nbsp;无效号码数：
-                <c:if test="${detail_1.invalidNum == null}">0</c:if>
-                <c:if test="${detail_1.invalidNum != null}">${detail_1.invalidNum}</c:if>
-            </small>
+        <div class="row statistics_row">
+            <div class="col-md-9" >
+                <small style="font-size:14px;">任务名称：${detail_1.taskName}&nbsp;&nbsp;&nbsp;&nbsp;
+                    任务状态：
+                    <c:if test="${detail_1.state==1||detail_1.state==-1}">任务完成</c:if>
+                    <c:if test="${detail_1.state==0}">待处理</c:if>&nbsp;&nbsp;&nbsp;&nbsp;
+                    总数：
+                    <c:set var="sumNum1" value="${detail_1.sumNum != null?(detail_1.sumNum + (detail_1.invalidNum != null?detail_1.invalidNum :0)):(detail_1.invalidNum != null?detail_1.invalidNum :0) }"></c:set>
+                    ${sumNum1}
+                    &nbsp;成功数：
+                    <c:if test="${detail_1.succNum == null}">0</c:if>
+                    <c:if test="${detail_1.succNum != null}">${detail_1.succNum}</c:if>
+                    &nbsp;失败数：
+                    <c:if test="${detail_1.failNum == null}">0</c:if>
+                    <c:if test="${detail_1.failNum != null}">${detail_1.failNum}</c:if>
+                    &nbsp;待发数：
+                    <c:if test="${detail_1.pendingNum == null}">0</c:if>
+                    <c:if test="${detail_1.pendingNum != null}">${detail_1.pendingNum}</c:if>
+                    &nbsp;无效号码数：
+                    <c:if test="${detail_1.invalidNum == null}">0</c:if>
+                    <c:if test="${detail_1.invalidNum != null}">${detail_1.invalidNum}</c:if>
+                </small>
+            </div>
         </div>
         <div class="row statistics_row" >
-            <div class="col-md-2 mywidth">
+            <div class="col-md-2 remove-padding-right" style="width: 90px">
                 手机号码
             </div>
-            <div class="col-md-2">
+            <div class="col-md-2 remove-padding">
                 <input type="text" id="mobile2" class="form-control"  value="${mobile1}"  />
             </div>
-            <div class="col-md-2 mywidth">
+            <div class="col-md-2 remove-padding-right" style="width: 90px">
                 发送结果
             </div>
-            <div class="col-md-2">
-                <select id="state2">
+            <div class="col-md-2 remove-padding"  >
+                <select id="state2" class="form-control" >
                     <option value="-100" <c:if test="${state==-100}">selected </c:if>>全部</option>
                     <option value="1" <c:if test="${state==1}"> selected</c:if> >成功</option>
                     <option value="-1" <c:if test="${state==-1}">selected </c:if> >失败</option>
