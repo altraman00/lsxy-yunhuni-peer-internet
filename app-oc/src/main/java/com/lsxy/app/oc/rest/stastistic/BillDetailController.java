@@ -167,7 +167,7 @@ public class BillDetailController extends AbstractRestController {
             return RestResponse.failed("0000","验证失败，无法下载");
         }
         if(voiceFileRecord.getStatus()!=null&&voiceFileRecord.getStatus()==1){
-            String ossUri = getOssTempUri(voiceFileRecord.getOssUrl());
+            String ossUri = OssTempUriUtils.getOssTempUri(voiceFileRecord.getOssUrl());
             if(logger.isDebugEnabled()) {
                 logger.debug("生成ossUri地址：[{}]", ossUri);
             }
@@ -193,7 +193,7 @@ public class BillDetailController extends AbstractRestController {
             mqService.publish(new VoiceFileRecordSyncEvent(tenant.getId(), voiceFileRecord.getAppId(), voiceFileRecord.getId(), VoiceFileRecordSyncEvent.TYPE_FILE));
             return RestResponse.failed("0004", id);
         }else {
-            String ossUri = getOssTempUri(list.get(0).getOssUrl());
+            String ossUri = OssTempUriUtils.getOssTempUri(list.get(0).getOssUrl());
             return RestResponse.success(ossUri);
         }
     }
@@ -206,7 +206,7 @@ public class BillDetailController extends AbstractRestController {
         if(v1 != null) {
             if (v1.getStatus() != null) {
                 if (v1.getStatus() == 1) {
-                    String ossUri = getOssTempUri(v1.getOssUrl());
+                    String ossUri = OssTempUriUtils.getOssTempUri(v1.getOssUrl());
                     return RestResponse.success(ossUri);
                 } else if (v1.getStatus() == -1) {
                     return RestResponse.failed("0001", "下载失败，请稍后重试");
@@ -251,7 +251,7 @@ public class BillDetailController extends AbstractRestController {
             mqService.publish(new VoiceFileRecordSyncEvent(tenant.getId(), voiceCdr.getAppId(), voiceCdr.getId(), VoiceFileRecordSyncEvent.TYPE_CDR));
             return RestResponse.failed("0004", list.get(0).getId());
         }else {
-            String ossUri = getOssTempUri(list.get(0).getOssUrl());
+            String ossUri = OssTempUriUtils.getOssTempUri(list.get(0).getOssUrl());
             return RestResponse.success(ossUri);
         }
     }

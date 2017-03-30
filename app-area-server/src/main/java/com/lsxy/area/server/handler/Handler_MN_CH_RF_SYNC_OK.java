@@ -95,6 +95,7 @@ public class Handler_MN_CH_RF_SYNC_OK extends RpcRequestHandler {
             }
             for (int i = 0; i < list.size(); i++) {
                 VoiceFileRecord voiceFileRecord = list.get(i);
+                voiceFileRecord.setWaitedUpload(false);
                 voiceFileRecord.setStatus(status);
                 voiceFileRecord.setOssUrl(ossUri);
                 voiceFileRecordService.save(voiceFileRecord);

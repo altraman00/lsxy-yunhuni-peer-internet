@@ -18,7 +18,7 @@ public abstract class RPCHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(RPCHandler.class);
 	public static final int CORE_POOL_SIZE = 20;
-	public static final int MAXIMUM_POOL_SIZE = 200;
+	public static final int MAXIMUM_POOL_SIZE = 1024;
 	public static final int QUEUE_CAPACITY = 1024;
 
 	/**
@@ -35,7 +35,7 @@ public abstract class RPCHandler {
 	 * @return
 	 */
 	public static ExecutorService rpcHandlerExecutorService(String threadNamePattern) {
-		return new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, 0L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(QUEUE_CAPACITY),
+		return new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, 60L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(QUEUE_CAPACITY),
 				new BasicThreadFactory.Builder().namingPattern(threadNamePattern).build());
 	}
 

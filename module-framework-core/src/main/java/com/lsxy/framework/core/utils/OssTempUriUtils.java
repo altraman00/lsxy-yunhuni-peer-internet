@@ -1,9 +1,11 @@
 package com.lsxy.framework.core.utils;
 
+import com.lsxy.framework.config.SystemConfig;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.Date;
 
@@ -83,14 +85,29 @@ public class OssTempUriUtils {
         String url =  "http://"+bucket + "." + host + "/" + object_name + "?OSSAccessKeyId=" + accessId + "&Expires=" + expireTime + "&Signature=" + OSSEncodeURI.encodeURIComponent(sign);
         return url;
     }
-    public static void main(String[] args){
-        String accessId= "nfgEUCKyOdVMVbqQ";
-        String accessKey = "HhmxAMZ2jCrE0fTa2kh9CLXF9JPcOW";
-        String host = "oss-cn-beijing.aliyuncs.com";
-        String verb = "GET";
-        String resource = "/yunhuni-development/tenant_res/40288aca574060400157406339080002/realname_auth/20160919/f4d2f47874cc9af7e123ebca7810bf89.jpg";
-        long expire = 20;
-        String re = getOssTempUri(accessId,accessKey,host,verb,resource,expire);
-        System.out.println(re);
+//    public static void main(String[] args){
+//        String accessId= "nfgEUCKyOdVMVbqQ";
+//        String accessKey = "HhmxAMZ2jCrE0fTa2kh9CLXF9JPcOW";
+//        String host = "oss-cn-beijing.aliyuncs.com";
+//        String verb = "GET";
+//        String resource = "/yunhuni-development/tenant_res/40288aca574060400157406339080002/realname_auth/20160919/f4d2f47874cc9af7e123ebca7810bf89.jpg";
+//        long expire = 20;
+//        String re = getOssTempUri(accessId,accessKey,host,verb,resource,expire);
+//        System.out.println(re);
+//    }
+
+    public static String getOssTempUri(String resource){
+        String host = SystemConfig.getProperty("global.oss.aliyun.endpoint.internet","http://oss-cn-beijing.aliyuncs.com");
+        String accessId = SystemConfig.getProperty("global.aliyun.key","nfgEUCKyOdVMVbqQ");
+        String accessKey = SystemConfig.getProperty("global.aliyun.secret","HhmxAMZ2jCrE0fTa2kh9CLXF9JPcOW");
+        String resource1 = SystemConfig.getProperty("global.oss.aliyun.bucket");
+        try {
+            URL url = new URL(host);
+            host = url.getHost();
+        }catch (Exception e){}
+        resource = "/"+resource1+"/"+resource;
+        String result = OssTempUriUtils.getOssTempUri( accessId, accessKey, host, "GET",resource ,10*60);
+        return result;
     }
+
 }

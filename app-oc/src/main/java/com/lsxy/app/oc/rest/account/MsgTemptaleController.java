@@ -214,7 +214,6 @@ public class MsgTemptaleController extends AbstractRestController {
                 }
             }
             accountMessageService.sendTenantTempletMessage(null,msgTemplate.getTenantId(), AccountMessage.MESSAGE_MSG_TEMPLATE_SUCCESS );
-            mqService.publish(new TemplateCompleteEvent(msgTemplate.getTempId()));
             return RestResponse.success();
         }else{
             return RestResponse.failed("","模板不存在");
