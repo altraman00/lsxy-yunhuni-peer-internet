@@ -17,7 +17,7 @@ public abstract class AbstractSupplierSendServiceImpl implements SupplierSendSer
 
 
     @Override
-    public ResultOne sendOne(String tempId, List<String> tempArgs, String msg, String mobile, String sendType) {
+    public ResultOne sendOne(String tempId, List<String> tempArgs, String msg, String mobile, String sendType,String msgKey) {
         return null;
     }
 
@@ -27,7 +27,7 @@ public abstract class AbstractSupplierSendServiceImpl implements SupplierSendSer
     }
 
     @Override
-    public Object getTask(String taskId){
+    public Object getTask(String taskId,Object ...params){
         return null;
     }
 

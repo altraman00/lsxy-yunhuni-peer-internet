@@ -43,7 +43,7 @@ public class QiXunTongServiceImpl extends AbstractSupplierSendServiceImpl {
     }
 
     @Override
-    public ResultOne sendOne(String tempId, List<String> tempArgs, String msg, String mobile,String sendType) {
+    public ResultOne sendOne(String tempId, List<String> tempArgs, String msg, String mobile,String sendType,String msgKey) {
         if(MsgConstant.MSG_SMS.equals(sendType)){
             String result = getQiXinTongClient().sendMSM("", msg ,  mobile);
             logger.info("调用[企信通][单发][模板短信]结果:"+ result);

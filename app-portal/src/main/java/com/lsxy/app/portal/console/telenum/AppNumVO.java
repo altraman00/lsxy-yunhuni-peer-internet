@@ -13,6 +13,24 @@ public class AppNumVO {
     String isDialing;
     String areaCode;
     String expireTime;
+    String certId;
+    String subId;
+
+    public String getCertId() {
+        return certId;
+    }
+
+    public void setCertId(String certId) {
+        this.certId = certId;
+    }
+
+    public String getSubId() {
+        return subId;
+    }
+
+    public void setSubId(String subId) {
+        this.subId = subId;
+    }
 
     public String getRentId() {
         return rentId;
