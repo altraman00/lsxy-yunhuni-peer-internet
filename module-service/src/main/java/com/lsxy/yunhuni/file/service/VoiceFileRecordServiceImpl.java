@@ -299,4 +299,27 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
         return flag;
     }
 
+    @Override
+    public Page<VoiceFileRecord> getPageListForGW(String appId, String subaccountId, Date start, Date end, Integer pageNo, Integer pageSize) {
+        if(StringUtils.isNotBlank(subaccountId)){
+            String hql = "from VoiceFileRecord obj where obj.appId=?1 and obj.subaccountId=?2 and obj.createTime between ?3 and ?4 ";
+            return this.pageList(hql,pageNo,pageSize,appId,subaccountId,start,end);
+        }else{
+            String hql = "from VoiceFileRecord obj where obj.appId=?1 and obj.subaccountId is null and obj.createTime between ?2 and ?3 ";
+            return this.pageList(hql,pageNo,pageSize,appId,start,end);
+        }
+    }
+
+    @Override
+    public Integer setWaitedUpload(List<String> ids) {
+        if(ids == null || ids.size() ==0 ){
+            return 0;
+        }else{
+            String join = StringUtils.join(ids, "','");
+            String sql = "UPDATE db_lsxy_bi_yunhuni.tb_bi_voice_file_record d SET d.waited_upload = 1 WHERE d.id IN ('"+join+"') AND (d.waited_upload = 0 OR d.waited_upload IS NULL) ";
+            Integer result = jdbcTemplate.update(sql);
+            return result;
+        }
+    }
+
 }
