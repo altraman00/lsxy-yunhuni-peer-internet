@@ -16,6 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
 import java.util.Map;
@@ -23,6 +24,7 @@ import java.util.Map;
 /**
  * Created by liups on 2017/3/20.
  */
+@Component
 public class RecordFileDownloadNotificationHandler implements MQMessageHandler<RecordFileDownloadNotificationEvent> {
     private static final Logger logger = LoggerFactory.getLogger(RecordFileDownloadNotificationHandler.class);
     @Autowired
