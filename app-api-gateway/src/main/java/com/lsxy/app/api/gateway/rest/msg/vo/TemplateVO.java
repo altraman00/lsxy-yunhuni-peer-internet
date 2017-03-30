@@ -25,8 +25,10 @@ public class TemplateVO {
         this.tempId = template.getTempId();
         this.content = template.getContent();
         this.status = template.getStatus();
-        this.checkTime = DateUtils.getTime(template.getLastTime(),"yyyy-MM-dd HH:mm:ss");
-        this.reason = template.getReason();
+        if(MsgTemplate.STATUS_FAIL == status || MsgTemplate.STATUS_PASS == status){
+            this.checkTime = DateUtils.getTime(template.getLastTime(),"yyyy-MM-dd HH:mm:ss");
+            this.reason = template.getReason();
+        }
         this.remark = template.getRemark();
     }
 
