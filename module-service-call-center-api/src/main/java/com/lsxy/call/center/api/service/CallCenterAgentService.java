@@ -59,6 +59,8 @@ public interface CallCenterAgentService extends BaseService<CallCenterAgent> {
 
     CallCenterAgent get(String appId,String accountId, String agentName) throws YunhuniApiException;
 
+    CallCenterAgent getSimple(String appId,String accountId, String agentName) throws YunhuniApiException;
+
     String getId(String appId, String agentName) throws YunhuniApiException;
 
     String getId(String appId,String subaccountId, String agentName) throws YunhuniApiException;

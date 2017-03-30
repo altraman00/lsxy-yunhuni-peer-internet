@@ -14,12 +14,14 @@ public class RestToken extends UsernamePasswordAuthenticationToken {
     private String tenantId;
     private String subaccountId;
     private String appId;
+    private String ip;
 
     // this constructor creates a non-authenticated token (see super-class)
-    public RestToken(String principal, RestCredentials credentials, Date timestamp,String appId) {
+    public RestToken(String principal, RestCredentials credentials, Date timestamp,String appId,String ip) {
         super(principal, credentials);
         this.timestamp = timestamp;
         this.appId = appId;
+        this.ip = ip;
     }
 
     // this constructor creates an authenticated token (see super-class)
@@ -62,6 +64,10 @@ public class RestToken extends UsernamePasswordAuthenticationToken {
 
     public void setAppId(String appId) {
         this.appId = appId;
+    }
+
+    public String getIp() {
+        return ip;
     }
 }
 

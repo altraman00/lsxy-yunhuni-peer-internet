@@ -69,7 +69,6 @@ public class MsgRequestCompletedEventHandler implements MQMessageHandler<MsgRequ
                     .putIfNotEmpty("state",request.getState())
                     .putIfNotEmpty("failMobiles",failMobiles)
                     .putIfNotEmpty("type",(request.getIsMass()!=null&&request.getIsMass())?1:0)
-                    .putIfNotEmpty("url",callbackUrl)
                     .build();
             // 发送通知
             notifyCallbackUtil.postNotify(callbackUrl,notify_data,null,3);

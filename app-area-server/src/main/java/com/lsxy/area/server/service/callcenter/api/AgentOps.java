@@ -251,7 +251,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
     }
 
     @Override
-    public boolean callOut(String subaccountId,String ip, String appId, String name,
+    public String callOut(String subaccountId,String ip, String appId, String name,
                            String from, String to, Integer maxDialSeconds, Integer maxAnswerSeconds,String userData) throws YunhuniApiException {
         if(StringUtil.isBlank(to)){
             throw new RequestIllegalArgumentException(
@@ -383,15 +383,20 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         }
         //有正在处理的交谈
         if(state != null && (state.getClosed() == null || !state.getClosed())){
-            //TODO 将其他交谈全部设置为保持（cti需要提供批量） 这里应该是阻塞调用好点
-
-            //创建新的交谈，交谈创建成功事件中将坐席加入到新的交谈， 坐席加入交谈成功事件中呼叫外线，在振铃事件中把外线加入交谈 交谈正式开始
+            //TODO 将其他交谈全部设置为保持（cti需要提供批量） 这里应该是阻塞调用好点 先throw exception
+            throw new AgentIsBusyException(new ExceptionContext().put("subaccountId",subaccountId)
+                    .put("appId",appId)
+                    .put("agentName",name)
+                    .put("agentId",agent)
+                    .put("agentstate",aState)
+                    .put("extensionstate",eState));
+            /*//创建新的交谈，交谈创建成功事件中将坐席加入到新的交谈， 坐席加入交谈成功事件中呼叫外线，在振铃事件中把外线加入交谈 交谈正式开始
             conversationService.create(subaccountId,conversationId,
                     CallCenterUtil.CONVERSATION_TYPE_CALL_OUT,
                     state.getBusinessData().get(BusinessState.REF_RES_ID),state,
                     state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),maxAnswerSeconds,null,userData);
             //坐席加入交谈成功事件中要呼叫这个号码
-            businessStateService.updateInnerField(callId,"invite_from",from!=null?from:"","invite_to",to);
+            businessStateService.updateInnerField(callId,"invite_from",from!=null?from:"","invite_to",to);*/
         }else{
             AgentLock agentLock = new AgentLock(redisCacheService,agent);
             if(!agentLock.lock()){
@@ -407,7 +412,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             //FINALLY 坐席解锁
             try {
                 if(!CallCenterAgent.STATE_IDLE.equals(agentState.getState(agent))){
-                    throw new SystemBusyException(
+                    throw new AgentIsBusyException(
                             new ExceptionContext().put("subaccountId",subaccountId)
                                     .put("appId",appId)
                                     .put("agentName",name)
@@ -448,11 +453,11 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                 agentLock.unlock();
             }
         }
-        return true;
+        return callId;
     }
 
     @Override
-    public boolean callAgent(String subaccountId,String ip, String appId, String name, String from, String enqueueXml, Integer maxDialSeconds, Integer maxAnswerSeconds) throws YunhuniApiException {
+    public String callAgent(String subaccountId,String ip, String appId, String name, String from, String enqueueXml, Integer maxDialSeconds, Integer maxAnswerSeconds) throws YunhuniApiException {
         if(StringUtil.isBlank(enqueueXml)){
             throw new RequestIllegalArgumentException(
                     new ExceptionContext().put("subaccountId",subaccountId)
@@ -602,15 +607,21 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
         }
         //有正在处理的交谈
         if(state != null && (state.getClosed() == null || !state.getClosed())){
-            //TODO 将其他交谈全部设置为保持（cti需要提供批量） 这里应该是阻塞调用好点
+            //TODO 将其他交谈全部设置为保持（cti需要提供批量） 这里应该是阻塞调用好点 先throw exception
+            throw new AgentIsBusyException(new ExceptionContext().put("subaccountId",subaccountId)
+                    .put("appId",appId)
+                    .put("agentName",name)
+                    .put("agentId",agent)
+                    .put("agentstate",aState)
+                    .put("extensionstate",eState));
 
-            //创建新的交谈，交谈创建成功事件中将坐席加入到新的交谈， 坐席加入交谈成功事件中进行排队，在振铃事件中把排到的坐席加入交谈 交谈正式开始
+            /*//创建新的交谈，交谈创建成功事件中将坐席加入到新的交谈， 坐席加入交谈成功事件中进行排队，在振铃事件中把排到的坐席加入交谈 交谈正式开始
             conversationService.create(subaccountId,conversationId,
                     CallCenterUtil.CONVERSATION_TYPE_CALL_AGENT,
                     state.getBusinessData().get(BusinessState.REF_RES_ID),state,
                     state.getTenantId(),state.getAppId(),state.getAreaId(),state.getCallBackUrl(),maxAnswerSeconds,null,enQueue.getUser_data());
             //坐席加入交谈成功事件中要排队找坐席
-            businessStateService.updateInnerField(callId,"enqueue_xml",enqueueXml);
+            businessStateService.updateInnerField(callId,"enqueue_xml",enqueueXml);*/
         }else{
             AgentLock agentLock = new AgentLock(redisCacheService,agent);
             if(!agentLock.lock()){
@@ -627,7 +638,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             //FINALLY 坐席解锁
             try {
                 if(!CallCenterAgent.STATE_IDLE.equals(agentState.getState(agent))){
-                    throw new SystemBusyException(
+                    throw new AgentIsBusyException(
                             new ExceptionContext().put("subaccountId",subaccountId)
                                     .put("appId",appId)
                                     .put("agentName",name)
@@ -668,7 +679,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                 agentLock.unlock();
             }
         }
-        return true;
+        return callId;
     }
 
 
@@ -923,9 +934,14 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             //呼叫已经存在
             String curConversation = callConversationService.head(callId);//原有交谈
 
-            //TODO 设置所有交谈为保持状态，这里应该是阻塞调用好点,一次只能活动在一个交谈
-
-            try {
+            //TODO 将其他交谈全部设置为保持（cti需要提供批量） 这里应该是阻塞调用好点 先throw exception
+            throw new AgentIsBusyException(new ExceptionContext().put("subaccountId",subaccountId)
+                    .put("appId",appId)
+                    .put("agentName",name)
+                    .put("agentId",agent)
+                    .put("agentstate",aState)
+                    .put("extensionstate",eState));
+            /*try {
                 //加入交谈（是否需要上一步成功后再执行加入交谈）
                 conversationService.join(conversationId,callId,null,null,mode);
                 if(holding!=null && !holding){
@@ -940,7 +956,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
                 //--是否需要调用退出
                 conversationService.logicExit(conversationId,callId);
                 throw e;
-            }
+            }*/
         }else{
             //呼叫不存在 需要呼叫坐席
             AgentLock agentLock = new AgentLock(redisCacheService,agent);
@@ -958,7 +974,7 @@ public class AgentOps implements com.lsxy.call.center.api.service.AgentOps {
             //FINALLY 坐席解锁
             try {
                 if(!CallCenterAgent.STATE_IDLE.equals(agentState.getState(agent))){
-                    throw new SystemBusyException(
+                    throw new AgentIsBusyException(
                             new ExceptionContext().put("subaccountId",subaccountId)
                                     .put("appId",appId)
                                     .put("conversation_id",conversationId)

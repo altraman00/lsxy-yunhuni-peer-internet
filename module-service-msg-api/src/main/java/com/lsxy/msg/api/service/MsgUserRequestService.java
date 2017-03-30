@@ -11,7 +11,7 @@ import java.util.List;
  * Created by liups on 2017/3/1.
  */
 public interface MsgUserRequestService extends BaseService<MsgUserRequest> {
-    Page<MsgUserRequest> getPageByCondition(Integer pageNo, Integer pageSize, String sendType,String appId,Date start, Date end, int isMass, String taskName, String mobile );
+    Page<MsgUserRequest> getPageByCondition(Integer pageNo, Integer pageSize, String sendType,String appId,Date start, Date end, int isMass, String taskName, String mobile,String tenantId );
 
     void updateNoMassStateByMsgKey(String msgKey, int state);
 
