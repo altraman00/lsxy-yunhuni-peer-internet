@@ -66,7 +66,7 @@ public class RecordFileDownloadNotificationHandler implements MQMessageHandler<R
                     callbackUrl = subCallbackUrl;
                 }
             }
-            if(StringUtils.isNotBlank(callbackUrl)){
+            if(StringUtils.isBlank(callbackUrl)){
                 App app = appService.findById(message.getAppId());
                 String url = app.getUrl();
                 if(StringUtils.isNotBlank(url)){
