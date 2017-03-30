@@ -1,5 +1,6 @@
 package com.lsxy.area.server.mq.handler;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.server.mq.UpdateQueueEvent;
 import com.lsxy.call.center.api.model.CallCenterConversationMember;
 import com.lsxy.call.center.api.model.CallCenterQueue;
@@ -27,7 +28,7 @@ public class UpdateQueueEventHandler implements MQMessageHandler<UpdateQueueEven
     /**超过半个小时的消息直接丢弃**/
     private static final long expired = 1000 * 60 * 30;
 
-    @Autowired
+    @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterQueueService callCenterQueueService;
 
     @Override
