@@ -5,6 +5,7 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.mq.UpdateQueueEvent;
 import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
@@ -25,6 +26,7 @@ import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.callcenter.ConversationCompletedEvent;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -113,6 +115,9 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
 
     @Autowired
     private CallCenterStatisticsService callCenterStatisticsService;
+
+    @Autowired
+    private MQService mqService;
 
     @Override
     public String getEventName() {
@@ -321,26 +326,30 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             String initorid = null;
             BusinessState init_state = null;
             String queueId = null;
-            try{
-                //更新排队记录
-                initorid = state.getBusinessData().get(CallCenterUtil.INITIATOR_FIELD);
-                if(initorid != null){
-                    init_state = businessStateService.get(initorid);
-                    if(init_state != null){
-                        queueId = init_state.getBusinessData().get(CallCenterUtil.QUEUE_ID_FIELD);
-                        if(queueId != null){
+
+            //更新排队记录
+            initorid = state.getBusinessData().get(CallCenterUtil.INITIATOR_FIELD);
+            if(initorid != null){
+                init_state = businessStateService.get(initorid);
+                if(init_state != null){
+                    queueId = init_state.getBusinessData().get(CallCenterUtil.QUEUE_ID_FIELD);
+                    if(queueId != null){
+                        CallCenterQueue updateQueue = new CallCenterQueue();
+                        updateQueue.setDialTime(new Date());
+                        updateQueue.setResult(StringUtils.isBlank(error)?CallCenterQueue.RESULT_DIAL_SUCC:CallCenterQueue.RESULT_DIAL_FAIL);
+                        try{
                             CallCenterQueue callCenterQueue = callCenterQueueService.findById(queueId);
-                            if(callCenterQueue != null && callCenterQueue.getDialTime() == null){
-                                callCenterQueue = new CallCenterQueue();
-                                callCenterQueue.setDialTime(new Date());
-                                callCenterQueue.setResult(StringUtils.isBlank(error)?CallCenterQueue.RESULT_DIAL_SUCC:CallCenterQueue.RESULT_DIAL_FAIL);
-                                callCenterQueueService.update(queueId,callCenterQueue);
+                            if(callCenterQueue == null){
+                                mqService.publish(new UpdateQueueEvent(JSONUtil2.objectToJson(updateQueue),queueId));
+                            }else if(callCenterQueue.getDialTime() == null){
+                                callCenterQueueService.update(queueId,updateQueue);
                             }
+                        }catch (Throwable t){
+                            logger.warn(String.format("更新排队记录失败,queueId=%s",queueId),t);
+                            mqService.publish(new UpdateQueueEvent(JSONUtil2.objectToJson(updateQueue),queueId));
                         }
                     }
                 }
-            }catch (Throwable t){
-                logger.warn("更新排队记录失败",t);
             }
 
             if(StringUtil.isBlank(error)){
