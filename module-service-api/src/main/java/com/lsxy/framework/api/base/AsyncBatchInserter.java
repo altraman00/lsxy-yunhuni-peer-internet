@@ -71,7 +71,7 @@ public abstract class AsyncBatchInserter<T> extends Thread{
                     retryTimes = 0;
                 }else{
                     try {//sleep随机时间（1秒内）后重试
-                        this.sleep(new Random(1000).nextInt());
+                        this.sleep(new Random().nextInt(1000));
                     } catch (InterruptedException e1) {
                         logger.error("异步批量入库线程被中断",e1);
                         Thread.currentThread().interrupt();

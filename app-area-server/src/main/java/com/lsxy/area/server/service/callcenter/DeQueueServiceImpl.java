@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.server.mq.UpdateQueueEvent;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.call.center.api.model.*;
@@ -13,9 +14,11 @@ import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.framework.core.exceptions.api.CallNotExistsException;
 import com.lsxy.framework.core.exceptions.api.ConversationNotExistException;
 import com.lsxy.framework.core.exceptions.api.ExceptionContext;
+import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
+import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
@@ -74,6 +77,9 @@ public class DeQueueServiceImpl implements DeQueueService {
 
     @Autowired
     private CallCenterStatisticsService callCenterStatisticsService;
+
+    @Autowired
+    private MQService mqService;
 
     /**
      * 创建交谈，然后呼叫坐席。
@@ -306,17 +312,13 @@ public class DeQueueServiceImpl implements DeQueueService {
     private void updateQueue(String id,String callId,String conversationId,
                              String agentName,String agentCallId,String result){
         //更新排队记录
-        try{
-            if(id == null){
-                return;
-            }
-            CallCenterQueue callCenterQueue = callCenterQueueService.findById(id);
-            if(callCenterQueue == null){
-                return;
-            }
-            CallCenterQueue updateCallCenterQueue = new CallCenterQueue();
+        if(id == null){
+            return;
+        }
+        Date cur = new Date();
+        CallCenterQueue updateCallCenterQueue = new CallCenterQueue();
 
-            Date cur = new Date();
+        try{
             updateCallCenterQueue.setRelevanceId(callId);
             if(conversationId != null){
                 updateCallCenterQueue.setConversation(conversationId);
@@ -329,13 +331,26 @@ public class DeQueueServiceImpl implements DeQueueService {
                 updateCallCenterQueue.setInviteTime(cur);
             }
             updateCallCenterQueue.setEndTime(cur);
-            if(callCenterQueue.getStartTime()!=null){
-                updateCallCenterQueue.setToManualTime((cur.getTime() - callCenterQueue.getStartTime().getTime()) / 1000);
-            }
             updateCallCenterQueue.setResult(result);
+
+            long startTime = cur.getTime();
+            CallCenterQueue callCenterQueue = null;
+            try{
+                callCenterQueue = callCenterQueueService.findById(id);
+            }catch (Throwable t){
+                logger.warn(String.format("获取排队记录失败%s",id),t);
+            }
+            if(callCenterQueue != null && callCenterQueue.getStartTime()!=null){
+                startTime = callCenterQueue.getStartTime().getTime();
+            }
+            updateCallCenterQueue.setToManualTime((cur.getTime() - startTime) / 1000);
+            if(callCenterQueue == null){
+                mqService.publish(new UpdateQueueEvent(JSONUtil2.objectToJson(updateCallCenterQueue),id));
+            }
             callCenterQueueService.update(id,updateCallCenterQueue);
         }catch (Throwable t){
-            logger.error(String.format("更新排队记录失败,queueId=%s",id),t);
+            logger.warn(String.format("更新排队记录失败,queueId=%s",id),t);
+            mqService.publish(new UpdateQueueEvent(JSONUtil2.objectToJson(updateCallCenterQueue),id));
         }
     }
 
