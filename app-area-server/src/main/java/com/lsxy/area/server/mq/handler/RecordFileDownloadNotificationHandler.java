@@ -16,6 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
 import java.util.Map;
@@ -23,6 +24,7 @@ import java.util.Map;
 /**
  * Created by liups on 2017/3/20.
  */
+@Component
 public class RecordFileDownloadNotificationHandler implements MQMessageHandler<RecordFileDownloadNotificationEvent> {
     private static final Logger logger = LoggerFactory.getLogger(RecordFileDownloadNotificationHandler.class);
     @Autowired
@@ -64,7 +66,7 @@ public class RecordFileDownloadNotificationHandler implements MQMessageHandler<R
                     callbackUrl = subCallbackUrl;
                 }
             }
-            if(StringUtils.isNotBlank(callbackUrl)){
+            if(StringUtils.isBlank(callbackUrl)){
                 App app = appService.findById(message.getAppId());
                 String url = app.getUrl();
                 if(StringUtils.isNotBlank(url)){
@@ -76,7 +78,7 @@ public class RecordFileDownloadNotificationHandler implements MQMessageHandler<R
                 return;
             }
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                    .putIfNotEmpty("event","recording.download_preparing")
+                    .putIfNotEmpty("event","recording.url_generate")
                     .putIfNotEmpty("id",message.getRecordFileId())
                     .putIfNotEmpty("subaccount_id",message.getSubaccountId())
                     .putIfNotEmpty("url",ossUri)

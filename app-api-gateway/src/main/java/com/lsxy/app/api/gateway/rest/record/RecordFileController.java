@@ -42,7 +42,7 @@ public class RecordFileController extends AbstractAPIController {
     @Autowired
     AppService appService;
 
-    @RequestMapping(value = "/{accountId}/recording/page",method = RequestMethod.GET)
+    @RequestMapping(value = "/{accountId}/recording/plist",method = RequestMethod.GET)
     public ApiGatewayResponse getRecordFilePage(HttpServletRequest request,
                                                 @PathVariable String accountId,
                                                 @RequestHeader(value = "AppID") String appId,
@@ -73,7 +73,7 @@ public class RecordFileController extends AbstractAPIController {
         return date;
     }
 
-    @RequestMapping(value = "/{accountId}/recording/download/url",method = RequestMethod.GET)
+    @RequestMapping(value = "/{accountId}/recording/url/gen",method = RequestMethod.GET)
     public ApiGatewayResponse getRecordFileDownloadUrl(HttpServletRequest request,
                                                 @PathVariable String accountId,
                                                 @RequestHeader(value = "AppID") String appId,

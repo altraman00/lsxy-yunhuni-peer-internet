@@ -1,5 +1,6 @@
 package com.lsxy.app.api.gateway.rest.msg.vo;
 
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.msg.api.model.MsgTemplate;
 
 /**
@@ -11,6 +12,8 @@ public class TemplateVO {
     private String tempId;
     private String content;
     private Integer status;
+    private String checkTime;
+    private String reason;
     private String remark;
 
     public TemplateVO() {
@@ -22,6 +25,10 @@ public class TemplateVO {
         this.tempId = template.getTempId();
         this.content = template.getContent();
         this.status = template.getStatus();
+        if(MsgTemplate.STATUS_FAIL == status || MsgTemplate.STATUS_PASS == status){
+            this.checkTime = DateUtils.getTime(template.getLastTime(),"yyyy-MM-dd HH:mm:ss");
+            this.reason = template.getReason();
+        }
         this.remark = template.getRemark();
     }
 
@@ -63,6 +70,22 @@ public class TemplateVO {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public String getCheckTime() {
+        return checkTime;
+    }
+
+    public void setCheckTime(String checkTime) {
+        this.checkTime = checkTime;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 
     public String getRemark() {

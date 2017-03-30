@@ -71,7 +71,7 @@ public class TemplateController extends AbstractAPIController {
         return ApiGatewayResponse.success(new TemplateVO(template));
     }
 
-    @RequestMapping(value = "/{account_id}/msg/template/{tempId}",method = RequestMethod.POST)
+    @RequestMapping(value = "/{account_id}/msg/template/{tempId}",method = {RequestMethod.POST,RequestMethod.PUT})
     public ApiGatewayResponse updateTemplate(HttpServletRequest request,@PathVariable String tempId, @Valid @RequestBody TemplateDTO dto, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         App app = appService.findById(appId);

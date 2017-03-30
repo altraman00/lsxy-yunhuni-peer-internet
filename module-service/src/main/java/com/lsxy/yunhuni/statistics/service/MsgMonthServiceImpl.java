@@ -4,10 +4,8 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.yunhuni.api.statistics.model.MsgDay;
 import com.lsxy.yunhuni.api.statistics.model.MsgMonth;
 import com.lsxy.yunhuni.api.statistics.model.MsgStatisticsVo;
-import com.lsxy.yunhuni.api.statistics.model.SubaccountMonth;
 import com.lsxy.yunhuni.api.statistics.service.MsgMonthService;
 import com.lsxy.yunhuni.statistics.dao.MsgMonthDao;
 import org.apache.commons.lang.StringUtils;
@@ -48,13 +46,13 @@ public class MsgMonthServiceImpl extends AbstractService<MsgMonth> implements Ms
 
         //子账号最初开始有的日期2017-03-14，之前的日期不用算了
         Date firstStatisticsDate = DateUtils.parseDate("2017-03", "yyyy-MM");
-        SubaccountMonth lastStatistics = msgMonthDao.findFirstByDt(preDate);
+        MsgMonth lastStatistics = msgMonthDao.findFirstByDt(preDate);
         //如果前一天没有统计数据，并且要统计的时间大于2017-03-14,则先统计前一天的数据
         if(lastStatistics == null && staticsDate.getTime() >= firstStatisticsDate.getTime()) {
             monthStatistics(preDate);
         }
         //如果今天有统计数据了，则说明不用统计了
-        SubaccountMonth todayStatistics = msgMonthDao.findFirstByDt(staticsDate);
+        MsgMonth todayStatistics = msgMonthDao.findFirstByDt(staticsDate);
         if(todayStatistics != null){
             return;
         }
