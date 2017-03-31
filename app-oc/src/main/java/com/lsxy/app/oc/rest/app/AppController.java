@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,11 +36,14 @@ public class AppController extends AbstractRestController {
     @ApiOperation(value = "查找当前用户的应用")
     public RestResponse listApp(
             @ApiParam(name = "uid",value = "用户id") @PathVariable String uid,
-            @ApiParam(name = "serviceType",value = "应用类型 语言产品voice呼叫中心产品call_center") @RequestParam(required = false) String serviceType
+            @ApiParam(name = "serviceType",value = "应用类型 语言产品voice呼叫中心产品call_center消息类型msg,多个用,隔开") @RequestParam(required = false) String serviceType
     ) throws Exception{
-        List<App> apps = null;
+        List<App> apps = new ArrayList<App>();
         if(StringUtils.isNotEmpty(serviceType)){
-            apps = appService.findAppByTenantIdAndServiceType(uid,serviceType);
+            String[] types = serviceType.split(",");
+            for (int i = 0; i < types.length; i++) {
+                apps.addAll(appService.findAppByTenantIdAndServiceType(uid,types[i]) );
+            }
         }else{
             apps = appService.findAppByUserName(uid);
         }
