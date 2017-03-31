@@ -6,6 +6,7 @@ import org.hibernate.annotations.Where;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 
 /**
  * 租户产品计费项折扣表
@@ -19,6 +20,7 @@ public class ProductTenantDiscount  extends IdEntity {
     private String productId;   //产品计费项Id（不是对产品，是对产品计费项）
     private Double discount;    //小数点后两位数字
     private String remark;
+    private BigDecimal buyoutPrice;//一口价
 
     public ProductTenantDiscount() {
     }
@@ -27,6 +29,12 @@ public class ProductTenantDiscount  extends IdEntity {
         this.tenantId = tenantId;
         this.productId = productId;
         this.discount = discount;
+    }
+    public ProductTenantDiscount(String tenantId, String productId, Double discount,BigDecimal buyoutPrice) {
+        this.tenantId = tenantId;
+        this.productId = productId;
+        this.discount = discount;
+        this.buyoutPrice = buyoutPrice;
     }
 
     @Column(name = "tenant_id")
@@ -63,5 +71,13 @@ public class ProductTenantDiscount  extends IdEntity {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+    @Column(name = "buyout_price")
+    public BigDecimal getBuyoutPrice() {
+        return buyoutPrice;
+    }
+
+    public void setBuyoutPrice(BigDecimal buyoutPrice) {
+        this.buyoutPrice = buyoutPrice;
     }
 }

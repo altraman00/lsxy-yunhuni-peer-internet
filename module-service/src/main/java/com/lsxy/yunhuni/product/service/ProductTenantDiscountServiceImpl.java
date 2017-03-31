@@ -10,6 +10,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by liups on 2016/8/27.
@@ -41,5 +42,10 @@ public class ProductTenantDiscountServiceImpl extends AbstractService<ProductTen
     @Override
     public ProductTenantDiscount findByProductIdAndTenantId(String productId, String tenantId) {
         return productTenantDiscountDao.findByProductIdAndTenantId(productId,tenantId);
+    }
+
+    @Override
+    public List<ProductTenantDiscount> findByTenantId(String tenantId) {
+        return productTenantDiscountDao.findByTenantId(tenantId);
     }
 }
