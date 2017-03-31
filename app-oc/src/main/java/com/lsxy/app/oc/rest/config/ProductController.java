@@ -1,10 +1,7 @@
 package com.lsxy.app.oc.rest.config;
 
 import com.lsxy.app.oc.base.AbstractRestController;
-import com.lsxy.app.oc.rest.config.vo.ProductEditVo;
-import com.lsxy.app.oc.rest.config.vo.ProductTenantDiscountEditVo;
-import com.lsxy.app.oc.rest.config.vo.ProductTenantDiscountVo;
-import com.lsxy.app.oc.rest.config.vo.ProductVo;
+import com.lsxy.app.oc.rest.config.vo.*;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.Page;
@@ -29,7 +26,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhangxb on 2016/11/19.
@@ -114,6 +113,59 @@ public class ProductController  extends AbstractRestController {
         }
         Page page1 = new Page(page.getStartIndex(),page.getTotalCount(),page.getPageSize(),tempList);
         return RestResponse.success(page1);
+    }
+    @RequestMapping(value = "/discount/{tenantId}/price/plist",method = RequestMethod.GET)
+    @ApiOperation(value = "获取用户的产品费用分页数据")
+    public RestResponse getTenantPricePList(
+            @PathVariable String tenantId,
+            @ApiParam(name = "pageNo",value = "第几页")  @RequestParam(defaultValue = "1")Integer pageNo,
+            @ApiParam(name = "pageSize",value = "每页记录数")  @RequestParam(defaultValue = "20")Integer pageSize
+    ){
+        Tenant tenant = tenantService.findById(tenantId);
+        if(tenant==null){
+            return RestResponse.failed("0000","无对应租户信息");
+        }
+        Page<ProductPrice> page= productPriceService.getPageOrderCreate(pageNo,pageSize);
+        List<ProductTenantDiscount> list = productTenantDiscountService.findByTenantId(tenantId);
+        Map<String,ProductTenantDiscount> map = new HashMap<String,ProductTenantDiscount>();
+        for (int i = 0; i < list.size(); i++) {
+            map.put( list.get(i).getProductId(),list.get(i) );
+        }
+        List<ProductTenatVo> tempList = new ArrayList<>();
+        for(int i=0;i<page.getResult().size();i++){
+            tempList.add(ProductTenatVo.initProductTenatVo(page.getResult().get(i),map.get( page.getResult().get(i).getProductItem().getId() )));
+        }
+        page.setResult(tempList);
+        return RestResponse.success(page);
+    }
+    @RequestMapping(value = "/discount/{tenantId}/price/edit/{id}",method = RequestMethod.POST)
+    @ApiOperation(value = "设置租户的计费优惠")
+    public RestResponse editTenantPriceDis(
+            @PathVariable String tenantId,@ApiParam(name = "pageNo",value = "计费项ID")@PathVariable String id,
+            @ApiParam(name = "discount",value = "不传则清空优惠")  @RequestParam(required = false) Integer discount,
+            @ApiParam(name = "buyoutPrice",value = "不传则清空一口价")  @RequestParam(required = false) BigDecimal buyoutPrice
+    ){
+        Tenant tenant = tenantService.findById(tenantId);
+        if(tenant==null){
+            return RestResponse.failed("0000","无对应租户信息");
+        }
+        ProductItem productItem = productItemService.findById(id);
+        if(productItem==null){
+            return RestResponse.failed("0000","无对应产品计费项");
+        }
+        ProductTenantDiscount productTenantDiscount = productTenantDiscountService.findByProductIdAndTenantId(id,tenantId);
+        Double discount1 = null;
+        if(discount!=null){
+            discount1 = new Double( discount/100.00 );
+        }
+        if(productTenantDiscount == null){
+            productTenantDiscount = new ProductTenantDiscount(tenantId,id,discount1,buyoutPrice);
+        }else{
+            productTenantDiscount.setBuyoutPrice(buyoutPrice);
+            productTenantDiscount.setDiscount( discount1 );
+        }
+        productTenantDiscountService.save(productTenantDiscount);
+        return RestResponse.success("设置租户的计费优惠成功");
     }
     @RequestMapping(value = "/price/{id}",method = RequestMethod.GET)
     @ApiOperation(value = "获取产品费用单调记录")
