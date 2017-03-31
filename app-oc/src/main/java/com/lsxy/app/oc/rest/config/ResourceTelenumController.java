@@ -1,11 +1,13 @@
 package com.lsxy.app.oc.rest.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.oc.base.AbstractRestController;
 import com.lsxy.app.oc.rest.config.vo.LineVo;
 import com.lsxy.app.oc.rest.config.vo.TelnumTEditVo;
 import com.lsxy.app.oc.rest.config.vo.TelnumTVo;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
@@ -33,6 +35,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,7 +70,20 @@ public class ResourceTelenumController extends AbstractRestController {
             @ApiParam(name = "isThrough",value = "是否支持透传，1是，0否")@RequestParam(required = false) String isThrough,
             @ApiParam(name = "status",value = "状态 1启用0禁用")@RequestParam(required = false) String status
     ){
-        Page page= resourceTelenumService.getPage(pageNo,pageSize,number,operator,isThrough,status);
+        Page<ResourceTelenum> page= resourceTelenumService.getPage(pageNo,pageSize,number,operator,isThrough,status);
+        List<Map> list = new ArrayList<Map>();
+        ObjectMapper mapper = new ObjectMapper();
+        String testTelnum = SystemConfig.getProperty("portal.test.call.number");
+        for (int i = 0; i < page.getResult().size(); i++) {
+            Map map = mapper.convertValue(page.getResult().get(i),Map.class);
+            if(StringUtils.isNotEmpty(testTelnum) && testTelnum.equals(page.getResult().get(i).getTelNumber()) ){
+                map.put("isTestTelnum",true);
+            }else{
+                map.put("isTestTelnum",false);
+            }
+            list.add(map);
+        }
+        page.setResult(list);
         return RestResponse.success(page);
     }
     @RequestMapping(value = "/notline/plist/{id}",method = RequestMethod.GET)
@@ -122,6 +138,7 @@ public class ResourceTelenumController extends AbstractRestController {
         }
         boolean isEditNum = false;
         String telnum1 = resourceTelenum.getTelNumber();
+        String telnum2 = SystemConfig.getProperty("portal.test.call.number");
         if(StringUtils.isNotEmpty(telnumTVo.getTelNumber())&&!resourceTelenum.getTelNumber().equals(telnumTVo.getTelNumber())){
             //验证号码和呼叫URI
             ResourceTelenum temp = resourceTelenumService.findByTelNumber(telnumTVo.getTelNumber());
@@ -135,6 +152,10 @@ public class ResourceTelenumController extends AbstractRestController {
             if (temp2 != null) {
                 return RestResponse.failed("0000", "该呼出URI已存在号码池中");
             }
+        }
+        //如果号码是测试号码，则不允许修改号码
+        if(StringUtils.isNotEmpty(telnum2) && telnum2.equals(resourceTelenum.getTelNumber()) && !telnum2.equals(telnum1) ){
+            return RestResponse.failed("0000","该号码为平台的呼入公共测试号，不允许修改真实号码");
         }
         Tenant tenant = null;
         int tenantType = 0;
@@ -150,6 +171,12 @@ public class ResourceTelenumController extends AbstractRestController {
                 return RestResponse.failed("0000","所选租户不存在");
             }
             tenantType = 2;//原来有租户，修改原来租户资源关系，新增租户资源关系
+        }
+        //如果号码是测试号码，则不能将该号码绑定到租户
+        if(tenant != null){
+            if(StringUtils.isNotEmpty(telnum2) && telnum2.equals( telnum1 )){
+                return RestResponse.failed("0000","该号码为平台的呼入公共测试号，不允许绑定租户");
+            }
         }
         //拷贝非空参数
         try {
@@ -276,7 +303,15 @@ public class ResourceTelenumController extends AbstractRestController {
             LineGateway line = lineGatewayService.findById(resourceTelenum.getLineId());
             resourceTelenum.setLine(line);
         }
-        return RestResponse.success(resourceTelenum);
+        ObjectMapper mapper = new ObjectMapper();
+        Map map = mapper.convertValue(resourceTelenum,Map.class);
+        String testTelnum = SystemConfig.getProperty("portal.test.call.number");
+        if(StringUtils.isNotEmpty(testTelnum) && testTelnum.equals(resourceTelenum.getTelNumber()) ){
+            map.put("isTestTelnum",true);
+        }else{
+            map.put("isTestTelnum",false);
+        }
+        return RestResponse.success(map);
     }
     @ApiOperation(value = "删除号码")
     @RequestMapping(value = "/{id}",method = RequestMethod.DELETE)
