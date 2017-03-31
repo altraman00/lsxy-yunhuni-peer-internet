@@ -3,6 +3,8 @@ package com.lsxy.yunhuni.api.product.service;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.yunhuni.api.product.model.ProductTenantDiscount;
 
+import java.util.List;
+
 /**
  * 产品折扣服务接口
  * Created by liups on 2016/8/27.
@@ -16,4 +18,5 @@ public interface ProductTenantDiscountService extends BaseService<ProductTenantD
      */
     Double getDiscountByProductIdAndTenantId(String productId,String tenantId);
     ProductTenantDiscount findByProductIdAndTenantId(String productId,String tenantId);
+    List<ProductTenantDiscount> findByTenantId(String tenantId);
 }

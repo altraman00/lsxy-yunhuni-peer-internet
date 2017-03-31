@@ -4,6 +4,7 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.yunhuni.api.product.model.ProductTenantDiscount;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by liups on 2016/8/27.
@@ -16,4 +17,5 @@ public interface ProductTenantDiscountDao extends BaseDaoInterface<ProductTenant
      * @return
      */
     ProductTenantDiscount findByProductIdAndTenantId(String productId, String tenantId);
+    List<ProductTenantDiscount> findByTenantId(String tenantId);
 }
